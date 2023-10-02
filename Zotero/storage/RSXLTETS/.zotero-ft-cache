@@ -1,0 +1,694 @@
+1
+HiddenSinger: High-Quality Singing Voice Synthesis via Neural Audio Codec and Latent
+Diffusion Models
+Ji-Sang Hwang , Sang-Hoon Lee , and Seong-Whan Lee , Fellow, IEEE
+
+arXiv:2306.06814v1 [eess.AS] 12 Jun 2023
+
+Abstract—Recently, denoising diffusion models have demonstrated remarkable performance among generative models in various domains. However, in the speech domain, the application of diffusion models for synthesizing time-varying audio faces limitations in terms of complexity and controllability, as speech synthesis requires very high-dimensional samples with long-term acoustic features. To alleviate the challenges posed by model complexity in singing voice synthesis, we propose HiddenSinger, a high-quality singing voice synthesis system using a neural audio codec and latent diffusion models. To ensure high-fidelity audio, we introduce an audio autoencoder that can encode audio into an audio codec as a compressed representation and reconstruct the high-fidelity audio from the low-dimensional compressed latent vector. Subsequently, we use the latent diffusion models to sample a latent representation from a musical score. In addition, our proposed model is extended to an unsupervised singing voice learning framework, HiddenSinger-U, to train the model using an unlabeled singing voice dataset. Experimental results demonstrate that our model outperforms previous models in terms of audio quality. Furthermore, the HiddenSinger-U can synthesize high-quality singing voices of speakers trained solely on unlabeled data.
+Index Terms—singing voice synthesis, latent diffusion model, unsupervised learning
+I. INTRODUCTION
+S INGING voice synthesis (SVS) systems aim to generate high-quality expressive singing voices from musical scores. Recent advancements in generative models [1]–[3] have led to rapid development in deep-learning-based SVS systems, resulting in high performance. Most SVS systems first synthesize an intermediate acoustic representation, such as Mel-spectrogram, from a musical score using an acoustic model [4]–[9]. Subsequently, separately trained vocoders [10]– [12] convert the generated representation into audio, as shown in Fig 1(a).
+However, conventional two-stage SVS systems face certain limitations. These systems depend on pre-defined intermediate representation, making it difficult to apply latent learning to improve audio generation. Moreover, a training-inference mismatch problem occurs because the predicted intermediate
+This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government (MSIT) (No. 2019-0-00079, Artificial Intelligence Graduate School Program (Korea University) and No. 2021-0-02068, Artificial Intelligence Innovation Hub) and Netmarble AI Center. (Corresponding author: Seong-Whan Lee.) Ji-Sang Hwang, Sang-Hoon Lee, and Seong-Whan Lee are with the Department of Artificial Intelligence, Korea University, Seoul 02841, South Korea (e-mail: js hwang@korea.ac.kr;sh lee@korea.ac.kr;sw.lee@korea.ac.kr).
+
+Fig. 1. Comparison of SVS system architectures: (a) two-stage pipeline SVS system with pre-defined intermediate representation; (b) end-to-end SVS system; (c) proposed SVS system that uses an audio codec from the pretrained audio autoencoder. The dashed outlines indicate that the parameters of the models are not updated during the generation of the audio codec from a musical score and the synthesis of audio from the audio codec.
+representation differs from the ground-truth intermediate representation. To resolve these issues, an end-to-end SVS system, VISinger [13], directly synthesizes audio by employing variational inference.
+Although existing systems can improve the audio quality, several challenges remain: 1) SVS systems require highdimensional audio or a linear-spectrogram to synthesize highfidelity audio, resulting in high computational costs in highdimensional space. 2) The training-inference mismatch problem persists in end-to-end systems. A gap between the posterior distribution from the audio and the prior distribution from the musical score exists, which results in inaccurate pitch and mispronunciations in the generated singing voice. Moreover, systems based on Normalizing Flows [2] are trained in a backward direction but perform inference in a forward direction [14]. 3) SVS systems require audio-musical score corpora for training, wherein it is time-consuming to obtain high-quality paired datasets.
+To address the aforementioned problems, we propose HiddenSinger, an advanced high-quality SVS system utilizing a neural audio codec and latent diffusion models. Our approach involves multiple components to enhance the synthesis process: First, we introduce an audio autoencoder that can efficiently encode audio into a compressed latent representation, resulting in a lower-dimensional representational space. We also adopt residual vector quantization in the audio autoencoder to regularize the arbitrarily high-variance latent space. Subsequently, we employ the powerful generative ability of latent diffusion models to generate a latent representation conditioned on a musical score, which is converted into audio through the audio autoencoder. Moreover, we propose an unsupervised singing voice learning framework that leverages
+
+2
+
+unpaired singing voice data containing only audio. The experimental results demonstrate that HiddenSinger outperforms previous SVS models in terms of audio quality. Furthermore, our model can synthesize high-quality singing voices, even for speakers who are represented in unpaired data, by using the proposed unsupervised singing voice learning framework (HiddenSinger-U).
+Our study makes the following contributions:
+• We introduce HiddenSinger, which utilizes a neural audio codec and latent diffusion models to synthesize highquality singing voices. The latent generator generates a latent representation conditioned on a musical score. Subsequently, the audio autoencoder synthesizes highquality singing voice audio from the generated latent representation.
+• We extend our proposed model to HiddenSinger-U, an unsupervised singing voice learning framework that performs training with both paired and unpaired datasets using acoustic features from audio. HiddenSinger-U can synthesize a high-quality singing voice of a speaker without a musical score during training.
+• The proposed model is demonstrated to outperform previous SVS models. Audio samples are available at https: //jisang93.github.io/hiddensinger-demo/
+II. RELATED STUDIES
+A. Singing Voice Synthesis
+Singing voice synthesis (SVS) systems are designed to generate a singing voice based on a musical score. Since singing voices comprise significant pitch variability and an extended duration of vowel, SVS systems require additional input data, such as note pitch, note duration, and lyrics. Conventional SVS systems follow a two-stage manner comprising an acoustic model [5]–[9] and a vocoder [10], [11] to synthesize a realistic singing voice. Although previous SVS systems improved the singing voice quality, the two-stage pipeline has inherent limitations that prevent it from surpassing the upper bound of the vocoder performance.
+To address these limitations, researchers have proposed end-to-end SVS systems [13] that use a well-learned latent representation to enhance the quality of singing voices and simplify the training procedure. However, the end-to-end method still faces problems, including a training-inference mismatch problem. Specifically, the gap between the posterior and prior distributions leads to degraded audio reconstruction performance. In this study, we leverage a well-learned latent representation, which is converted into an audio codec, to improve the quality of the reconstructed audio.
+B. Neural Audio Synthesis
+To generate natural audio, neural vocoders [15]–[17] are generally used to convert signal processing components, such as the Mel-spectrogram, into raw waveform audio. For highquality audio generation, a generative adversarial network (GAN)-based neural vocoder adopts a multi-scale discriminator [18] and a multi-period discriminator [19] to capture
+
+the specific characteristics of the waveform audio. Although a diffusion-based neural vocoder [20] has been presented, several limitations persist in the audio quality and inference speed in tasks concerning waveform audio generation.
+In recent developments, neural audio codecs have emerged in conjunction with neural vocoders. These audio codecs efficiently compress the audio in an autoencoder architecture. For improved compression, approaches such as SoundStream [21] introduce residual vector quantization, leading to enhanced coding efficiency. Encodec [22] also represents the audio as discrete units with the residual vector quantization and incorporates a multi-scale short-time Fourier transform (STFT)based discriminator to reduce artifacts in the reconstructed audio. Drawing inspiration from these studies, we adopt neural audio codecs to achieve high-fidelity audio generation and computational efficiency.
+C. Diffusion Probabilistic Model
+Diffusion probabilistic models (also known as diffusion models) [23] are a class of generative models that have achieved remarkable results in various domains, such as image [24]–[26], audio [27], [28] and video [29] generation. Particularly, in the audio domain, previous studies have mainly used diffusion models to generate acoustic features.
+For the acoustic feature generation, Grad-TTS [30], DiffSinger [9], and DDDM-VC [31] utilize the diffusion-based decoder to generate a high-quality Mel-spectrogram. Each model uses a conditional-diffusion decoder to condition text distribution for a text-to-speech system [30], the musical score for a SVS system, and speaker information for a voice conversion system. To improve the generation efficiency by compressing the Mel-spectrogram into discrete latent space, DiffSound [27] introduces a discrete diffusion-based token decoder in a nonautoregressive manner. Make-an-audio [28] adopts the latent diffusion models to generate a continuous latent representation that converts into Mel-spectrogram. For waveform generation, Diffwave [32] and WaveGrad [33] generate high-fidelity speech waveform from the Mel-spectrogram. In contrast to the above approaches, WaveGrad 2 [34] and FastDiff [20] adopt an end-to-end manner that generates the audio without any intermediate features (e.g., Mel-spectrogram). Inspired by the success of diffusion-based generation, we adopt latent diffusion models to generate a latent representation conditioned on a musical score.
+III. PRELIMINARY
+Diffusion models comprise two processes: a forward process (diffusion process) and reverse process (denoising process). In the forward process, the data X0 are gradually corrupted with a tiny Gaussian noise through a T -step Markov chain. The reverse process, which follows the reverse trajectory of the forward process, aims to generate the data X0 from the Gaussian noise XT .
+In [35], [36], a stochastic differential equation (SDE) was used to approximate the trajectory between X0 and XT . In the speech domain, Grad-TTS [30] and Guided-TTS [37] applied an SDE to the text-to-speech task. Following [35], forward
+
+3
+
+(b) Residual Vector Quantization Blocks
+𝒉𝒄𝒐𝒏𝒅
+
+(a) Overall Architecture
+
+(c) Condition Encoder
+
+Fig. 2. (a) Architecture of HiddenSinger. We train the audio autoencoder and latent generator separately. During the inference, the latent generator gradually denoises a noisy sample from the data-driven priors. Then, the audio autoencoder converts the sampled latent representation into audio. (b) The RVQ blocks discretize the continuous latent representation into an audio codec. (c) To guide the latent generator, the condition encoder extracts a condition representation hcond and estimates µˆ from a musical score. The dashed arrows indicate that the operations are only used during training.
+
+process that perturbs the data X0 into the noise XT is defined with the pre-defined noise schedule βt = β0 + (βT − β0)t:
+
+1
+
+dXt = − 2 Xtβtdt + βtdWt,
+
+(1)
+
+where Wt represents the standard Brownian motion and t denotes a continuous timestep t ∈ [0, T ].
+
+The reverse process is defined as a reverse-time SDE that formulates the trajectory from Gaussian noise XT to the data X0 as follows:
+
+1 dXt = − 2 Xt − ∇Xt log pt(Xt) βtdt +
+
+βtdW˜ t, (2)
+
+where W˜ t is the reverse Brownian motion and ∇Xt log pt(Xt) represents a score of the probability density function of data
+pt(Xt). A neural network sθ learns to estimate the score, which is
+parameterized by θ, to model the data distribution pt(Xt). By solving Eq. 2, X0 ∼ p0(X) can be obtained by starting from the noisy data XT and iteratively removing the noise using the score estimation networks sθ.
+
+IV. HIDDENSINGER
+In this paper, we propose a SVS system using neural audio codecs and latent diffusion for high-quality singing voice audio. We introduce an audio autoencoder using residual vector quantization to achieve high-fidelity audio generation and computational efficiency. Additionally, we adopt latent diffusion models in a latent generator to generate a latent representation conditioned on a musical score, which is converted into audio by the audio autoencoder. Furthermore, we extend HiddenSinger to HiddenSinger-U, which can train the
+
+model without musical scores. In the following subsection, we describe the details of HiddenSinger and an unsupervised singing voice learning framework (HiddenSinger-U).
+A. Audio Autoencoder
+For efficient coding and high-quality audio generation, we introduce the audio autoencoder to compress the audio into an audio codec, which provides a low-dimensional representation. The audio autoencoder comprises three modules: an encoder, residual vector quantization (RVQ) blocks, and a decoder, as illustrated in Fig. 2 (a).
+1) Encoder: The encoder takes a high-dimensional linearspectrogram as the input and extracts a low-dimensional continuous latent representation z0 from the audio y. Inspired by [26], the latent space is regularized through vector quantization (VQ) [38] to avoid an arbitrarily high-variance of the latent space. A previous study in which sampling was performed using latent diffusion models demonstrated that a model trained on the VQ-regularized latent space achieved better quality than the Kullback-Leibler (KL)-regularized latent space. In our preliminary experiments, we observed that the KL-regularized latent space achieved sub-optimal performance when the diffusion models restored the latent representation. However, conventional VQ is insufficient for high-fidelity audio reconstruction because a quantized vector should represent multiple features of a raw waveform. Therefore, we apply RVQ [21] to the continuous latent representation z0 for efficient audio compression.
+2) Residual Vector Quantization Blocks: As indicated in Fig. 2 (b), the first vector quantizer discretizes the continuous latent representation z0 into the closest entry in a codebook. Subsequently, the residual is computed. The next quantizer is
+
+4
+
+used with the second codebook, with this process repeated as many times as the number of quantizers C. The number of quantizers is related to the trade-off between the computational cost and coding efficiency. We follow the training procedure described in [21] to train the codebook for each quantizer. Furthermore, we apply the commitment loss [38] to stabilize the codebook training. We found that the low-weighted commitment loss helps to converge the RVQ blocks during training:
+
+C
+
+Lemb = ||z0,c − qc(z0,c)||22,
+
+(3)
+
+c=1
+
+where z0,c represents the residual vector of the c-th quantizer and qc(z0,c) denotes the closest entry in the c-th codebook.
+3) Decoder: The decoder generates a raw waveform from
+
+the audio codec yˆ = G(zq). We calculate a reconstruction loss Lrecon between the generated xˆmel and ground-truth Melspectrograms xmel to improve the training efficiency of the decoder. The reconstruction loss is defined as
+
+Lrecon = ||xmel − xˆmel||1.
+
+(4)
+
+Moreover, we adopt adversarial learning to improve the
+
+quality of the generated audio. We use a multi-scale STFTbased (MS-STFT) discriminator [22], which expands a multiresolution spectrogram discriminator [39]. The MS-STFT discriminator operates on a multi-scale complex-valued STFT
+
+that contains both real and imaginary parts. Similar to the work of [22], we observed that the MS-STFT discriminator trains the decoder efficiently and facilitates the synthesis of
+
+audio with better quality than the combination of a multiperiod discriminator [19] and multi-scale discriminator [18]. Furthermore, we adopt the feature matching loss Lfm [40], which is a perceptual loss for GAN training:
+
+Ladv (D) = E (D(y) − 1)2 + D(G(zq))2 ,
+
+(5)
+
+Ladv (G) = E (D(G(zq)) − 1)2 ,
+
+(6)
+
+L1 Lfm (G) = E l=1 Nl ||Dl(y) − Dl (G(zq)) ||1 , (7)
+where zq denotes the quantized latent representation, L is the total number of layers in discriminator D, Nl represents the number of features, and Dl extracts the feature map in the l-th layer of the discriminator.
+4) Auxiliary Multi-task Learning: We introduce auxiliary tasks based on a lyrics predictor and note-pitch predictor to improve the capability of the linguistic and acoustic information in the audio codec. Each predictor takes the compressed latent representation zq to predict a frame-level target feature. We calculate the connectionist temporal classification (CTC) loss [41] between the predicted and target feature. We only apply the CTC loss to paired datasets that contain a musical score.
+5) Final Loss: The final loss term for the audio autoencoder is defined as:
+
+Lgen = Ladv(G) + λreconLrecon + λembLemb + λfmLfm (G) + λlyricsLlyrics + λnoteLnote, (8)
+
+where λ∗ is the loss weight, Llyrics represents the CTC loss between the predicted and ground-truth lyrics, and Lnote denotes the CTC loss between the predicted and ground-truth pitch IDs according to the musical instrument digital interface (MIDI) standard.
+B. Condition Encoder
+We present a condition encoder to guide the diffusion models. The condition encoder comprises a lyrics encoder, a melody encoder, an enhanced condition encoder, and a prior estimator.
+1) Lyrics Encoder: The lyrics encoder takes a phonemelevel lyrics sequence with positional embedding as the input, and then extracts a lyrics representation. We use a grapheme-to-phoneme tool to convert the lyrics sequence into a phoneme-level lyrics sequence before feeding it into the lyrics encoder.
+2) Melody Encoder: We introduce the melody encoder to generate a singing voice with an adequate melody from a musical score. Before using the musical score, we divide the notes into a phoneme-level note sequence. A Korean syllable generally comprises an onset, nucleus, and coda. Following the previous Korean SVS systems [8], [42], we assign onset and coda to a maximum of three frames with the remainder considered as the nucleus.
+Subsequently, the melody encoder extracts a melody representation from the concatenation of a note pitch, note duration, and note tempo embedding sequence with positional embedding. The note pitch sequence is transformed into the note pitch embedding. The note duration embedding sequence is represented by a fixed set of duration tokens, among which the resolution is represented by a specific note duration (e.g., the 64th note). The note tempo is calculated in beats per minute and encoded into the tempo embedding.
+3) Enhanced Condition Encoder: The enhanced condition encoder encodes the summation of the outputs of the lyrics and melody encoders to provide a more informative condition representation hcond. Before summing the two representations, they are expanded into the frame-level based on the note duration. In our preliminary experiments, we observed that the enhanced condition encoder effectively stabilized the pronunciation of synthesized singing voices, similar to the result in [13], [43].
+C. Latent Generator
+We adopt the latent diffusion models [26] in the latent generator to generate the latent representation of the audio autoencoder. The latent representation zˆ0 is sampled using the latent diffusion models, following which the generated latent representation zˆ0 is converted into the audio codec in the audio autoencoder. Furthermore, the latent representation is normalized to ease the sampling.
+1) Data-Driven Priors: We use data-driven priors in the latent diffusion models to improve their generation abilities. Previous studies [30], [44] have demonstrated that the use of data-driven priors helps approximate the trajectories between the complex data and known priors. Following [30], we design
+
+5
+
+the diffusion models to start denoising from noise close to the target z0′ , which is easier than denoising from standard Gaussian noise. We predict µˆ from the condition representation
+hcond using the prior estimator of the condition encoder. We apply the negative log-likelihood loss Lprior between the normalized latent z0′ and the predicted µˆ to consider µˆ as a mean-shifted Gaussian distribution N (µˆ, I).
+2) Latent Diffusion Models: The diffusion process is de-
+fined using a forward stochastic differential equation (SDE)
+with the data-driven priors given a time horizon t ∈ [0, 1]. The forward SDE converts the normalized latent representations z0′ into Gaussian noise:
+
+dzt′
+
+=
+
+1 (µˆ −
+2
+
+zt′ )βt dt
+
++
+
+βtdWt,
+
+(9)
+
+where Wt is the standard Brownian motion and βt is the non-
+
+negative pre-defined noise schedule. Its solution is expressed
+
+as:
+
+zt′ =
+
+I
+
+−
+
+e−
+
+1 2
+
+t 0
+
+βs ds
+
+µˆ
+
++
+
+e−
+
+1 2
+
+z t
+0
+
+βs ds
+
+0
+
+t
++
+0
+
+βs
+
+e−
+
+1 2
+
+t s
+
+βu
+
+du
+
+dWs
+
+,
+
+(10)
+
+According to the properties of Itˆo’s integral, the transition density pt(zt′|z0′ ) is the Gaussian distribution pt(zt′|z0′ ) ∼ N (zt′; ρt, λt), as follows:
+
+ρt =
+
+I
+
+−
+
+e−
+
+1 2
+
+t 0
+
+βs ds
+
+µˆ
+
++
+
+e−
+
+1 2
+
+t 0
+
+βsdsz0′ ,
+
+(11)
+
+λt =I − e−
+
+. t
+0
+
+βs ds
+
+(12)
+
+We define the reverse process as an SDE solver to obtain the normalized latent representations z0′ ∼ p0(z′). We use a score estimation network sθ to approximate the intractable score:
+
+dzt′ =
+
+1 2
+
+(µˆ
+
+−
+
+zt′ )
+
+−
+
+sθ
+
+(zt′ ,
+
+µˆ,
+
+hcond,
+
+t)
+
+βtdt
+
+(13)
+
++ βtdW˜ t,
+
+t ∈ [0, 1] ,
+
+where W˜ t is the reverse Brownian motion.
+Following [35], we compute the expected value of the estimated gradients of the log-density of the noisy latent zt′:
+
+Ldiff = Ez0′ ,zt′,t ||sθ(zt′, µˆ, hcond, t) − ∇zt′ log pt(zt′|z0′ )||22 , (14)
+where ∇zt′ log pt(zt′|z0′ ) = −λ−t 1ϵt and ϵt ∈ N (0, I). Furthermore, we adopt a temperature parameter τ for the data-driven prior distribution N µˆ, τ −1I during sampling, which helps the latent generator to maintain the quality when τ > 1, similar to the approach in [30].
+We jointly optimize the latent generator and condition encoder based on the following objective:
+
+extended our proposed model to HiddenSinger-U, an unsupervised singing voice learning framework, to mitigate the difficulty of collecting paired datasets. This framework enables the model to use unlabeled data during training. We introduce two additional encoders into the condition encoder to model the unsupervised lyrics and melody representation, as shown in Fig. 2 (c): an unsupervised lyrics encoder (lyrics-U encoder) and an unsupervised melody encoder (melody-U encoder). Furthermore, we employ contrastive learning in the proposed framework.
+1) Lyrics-U Encoder: We use a self-supervised speech representation method for the linguistic information. Previous works [45], [46] have demonstrated that the speech representation from the middle layer of a self-supervised model contains phonetic information. Therefore, the phonetic information can be leveraged by extracting the self-supervised representation from the target audio. We perform information perturbation before extracting the self-supervised representation to mitigate speaker information in the target audio. The information perturbation causes the self-supervised model to focus on extracting only phonetic information. Subsequently, the lyricsU encoder encodes the self-supervised representation into a frame-level unsupervised lyrics representation.
+2) Melody-U Encoder: SVS models still require melody information of the target audio to synthesize singing voices. We first extract the fundamental frequency (F 0) from the audio to extract melody information. Thereafter, we quantize the F 0 and encode it into a pitch embedding to obscure speaker information in the target audio. Subsequently, the melody-U encoder takes the pitch embedding to extract a frame-level unsupervised melody representation.
+3) Contrastive Learning: We observed that it is insufficient to only use the objective Llg to optimize HiddenSinger-U owing to the gap between the paired representations (e.g., the lyrics and unsupervised lyrics representation). To maximize the agreement and penalize the dissimilarity between the paired representations, we introduce the contrastive loss [47], [48] for the paired data as follows:
+
+T
+Lcont∗ =
+t=1
+T
++
+t=1
+
+e( ) cos (h(∗t),h˜(∗t))/τcont
+
+e ξ[k̸=t]
+
+cos (h(∗t),h(∗k))/τcont
+
+e( ) cos (h˜∗(t),h(∗t))/τcont
+
+,
+
+e ξ[k̸=t]
+
+cos (h˜(∗t),h˜(∗k))/τcont
+
+(16)
+
+Llg = Ldiff + λpriorLprior,
+
+(15)
+
+where λprior is the loss weight for the prior loss Lprior.
+
+D. Unsupervised Singing Voice Learning Framework
+Conventional SVS models require paired data (audiomusical score corpora) for training. Furthermore, these models cannot synthesize the singing voice of an untrained speaker without special techniques such as zero-shot adaptation. We
+
+where cos(·, ·) calculates the cosine similarity between the pairs, τcont denotes the temperature, and ξ[k̸=t] represents a set of random time indices as negative samples. Following [48], we randomly select several unmatched frames within each paired representation for negative samples. We apply the contrastive loss for each type of representation h∗ ∈ [hlyrics, hmelody]. The gap between the paired representations can be reduced by adopting the contrastive terms Lcont∗ in the objective Llg.
+
+6
+
+V. EXPERIMENT AND RESULTS
+A. Experimental Setup
+1) Datasets: We trained HiddenSinger on the Guide vocal dataset1 to synthesize the singing voice The Guide vocal dataset contains approximately 157.39 hours of audio for 4, 000 paired Korean songs. We divided the audio into segments of two-bar segments to facilitate the model training, resulting in 93, 127 samples. Subsequently, we divided our dataset into three subsets: 89, 186 samples for training, 1, 975 samples for validation, and 1, 966 samples for testing.
+We trained HiddenSinger-U using the Guide vocal dataset and an internal singing voice dataset containing approximately 3.30 hours of audio for 316 Korean songs that do not have musical scores to evaluate the unsupervised singing voice learning framework. The internal dataset was divided into three subsets: 1, 130 samples for training, 99 samples for validation, and 97 samples for testing. Moreover, we considered specific speakers in the Guide vocal dataset as unlabeled data during training. To train the audio autoencoder, we used the aforementioned dataset, a multi-speaker singing dataset2, and children singing dataset [49], which contain a total of 285.1 hours of audio for 8, 781 K-pop songs.
+2) Pre-processing: We downsampled the audio at 24,000 Hz for training. We transformed the audio into a linearspectrogram with 1,025 bins to train the audio autoencoder. For the reconstruction loss, we used the Mel-spectrogram with 128 bins. We grouped words into phrases and separated the phrases with the 16th rest in a text sequence for the lyrics encoder input. Subsequently, we converted the text sequence into a phoneme sequence using the grapheme-to-phoneme tool3. We used a 64th note resolution for the note duration tokens. We used the range [16, 256] for the tempo values of the tempo tokens. We extracted the self-supervised representation from the middle of XLS-R [50], pre-trained wav2vec 2.0 [51] with 128 language dataset including Korean, as inputs for the lyrics-U encoder. Prior to the extraction, we resampled the audio at 16,000 Hz and perturbed it. We interpolated the extracted representation back to 24,000 Hz sampling rate.
+3) Training: We trained the audio autoencoder using the AdamW optimizer [52] with a learning rate of 2 × 10−4, β1 = 0.8, β2 = 0.99, and a weight decay of λ = 0.01. We adopted a windowed generator training [53]–[55] for efficiency. We randomly extracted segments of the raw waveform with a window size of 128 frames as the input for the encoder to capture the linguistic features. Furthermore, the decoder took a randomly sliced segment of the quantized latent representation zq with a window size of 32 frames. We used the corresponding audio segment from the ground-truth audio as the training target. Four NVIDIA RTX A6000 GPUs were used for the training. The batch size was set to 32 per GPU and the model was trained for up to 1M steps.
+We jointly trained the condition encoder and latent generator using the AdamW optimizer with a learning rate of 5 × 10−5, β1 = 0.8, β2 = 0.99, and a weight decay of λ = 0.01. We
+1https://bit.ly/3GbEUIX 2https://bit.ly/3Q9rOkn 3https://github.com/Kyubyong/g2p
+
+Fig. 3. Architecture of the score estimation network in the latent generator
+randomly extracted segments of the latent representations z0 with a window size of 128 frames for efficient training. We used two NVIDIA RTX A6000 GPUs for training and set the batch size to 32 per GPU. The model was trained for up to 2M steps.
+B. Implementation Details
+1) Audio Autoencoder: The encoder comprises non-causal WaveNet residual blocks, as proposed by [56]. The decoder uses a HiFi-GAN V1 generator [19]. We implemented 30 quantizers with codebook sizes of 1,024 entries and 128 dimensions for the residual vector quantizer blocks.
+2) Condition Encoder: The lyrics, melody, and enhanced condition encoders comprise four feed-forward Transformer (FFT) blocks [54] with relative-position encoding [57] following Glow-TTS [58]. In each FFT block, we set the number of attention heads to 2, the hidden size to 192, and kernel size to 9. The prior estimator is a single linear layer.
+3) Latent Generator: As illustrated in Fig. 3, a non-causal WaveNet-based denoiser architecture is used for the score estimation network sθ, similar to the architecture in [9], [32]. We set the number of dilated convolution layers to 20, the residual channels to 256, and kernel size to 3 for the score estimation network. We set the dilation to 1 in each layer. We set β0 = 0.05, β1 = 20 and T = 1 to train the latent generator and τ = 1.5 to sample the latent representation during inference.
+4) Unsupervised Learning Module: The lyrics-U and melody-U encoders have the same architecture as the lyrics and melody encoders, respectively, which consist of four FFT blocks with relative-position encoding. We used the 12th layer of the pre-trained XLS-R to extract the self-supervised representation. We quantized F 0 into 128 intervals to mitigate the speaker information.
+
+7
+
+TABLE I EXPERIMENTAL RESULTS IN TERMS OF SUBJECTIVE METRICS AND FOUR OBJECTIVE METRICS ON THE TEST DATASET. HIDDENSINGER-U WAS TRAINED
+ON THE SAME SVS DATASET, OF WHICH 10% WAS DEFINED AS UNLABELED DATA.
+
+Method
+GT HiFi-GAN (recon.)
+FastSpeech 2 + HiFi-GAN DiffSinger + HiFi-GAN VISinger
+HiddenSinger (Ours) HiddenSinger-U (Ours)
+
+nMOS (↑)
+4.48 ± 0.06 4.01 ± 0.08
+2.27 ± 0.08 3.36 ± 0.09 3.47 ± 0.09
+3.80 ± 0.08 3.83 ± 0.08
+
+MAE (↓)
+− 0.161
+0.432 0.431 0.439
+0.467 0.454
+
+Pitch (↓)
+− 17.893
+55.156 45.726 44.441
+43.247 43.536
+
+Periodicity (↓)
+− 0.075
+0.195 0.172 0.165
+0.172 0.168
+
+V/UV F1 (↑)
+− 0.978
+0.939 0.949 0.953
+0.948 0.950
+
+C. Subjective Metrics
+We conducted a five-scale naturalness mean opinion score (nMOS) listening test on the test dataset to evaluate the (a) naturalness of the audio. Each audio was evaluated by 15 native Korean speakers. The subjective metrics are reported with 95% confidence intervals in this paper.
+
+Frequency [Hz]
+
+Time [Frames]
+
+Frequency [Hz]
+
+D. Objective Metrics
+
+We calculated the objective metrics to evaluate various types of distance between the ground-truth and synthesized audio. We considered four metrics to evaluate the SVS quality: 1) spectrogram mean absolute error (MAE); 2) pitch error; 3) periodicity error; and 4) F1 score of voiced/unvoiced classification (V/UV F1). We used the implementation of CARGAN [59] to evaluate the pitch, periodicity, and V/UV F1. Moreover, we provided additional objective metrics for the reconstruction quality, namely the perceptual evaluation of speech quality (PESQ) [60], in Subsection V-F.
+1) Spectrogram mean absolute error (MAE):
+
+1 M AE =
+T
+
+T
+
+|si − s′i|,
+
+(17)
+
+i=1
+
+where si and s′i denote the i-th spectrogram frame from the ground-truth and synthesized waveform, respectively. T represents the frame lengths of the spectrogram.
+2) Pitch error:
+
+P itch =
+
+1 T
+
+T
+
+(1200 × (log2 pi − log2 p′i))2,
+
+(18)
+
+i=1
+
+where pi and p′i represent the i-th extracted pitch representations from the ground-truth and synthesized waveform by using torchcrepe4, respectively. As following CARGAN, we
+only measure the pitch error on voiced parts in a waveform.
+3) Periodicity error:
+
+P eriodicity =
+
+1 T
+
+T
+
+(ϕi − ϕ′i)2,
+
+(19)
+
+i=1
+
+4https://github.com/maxrmorrison/torchcrepe
+
+(b)
+Time [Frames]
+Fig. 4. Visualization of generated F0 contours: (a) F0 contour variations of synthesized singing voice for five inferences with the same musical score; (b) F0 contour variations of synthesized singing voice for five speakers with the same musical score.
+where ϕi and ϕ′i are the i-th extracted phase features from the ground-truth and synthesized waveform by using torchcrepe, respectively.
+Note that the length of the synthesized and target singing voices are the same, because of the musical score that informs the duration of each note. Therefore, we do not consider time alignment, such as dynamic time warping [61], to calculate objective evaluations.
+E. Singing Voice Synthesis We compared the audio generated by our proposed models,
+HiddenSinger and HiddenSinger-U, to the outputs of the following systems: 1) GT, Ground-truth audio; 2) HiFi-GAN [19], in which we reconstructed the audio from the groundtruth Mel-spectrogram using HiFi-GAN; 3) FastSpeech 2 [54] + HiFi-GAN, in which we added a melody encoder for SVS; 4) DiffSinger [9] + HiFi-GAN; and 5) VISinger [13], which is an end-to-end SVS system. We trained HiddenSinger-U on the same SVS dataset, of which 10% was defined as unlabeled data. Moreover, for fair comparisons, we trained the HiFiGAN using the same datasets and training steps that were used to train the audio autoencoder.
+As indicated in Table I, according to the subjective audio evaluation, HiddenSinger and HiddenSinger-U outperformed the other SVS models in terms of naturalness. Moreover, our proposed models reduced the pitch error without variation
+
+8
+
+TABLE II SUBJECTIVE AND OBJECTIVE COMPARISONS OF RECONSTRUCTED AUDIO. RECON. INDICATES RECONSTRUCTION. KL, REG., AND RVQ DENOTE
+KULLBACK-LEIBLER, REGULARIZATION, AND RESIDUAL VECTOR QUANTIZATION, RESPECTIVELY.
+
+Method
+GT
+HiFi-GAN VISinger (recon.)
+Autoencoder w/o reg. Autoencoder w/ KL-reg. Autoencoder w/ RVQ-reg.
+
+MOS (↑)
+4.18 ± 0.09
+3.67 ± 0.11 3.59 ± 0.11
+3.86 ± 0.09 3.87 ± 0.10 3.75 ± 0.10
+
+PESQW B (↑)
+−
+3.771 2.564
+3.891 3.814 3.343
+
+PESQNB (↑)
+−
+3.976 2.986
+4.077 4.045 3.675
+
+MAE (↓)
+−
+0.161 0.252
+0.185 0.193 0.228
+
+Pitch (↓)
+−
+17.893 25.666
+18.439 19.076 18.614
+
+Periodicity (↓)
+−
+0.075 0.094
+0.076 0.078 0.079
+
+V/UV F1 (↑)
+−
+0.978 0.974
+0.979 0.979 0.978
+
+(a) GT
+
+(b) HiFi-GAN (recon.)
+
+(b) FastSpeech 2
+
+TABLE III LATENT GENERATOR WITH DIFFERENT REGULARIZED AUDIO AUTOENCODERS. LG REPRESENTS THE LATENT GENERATOR.
+
+Method
+LG w/ RVQ-reg.
+LG w/o reg. LG w/ KL-reg.
+
+nMOS (↑)
+4.06 ± 0.08
+2.97 ± 0.08 3.95 ± 0.08
+
+Pitch (↓)
+43.247
+44.247 45.825
+
+Periodicity (↓)
+0.172
+0.187 0.178
+
+V/UV F1 (↑)
+0.948
+0.939 0.946
+
+(c) DiffSinger
+
+(d) VISinger
+
+(e) HiddenSinger (proposed)
+
+Fig. 5. Visualization of generated samples with varying systems: (a) GT, (b) HiFi-GAN, (c) FastSpeech 2, (d) DiffSinger, (e) VISinger, and (f) HiddenSinger.
+
+predictions, such as pitch or energy prediction. These results indicate that HiddenSinger can learn accurate pitch information.
+However, VISinger achieved better performance in terms of the MAE, periodicity error, and V/UV F1 score. As our proposed models generate the latent representation through stochastic iterations, the stochasticity of the models may increase the distance between the ground-truth and synthesized audio. We computed the F 0 contour from the synthesized audio of HiddenSinger using Parselmouth5 to demonstrate the stochasticity of the models. As indicated in Fig. 4 (a), we performed inference five times for a speaker with the same musical score. It can be observed that HiddenSinger synthesized singing voices that contained appropriate tunes based on the musical score and variations such as intonation. As indicated in Fig. 4 (b), we synthesized singing voices using five different speakers and the same musical score. It can be observed that HiddenSinger generated various styles of singing voices from different speakers.
+Furthermore, we visualized the Mel-spectrograms of the synthesized audio to compare the models. Although the shapes of the harmonics that were synthesized by HiddenSinger differed slightly from those of the ground-truth Mel-spectrogram, the harmonics in the high-frequency band of HiddenSinger
+5https://github.com/YannickJadoul/Parselmouth
+
+were more fine-grained than those of the other systems, as illustrated in Fig. 5. These results demonstrate that HiddenSinger generates high-fidelity and natural singing voices using the denoising process that can inject several variations.
+F. Audio Autoencoder
+To demonstrate the performance of the audio autoencoder, we evaluated the quality of the reconstructed audio. We reconstructed the singing voice dataset used to train the VISinger for a fair comparison. As each decoder of our audio autoencoders leverages the HiFi-GAN V1 generator [19], they achieved similar performance to HiFi-GAN in terms of the objective evaluation metrics in Table II. However, in terms of naturalness, our audio autoencoders achieved slightly better performance than HiFi-GAN. Moreover, the reconstruction results of the VISinger exhibited the worst performance in terms of the subjective and objective evaluation measures. These observations suggest that the end-to-end training may reduce the quality of the reconstructed audio, resulting in the upper bound of the audio generation being degraded.
+We evaluated the effectiveness of the different combinations of our audio autoencoder and the latent generator. We trained the latent generator separately using different regularized latent spaces. As indicated in Table III, the latent generator with the RVQ-regularized autoencoder outperformed the other combinations. Furthermore, it was difficult for the latent space without regularization to generate the latent representation with the latent diffusion models. These results indicate that the RVQ-regularized latent space is more suitable for sampling targets than the KL-regularized latent space in our setting, similar to the results reported in [26].
+G. Unsupervised Singing Voice Learning Framework
+We compared the changes in the evaluation metrics according to the ratio of unlabeled data in the training dataset to verify the effectiveness of the unsupervised singing voice learning
+
+9
+
+TABLE IV EXPERIMENTAL RESULTS FOR UNSUPERVISED SINGING VOICE LEARNING FRAMEWORK
+
+Unlabeled ratio
+GT
+0% 2% 5% 10% 20% 50%
+
+nMOS (↑)
+4.41 ± 0.09
+3.81 ± 0.11 3.78 ± 0.11 3.59 ± 0.13 3.68 ± 0.11 3.60 ± 0.12 3.70 ± 0.13
+
+sMOS (↑)
+3.79 ± 0.05
+3.39 ± 0.08 3.33 ± 0.09 2.97 ± 0.10 2.98 ± 0.10 2.78 ± 0.10 2.89 ± 0.10
+
+MAE (↓)
+−
+0.467 0.454 0.462 0.454 0.463 0.481
+
+Pitch (↓)
+−
+43.247 42.350 42.819 43.536 45.914 49.084
+
+Periodicity (↓)
+−
+0.172 0.165 0.168 0.168 0.172 0.182
+
+V/UV F1 (↑)
+−
+0.948 0.951 0.950 0.950 0.949 0.946
+
+TABLE V ABLATION STUDY OF HIDDENSINGER. ENHANCED CE REPRESENTS THE
+ENHANCED CONDITION ENCODER IN THE CONDITION ENCODER
+
+Method
+HiddenSinger
+w/o enhanced CE w/ zq generation w/ standard Gaussian
+
+nMOS (↑)
+3.86 ± 0.09
+3.24 ± 0.10 3.73 ± 0.09 3.64 ± 0.09
+
+Pitch (↓)
+43.247
+49.495 44.258 45.381
+
+Periodicity (↓)
+0.172
+0.216 0.170 0.179
+
+V/UV F1 (↑)
+0.948
+0.930 0.949 0.947
+
+framework. We pre-defined certain speakers as unlabeled data that consisted of only audio for verification. We conducted the nMOS test to evaluate the naturalness of the audio. Moreover, we conducted a four-scale similarity MOS (sMOS) test to evaluate the voice similarity between the ground-truth and generated audio. We evaluated samples of pre-defined speakers that were considered unlabeled data in every setting, except for the 0% and 2% ratio settings in both MOS tests. The 0% ratio setting represents HiddenSinger, which has been trained without the unsupervised singing voice learning framework.
+It can be observed from Table IV that the nMOS results were statistically insignificant in most of the settings. This suggests that the unsupervised singing voice learning framework helps the model learn to synthesize a natural singing voice, regardless of changes in the unlabeled ratio. Moreover, the objective evaluations demonstrate that the proposed framework can be trained stably in every setting.
+However, as shown in Table IV, the similarity of the synthesized singing voice decreased with an increase in the unlabeled ratio. As there were differences between the note pitch of a musical score and the F 0 of a human speaker’s singing voice, the models were trained with slightly different speaker identities due to the difference. Therefore, the human listener differentiated between the ground-truth and synthesized audio according to the difference. Although the difference degrades the similarity according to the increasing unlabeled ratio, the proposed framework is effective in synthesizing a natural singing voice with proper linguistic information and a perceptually similar speaker identity. Moreover, the contrastive terms Lcont∗ and information perturbation aid in stabilizing the training. In particular, it is difficult to synthesize an appropriate singing voice when training is performed without the contrastive terms.
+
+H. Ablation Study
+We conducted an ablation study to verify the effectiveness of each module in the proposed system. The results are presented in Table V. It can be observed that the subjective and objective evaluations significantly degraded with the removal of the enhanced condition encoder. Furthermore, the pronunciation of the synthesized audio was highly inaccurate without the enhanced condition encoder. Therefore, the enhanced condition encoder is necessary for the appropriate functioning of the proposed model.
+We performed training on the latent generator with the audio codec zq as the target of the latent diffusion models. Table V indicates that the generation of z0 could provide more natural audio than the generation of zq in the latent generator. As the RVQ blocks may refine the sampled latent representation zˆ0 with residual operations, the generation of z0 is superior in terms of naturalness.
+Furthermore, we considered a standard Gaussian as the priors following the original denoising diffusion probabilistic models [23]. However, the data-driven priors outperformed the standard Gaussian-based priors. This indicates that the trajectory between the data space and data-driven priors can be more stably approximate than the trajectory between the data space and standard Gaussian.
+VI. CONCLUSIONS
+We have introduced HiddenSinger, a novel approach that enables the synthesis of high-quality and high-diversity singing voice audio through the integration of a neural audio codec and latent diffusion models. Our study demonstrated the efficacy of the audio autoencoder in reconstructing high-fidelity audio using low-dimensional audio codecs. Furthermore, we successfully generated latent representations conditioned on a musical score using latent diffusion models. The audio was successfully reconstructed from the generated latent representation by the audio autoencoder. We extended our model to an unsupervised singing voice learning framework that can be trained without lyrics and note information using self-supervised representation. Our latent diffusion models could be used in any speech domain, including text-to-speech and voice conversion systems. However, our model still has limitations regarding novel singing style adaptation, not voice. In future works, we will attempt to implement a zero-shot singing style transfer by adopting style-generalized generative models.
+
+10
+
+VII. DISCUSSION
+A. Broader Impact
+Recently, neural audio codecs have been used in various tasks [62], [63]. As following concurrent works [62], our proposed model can be extended to a text-to-speech system. Moreover, we can address the data scarcity problem by applying our unsupervised learning framework to a low-resource language.
+B. Social Negative Impact
+Although HiddenSinger may have practical applications such as podcasts or music generation, there is an increased risk of potential misuse of such technologies. In particular, unauthorized usage of data from web crawlers in SVS can give rise to concerns related to copyright infringement and voice spoofing. We want to emphasize that we strongly discourage the utilization of our work for any illicit or unethical purposes.
+C. Limitation
+Although we adopt the latent diffusion models for highefficient latent generation, the diffusion models require a number of iterative processes to generate the representations. In the future, we will introduce the consistency models [64] to distill the teacher diffusion models for a single-step generation.
+REFERENCES
+[1] D. P. Kingma and M. Welling, “Auto-Encoding Variational Bayes,” arXiv preprint arXiv:1312.6114, 2013.
+[2] D. Rezende and S. Mohamed, “Variational Inference with Normalizing Flows,” in International Conference on Machine Learning. PMLR, 2015, pp. 1530–1538.
+[3] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, “Generative Adversarial Networks,” Communications of the ACM, vol. 63, no. 11, pp. 139–144, 2020.
+[4] G. Degottex, L. Ardaillon, and A. Roebel, “Multi-Frame Amplitude Envelope Estimation for Modification of Singing Voice,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 24, no. 7, pp. 1242–1254, 2016.
+[5] J. Chen, X. Tan, J. Luan, T. Qin, and T.-Y. Liu, “Hifisinger: Towards High-fidelity Neural Singing Voice Synthesis,” arXiv preprint arXiv:2009.01776, 2020.
+[6] Y. Hono, K. Hashimoto, K. Oura, Y. Nankaku, and K. Tokuda, “Sinsy: A Deep Neural Network-based Singing Voice Synthesis System,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 29, pp. 2803–2815, 2021.
+[7] G.-H. Lee, T.-W. Kim, H. Bae, M.-J. Lee, Y.-I. Kim, and H.-Y. Cho, “N-Singer: A Non-autoregressive Korean Singing Voice Synthesis System for Pronunciation Enhancement,” arXiv preprint arXiv:2106.15205, 2021.
+[8] S. Choi and J. Nam, “A Melody-Unsupervision Model for Singing Voice Synthesis,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2022, pp. 7242–7246.
+[9] J. Liu, C. Li, Y. Ren, F. Chen, and Z. Zhao, “DiffSinger: Singing Voice Synthesis via Shallow Diffusion Mechanism,” in Proceedings of the AAAI Conference on Artificial Intelligence, vol. 36, no. 10, 2022, pp. 11 020–11 028.
+[10] F. Chen, R. Huang, C. Cui, Y. Ren, J. Liu, and Z. Zhao, “SingGAN: Generative Adversarial Network for High-fidelity Singing Voice Generation,” arXiv preprint arXiv:2110.07468, 2021.
+[11] D.-Y. Wu, W.-Y. Hsiao, F.-R. Yang, O. Friedman, W. Jackson, S. Bruzenak, Y.-W. Liu, and Y.-H. Yang, “DDSP-based Singing Vocoders: A New Subtractive-based Synthesizer and a Comprehensive Evaluation,” arXiv preprint arXiv:2208.04756, 2022.
+
+[12] S.-H. Lee, H.-R. Noh, W.-J. Nam, and S.-W. Lee, “Duration Controllable Voice Conversion via Phoneme-based Information Bottleneck,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 30, pp. 1173–1183, 2022.
+[13] Y. Zhang, J. Cong, H. Xue, L. Xie, P. Zhu, and M. Bi, “ViSinger: Variational Inference with Adversarial Learning for End-to-End Singing Voice Synthesis,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2022, pp. 7237–7241.
+[14] X. Tan, J. Chen, H. Liu, J. Cong, C. Zhang, Y. Liu, X. Wang, Y. Leng, Y. Yi, L. He et al., “NaturalSpeech: End-to-End Text to Speech Synthesis with Human-level Quality,” arXiv preprint arXiv:2205.04421, 2022.
+[15] A. v. d. Oord, S. Dieleman, H. Zen, K. Simonyan, O. Vinyals, A. Graves, N. Kalchbrenner, A. Senior, and K. Kavukcuoglu, “WaveNet: A Generative Model for Raw Audio,” arXiv preprint arXiv:1609.03499, 2016.
+[16] R. Yamamoto, E. Song, and J.-M. Kim, “Parallel WaveGAN: A Fast Waveform Generation Model based on Generative Adversarial Networks with Multi-resolution Spectrogram,” in IEEE International Conference on Acoustics, Speech and Signal Processing. IEEE, 2020, pp. 6199– 6203.
+[17] Y. Ai and Z.-H. Ling, “A Neural Vocoder with Hierarchical Generation of Amplitude and Phase Spectra for Statistical Parametric Speech Synthesis,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 28, pp. 839–851, 2020.
+[18] K. Kumar, R. Kumar, T. de Boissiere, L. Gestin, W. Z. Teoh, J. Sotelo, A. de Bre´bisson, Y. Bengio, and A. C. Courville, “Melgan: Generative Adversarial Networks for Conditional Waveform Synthesis,” Advances in Neural Information Processing Systems, vol. 32, 2019.
+[19] J. Kong, J. Kim, and J. Bae, “Hifi-GAN: Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis,” Advances in Neural Information Processing Systems, vol. 33, pp. 17 022–17 033, 2020.
+[20] R. Huang, M. W. Lam, J. Wang, D. Su, D. Yu, Y. Ren, and Z. Zhao, “FastDiff: A Fast Conditional Diffusion Model for High-quality Speech Synthesis,” arXiv preprint arXiv:2204.09934, 2022.
+[21] N. Zeghidour, A. Luebs, A. Omran, J. Skoglund, and M. Tagliasacchi, “Soundstream: An End-to-End Neural Audio Codec,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 30, pp. 495–507, 2021.
+[22] A. De´fossez, J. Copet, G. Synnaeve, and Y. Adi, “High Fidelity Neural Audio Compression,” arXiv preprint arXiv:2210.13438, 2022.
+[23] J. Ho, A. Jain, and P. Abbeel, “Denoising Diffusion Probabilistic Models,” Advances in Neural Information Processing Systems, vol. 33, pp. 6840–6851, 2020.
+[24] P. Dhariwal and A. Nichol, “Diffusion Models Beat GANs on Image Synthesis,” Advances in Neural Information Processing Systems, vol. 34, pp. 8780–8794, 2021.
+[25] A. Ramesh, P. Dhariwal, A. Nichol, C. Chu, and M. Chen, “Hierarchical Text-conditional Image Generation with Clip Latents,” arXiv preprint arXiv:2204.06125, 2022.
+[26] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, “High-resolution Image Synthesis with Latent Diffusion Models,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2022, pp. 10 684–10 695.
+[27] D. Yang, J. Yu, H. Wang, W. Wang, C. Weng, Y. Zou, and D. Yu, “Diffsound: Discrete Diffusion model for Text-to-Sound Generation,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, 2023.
+[28] R. Huang, J. Huang, D. Yang, Y. Ren, L. Liu, M. Li, Z. Ye, J. Liu, X. Yin, and Z. Zhao, “Make-an-Audio: Text-to-Audio Generation with Prompt-Enhanced Diffusion Models,” arXiv preprint arXiv:2301.12661, 2023.
+[29] J. Ho, T. Salimans, A. Gritsenko, W. Chan, M. Norouzi, and D. J. Fleet, “Video Diffusion Models,” arXiv preprint arXiv:2204.03458, 2022.
+[30] V. Popov, I. Vovk, V. Gogoryan, T. Sadekova, and M. Kudinov, “GradTTS: A Diffusion Probabilistic Model for Text-to-Speech,” in International Conference on Machine Learning. PMLR, 2021, pp. 8599–8608.
+[31] H.-Y. Choi, S.-H. Lee, and S.-W. Lee, “DDDM-VC: Decoupled Denoising Diffusion Models with Disentangled Representation and Prior Mixup for Verified Robust Voice Conversion,” arXiv preprint arXiv:2305.15816, 2023.
+[32] Z. Kong, W. Ping, J. Huang, K. Zhao, and B. Catanzaro, “Diffwave: A Versatile Diffusion Model for Audio Synthesis,” arXiv preprint arXiv:2009.09761, 2020.
+[33] N. Chen, Y. Zhang, H. Zen, R. J. Weiss, M. Norouzi, and W. Chan, “WaveGrad: Estimating Gradients for Waveform Generation,” arXiv preprint arXiv:2009.00713, 2020.
+
+11
+
+[34] N. Chen, Y. Zhang, H. Zen, R. J. Weiss, M. Norouzi, N. Dehak, and W. Chan, “WaveGrad 2: Iterative Refinement for Text-to-Speech Synthesis,” arXiv preprint arXiv:2106.09660, 2021.
+[35] Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole, “Score-based Generative Modeling through Stochastic Differential Equations,” arXiv preprint arXiv:2011.13456, 2020.
+[36] A. Vahdat, K. Kreis, and J. Kautz, “Score-based Generative Modeling in Latent Space,” Advances in Neural Information Processing Systems, vol. 34, pp. 11 287–11 302, 2021.
+[37] H. Kim, S. Kim, and S. Yoon, “Guided-TTS: A Diffusion Model for Text-to-Speech via Classifier Guidance,” in International Conference on Machine Learning. PMLR, 2022, pp. 11 119–11 133.
+[38] A. Van Den Oord, O. Vinyals et al., “Neural Discrete Representation Learning,” Advances in Neural Information Processing Systems, vol. 30, 2017.
+[39] W. Jang, D. Lim, J. Yoon, B. Kim, and J. Kim, “UnivNet: A Neural Vocoder with Multi-resolution Spectrogram Discriminators for Highfidelity Waveform Generation,” arXiv preprint arXiv:2106.07889, 2021.
+[40] A. B. L. Larsen, S. K. Sønderby, H. Larochelle, and O. Winther, “Autoencoding beyond Pixels Using a Learned Similarity Metric,” in International Conference on Machine Learning. PMLR, 2016, pp. 1558–1566.
+[41] A. Graves, S. Ferna´ndez, F. Gomez, and J. Schmidhuber, “Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks,” in International Conference on Machine Learning, 2006, pp. 369–376.
+[42] J. Lee, H.-S. Choi, C.-B. Jeon, J. Koo, and K. Lee, “Adversarially Trained End-to-End Korean Singing Voice Synthesis System,” arXiv preprint arXiv:1908.01919, 2019.
+[43] Y. Shirahata, R. Yamamoto, E. Song, R. Terashima, J.-M. Kim, and K. Tachibana, “Period VITS: Variational Inference with Explicit Pitch Modeling for End-to-end Emotional Speech Synthesis,” arXiv preprint arXiv:2210.15964, 2022.
+[44] S.-G. Lee, H. Kim, C. Shin, X. Tan, C. Liu, Q. Meng, T. Qin, W. Chen, S. Yoon, and T.-Y. Liu, “Priorgrad: Improving Conditional Denoising Diffusion Models with Data-driven Adaptive Prior,” arXiv preprint arXiv:2106.06406, 2021.
+[45] H.-S. Choi, J. Lee, W. Kim, J. Lee, H. Heo, and K. Lee, “Neural Analysis and Synthesis: Reconstructing Speech from Self-supervised Representations,” Advances in Neural Information Processing Systems, vol. 34, pp. 16 251–16 265, 2021.
+[46] S.-H. Lee, S.-B. Kim, J.-H. Lee, E. Song, M.-J. Hwang, and S.-W. Lee, “HierSpeech: Bridging the Gap between Text and Speech by Hierarchical Variational Inference using Self-supervised Representations for Speech Synthesis,” in Advances in Neural Information Processing Systems, 2022.
+[47] T. Chen, S. Kornblith, M. Norouzi, and G. Hinton, “A Simple Framework for Contrastive Learning of Visual Representations,” in International Conference on Machine Learning. PMLR, 2020, pp. 1597–1607.
+[48] K. Qian, Y. Zhang, H. Gao, J. Ni, C.-I. Lai, D. Cox, M. HasegawaJohnson, and S. Chang, “Contentvec: An Improved Self-supervised Speech Representation by Disentangling Speakers,” in International Conference on Machine Learning. PMLR, 2022, pp. 18 003–18 017.
+[49] S. Choi, W. Kim, S. Park, S. Yong, and J. Nam, “Children’s Song Dataset for Singing Voice Research,” in International Society for Music Information Retrieval Conference (ISMIR), 2020.
+[50] A. Babu, C. Wang, A. Tjandra, K. Lakhotia, Q. Xu, N. Goyal, K. Singh, P. von Platen, Y. Saraf, J. Pino et al., “XLS-R: Self-supervised Cross-lingual Speech Representation Learning at Scale,” arXiv preprint arXiv:2111.09296, 2021.
+[51] A. Baevski, Y. Zhou, A. Mohamed, and M. Auli, “wav2vec 2.0: A Framework for Self-supervised Learning of Speech Representations,” Advances in Neural Information Processing Systems, vol. 33, pp. 12 449–12 460, 2020.
+[52] I. Loshchilov and F. Hutter, “Decoupled Weight Decay Regularization,” arXiv preprint arXiv:1711.05101, 2017.
+[53] J. Donahue, S. Dieleman, M. Bin´kowski, E. Elsen, and K. Simonyan, “End-to-End Adversarial Text-to-Speech,” arXiv preprint arXiv:2006.03575, 2020.
+[54] Y. Ren, C. Hu, X. Tan, T. Qin, S. Zhao, Z. Zhao, and T.-Y. Liu, “Fastspeech 2: Fast and High-quality End-to-End Text to Speech,” arXiv preprint arXiv:2006.04558, 2020.
+[55] J. Kim, J. Kong, and J. Son, “Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech,” in International Conference on Machine Learning. PMLR, 2021, pp. 5530–5540.
+
+[56] R. Prenger, R. Valle, and B. Catanzaro, “WaveGlow: A Flow-based Generative Network for Speech Synthesis,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2019, pp. 3617–3621.
+[57] P. Shaw, J. Uszkoreit, and A. Vaswani, “Self-attention with Relative Position Representations,” arXiv preprint arXiv:1803.02155, 2018.
+[58] J. Kim, S. Kim, J. Kong, and S. Yoon, “Glow-tts: A Generative Flow for Text-to-Speech via Monotonic Alignment Search,” Advances in Neural Information Processing Systems, vol. 33, pp. 8067–8077, 2020.
+[59] M. Morrison, R. Kumar, K. Kumar, P. Seetharaman, A. Courville, and Y. Bengio, “Chunked Autoregressive GAN for Conditional Waveform Synthesis,” arXiv preprint arXiv:2110.10139, 2021.
+[60] A. W. Rix, J. G. Beerends, M. P. Hollier, and A. P. Hekstra, “Perceptual Evaluation of Speech Quality (PESQ)-A New Method for Speech Quality Assessment of Telephone Networks and Codecs,” in IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP), vol. 2. IEEE, 2001, pp. 749–752.
+[61] M. Mu¨ller, “Dynamic Time Warping,” Information retrieval for music and motion, pp. 69–84, 2007.
+[62] K. Shen, Z. Ju, X. Tan, Y. Liu, Y. Leng, L. He, T. Qin, S. Zhao, and J. Bian, “NaturalSpeech 2: Latent Diffusion Models are Natural and Zero-Shot Speech and Singing Synthesizers,” arXiv preprint arXiv:2304.09116, 2023.
+[63] M. W. Lam, Q. Tian, T. Li, Z. Yin, S. Feng, M. Tu, Y. Ji, R. Xia, M. Ma, X. Song et al., “Efficient Neural Music Generation,” arXiv preprint arXiv:2305.15719, 2023.
+[64] Y. Song, P. Dhariwal, M. Chen, and I. Sutskever, “Consistency Models,” arXiv preprint arXiv:2303.01469, 2023.
+

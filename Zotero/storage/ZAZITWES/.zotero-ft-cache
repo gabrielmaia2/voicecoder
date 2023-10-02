@@ -1,0 +1,130 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Outline
+
+    Abstract
+    Keywords
+    1. Introduction
+    2. Speech features
+    3. Mapping features
+    4. Time-alignment
+    5. Spectral modeling
+    6. Prosodic modeling
+    7. Performance evaluation
+    8. Applications
+    9. Challenges
+    10. Future directions
+    References 
+
+Show full outline
+Cited by (250)
+Figures (3)
+
+    Fig. 1. Training and conversion phases of a typical VC system
+    Fig. 2. A toy example comparing JDVQ, JDVQ-DIFF, JDGMM, and ANN
+    Fig. 3. Piece-wise linear frequency warping function
+
+Tables (2)
+
+    Table 2
+    Table 3 
+
+Elsevier
+Speech Communication
+Volume 88 , April 2017, Pages 65-82
+Speech Communication
+An overview of voice conversion systems
+Author links open overlay panel Seyed Hamidreza Mohammadi , Alexander Kain
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.specom.2017.01.008 Get rights and content
+Abstract
+
+Voice transformation (VT) aims to change one or more aspects of a speech signal while preserving linguistic information. A subset of VT, Voice conversion (VC) specifically aims to change a source speaker’s speech in such a way that the generated output is perceived as a sentence uttered by a target speaker. Despite many years of research, VC systems still exhibit deficiencies in accurately mimicking a target speaker spectrally and prosodically, and simultaneously maintaining high speech quality. In this work we provide an overview of real-world applications, extensively study existing systems proposed in the literature, and discuss remaining challenges.
+
+    Previous article in issue
+    Next article in issue 
+
+Keywords
+Voice conversion
+Overview
+Survey
+Cited by (250)
+
+    Deepfakes as a threat to a speaker and facial recognition: An overview of tools and attack vectors
+    2023, Heliyon
+    Show abstract
+    Comparing the performance of classic voice-driven assistive systems for dysarthric speech
+    2023, Biomedical Signal Processing and Control
+    Citation Excerpt :
+
+    Hence, this is the reason why the used SE and VC methods cannot provide suitable performance for moderate dysarthria patients. In addition, the voices of the source and target speakers must be paired and aligned during the SE and VC conversion training procedure [55]. However, a defect in the consonant pronunciation of dysarthric speakers can easily produce errors in the corpus alignment [4].
+    Show abstract
+    A Review of Differentiable Digital Signal Processing for Music &amp; Speech Synthesis
+    2023, arXiv
+    Phoneme Hallucinator: One-shot Voice Conversion via Set Expansion
+    2023, arXiv
+    Towards Stealthy Backdoor Attacks against Speech Recognition via Elements of Sound
+    2023, arXiv
+    Fake the Real: Backdoor Attack on Deep Speech Classification via Voice Conversion
+    2023, arXiv
+
+View all citing articles on Scopus
+View full text
+© 2017 Elsevier B.V. All rights reserved.
+Recommended articles
+
+    Template-matching for text-dependent speaker verification
+    Speech Communication, Volume 88, 2017, pp. 96-105
+    Subhadeep Dey , …, Marc Ferras
+    Improving the automatic segmentation of subtitles through conditional random field
+    Speech Communication, Volume 88, 2017, pp. 83-95
+    Aitor Álvarez , …, Arantza del Pozo
+    Interpretable parametric voice conversion functions based on Gaussian mixture models and constrained transformations
+    Computer Speech & Language, Volume 30, Issue 1, 2015, pp. 3-15
+    Daniel Erro , …, Inma Hernaez
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 181 
+
+Captures
+
+    Exports-Saves: 3
+    Readers: 168 
+
+Social Media
+
+    Shares, Likes & Comments: 2 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

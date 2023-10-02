@@ -1,0 +1,591 @@
+Autoencoders
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+arXiv:2003.05991v2 [cs.LG] 3 Apr 2021
+
+Abstract An autoencoder is a speciﬁc type of a neural network, which is mainly designed to encode the input into a compressed and meaningful representation, and then decode it back such that the reconstructed input is similar as possible to the original one. This chapter surveys the diﬀerent types of autoencoders that are mainly used today. It also describes various applications and use-cases of autoencoders.
+
+1 Autoencoders
+
+Autoencoders have been ﬁrst introduced in [43] as a neural network that is trained to reconstruct its input. Their main purpose is learning in an unsupervised manner an “informative” representation of the data that can be used for various implications such as clustering. The problem, as formally deﬁned in [2], is to learn the functions 𝐴 : R𝑛 → R𝑝 (encoder) and 𝐵 : R𝑝 → R𝑛 (decoder) that satisfy
+
+arg min𝐴,𝐵 𝐸 [Δ(x, 𝐵 ◦ 𝐴(x)],
+
+(1)
+
+where 𝐸 is the expectation over the distribution of 𝑥, and Δ is the reconstruction loss function, which measures the distance between the output of the decoder and the intput. The latter is usually set to be the ℓ2-norm. Figure 1 provides an illustration of the autoencoder model.
+
+Dor Bank School of Electrical Engineering, Tel Aviv University, e-mail: dorbank@mail.tau.ac.il Noam Koenigstein Department of Industrial Engineering, Faculty of Engineering, Tel Aviv University, e-mail: noamk@ tauex.tau.ac.il Raja Giryes School of Electrical Engineering, Tel Aviv University, e-mail: raja@tauex.tau.ac.il
+1
+
+2
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+Fig. 1: An autoencoder example. The input image is encoded to a compressed representation and then decoded.
+In the most popular form of autoencoders, 𝐴 and 𝐵 are neural networks [40]. In the special case that 𝐴 and 𝐵 are linear operations, we get a linear autoencoder [3]. In the case of linear autoencoder where we also drop the non-linear operations, the autoencoder would achieve the same latent representation as Principal Component Analysis (PCA) [38]. Therefore, an autoencoder is in fact a generalization of PCA, where instead of ﬁnding a low dimensional hyperplane in which the data lies, it is able to learn a non-linear manifold.
+Autoencoders may be trained end-to-end or gradually layer by layer. In the latter case, they are ”stacked” together, which leads to a deeper encoder. In [35], this is done with convolutional autoencoders, and in [54] with denoising autoencoder (described below).
+This chapter is organized as follows. In Section 2, diﬀerent regularization techniques for autoencoders are considered, whose goal is to ensure that the learned compressed representation is meaningful. In Section 3, the variational autoencoders are presented, which are considered to be the most popular form of autoencoders. Section 4 covers very common applications for autoencoders, Section 5.1 brieﬂy discusses the comparison between autoencoders and generative adversarial networks, and Section 5 describes some recent advanced techniques in this ﬁeld. Section 6 concludes this chapter.
+2 Regularized autoencoders
+Since in training, one may just get the identity operator for 𝐴 and 𝐵, which keeps the achieved representation the same as the input, some additional regularization is required. The most common option is to make the dimension of the representation smaller than the input. This way, a 𝑏𝑜𝑡𝑡𝑙𝑒𝑛𝑒𝑐𝑘 is imposed. This option also directly serves the goal of getting a low dimensional representation of the data. This representation can be used for purposes such as data compression, feature extraction, etc. Its important to note that even if the 𝑏𝑜𝑡𝑡𝑙𝑒𝑛𝑒𝑐𝑘 is comprised of only one node, then
+
+Autoencoders
+
+3
+
+overﬁtting is still possible if the capacity of the encoder and the decoder is large enough to encode each sample to an index.
+In cases where the size of the hidden layer is equal or greater than the size of the input, there is a risk that the encoder will simply learn the identity function. To prevent it without creating a bottleneck (i.e. smaller hidden layer) several options exists for regularization, which we describe hereafter, that would enforce the autoencoder to learn a diﬀerent representation of the input.
+An important tradeoﬀ in autoencoders is the bias-variance tradeoﬀ. On the one hand, we want the architecure of the autoencoder to be able to reconstruct the input well (i.e. reduce the reconstruction error). On the other hand, we want the low representation to generalize to a meaningful one. We now turn to describe diﬀerent methods to tackle such tradeoﬀs.
+
+2.1 Sparse Autoencoders
+
+One way to deal with this tradeoﬀ is to enforce sparsity on the hidden activations. This can be added on top of the bottleneck enforcement, or instead of it. There are two strategies to enforce the sparsity regularization. They are similar to ordinary regularization, where they are applied on the activations instead of the weights. The ﬁrst way to do so, is to apply 𝐿1 regularization, which is known to induce sparsity. Thus, the autoencoder optimization objective becomes:
+
+∑︁
+
+arg min𝐴,𝐵 𝐸 [Δ(x, 𝐵 ◦ 𝐴(x)] + 𝜆 |𝑎𝑖 |,
+
+(2)
+
+𝑖
+
+where 𝑎𝑖 is the activation at the 𝑖th hidden layer and 𝑖 iterates over all the hiddens
+
+activations. Another way to do so, is to use the KL-divergence, which is a measure of
+
+the distance between two probability distributions. Instead of tweaking the 𝑙𝑎𝑚𝑏𝑑𝑎
+
+parameter as in the 𝐿1 regularization, we can assume the activation of each neuron acts as a Bernouli variable with probability 𝑝 and tweak that probability. At each
+
+batch, the actual probability is then measured, and the diﬀerence is calculated and
+
+applied as a regularization factor. For each neuron 𝑗, the calculated empirical prob-
+
+ability
+
+is
+
+𝑝ˆ 𝑗
+
+=
+
+1 𝑚
+
+𝑖 𝑎𝑖 (𝑥), where 𝑖 iterates over the samples in the batch. Thus the
+
+overall loss function would be
+
+∑︁
+
+arg min𝐴,𝐵 𝐸 [Δ(x, 𝐵 ◦ 𝐴(x)] + 𝐾 𝐿 ( 𝑝|| 𝑝ˆ 𝑗 ),
+
+(3)
+
+𝑗
+
+where the regularization term in it aims at matching 𝑝 to 𝑝ˆ.
+
+4
+2.2 Denoising Autoencoders
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+Denoising autoencoders [53] can be viewed either as a regularization option, or as robust autoencoders which can be used for error correction. In these architectures, the input is disrupted by some noise (e.g., additive white Gaussian noise or erasures using Dropout) and the autoencoder is expected to reconstruct the clean version of the input, as illustrated in Figure 2.
+
+Fig. 2: A denoising autoencoder example. The disrupted input image is encoded to a representation and then decoded.
+
+Note that x˜ is a random variable, whose distribution is given by 𝐶 (x˜ |x). Two common options for 𝐶 are:
+
+𝐶𝜎 (x˜ |x) = N (x, 𝜎2I),
+
+(4)
+
+and
+
+𝐶𝑝 (x˜ |x) = 𝛽 x, 𝛽 ∼ 𝐵𝑒𝑟 ( 𝑝),
+
+(5)
+
+where detnotes an element-wise (Hadamard) product. In the ﬁrst option, the variance parameter 𝜎 sets the impact of the noise. In the second, the parameter 𝑝 sets the probability of a value in x not being nulliﬁed. A relationship between denoising autoencoders with dropout to analog coding with erasures has been shown in [4].
+
+Autoencoders
+
+5
+
+2.3 Contractive Autoencoders
+
+In denoising autoencoders, the emphasis is on letting the encoder be resistant to some perturbations of the input. In contractive autoencoders, the emphasis is on making the feature extraction less sensitive to small perturbations, by forcing the encoder to disregard changes in the input that are not important for the reconstruction by the decoder. Thus, a penatly is imposed on the Jacobian of the network. The Jacobian matrix of the hidden layer ℎ consists of the derivative of each node ℎ 𝑗 with respect to each value 𝑥𝑖 in the input 𝑥. Formally: 𝐽 𝑗𝑖 = ∇𝑥𝑖 ℎ 𝑗 (𝑥𝑖). In contractive autoencoders we try to minimize its L2 norm, such that the overall optimization loss would be:
+
+arg min𝐴,𝐵 𝐸 [Δ(𝑥, 𝐵 ◦ 𝐴(𝑥)] + 𝜆||𝐽𝐴(𝑥)||22.
+
+(6)
+
+The reconstruction loss function and the regularization loss actually pull the result towards opposite directions. By minimizing the squared Jacobian norm, all the latent representations of the input tend to be more similar to each other, and by thus make the reconstruction more diﬃcult, since the diﬀerences between the representations are smaller. The main idea is that variations in the latent representation that are not important for the reconstructions would be diminished by the regularization factor, while important variations would remain because of their impact on the reconstruction error.
+
+3 Variational Autoencoders
+
+A major improvement in the representation capabilities of autoencoders has been
+
+achieved by the Variational Autoencoders (VAE) model [27]. Following Variational
+
+Bayes (VB) Inference [6], VAE are generative models that attempt to describe
+
+data generation through a probabilistic distribution. Speciﬁcally, given an observed
+
+dataset X = {x𝑖 }𝑖𝑁=1 of 𝑉 i.i.d samples, we assume a generative model for each datum x𝑖 conditioned on an unobserved random latent variable z𝑖, where 𝜃 are the param-
+
+eters governing the generative distribution. This generative model is also equivalent
+
+to a probabilistic decoder. Symmetrically, we assume an approximate posterior dis-
+
+tribution over the latent variable z𝑖 given a datum x𝑖 denoted by recognition, which
+
+is equivalent a probabilistic encoder and governed by the parameters 𝜙. Finally, we
+
+assume a prior distribution for the latent variables z𝑖 denoted by 𝑝 𝜃 (z𝑖). Figure 3
+
+depicts the relationship described above. The parameters 𝜃 and 𝜙 are unknown and
+
+needs to learned from the data. The observed latent variables z𝑖 can be interpreted
+
+as a code given by the recognition model 𝑞 𝜙 (z|x).
+
+The marginal log-likelihood is expressed as a sum over the individual data points
+
+log 𝑝 𝜃 (x1, x2, ..., x𝑁 ) =
+
+𝑁 𝑖=1
+
+log
+
+𝑝
+
+𝜃
+
+(x𝑖
+
+),
+
+and
+
+each
+
+point
+
+can
+
+be
+
+rewritten
+
+as:
+
+log 𝑝 𝜃 (x𝑖) = 𝐷𝐾 𝐿 𝑞 𝜙 (z|x𝑖) || 𝑝 𝜃 (z|x𝑖) + L (𝜃, 𝜙; x𝑖),
+
+(7)
+
+6
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+Fig. 3: A Graphical Representatin of VAE
+
+where the ﬁrst term is the Kullback-Leibler divergence of the approximate recognition model from the true posterior and the second term is called the variational lower bound on the marginal likelihood deﬁned as:
+
+L (𝜃, 𝜙; x𝑖) E𝑞𝜙 (z|x𝑖) − log 𝑞 𝜙 (z|x) + log 𝑝 𝜃 (x, z) .
+
+(8)
+
+Since the Kullback-Leibler divergence is non-negative, L (𝜃, 𝜙; x𝑖) is a lower bound on the marginal log-likelihood and the marginal log-likelihood is independent of the parameters 𝜃 and 𝜙, maximizing the lower bound improves our approximation of the posterior with respect to the Kullback-Leibler divergence.
+The variational lower bound can be further expanded as follows:
+
+L (𝜃, 𝜙; x𝑖) = −𝐷𝐾 𝐿 𝑞 𝜙 (z|x𝑖)|| 𝑝 𝜃 (z) + E𝑞𝜙 (z|x𝑖) log 𝑝 𝜃 (x𝑖 |z)
+
+(9)
+
+Variational inference follows by maximizing L (𝜃, 𝜙; x𝑖) for all data points with
+respect to 𝜃 and 𝜙. Given a dataset X = {x𝑖 }𝑖𝑁=1 with 𝑁 data points, we can estimate the marginal
+likelihood lower-bound of the full dataset L (𝜃, 𝜙; X) using a mini-batch X𝑀 = {x𝑖 }𝑖𝑀=1 of size 𝑀 as follows:
+
+𝑀
+
+L (𝜃, 𝜙; X) ≈ L˜ 𝑀 (𝜃, 𝜙; X𝑀 ) =
+
+𝑁
+
+∑︁ L (𝜃, 𝜙; x𝑖)
+
+(10)
+
+𝑀
+
+𝑖=1
+
+Classical mean-ﬁeld VB assumes a factorized approximate posterior followed by a closed form optimization updates (which usually required conjugate priors). However, VAE follows a diﬀerent path in which the gradients of L˜ 𝑀 (𝜃, 𝜙; X𝑀 ) are approximated using a the reparameterization trick and stochastic gradient optimization.
+
+Autoencoders
+
+7
+
+3.1 The Reparameterization Trick
+
+The reparameterization trick is a simple approach to estimate L (𝜃, 𝜙; x𝑖) based on a small sample of size 𝐿. Consider Equation 8, we can reparameterize the random variable z˜ ∼ 𝑞 𝜙 (z|x) using a diﬀerentiable transformation 𝑔𝜙 (𝜖, x) using an auxiliary noise vrabile 𝜖 drawn from some distribution 𝜖 ∼ 𝑝(𝜖) [27]. Using this tecnique, L (𝜃, 𝜙; x𝑖) is approximated as follows:
+
+L (𝜃, 𝜙; x𝑖)
+
+≈ L˜ (𝜃, 𝜙; x𝑖)
+
+=
+
+1
+
+𝐿
+∑︁ log 𝑝 𝜃 (x𝑖, z(𝑖,𝑙) ) − log 𝑞 𝜙 (z(𝑖,𝑙) |x𝑖 ),
+
+(11)
+
+𝐿
+
+𝑙=1
+
+where z(𝑖,𝑙) = 𝑔𝜙 (𝜖(𝑖,𝑙) , x𝑖) and 𝜖(𝑖,𝑙) is a random noise drawn from 𝜖𝑙 ∼ 𝑝(𝜖). Remember we wish to optimize the mini-batch estimates from Equation 10. By
+plugging Equation 11 we get the following diﬀerentiable expression:
+
+𝑀
+
+Lˆ 𝑀 (𝜃, 𝜙; X) = 𝑁 ∑︁ L˜ (𝜃, 𝜙; x𝑖),
+
+(12)
+
+𝑀
+
+𝑖=1
+
+which can be derived according to 𝜃 and 𝜙 and plugged into an optimizer framework.
+
+Algorithm 1 Pseudo-code for VAE
+( 𝜃 , 𝜙) ← Initialize Parameter repeat
+X𝑀 ← Random minibatch of 𝑀 datapoints 𝜖 ← 𝐿 random samples of 𝑝 ( 𝜖 ) g ← ∇( 𝜃,𝜙) LˆM ( 𝜃 , 𝜙; X) {Gradients of Equation 12} ( 𝜃 , 𝜙) ← Update parameters based on g {e.g., update with SGD or Adagrad} until Convergenge of ( 𝜃 , 𝜙) return ( 𝜃 , 𝜙)
+
+Algorithm 1 summarizes the full optimization procedure for VAE. Often 𝐿 can be set to 1 so long as 𝑀 is large enough. Typical numbers are 𝑀 = 100 and 𝐿 = 1.
+Equation11 presents a lower bound on the log-likelihood log 𝑝 𝜃 (x𝑖). In [8], the equation is changed to
+
+L (𝜃, 𝜙; x𝑖)
+
+=
+
+1 𝐿
+
+𝐿
+∑︁ log
+𝑙=1
+
+1 𝑘
+
+𝑘
+∑︁
+𝑗 =1
+
+𝑝 𝜃 (x𝑖, z( 𝑗,𝑙) ) .
+𝑞 𝜙 (z( 𝑗,𝑙) |x𝑖 )
+
+(13)
+
+Intuitively, instead of taking the gradient of a single randomized latent representation, the gradients of the generative network are learned by a weighted average of the sample over diﬀerent samples from its (approximated) posterior distribution. The weights simply the likelihood functions 𝑞 𝜙 (z( 𝑗,𝑙) |x𝑖 ).
+
+8
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+3.2 Example: The Case of Normal Distribution
+
+Usually, we approximate 𝑝(z|x) with a Gaussian distribution 𝑞 𝜙 (z|x) = N (𝑔(x), ℎ(x)), where 𝑔(x) and ℎ(x) are the mean and the covariance of the distribution deﬁned by the encoder network. Namely, the encoder takes an input x𝑖 and maps it into a mean and covariance that determine the approximate posterior distribution 𝑞 𝜙 (z|x).
+To enable backpropagation through the network, sampling from 𝑞 𝜙 (z|x) can simpliﬁed using the reparametrisation trick as follows:
+
+z = ℎ(x)𝜉 + 𝑔(x),
+
+(14)
+
+where 𝜉 ∼ N (0, I) is a normal distribution. Finally, we denote the decoder with an additional function 𝑓 , and require that
+𝑥 ≈ 𝑓 (z). The loss function of the entire network then becomes:
+
+𝑙𝑜𝑠𝑠 = 𝑐 𝑥 − 𝑓 (z) 2 + 𝐷𝐾 𝐿 (N (𝑔(x), ℎ(x)), N (0, I)) ,
+
+(15)
+
+which can be automatically derived with respect to the network parameters in 𝑔, ℎ and 𝑓 and optimized with backpropogation.
+
+3.3 Disentangled Autoencoders
+The variational lower bound as presented at Eq. 9, can be viewed as the summation of two terms: The right term that includes the reconstruction capability of samples, and the left term that acts as a regularization that biases 𝑞 𝜙 (𝑧|x(𝑖) towards the assumed prior 𝑝 𝜃 (𝑧). Disentangled autoencoders include variational autoencoders with a small addition. They add a parameter 𝛽 is as a multiplicative factor for the 𝐾 𝐿 divergence [23] at Eq. 9. Its maximization factor is thus:
+L (𝜃, 𝜙, x(𝑖) ) = −𝛽𝐷𝐾 𝐿 (𝑞 𝜙 (𝑧|x(𝑖) ) || 𝑝 𝜃 (𝑧)) + E𝑞𝜙 (𝑧 |x(𝑖) ) [log 𝑝 𝜃 (x(𝑖) |𝑧)]. (16)
+In practice, the prior 𝑝 𝜃 (𝑧) is commonly set as the standard multivariate normal distribution N (0, I). In those cases, all the features are uncorrelated, and the 𝐾 𝐿 divergence regularizes the latent features distribution 𝑞 𝜙 (𝑧|x(𝑖) to a less correlated one. Note that the larger the 𝛽, the less correlated (more disentangled) the features will be.
+
+4 Applications of autoencoders
+Learning a representation via the autoencoder can be used for various applications. The diﬀerent types of autoencoders may be modiﬁed or combined to form new models for various applications. For example, in [39], they are used for classiﬁcation,
+
+Autoencoders
+
+9
+
+captioning, and unsupervised learning. We describe below some of the applications of autoencoders.
+
+4.1 Autoencoders as a generative model
+As explained in Section 3, variational autoencoders are generative models that attempt to describe data generation through a probabilistic distribution. Furthermore, as can be seen in Equation 9, the posterior distribution 𝑞 𝜙 (z|x(𝑖) which is derived by the encoder, is regularized towards a continuous and complete distribution in the shape of the predeﬁned prior of the latent variables 𝑝 𝜃 (z). Once trained, one can simply samples random variables from the the same prior, and feed it to the decoder. Since the decoder was trained generate x from 𝑝 𝜃 (x𝑖 |z), it would generate a meaningful newly-generated sample. In ﬁgure 4, original and generated images are displayed over the MNIST dataset. When discussing the generation of new samples, the immediate debate involves the comparison between VAE and GANs. An overview on this can be found at Section 5.1, and two methods that combine both models can be found at Sections 5.2 and 5.3.
+
+(a) Sample from the original MNIST dataset.
+
+(b) VAE generated MNIST images.
+
+Fig. 4: Generated images of from a variational autoencoder, trained on the MNIST dataset with a prior 𝑝 𝜃 (z) = N (0, I). Left: original images from the dataset. Right: generated images.
+
+4.2 Use of autoencoders for classiﬁcation
+While autoencoders are being trained in an unsupervised manner (i.e., in the absence of labels), they can be used also in the semi-supervised setting (where part of the
+
+10
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+data do have labels) for improving classiﬁcation results. In this case, the encoder is used as a feature extractor and is "plugged" into a classiﬁcation network. This is mainly done in the semi-supervised learning setup, where a large dataset is given for a supervised learning task, but only a small portion of it is labeled.
+The key assumption is that samples with the same label should correspond to some latent presentation, which can be approximated by the latent layer of autoencoders. First, the autoencoders are trained in an unsupervised way, as described in previous sections. Then (or in parallel), the decoder is put aside, and the encoder is used as the ﬁrst part of a classiﬁcation model. Its weights may be ﬁne tuned [13] or stay ﬁxed during training. A simpler strategy can be found in [17], where a support vector machine (SVM) is trained on the output features of the encoder. In cases where the domain is high dimensional, and the layer-by-layer training is unfeasable, one solution is to train each layer as a linear layer before adding the non linearity. In this case, even with denoising the inputs, there exists a closed form solution for each layer, and no iterative process is needed [9].
+Another approach use autoencoders as a regularization technique for a classiﬁcation network. For example, in [29, 60], two networks are connected to the encoder, a classiﬁcation network (trained with the labelled data) and the decoder network (trained to reconstruct the data, whether labeled or unlabeled). Having the reconstruction head in addition to the classiﬁcation head serves a regularizer for the latter. An illustration is given in ﬁgure 5.
+
+4.3 Use of autoencoders for clustering
+Clustering is an usupervised problem, where the target is to split the data to groups such that sampless in each group are similar to one another, and diﬀerent from the samples in the other groups. Most of the clustering algorithms are sensitive to the dimensions of the data, and suﬀer from the curse of dimensionality.
+Assuming that the data have some low-dimensional latent representation, one may use autoencoders to calculate such representations for the data, which are composed of much less features. First, the autoencoder is trained as described in the sections before. Then, the decoder is put aside, similarly to the usage in classiﬁcation. The latent representation (the encoders output) of each data point is then kept, and serves as the input for any given clustering algorithm (e.g., 𝐾-means).
+The main disadvantage of using vanilla autoencoders for clustering is that the embeddings are trained solely for reconstruction and not for the clustering application. To overcome this, several modiﬁcations can be made. In [45], the clustering is done similarly to the K-means algorithm [55], but the embeddings are also retrained at each iteration. In this training an argument is added to the autoencoder loss function, which penalizes the distance between the embedding and the cluster center.
+In [20], A prior distribution is made on the embeddings. Then, the optimization is done both by the reconstruction error and by the KL-Divergence between the resulting embeddings distribution and the assumed prior. This can be done implicitly,
+
+Autoencoders
+
+11
+
+Fig. 5: An illustration for using autoencoders as regularization for supervised models. Given the reconstruction loss 𝑅(𝑥, 𝑥ˆ), and the classiﬁcation lost function L (𝑦, 𝑦ˆ), the new loss function would be L˜ = L (𝑦, 𝑦ˆ) +𝜆𝑅(𝑥, 𝑥ˆ), where 𝜆 is the regularization parameter
+.
+by training a VAE with the assumed prior. At [10], this is done while assuming a multivariate Gaussian mixture.
+4.4 Use of autoencoders for anomaly detection
+Anomaly detection is another unsupervised task, where the objective is to learn a normal proﬁle given only the normal data examples and then identify the samples not conforming to the normal proﬁle as anomalies. This can be applied in diﬀerent applications such as fraud detection, system monitoring, etc. The use of autoencoders for this tasks, follows the assumption that a trained autoencoder would learn the latent subspace of normal samples. Once trained, it would result with a low reconstruction error for normal samples, and high reconstruction error for anomalies [21, 18, 62, 61].
+
+12
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+4.5 Use of autoencoders for recommendation systems
+
+A recommender system, is a model or system that seek to predict users preferences or aﬃnities to items [41]. Recommender systems are prominent in e-commerce websites, application stores, online content providers and have many other commercial applications. A classical approach in recommender system models is Collaborative Filtering (CF) [22]. In CF, user preferences are inferred based on information from other user preferences. The hidden assumption is that the human preferences are highly correlated i.e., people that exhibit similar preferences in the past will exhibit similar preferences in the future.
+An basic example of the use of autoencoders for recommender systems is the AutoRec model [44]. The AutoRec model has two variants: user-based AutoRec (U-AutoRec) and item-based AutoRec (I-AutoRec). In U-AutoRec the autoencoder learns a lower dimensional representation of item preferences for speciﬁc users while in I-AutoRec, the autoencoder learns a lower dimensional representation of user preferences for speciﬁc items.
+For example, assume a dataset consisting of 𝑀 user and 𝑁 items. Let rm ∈ RN be a preference vector for the user 𝑚 consisting of its preference score to each of the 𝑁 items. U-AutoReco’s decoder is 𝑧 = 𝑔(r𝑚) mapping r𝑚 into representation the representation vector 𝑧 ∈ R𝑑, where 𝑑 𝑁. The reconstruction given the encoder 𝑓 (𝑧) is ℎ(r𝑚; 𝜃) = 𝑓 (𝑔(r𝑚)), where 𝜃 are the model’s parameters. The U-AutoRec objective is deﬁned as
+
+𝑀
+
+∑︁ arg min𝜃
+
+r𝑚 − ℎ(r𝑚; 𝜃)
+
+2 + 𝜆 · 𝑟𝑒𝑔.
+𝑂
+
+(17)
+
+𝑚=1
+
+Here, · 2 means that the loss is deﬁned only on the observed preferences of the
+𝑂
+user. At prediction time, we can investigate the reconstruction vector and ﬁnd items that the user is likely to prefer.
+The I-AutoRec is deﬁned symetrically as follows: Let r𝑛 be item 𝑛’s preference vector for each user. The I-AutoRec objective is deﬁned as
+
+𝑁
+
+∑︁ arg min𝜃
+
+r𝑛 − ℎ(r𝑛; 𝜃)
+
+2 + 𝜆 · 𝑟𝑒𝑔.
+𝑂
+
+(18)
+
+𝑛=1
+
+At prediction time, we reconstruct the preference vector for each item, and look for potential users with high predicted preference.
+In [47, 46], the basic AutoRec model was extended by including de-noising techniques and incorporating users and items side information such as user demographics or item descriptoin. The de-noising serve as another type of regularization that prevent the auto-encoder overﬁtting rare patterns that do not concur with general user preferences. The side information whas shown to improve accuracy and speed-up the training process.
+
+Autoencoders
+
+13
+
+Similar to the original AutoRec, two symetrical models have been proposed, one that works with user preference r𝑚 vectors and the other with item preference vectors r𝑛. In the general case, these vectors may consist of explicit ratings. The Collaborative Denoising Auto-Encoder (CDAE) model [59] is essentially applying the same approach on vectors of implicit ratings rather than explicit ratings. Finally, a variational approach have been attempted by applaying VAE in a similar fashion [31].
+
+4.6 Use of autoencoders for dimensionality reduction
+Real world data such as text or images is often represented using a sparse highdimensional representation. While many models and applications work directly in the high dimensional space, this often leads to the curse of dimensioanlity [15]. The goal of dimensionality reduction is to learn a a lower dimensional manifold, so-called “intrinsic dimensionality” space.
+A classical approach for dimensionality reduction is Principal Component Analysis (PCA) [58]. PCA is a linear projection of data points into a lower dimensional space such that the squared reconstruction loss is minimized. As a linear projection, PCA is optmial. However, non-linear methods such as autoencoders, may and often do achieve superior results.
+Other methods for dimensionalty reduction employ diﬀerent objectives. For example, Linear Discriminant Analysis (LDA) is a supervised method to ﬁnd a linear subspace, which is optimal for discriminating data from diﬀerent classes [11]. ISOMAP [48] learns a low dimensional manifold by retaining the geodesic distance between pairwise data in the original space. For a survey of diﬀerent dimensioanlity methods see [51].
+The use of autoencoders for dimensionality reduction is stright forward. In fact, the dimensionality reduction is performed by every autoencoder in the bottleneck layer. The projection of the original input into the lower-dimensional bottleneck representation is a dimension reduction operation through the encoder and under the objective given to the decoder. For example, an autoencoder comrised of a simple fully connected encoder and decoder with a squared loss objective performs dimension reduction with a similar objective to PCA. However, the non-linearity activation functions often allows for a superior reconstruction when compared to simple PCA. More complex architectures and diﬀerent objectives allow diﬀerent complex dimension reduction models. To review the diﬀerent applications of autoencoders for dimension reduction, we erefer the interested reader to [24, 56, 57].
+
+14
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+5 Advanced autoencoder techniques
+
+Autoencoders are usually trained by a loss function corresponding to the diﬀerence between the input and the output. As shown above, one of the strengths of autoencoders is the ability to use their latent representation for diﬀerent usages. On the other hand, by looking at the reconstruction quality of autoencoders for images, one of its major weaknesses becomes clear, as the resulting images are usually blurry. The reason for that is the used loss function, which does not take into account how realistic its results are and does not use the prior knowledge that the input images are not blurred. In recent years, there were some developments related to autoencoders, which deal with this weakness.
+
+5.1 Autoencoders and generative adversarial networks
+Variational autoencoders are trained (usually) on MSE which yields slightly blurred images, but allows inference over the latent variables in order to control the output. An alternative generative model to autoencoders that synthesize data (such as images) is the Generative Adversarial Networks (GANs). In a nutshell, a GAN architecture consists of two parts: The generator which generates new samples, and a discriminator which is trained to distinguish between real samples, and generated ones. The generator and the discriminator are trained together using a loss function that enforces them to compete with each other, and by thus improves the quality of the generated data. This leads to generated results that are quite compelling visually, but in the cost of the control on the resulting images. Diﬀerent works have been done for having the advantages of both models, by diﬀerent combinations of the architectures and the loss functions. In Adversarial Autoencoders [34], The KL-divergence in the VAE loss function is replaced by a discriminator network that distinguishes between the prior and the approximated posterior. In [28], the reconstruction loss in the VAE loss is replaced by a discriminator, which makes the decoder to essentially merge with the generator. In [14], the discriminator of the GAN is combined with an encoder via shared weights, which enables the latent space to be conveniently modeled by GMM for inference. This approach was then used in [25] for self-supervised learning. We detail next two other directions for combining GANs with autoencoders.
+
+5.2 Adversarially learned inference
+One of the disadvantages of GANs is mode collapse, which unlike autoencoders, may cause them to represent via the latent space just part of the data (miss some modes in its distribution) and not all of it.
+In Adversarially Learned Inference (ALI) there is an attempt to merge the ideas of both VAEs and GANS, and get a compromise of their strengths and weaknesses
+
+Autoencoders
+
+15
+
+[12]. Instead of training a VAE with some loss function between the input and the output, a discriminator is used to distinguish between (x, zˆ) pairs, where x is an input sample and z ∼ 𝑞(z|x) is sampled from the encoders output, and (x˜, z) pairs, where z ∼ 𝑝(z) is sampled from the used prior in the VAE, and x˜ ∼ 𝑝(x|z) is the decoders output. This way the decoder is enforced to output realistic results in order to "fool" the discriminator. Yet, the autoencoder structure is maintained. An example of how ALI enables altering speciﬁc features in order to get meaningful alterations in images is presented in Figure 6.
+
+Fig. 6: An Image drawn from [12]. A model is ﬁrst trained on the CelebA dataset [33]. It includes 40 diﬀerent attributes on each image, which in ALI are linearly embedded in the encoder, decoder, and discriminator. Following the training phase, a single ﬁxed latent code 𝑧 is sampled. Each row has a subset of attributes that are held constant across columns. The attributes are male, attractive, young for row 𝐼; male attractive, older for row 𝐼 𝐼; female, attractive, young for row 𝐼 𝐼 𝐼; female, attractive, older for Row 𝐼𝑉. Attributes are then varied uniformly over rows across all columns in the following sequence: (b) black hair; (c) brown hair; (d) blond hair; (e) black hair, wavy hair; (f) blond hair, bangs; (g) blond hair, receding hairline; (h) blond hair, balding; (i) black hair, smiling; (j) black hair, smiling, mouth slightly open; (k) black hair, smiling, mouth slightly open, eyeglasses; (l) black hair, smiling, mouth slightly open, eyeglasses, wearing hat.
+ALI is an important milestone in the goal of merging both concepts and it had many extentions. For example, HALI [5] learns the autoencoder in hierchical structure in order to improve the recostruction ability. ALICE [30] added a conditional entropy loss between the real and the reconstructed images.
+5.3 Wasserstein autoencoders
+In continuation to Section 5.2, GANs generate compelling images, but do not provide inference, and have a lot of inherent problems regarding its learning stability.
+
+16
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+Wasserstein-GAN (WGAN) [1], solves a lot of those problems by using the Wasserstein distance for the optimizations loss function. The Wasserstein distance, is a speciﬁc case of the Optimal Transport distance [52], which is a distance between two probabilities, 𝑃𝑋 and 𝑃𝐺, and is deﬁned as:
+
+𝑊𝑐 (𝑃𝑋 , 𝑃𝐺) =
+
+inf
+
+E(𝑋 ,𝑌 )∼Γ [𝑐( 𝑋, 𝑌 )]
+
+(19)
+
+Γ∈𝑃 (𝑋 ∼𝑃𝑋 ,𝑌 ∼𝑃𝐺 )
+
+where 𝑐(𝑥, 𝑦) is some cost function. When 𝑐(𝑥, 𝑦) = 𝑑 𝑝 (𝑥, 𝑦) is a metric measurement, then the 𝑝-th root of 𝑊𝑐 is called the 𝑝-Wasserstein distance. When 𝑐(𝑥, 𝑦) = 𝑑 (𝑥, 𝑦), then we get to the 1-Wasserstein distance, which is also known as the "Earth Moving Distance" [42] and can be deﬁned as:
+
+𝑊1 (𝑃𝑋 , 𝑃𝐺) = sup E𝑋∼𝑃𝑋 [ 𝑓 ( 𝑋)] − E𝑌 ∼𝑃𝐺 [ 𝑓 (𝑌 )]
+
+(20)
+
+𝑓 ∈𝔉
+
+Unformally, we try to match the two probabilities by "moving" the ﬁrst to the latter in the shortest distance, and that distance is deﬁned as the 1-Wasserstein distance.
+As seen in Equation 9, the loss function of a speciﬁc sample is comprised of the reconstruction error and a regularization factor which enforces the latent representation to resemble the prior (usually multivariate standard normal). The problem addressed in [49], is that this regularization essentially pushes all the samples to look the same, and does not use the entire latent space as a whole. In GANs, the OT distance is used to discriminate between the distribution of real images and the distribution of fake ones. In Wasserstein autoencoders (WAE) [49], the authors modiﬁed the loss function for autoencoders, which lead to the following objective:
+
+𝐷𝑊
+
+𝐴𝐸
+
+(𝑃𝑋 ,
+
+𝑃𝐺 )
+
+=
+
+inf
+𝑄(𝑍 |𝑋) ∈𝔔
+
+E𝑃𝑋 E𝑄 (𝑍 |𝑋)
+
+[𝑐(𝑋,
+
+𝐺(𝑍))]
+
++
+
+𝜆
+
+·
+
+𝐷𝑍
+
+(𝑄𝑍 ,
+
+𝑃𝑍 ),
+
+(21)
+
+Where 𝑄 is the encoder and 𝐺 is the decoder. The left part is the new reconstruction loss, which now penalizes on the output distribution and the sample distribution. This is penalization since the "transportation plan" factors through the 𝐺 mapping [7]. The right part penalizes the distance between the latent space distribution to the prior distribution. The authors keep the prior as the multivariate normal distribution, and use to examples for divergences: the Jensen-Shannon divergence 𝐷 𝑗 𝑠 [32], and the maximum mean discrepancy (MMD) [19] Figure 7 illustrates the regularizations diﬀerence between 𝑉 𝐴𝐸 and 𝑊 𝐴𝐸.
+
+5.4 Deep feature consistent variational autoencoder
+In this section, a diﬀerent loss function is presented to optimize the autoencoder. Given an original image and a reconstructed one, instead of measuring some norm on the pixel diﬀerence (such as the ℓ2), a diﬀerent measure is used that takes into account the correlation between the pixels.
+
+Autoencoders
+
+17
+
+Fig. 7: An Image drawn from [49]. Both VAE and WAE minimize two terms: the reconstruction cost and the regularizer penalizing discrepancy between 𝑃𝑍 and distribution induced by the encoder 𝑄. VAE forces 𝑄(𝑍 |𝑋 = 𝑥) to match 𝑃𝑍 for all the diﬀerent input examples 𝑥 drawn from 𝑃𝑋 . This is illustrated on picture (a), where every single red ball is forced to match 𝑃𝑍 depicted as the white shape. Red balls start intersecting, which leads to problems with reconstruction. In contrast, WAE forces the continuous mixture 𝑄𝑍 := ∫ 𝑄(𝑍 |𝑋)𝑑𝑃𝑋 to match 𝑃𝑍 , as depicted with the green ball in picture (b). As a result latent codes of diﬀerent examples get a chance to stay far away from each other, promoting a better reconstruction.
+Pretrained classiﬁcation networks are commonly used for transfer learning. They allow transcending between diﬀerent input domains, where the weights of the model, which have been trained for one domain, are ﬁne tuned for the new domain in order to adapt to the changes between the domains. This can be done by training all the models’ (pretrained) weights for several epochs, or just the ﬁnal layers. Another use of pretrained networks is style transfer, where a style of one image is transfered to another image [16], .e.g., causing a regular photo looks like a painting of a given painter (e.g., Van Gogh) while maintaining its content (e.g., keeping the trees, cars, houses, etc. at the same place). In this case, the pretrained networks serve as a loss function.
+The same can be done for autencoders. A pretrained network can be used for creating a loss function for autoencoders [26]. After encoding and decoding an image, both the original and reconstructed image are inserted as input to a pretrained network. Assuming the pretrained network results with high accuracy, and the domain which it was trained on is not too diﬀerent than the one of the autoencoder, then each layer can be seen as a successful feature extractor of the input image. Therefore, instead of measuring the diﬀerence between the two images directly, it can be measured between their representation in the network layers. By measuring the diﬀerence between the images at diﬀerent layers in the network imposes a more realistic diﬀerence measure for the autoencoder.
+
+18
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+5.5 Conditional image generation with PixelCNN decoders
+
+Another alternative proposes a composition between autoencoders and PixelCNN [37]. In PixelCNN [36], the pixels in the image are ordered by some arbitrary order (e.g., top to bottom, left to right, or RGB values). Then the output is formed sequentially where each pixel is a result of both the output of previous pixels, and the input. This strategy takes into account the local spatial statistics of the image, as illustrated in Figure 8. For example, below a background pixel, there is a higher chance to have another background pixel, than the chance of having a foreground pixel. With the use of the spatial ordering (in addition to the input pixel information), the probability of getting a blurred pixel diminishes. In a later development [50], the local statistics was replaced by the usage of an RNN, but the same concept of pixel generation was remained. This concept can be combined with autoencoders by setting the decoder to be structured as a pixelCNN network generating the output image in a sequential order.
+
+Fig. 8: The pixelCNN generation framework. The pixels are generated sequentially. In this case they are generated from top to bottom and from laft to right. The next pixel to be generated is the yellow one. The green pixels are the already generated ones. For generating the yellow pixel, the pixelRNN takes into account the hidden state, and the information of the green pixels in the red square.
+
+Autoencoders
+
+19
+
+6 Conclusion
+
+This chapter presented autoencoders showing how the naive architectures that were ﬁrst deﬁned for them evolved to powerful models with the core abilities to learn a meaningful representation of the input and to model generative processes. These two abilities can be easily transformed to various use-cases, where part of them were covered. As explained in Section 5.2, one of the autoencoders fall-backs, is that its reconstruction errors do not include how realistic the outputs are. As for modeling generative processes, despite the success of variational and disentangled autoencoders, the way to choose the size and distribution of the hidden state is still based on experimentation, by considering the reconstruction error, and by varying the hidden state at post training. A future research that better sets these parameters is required.
+To conclude, the goal of autoencoders is to get a compressed and meaningful representation. We would like to have a representation that is meaningful to us, and at the same time good for reconstruction. In that trade oﬀ, it is important to ﬁnd the architectures which serves all needs.
+
+References
+1. Arjovsky, M., Chintala, S., Bottou, L.: Wasserstein generative adversarial networks. In: D. Precup, Y.W. Teh (eds.) Proceedings of the 34th International Conference on Machine Learning, Proceedings of Machine Learning Research, vol. 70, pp. 214–223. PMLR, International Convention Centre, Sydney, Australia (2017)
+2. Baldi, P.: Autoencoders, unsupervised learning, and deep architectures. In: I. Guyon, G. Dror, V. Lemaire, G. Taylor, D. Silver (eds.) Proceedings of ICML Workshop on Unsupervised and Transfer Learning, Proceedings of Machine Learning Research, vol. 27, pp. 37–49. PMLR, Bellevue, Washington, USA (2012)
+3. Baldi, P., Hornik, K.: Neural networks and principal component analysis: Learning from examples without local minima. Neural Netw. 2(1), 53–58 (1989). DOI 10.1016/0893-6080(89) 90014-2. URL http://dx.doi.org/10.1016/0893-6080(89)90014-2
+4. Bank, D., Giryes, R.: An ETF view of dropout regularization. In: 31st British Machine Vision Conference 2020, BMVC 2020, Virtual Event, UK, September 7-10, 2020. BMVA Press (2020). URL https://www.bmvc2020-conference.com/assets/papers/0044.pdf
+5. Belghazi, M.I., Rajeswar, S., Mastropietro, O., Rostamzadeh, N., Mitrovic, J., Courville, A.: Hierarchical adversarially learned inference (2018)
+6. Bishop, C.M.: Pattern Recognition and Machine Learning (Information Science and Statistics). Springer-Verlag, Berlin, Heidelberg (2006)
+7. Bousquet, O., Gelly, S., Tolstikhin, I., Simon-Gabriel, C.J., Schoelkopf, B.: From optimal transport to generative modeling: the vegan cookbook. arXiv (2017)
+8. Burda, Y., Grosse, R.B., Salakhutdinov, R.: Importance weighted autoencoders. CoRR abs/1509.00519 (2015)
+9. Chen, M., Xu, Z., Weinberger, K., Sha, F.: Marginalized denoising autoencoders for domain adaptation. Proceedings of the 29th International Conference on Machine Learning, ICML 2012 1 (2012)
+10. Dilokthanakul, N., Mediano, P.A.M., Garnelo, M., Lee, M.C.H., Salimbeni, H., Arulkumaran, K., Shanahan, M.: Deep unsupervised clustering with gaussian mixture variational autoencoders. ArXiv abs/1611.02648 (2017)
+
+20
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+11. Duda, R.O., Hart, P.E., Stork, D.G., et al.: Pattern classiﬁcation. International Journal of Computational Intelligence and Applications 1, 335–339 (2001)
+12. Dumoulin, V., Belghazi, I., Poole, B., Lamb, A., Arjovsky, M., Mastropietro, O., Courville, A.C.: Adversarially learned inference. ArXiv abs/1606.00704 (2016)
+13. Erhan, D., Bengio, Y., Courville, A., Manzagol, P.A., Vincent, P., Bengio, S.: Why does unsupervised pre-training help deep learning? J. Mach. Learn. Res. 11, 625–660 (2010)
+14. Feigin, Y., Spitzer, H., Giryes, R.: Gmm-based generative adversarial encoder learning (2020) 15. Friedman, J.H.: On bias, variance, 0/1—loss, and the curse-of-dimensionality. Data mining
+and knowledge discovery 1(1), 55–77 (1997) 16. Gatys, L.A., Ecker, A.S., Bethge, M.: Image style transfer using convolutional neural networks.
+2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) pp. 2414–2423 (2016) 17. Gogoi, M., Begum, S.A.: Image classiﬁcation using deep autoencoders. In: 2017 IEEE International Conference on Computational Intelligence and Computing Research (ICCIC), pp. 1–5 (2017). DOI 10.1109/ICCIC.2017.8524276 18. Gong, D., Liu, L., Le, V., Saha, B., Mansour, M.R., Venkatesh, S., van den Hengel, A.: Memorizing normality to detect anomaly: Memory-augmented deep autoencoder for unsupervised anomaly detection (2019) 19. Gretton, A., Borgwardt, K.M., Rasch, M.J., Schölkopf, B., Smola, A.: A kernel two-sample test. J. Mach. Learn. Res. 13(null), 723–773 (2012) 20. Guo, X., Liu, X., Zhu, E., Yin, J.: Deep clustering with convolutional autoencoders. pp. 373–382 (2017) 21. Hasan, M., Choi, J., Neumann, J., Roy-Chowdhury, A.K., Davis, L.S.: Learning temporal regularity in video sequences. In: 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp. 733–742 (2016) 22. Herlocker, J.L., Konstan, J.A., Riedl, J.: Explaining Collaborative Filtering Recommendations. In: Proceedings of the 2000 ACM Conference on Computer Supported Cooperative Work, CSCW ’00, pp. 241–250. ACM (2000) 23. Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M.M., Mohamed, S., Lerchner, A.: beta-vae: Learning basic visual concepts with a constrained variational framework. In: ICLR (2017) 24. Hinton, G.E., Salakhutdinov, R.R.: Reducing the dimensionality of data with neural networks. science 313(5786), 504–507 (2006) 25. Hochberg, D.C., Giryes, R., Greenspan, H.: A self supervised stylegan for classiﬁcationwith extremely limited annotations (2021) 26. Hou, X., Shen, L., Sun, K., Qiu, G.: Deep feature consistent variational autoencoder. CoRR abs/1610.00291 (2016). URL http://arxiv.org/abs/1610.00291 27. Kingma, D.P., Welling, M.: Auto-encoding variational bayes. CoRR abs/1312.6114 (2013) 28. Larsen, A.B.L., Sønderby, S.K., Larochelle, H., Winther, O.: Autoencoding beyond pixels using a learned similarity metric. In: Proceedings of the 33rd International Conference on International Conference on Machine Learning - Volume 48, ICML’16, p. 1558–1566. JMLR.org (2016) 29. Le, L., Patterson, A., White, M.: Supervised autoencoders: Improving generalization performance with unsupervised regularizers. In: S. Bengio, H. Wallach, H. Larochelle, K. Grauman, N. Cesa-Bianchi, R. Garnett (eds.) Advances in Neural Information Processing Systems 31, pp. 107–117. Curran Associates, Inc. (2018) 30. Li, C., Liu, H., Chen, C., Pu, Y., Chen, L., Henao, R., Carin, L.: Alice: Towards understanding adversarial learning for joint distribution matching. In: I. Guyon, U.V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, R. Garnett (eds.) Advances in Neural Information Processing Systems, vol. 30. Curran Associates, Inc. (2017). URL https://proceedings. neurips.cc/paper/2017/file/ade55409d1224074754035a5a937d2e0-Paper.pdf 31. Liang, D., Krishnana, R.G., Hoﬀman, M.D., Jebara, T.: Variational autoencoders for collaborative ﬁltering. CoRR abs/1802.05814 (2018). URL https://arxiv.org/abs/1802.05814
+
+Autoencoders
+
+21
+
+32. Lin, J.: Divergence measures based on the shannon entropy. IEEE Transactions on Information Theory 37(1), 145–151 (1991). DOI 10.1109/18.61115. URL http://ieeexplore.ieee. org/xpl/articleDetails.jsp?arnumber=61115
+33. Liu, Z., Luo, P., Wang, X., Tang, X.: Deep learning face attributes in the wild. In: Proceedings of the 2015 IEEE International Conference on Computer Vision (ICCV), ICCV ’15, p. 3730–3738. IEEE Computer Society, USA (2015). DOI 10.1109/ICCV.2015.425. URL https://doi. org/10.1109/ICCV.2015.425
+34. Makhzani, A., Shlens, J., Jaitly, N., Goodfellow, I.J.: Adversarial autoencoders. CoRR abs/1511.05644 (2015)
+35. Masci, J., Meier, U., Cireşan, D., Schmidhuber, J.: Stacked convolutional auto-encoders for hierarchical feature extraction. In: T. Honkela, W. Duch, M. Girolami, S. Kaski (eds.) Artiﬁcial Neural Networks and Machine Learning – ICANN 2011, pp. 52–59. Springer Berlin Heidelberg, Berlin, Heidelberg (2011)
+36. van den Oord, A., Kalchbrenner, N., Kavukcuoglu, K.: Pixel recurrent neural networks (2016) 37. Oord, A.v.d., Kalchbrenner, N., Vinyals, O., Espeholt, L., Graves, A., Kavukcuoglu, K.: Con-
+ditional image generation with pixelcnn decoders. In: Proceedings of the 30th International Conference on Neural Information Processing Systems, NIPS’16, pp. 4797–4805. Curran Associates Inc., USA (2016). URL http://dl.acm.org/citation.cfm?id=3157382. 3157633 38. Plaut, E.: From principal subspaces to principal components with linear autoencoders (2018) 39. Pu, Y., Gan, Z., Henao, R., Yuan, X., Li, C., Stevens, A., Carin, L.: Variational autoencoder for deep learning of images, labels and captions. In: Advances in Neural Information Processing Systems 29: Annual Conference on Neural Information Processing Systems 2016, December 5-10, 2016, Barcelona, Spain, pp. 2352–2360 (2016) 40. Ranzato, M., Huang, F.J., Boureau, Y., LeCun, Y.: Unsupervised learning of invariant feature hierarchies with applications to object recognition. In: 2007 IEEE Conference on Computer Vision and Pattern Recognition, pp. 1–8 (2007). DOI 10.1109/CVPR.2007.383157 41. Ricci, F., Rokach, L., Shapira, B.: Introduction to recommender systems handbook. In: Recommender systems handbook, pp. 1–35. Springer (2011) 42. Rubner, Y., Tomasi, C., Guibas, L.: The earth mover’s distance as a metric for image retrieval. International Journal of Computer Vision 40, 99–121 (2000). DOI 10.1023/A:1026543900054 43. Rumelhart, D.E., Hinton, G.E., Williams, R.J.: Parallel distributed processing: Explorations in the microstructure of cognition, vol. 1. chap. Learning Internal Representations by Error Propagation, pp. 318–362. MIT Press, Cambridge, MA, USA (1986). URL http://dl.acm. org/citation.cfm?id=104279.104293 44. Sedhain, S., Menon, A.K., Sanner, S., Xie, L.: Autorec: Autoencoders meet collaborative ﬁltering. In: Proceedings of the 24th International Conference on World Wide Web Companion, WWW 2015, Florence, Italy, May 18-22, 2015 - Companion Volume, pp. 111–112 (2015) 45. Song, C., Liu, F., Huang, Y., Wang, L., Tan, T.: Auto-encoder based data clustering. In: J. Ruiz-Shulcloper, G. Sanniti di Baja (eds.) Progress in Pattern Recognition, Image Analysis, Computer Vision, and Applications, pp. 117–124. Springer Berlin Heidelberg, Berlin, Heidelberg (2013) 46. Strub, F., Mary, J.: Collaborative Filtering with Stacked Denoising AutoEncoders and Sparse Inputs. In: NIPS Workshop on Machine Learning for eCommerce. Montreal, Canada (2015) 47. Strub, F., Mary, J., Gaudel, R.: Hybrid recommender system based on autoencoders. CoRR abs/1606.07659 (2016). URL http://arxiv.org/abs/1606.07659 48. Tenenbaum, J.B., De Silva, V., Langford, J.C.: A global geometric framework for nonlinear dimensionality reduction. science 290(5500), 2319–2323 (2000) 49. Tolstikhin, I., , Bousquet, O., Gelly, S., Scholkopf, B.: Wasserstein auto-encoders. ICML 2018 (2018) 50. Van Den Oord, A., Kalchbrenner, N., Kavukcuoglu, K.: Pixel recurrent neural networks. In: Proceedings of the 33rd International Conference on International Conference on Machine Learning - Volume 48, ICML’16, p. 1747–1756. JMLR.org (2016) 51. Van Der Maaten, L., Postma, E., Van den Herik, J.: Dimensionality reduction: a comparative review. J Mach Learn Res 10, 66–71 (2009)
+
+22
+
+Dor Bank, Noam Koenigstein, Raja Giryes
+
+52. Villani, C.: Topics in Optimal Transportation. Graduate studies in mathematics. American Mathematical Society (2003). URL https://books.google.co.il/books?id= GqRXYFxe0l0C
+53. Vincent, P., Larochelle, H., Bengio, Y., Manzagol, P.A.: Extracting and composing robust features with denoising autoencoders. In: Proceedings of the 25th International Conference on Machine Learning, ICML ’08, pp. 1096–1103. ACM, New York, NY, USA (2008). DOI 10.1145/1390156.1390294. URL http://doi.acm.org/10.1145/1390156.1390294
+54. Vincent, P., Larochelle, H., Lajoie, I., Bengio, Y., Manzagol, P.A.: Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion. J. Mach. Learn. Res. 11, 3371–3408 (2010). URL http://dl.acm.org/citation.cfm?id= 1756006.1953039
+55. Wagstaﬀ, K., Cardie, C., Rogers, S., Schrödl, S.: Constrained k-means clustering with background knowledge. In: Proceedings of the Eighteenth International Conference on Machine Learning, ICML ’01, p. 577–584. Morgan Kaufmann Publishers Inc., San Francisco, CA, USA (2001)
+56. Wang, W., Huang, Y., Wang, Y., Wang, L.: Generalized autoencoder: A neural network framework for dimensionality reduction. In: Proceedings of the IEEE conference on computer vision and pattern recognition workshops, pp. 490–497 (2014)
+57. Wang, Y., Yao, H., Zhao, S.: Auto-encoder based dimensionality reduction. Neurocomputing 184, 232–242 (2016)
+58. Wold, S., Esbensen, K., Geladi, P.: Principal component analysis. Chemometrics and intelligent laboratory systems 2(1-3), 37–52 (1987)
+59. Wu, Y., DuBois, C., Zheng, A.X., Ester, M.: Collaborative denoising auto-encoders for top-n recommender systems. In: Proceedings of the Ninth ACM International Conference on Web Search and Data Mining, San Francisco, CA, USA, February 22-25, 2016, pp. 153–162 (2018)
+60. Zhang, Y., Lee, K., Lee, H.: Augmenting supervised neural networks with unsupervised objectives for large-scale image classiﬁcation. In: Proceedings of the 33rd International Conference on International Conference on Machine Learning - Volume 48, ICML’16, p. 612–621. JMLR.org (2016)
+61. Zhao, Y., Deng, B., Shen, C., Liu, Y., Lu, H., Hua, X.S.: Spatio-temporal autoencoder for video anomaly detection. In: Proceedings of the 25th ACM International Conference on Multimedia, MM ’17, p. 1933–1941. Association for Computing Machinery, New York, NY, USA (2017). DOI 10.1145/3123266.3123451. URL https://doi.org/10.1145/3123266.3123451
+62. Zong, B., Song, Q., Min, M.R., Cheng, W., Lumezanu, C., ki Cho, D., Chen, H.: Deep autoencoding gaussian mixture model for unsupervised anomaly detection. In: ICLR (2018)
+

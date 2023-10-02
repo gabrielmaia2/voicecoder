@@ -1,0 +1,126 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > IEEE/ACM Transactions on Audi... > Volume: 28
+Examining the Mapping Functions of Denoising Autoencoders in Singing Voice Separation
+Publisher: IEEE
+Cite This
+PDF
+Stylianos Ioannis Mimilakis ; Konstantinos Drossos ; Estefanía Cano ; Gerald Schuller
+All Authors
+11
+Cites in
+Papers
+502
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction
+    II.
+    Denoising Autoencoders in Music Source Separation
+    III.
+    Neural Couplings Algorithm
+    IV.
+    Experimental Procedure
+    V.
+    Results & Discussion
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+Abstract:
+The goal of this article is to investigate what singing voice separation approaches based on neural networks learn from the data. We examine the mapping functions of neural networks based on the denoising autoencoder (DAE) model that are conditioned on the mixture magnitude spectra. To approximate the mapping functions, we propose an algorithm inspired by the knowledge distillation, denoted the neural couplings algorithm (NCA). The NCA yields a matrix that expresses the mapping of the mixture to the target source magnitude information. Using the NCA, we examine the mapping functions of three fundamental DAE-based models in music source separation; one with single-layer encoder and decoder, one with multi-layer encoder and single-layer decoder, and one using skip-filtering connections (SF) with a single-layer encoding and decoding. We first train these models with realistic data to estimate the singing voice magnitude spectra from the corresponding mixture. We then use the optimized models and test spectral data as input to the NCA. Our experimental findings show that approaches based on the DAE model learn scalar filtering operators, exhibiting a predominant diagonal structure in their corresponding mapping functions, limiting the exploitation of inter-frequency structure of music data. In contrast, skip-filtering connections are shown to assist the DAE model in learning filtering operators that exploit richer inter-frequency structures.
+Published in: IEEE/ACM Transactions on Audio, Speech, and Language Processing ( Volume: 28 )
+Page(s): 266 - 278
+Date of Publication: 06 November 2019
+ISSN Information:
+INSPEC Accession Number: 19404820
+DOI: 10.1109/TASLP.2019.2952013
+Publisher: IEEE
+Funding Agency:
+I. Introduction
+
+Signal enhancement and separation based on deep learning methods is an active research area that has attracted a lot of attention [1]. The objective is to estimate an individual target signal from an observed corrupted version. In the context of music source separation, the corrupted observation refers to the observed mixture signal, and the individual target signal to the isolated music source, e.g. singing voice, drums, etc. A particularly challenging task in music source separation is the estimation of singing voice from a single channel, i.e., monaural, mixture signal [2]. To that aim, deep learning approaches are shown to yield state-of-the-art (SOTA) results [3].
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+More Like This
+Carnatic Music Identification of Melakarta Ragas through Machine and Deep Learning using Audio Signal Processing
+
+2023 4th International Conference for Emerging Technology (INCET)
+
+Published: 2023
+On the importance of exact synchronization for distributed audio signal processing
+
+2003 IEEE International Conference on Acoustics, Speech, and Signal Processing, 2003. Proceedings. (ICASSP '03).
+
+Published: 2003
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

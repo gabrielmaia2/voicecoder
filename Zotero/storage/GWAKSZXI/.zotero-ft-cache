@@ -1,0 +1,1258 @@
+EXAMINING THE MAPPING FUNCTIONS OF DENOISING AUTOENCODERS IN SINGING VOICE SEPARATION
+
+arXiv:1904.06157v2 [eess.AS] 20 Oct 2019
+
+Stylianos Ioannis Mimilakis∗ Konstantinos Drossos
+
+Fraunhofer-IDMT
+
+Audio Research Group
+
+Ilmenau, Germany
+
+Tampere University
+
+Tampere, Finland
+
+Estefanía Cano Fraunhofer-IDMT Ilmenau, Germany
+
+Gerald Schuller Dpt. for Media Technology Techinical University of Ilmenau
+Ilmenau, Germany
+
+ABSTRACT
+The goal of this work is to investigate what singing voice separation approaches based on neural networks learn from the data. We examine the mapping functions of neural networks based on the denoising autoencoder (DAE) model that are conditioned on the mixture magnitude spectra. To approximate the mapping functions, we propose an algorithm inspired by the knowledge distillation, denoted the neural couplings algorithm (NCA). The NCA yields a matrix that expresses the mapping of the mixture to the target source magnitude information. Using the NCA, we examine the mapping functions of three fundamental DAE-based models in music source separation; one with single-layer encoder and decoder, one with multi-layer encoder and single-layer decoder, and one using skipﬁltering connections (SF) with a single-layer encoding and decoding. We ﬁrst train these models with realistic data to estimate the singing voice magnitude spectra from the corresponding mixture. We then use the optimized models and test spectral data as input to the NCA. Our experimental ﬁndings show that approaches based on the DAE model learn scalar ﬁltering operators, exhibiting a predominant diagonal structure in their corresponding mapping functions, limiting the exploitation of inter-frequency structure of music data. In contrast, skip-ﬁltering connections are shown to assist the DAE model in learning ﬁltering operators that exploit richer inter-frequency structures.
+Keywords Music source separation, singing voice, denoising autoencoder, DAE, skip connections, neural couplings algorithm, NCA.
+1 Introduction
+Signal enhancement and separation based on deep learning methods is an active research area that has attracted a lot of attention [1]. The objective is to estimate an individual target signal from an observed corrupted version. In the context of music source separation, the corrupted observation refers to the observed mixture signal, and the individual target signal to the isolated music source, e.g. singing voice, drums, etc. A particularly challenging task in music source separation is the estimation of singing voice from a single channel, i.e., monaural, mixture signal [2]. To that aim, deep learning approaches are shown to yield state-of-the-art (SOTA) results [3].
+The majority of deep learning approaches use the time-frequency representation of the mixture signal as input [3, 2]. However, depending on the target output signal they use, we can identify three different classes of approaches. The approaches in the ﬁrst class, referred to in this text as spectral approximation methods, use the time-frequency representation of the target source as target output. This input-output relationship of signals follows the seminal work of the DAE model presented in [4, 5]. The DAE is presented as a model for signal recovery from corrupted observations2.
+∗Corresponding author: mis@idmt.fraunhofer.de 2The reader should note that the DAE model, as originally deﬁned in [4, 5], is not restricted to symmetric encoding-decoding functions with dimensionality reduction, commonly referred to as bottleneck [4][Sec. 5]. Following this deﬁnition, the current article uses the term DAE in a broad sense to refer to methods for signal recovery from corrupted signals.
+
+PREPRINT, FOR ARCHIVING PURPOSES
+In the second class of approaches, the target output signal is the pre-computed and source-dependent time-varying ﬁlter, i.e., the mask, that is used for ﬁltering the mixture input signal [6, 7, 8]. The methods in this category will be referred to in the text as mask prediction methods. The usage of pre-computed masks requires the information of at least two sources, the target and the interfering source(s) contained in the mixture [6, 7]. That is different from the ﬁrst class of approaches that require only the time-frequency representation of the target source [9, 10]. Furthermore, the computation of masks imposes various assumptions regarding the additive properties of the sources [11, 12]. In some cases, this leads to additional model retraining procedures such that it generalizes to more mixture signals [6]. This has led to research advocating the need for masks to be subject to optimization [13].
+Although the mask prediction approaches are not included in the analysis presented in Section 2, their relevance for the current study comes from the fact that they inspired the third class of approaches. Approaches in the third class conceptually combine spectral approximation and mask prediction, and are referred to in the text as skip-ﬁltering connections. Speciﬁcally, these methods allow deep learning approaches to implicitly mask the input mixture signal by using the output of the deep learning model [14, 15, 16, 17]. This operation yields a ﬁltered version of the mixture signal that serves as an estimate of the target source signal, and is used to optimize the overall approach [14, 16, 17]. The optimization is performed using a signal reconstruction objective as done in the spectral approximation approaches. In contrast to mask prediction methods [14, 18, 17, 19], methods based on skip-ﬁltering connections do not require pre-computed masks. While the terminology of skip-ﬁltering connections is used in the context of music source separation [16, 18, 19], the speech enhancement and separation community often refers to methods in the third class as the signal approximation method [14, 20].
+To estimate the target source signal(s), spectral approximation methods usually rely on an additional post-processing step using the generalized Wiener ﬁltering [9, 21, 22, 23, 6, 2, 18, 3]. This additional post-processing is an empirical strategy to obtain target signals of better perceptual quality than the direct outputs of the DAEs [9, 21]. In contrast, approaches based on skip-ﬁltering connections, which implicitly mask the mixture signal, yield competitive, yet not superior, results compared to the spectral approximation approaches, without the need of post-processing with Wiener ﬁltering [19, 17]. Furthermore, approaches based on skip-ﬁltering connections tend to result in better separation performance than mask prediction approaches [16, 18]. In relevant literature, for instance in the large-scale study presented in [3], it is not clear why approaches that focus on spectral approximation of the target source [9, 23, 22] require the post-processing step of generalized Wiener ﬁltering. It is also intriguing to provide an explanation on why methods based on skip-ﬁltering connections [18, 14, 17] work well in practice. With this in mind, we formulate the ﬁrst research question of our work: RQ1 - Why is masking important in approaches based on the DAE model?
+Additionally, the work presented in [24] underlines the tendency of the encoding and decoding functions of the DAE to become symmetric during training. The composition of symmetric functions yields another function used to map the input to the target signal, i.e., the mapping function, that shares many similarities with the identity function. For spectral-based denoising, this is a trivial scaling of the mixture spectral content. That could potentially result in poor estimation of the target source spectra, unless the learned function is derived from an ideal and time-variant frequency mask [25], computed using an appropriate time-frequency masking technique [26]. Subsequently, the second research question of our work is: RQ2 - Do DAEs that are commonly employed in music source separation learn trivial solutions for the given problem?
+In this study we focus on models that operate on the magnitude spectra of the observed audio mixture, and try to answer these research questions. To that aim we examine the mapping functions of music source separation approaches proposed to estimate the magnitude spectra of the singing voice. Since nearly all music separation approaches are non-linear, the computation of the mapping function is not straightforward. To tackle that, we propose an experimentally derived algorithm that approximates the mapping function of the non-linear model previously optimized for source separation. The result of the algorithm is a matrix that is utilized to linearly map the magnitude information of the mixture to the target source magnitude spectra. We will henceforth denote the algorithm as the neural couplings algorithm (NCA).
+The goal of the NCA is to compute a linear mapping function that describes how the input data are transformed to obtain the desired target source, according to the approach under examination. The NCA differs from methods that aim at explaining the neural network decisions, like for instance the layer-wise relevance propagation method presented in [27], but shares many similarities with the optimal transportation theory, in the discrete case [28, 29], and the knowledge distillation concept presented in [30]. The conceptual difference between the NCA and the previously stated methods is that the NCA speciﬁcally approximates the mapping function of a pre-trained neural network model. It does not aim at compressing the neural network model as in [30], or computing only distance-dependent mapping(s) between spectral data distributions as in [29], or at pin-pointing input spectral features that affect the choice of the neural network model as in [27].
+2
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+(a) DAE
+
+(b) MSS-DAE
+
+(c) SF
+
+Figure 1: Illustration of the graphical models of encoder-decoder conﬁgurations examined in this work. (a) DAE: a denoising auto-encoder model [4]. (b) MSS-DAE: a three layer example of a DAE model adapted to music source separation [9, 23]. (c) SF: skip-ﬁltering connections [16, 18, 14, 17]. Solid arrows are functions computed by neural networks. Dashed arrows are the identity function. In the context of the input and latent variables, the symbol “ ” refers to the multiplication of the corresponding variables.
+
+In this study, we cluster the spectral approximation and the skip-ﬁltering connection methods for music source separation under the general family of DAEs, since these approaches follow the exact same principle as the DAE model presented in [4, 5]; that is, to recover a target signal from its corrupted version. Speciﬁcally, we focus on three particular and fundamental extensions of the DAE model for music source separation:
+1. DAE: The DAE model presented in [4], as it forms the baseline that source separation approaches have built upon.
+2. MSS-DAE: The multi-layered extension of the DAE following the pioneering works in [9, 23].
+3. SF: The implicit mask prediction via the skip-ﬁltering (SF) connections employed in [16, 14, 17].
+In the three models, we employ the rectiﬁed linear unit activation function (ReLU) as it was shown experimentally to perform well in music source separation tasks [9]. The target signal to be estimated by each model is the singing voice magnitude spectra. For assessing the mapping functions of each model, we use the outcome of the NCA, and objectively compute a fraction of the magnitude contained in the main and off diagonal elements of the mapping matrix computed by the NCA. This will be explained in details in the following sections.
+The rest of this document is organized as follows: Section 2 provides background information on the DAEs and the variations proposed for the problem of music source separation tasks. Our proposed NCA algorithm is described in Section 3, followed by the experimental procedure described in Section 4. Our experimental ﬁndings are presented and discussed in Section 5. Section 6 concludes this work and suggests future research directions.
+
+2 Denoising Autoencoders in Music Source Separation
+
+2.1 Background
+
+Music source separation based on DAEs relies on a supervised learning scenario. Formally, given a data-set D =
+
+{x˜(i), x(i)}Ki=1, comprised of K ∈ Z+ training examples indexed by i, the goal is to learn a denoising function f . The function f is parameterized by θ, and estimates the clean x from the noisy x˜ observation, i.e., f : θ × x˜ → x. Obtaining
+
+x˜ involves a mixing process, which for audio signals, is commonly assumed to be the addition of the interfering or noise
+
+signal xn and the target source signal x [18], i.e., x˜ = x + xn. Given a reconstruction loss function L, the parameters θ are optimized using
+
+K
+
+θo = argmin L(x(i), xˆ(i)),
+
+(1)
+
+θ
+
+i=1
+
+where xˆ is an estimate of x, and θo is the (ideally optimal) parameter or set of parameters, that minimizes the cost. The updates of the parameters towards obtaining θo is carried out using stochastic gradient descent over samples drawn
+
+from the data-set D.
+
+In [4], two functions are introduced through the DAE structure in order to approximate f , namely fenc : θenc × x˜ → z and fdec : θdec × z → x. The parameters θ := {θenc, θdec} are optimized with respect to Eq. (1). In the context of music source separation, the motivation is to learn the empirical distribution q(x|x˜) through the usage of a latent representation
+z, and the utilization of the decoding process fdec. The beneﬁt of incorporating the latent variable z into the model is
+
+3
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+that it provides a feature space that is useful for denoising auto-encoding [4] and music source separation [9, 6, 23]. An illustration of the DAE model is given in Fig. 1a.
+In music source separation approaches, the computation of the latent variable z plays an important role [6, 21, 23, 9]. Speciﬁcally, the performance of the methods and the approximation of the target source x is shown empirically to be based on the computation of z , a deeper hidden representations of z that leads to the conditional distribution q(z |z −1) [6, 23, 9] . The subscript ∈ {1, 2, . . . , L} denotes the depth of the computed, hidden representations. The corresponding graphical depiction of a three layer example of the MSS-DAE is given in Fig. 1b.
+It is important to note that source separation approaches based on skip-ﬁltering connections use the same two functions as the DAE, i.e., fenc and fdec. The difference is that fdec : θdec × z → m, and
+
+x = m x˜,
+
+(2)
+
+where m is the mask. Eq. (2) is implemented by the skip connections which allow x˜ to be propagated to the encoding and to the last decoding function of the model [16, 14, 20]. SF models the empirical distribution q(x|x˜) using q(m|x˜)q(x˜), as illustrated in Fig.1c. Subject to the target source x, the empirical distribution leads to q(x|x˜)q(x˜) since both the mask m and the target signal x are computed as a function of x˜, i.e., x = fdec(fenc(x˜)) x˜. This is conceptually different from the DAE and MSS-DAE, which model q(x|x˜) directly. For the SF model and its corresponding conditional, the product between distributions is the product of the probability values between the outcome of the DAE and x˜.
+
+2.2 Prior Work
+The most widely adopted way to perform music source separation using deep learning is to employ the magnitude spectral representations computed using the short-time Fourier transform (STFT). This is performed in order to reduce the overlap that the sources exhibit in the time-domain signal representation [31], and to exploit the wide-sense stationarity and the phase-invariant structure(s) of speciﬁc types of music sources [32]. Therefore, we can think of the variables of the DAE, MSS-DAE, and SF models as vectors containing magnitude spectral information and allow the symbol “ ” to denote the Hadamard (element-wise) product. However, since the phase information is not considered, the additive properties of the mixing process for computing x˜ do not longer hold, i.e., x˜ = x + xn. More speciﬁcally, x˜, xˆ, x ∈ RN≥0, and z ∈ RF are the mixture signal, the estimated target source signal, the target source signal, and the latent representation after the application of the ReLU function, respectively. N and F denote the dimensionality of the input and hidden representations, respectively.
+For source estimation based on DAEs, the authors in [23] propose the use of multi-layered feed-forward neural networks, using context information of past and future STFT magnitude spectra. Context information for spectral-based denoising via feed-forward neural networks is also proposed in [9]. Aiming to model the dependencies of adjacent time-frames, the work in [21] proposes to use bi-directional RNNs instead of feed-forward neural networks. In both approaches [21] and [23], the estimated, by the DAE, target sources are further processed using the multi-channel Wiener ﬁltering. In contrast, the work presented in [6] proposes to explicitly predict pre-computed time-frequency masks using deep neural networks. After the mask prediction, the masks are applied to the mixture signal and then reﬁne the estimates using DAEs. More robust approaches allow implicit mask prediction by introducing the time-frequency masking operation into the computational graphs [16, 18, 14, 15, 33, 17, 34] by incorporating the skip connections described in Section 2.1.
+The skip connections are a straightforward extension of the denoising source separation (DSS) framework in the spectral domain presented in [25]. In the DSS framework, it is proposed to perform spectral-based denoising by learning a sparse matrix with non-zero elements only on the main diagonal. These elements allow a scalar ﬁltering operation of each corresponding frequency sub-band [35]. In music source separation works based on deep learning, the frequency sub-band scaling is achieved by employing the Hadamard product. That enables the usage of architectures that encompass time varying information, such as RNNs and/or CNNs, and therefore the prediction of time varying frequency masks. More speciﬁcally, the work in [15] proposes to employ deep RNNs for estimating the magnitude of all the sources contained in the mixed signal. The output estimates are then given to a deterministic function which yields source-dependent time-frequency masks by computing the ratio of the estimates. In this approach, RNNs do not learn the masking process, but rather learn to deliver magnitude estimates of the source that can be used to compute the mask. Aiming to also learn the masking process, i.e., allow the neural network to generate mask estimates without the necessity of devising rational models like in [15], the skip-ﬁltering connections were introduced in [16], where an RNN encoder-decoder is responsible for the generation of a mask that estimates the singing voice. Extensions that improve the mask generation process of the model presented in [16] are discussed in [18, 19]. An alternative architecture is presented in [17], where ladder-like structured CNNs are proposed for singing voice separation via the aforementioned mask generation process.
+
+4
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+2.3 Implementation of the Models
+
+Focusing on the graphical models presented in Figure 1, we constrain the problem to fully connected, feed-forward
+
+neural network (FNN) layers, and to the minimization of the mean squared error (MSE) loss function, deﬁned as:
+
+LMSE(x(i), xˆ(i))
+
+=
+
+1 N
+
+||x(i)
+
+− xˆ(i)||22,
+
+(3)
+
+where || · ||2 denotes the 2 vector norm.
+
+Stochastic gradient descent is performed to optimize the model parameters with respect to Eq. (3). This training
+
+conﬁguration including the MSE was adopted from SOTA approaches in music source separation [22, 21, 16, 23, 9, 36].
+
+An example of the calculation of z and the approximation of the i-th data example of the source xˆ, using the mixture
+
+signal x˜ and the corresponding encoding and decoding functions is given in Eqs. (4)–(10) for the DAE, MSS-DAE, and
+
+SF models.
+
+z(DiA)E = g(Wencx˜(i) + benc),
+
+(4)
+
+xˆ(DiA)E = g(Wdecz(DiA)E + bdec),
+
+(5)
+
+z(Mi)SS-DAE = g(W( =1)g(Wencx˜(i) + benc) + b( =1)),
+
+(6)
+
+xˆ(Mi)SS-DAE = g(Wdecz(Mi)SS-DAE + bdec),
+
+(7)
+
+z(SiF) = g(Wencx˜(i) + benc),
+
+(8)
+
+xˆ(SiF) = g(Wdecz(SiF) + bdec) x˜(i), where
+
+(9)
+
+g(x) = max(0, x).
+
+(10)
+
+Eqs. (4), (6), and (8) describe the encoding functions, and Eqs. (5), (7), and (9) the decoding functions of each model. The weight matrices and bias terms are denoted by W and b, respectively, and the subscripts “enc” and “dec” stand for encoder and decoder layers, respectively. The superscripts “ ” and “ ” in the weights and biases are used to distinguish between the parameters of different models (e.g. between W of MSS-DAE and DAE models). In more detail, Eqs. (4) and (5) express the encoding and decoding functions for the DAE model. An example of a three layered MSS-DAE model, with a single decoding function, for approximating the target source is given by Eqs. (6) and (7). The SF model in Eqs. (8) and (9) employs the same encoding and decoding conﬁguration as the DAE, with the only difference the output of the decoding is element-wise multiplied with the input to the model. In the Eqs. (4)–(9) the encoding and decoding functions are realized as linear operators, i.e., vector-matrix product, that are then followed by the ReLU activation function expressed in Eq. (10).
+
+3 Neural Couplings Algorithm
+The NCA is an iterative method for approximating the mapping function of a non-linear source separation model. The mapping function is deﬁned as an afﬁne transformation of magnitude spectral data. We constrain the afﬁne transformation to be linear and model-dependent in order to allow us to intuitively examine what each source separation model has learned. The afﬁne transformation is represented by a matrix that we denote the couplings matrix C ∈ RN×N . The couplings matrix C is used to transform/map the input mixture magnitude spectrum x˜ to the output y ∈ RN≥0 of the last layer of each corresponding model including the non-linearity, i.e., the output of the decoding matrix followed by the ReLU function. The vector y is used to denote the output of the decoding function in each model. Speciﬁcally, the output for the DAE and MSS-DAE models is the singing voice spectra, and for the SF model is the derived frequency mask. The indexing by i in x˜ and y is dropped in order to denote the usage of spectral data that are not sampled from the training data-set.
+The reason for using the mask instead of singing voice spectra for the SF model follows naturally from the graphical models illustrated in Fig. 1. Particularly for the SF model, the information of the mixture spectra is also necessary after the decoding process in order to estimate the source via masking using the Hadamard product expressed in Eq. (9). As masking is an additional operator that heavily depends on the mixture data, the computation of a single afﬁne transformation would fail to approximate both the masking and the mapping function of the model. A solution to this is given by knowledge distillation [30]; that is, to use the last hierarchical variable that is computed using the model’s parameters, leading to fair usage of information during the approximation of the NCA among source separation models. In our study, we also include the ReLU function applied to the decoding stage since an algebraic expression for the ReLU function is given in [37], and its relevance is explained later in this section.
+In the ideal case that each model is linear, the couplings matrix, and thus the mapping function, is expressed algebraically as the product of the corresponding encoding and decoding matrices. We denote that product as the linear composition.
+
+5
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+Neglecting the bias terms for brevity in the notation, the linear composition is computed for each model as follows:
+
+Colinear-DAE = WdecWenc, Colinear-MSS-DAE = WdecW( =1)Wenc, and
+Colinear-SF = WdecWenc.
+
+(11) (12) (13)
+
+As the DAE, MSS-DAE, and SF, models are non-linear, directly employing Eqs. (11)–(13) would result into rather crude
+
+approximations of the models’ mapping functions. Even the linear behaviour of the ReLU function in the non-negative
+
+range, and of the vector-matrix products expressed in Eqs. (4)–(9), is not sufﬁcient for the above linear composition
+
+functions to hold. The ReLU function performs a thresholding operation on the variables that yield the latent z and
+
+output y vectors that are learned through observations drawn from the training data-set. This in turn makes the models
+
+highly non-linear [38]. An algebraic expression of the ReLU function that is related to the concept of thresholding
+
+of negative values is presented in [37]. In [37][Sec. 3, Eq. (3)], a single application of the ReLU function for a given
+
+input vector x˜ can be expressed as a binary diagonal matrix, that sets to 0 any negative value of the encoded vector.
+
+We denote this matrix G. Consequently, to obtain the couplings matrix of the DAE, MSS-DAE, and SF models, it is
+
+necessary to compute as many matrices G as the number of application of the ReLU function in the DAE, MSS-DAE,
+
+and SF models:
+
+Co = GdecWdec . . . GencWenc.
+
+(14)
+
+Furthermore, to compute each matrix G∗ in Eq. (14), it is necessary to learn the model speciﬁc dependencies that are captured by the DAE, MSS-DAE, and SF models during the supervised training [38, 37]. The asterisk “∗” in the
+notation is used for brevity, and replaces the subscripts and/or superscripts of the layer identiﬁers initially used in Eqs. (4)–(9). The data dependencies expressed by each G∗ refer to the algebraic operations between the mixture x˜ or the corresponding latent vectors z, i.e., the encoding or decoding matrices W∗, and the corresponding bias terms b∗ as in Eqs. (4)–(10).
+
+A straightforward way to learn the data dependencies can be derived from the knowledge distillation concept presented
+
+in [30]. In knowledge distillation, a neural network, i.e., the student, is optimized by means of (stochastic) gradient
+
+descent to predict the output of a more complicated model (e.g. the non-linear DAE, MSS-DAE and SF). Subject to the
+
+goal of this work, we employ gradient descent as in knowledge distillation [30], and we restrict the student network to
+
+be a linear, afﬁne transformation from x˜ to y. That transformation is based on the product of the mixture spectra x˜
+
+and the couplings matrix C. For computing the couplings matrix C we propose to solve the following optimization
+
+problem:
+
+Co = argmin ||y − Cx˜||, where
+
+(15)
+
+C
+
+|| · || is the 1 norm and x˜ is sampled from the testing data-set. The output vector y is computed by using x˜ as an input to the corresponding model. We propose to use the 1 instead of the 2 norm, employed in the optimization of the source separation models, because the vector y is expected to be sparse, due to the application of the ReLU
+function [38]. Commonly, the 1 norm offers an attractive objective for error minimization between sparse vectors, when the choice of the regularization strength parameter in the sparse aware setting of 2-based optimization is difﬁcult [39][Ch. 9]. Nonetheless, by minimizing the 1 norm of errors we assume that the expected reconstruction error follows an exponential distribution. Given that Eq. (15) is inspired by the student network of the knowledge distillation concept [30], we will denote this strategy as the student.
+
+To compute Co, the student strategy employs the following partial derivatives, with E denoting the error of the 1 norm
+
+contained in Eq. (15):
+
+∂E ∂E ∂Cx˜
+
+∆ := =
+
+(16)
+
+∂C ∂Cx˜ ∂C
+
+From Eq. (16), it follows that the gradient signal ∆ that is used to update C in an iterative manner is given by ∆ = sgn(Cx˜ − y)x˜T , where sgn is the signum element-wise function and ·T is the vector/matrix transposition. The gradient signal ∆ suggests that the optimal Co lies over the least afﬁnity between the mixture magnitude spectra x˜ and
+
+Cx˜ − y. This means that the updates of C only favor the minimization of the reconstruction error term. Although this
+
+strategy could yield simpliﬁed and robust surrogates of possibly deep and complex models for source separation (in
+
+terms of reconstruction errors) [30], it neglects the learned data dependencies contained in the encoding and decoding
+
+matrices of Eq. (14).
+
+According to [40], the learned data dependencies of the encoding and decoding functions are the key ingredient to characterize the functionality of a non-linear model. It is also shown in [40] that those dependencies are described by linear systems that can be computed using observations of x˜, y and the corresponding weight matrices. Given that our goal is to approximate the functionality of the model, i.e., including the knowledge captured by the encoding/decoding
+
+6
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+matrices W∗ and the bias terms b∗, we propose an alternative strategy that we denote as compositional. The proposed strategy composes the couplings matrix C similar to the composition expressed in Eq. (14). In contrast to the method presented in [40], the compositional approach does not require the explicit computation of the latent information z∗ of each model. Instead, it uses directly G∗ to extract data dependencies contained in each W∗, capturing both the information of the encoding/decoding matrices and the spectral data. More speciﬁcally, we exploit the fact that the ReLU function behaves linearly in the non-negative range where the mixture x˜, the output y, and the latent z vectors reside in. Therefore, and according to Eqs. (4)–(9), the relevant components that affect which elements are thresholded by the ReLU function for computing the latent z and output y vectors, are the row-vectors contained in each W∗ and the corresponding bias term(s) b∗.
+Inspired by [37], that models the ReLU function as a diagonal matrix G∗ that scales the row-vectors of W∗ in Eq. (14), we build the couplings matrix for the compositional strategy as follows:
+
+C = (Gdec Wdec) . . . (Genc Wenc).
+
+(17)
+
+The Hadamard product in Eq. (17) accounts for each individual element of the row-vectors contained in the corresponding W∗, rather than having a single scalar value per row-vector as in the case of the matrix product using the diagonal matrix. Practically, this mitigates the usage of binary diagonal matrices allowing more degrees of freedom into the
+approximation as the operator is applied to all the elements of the corresponding matrix vectors [37]. The reason for accounting for all the elements, is that the sign and the magnitude of each corresponding element in each W∗ carry the essential information in the model-dependent processing of non-negative vectors. To consider the inﬂuence of the sign of the elements in each W∗, we restrict each matrix G∗ to be non-negative, i.e., G∗ ∈ RN≥0×N . To do so, and to account for the inﬂuence of the bias terms we compute each G∗ using:
+
+G∗ = g(Gˆ ∗)
+
+(18)
+
+Gˆ ∗ = P∗(W∗ + b∗)T .
+
+(19)
+
+In Eq. (19) we use a less conventional notation to denote the matrix-vector addition. Given a matrix W and a vector b we deﬁne the matrix-vector addition as Wˆ α,β = Wα,β + bβ for all elements α and β that are available in W and b. Speciﬁcally for Eq. (19), we add the bias vector b∗ to each column-vector of W∗. By the application of G∗ via the Hadamard product, the elements in W∗ are either preserved and scaled or nulliﬁed. This depends on their relevance for mapping the mixture magnitude spectra under linear constraints. The linear constraints are imposed by using the matrix C to the optimization problem deﬁned in Eq. (15). In order to compute the previously mentioned relevance, we propose to learn an additional afﬁne transformation computed for each matrix W∗ plus the corresponding bias term b∗. This afﬁne transformation is denoted by the matrix P∗. The corresponding basis vectors of P∗ are unknown for the compositional strategy. To jointly compute the unknowns of the compositional strategy, we use the back-propagation
+method.
+
+To further analyze how the previously mentioned data dependencies are learned using the compositional strategy, let
+
+us consider the case in which a single encoding and decoding matrix is used, as in the DAE and SF models. For the
+
+compositional strategy, it is necessary to compute two matrices Penc and Pdec. The corresponding partial derivatives are
+
+deﬁned as
+
+∂E ∂ Pdec
+
+=
+
+∂E ∂C ∂C ∂Gdec
+
+∂ Gdec ∂ Pdec
+
+,
+
+and
+
+∂E ∂ Penc
+
+=
+
+∂E ∂C
+
+∂C ∂ Genc
+
+∂ Genc ∂ Penc
+
+,
+
+respectively.
+
+Using Eq.(16) the aforementioned partial
+
+derivatives are as follows:
+
+∂E ∂Pdec = (∆(Wenc
+
+Genc)
+
+Wdec
+
+g (Gˆ dec))(Wdec + bdec)
+
+(20)
+
+∂E ∂Penc = ((Wdec
+
+Gdec)T ∆
+
+Wenc
+
+g (Gˆ enc))(Wenc + benc),
+
+(21)
+
+where g (x) is the ﬁrst derivative of the ReLU element-wise function, that is approximated by a function that is equal to 1 for positive inputs and 0 otherwise. Gdec and Genc are computed using Eq. (19). In Eqs. (20) and (21), instead of considering only the gradient for minimizing the reconstruction error ∆, the models’ optimized parameters partake into the optimization of the compositional strategy. Speciﬁcally, W* and b* contribute to the optimization in a similar vein as the linear compositions described in Eqs. (11)–(13). This can be seen, by the products between the outer parentheses that surround the encoding and decoding matrices in Eqs. (20) and (21). The Hadamard products including the g (x) inside the ﬁrst parentheses of Eqs. (20) and (21) can be understood as the search of elements contained in the decoder and encoder matrices that contribute to the mapping of the mixture to the corresponding output. From the above, it can be said that the compositional strategy applies a layer-wise restriction. This is in contrast to the student strategy, which does not take into account the information in each W∗ and b∗. The layer-wise restriction forces the couplings matrix to be computed using the parameters of each model, similar to the linear composition that algebraically corresponds to the mapping function. It should be mentioned that regardless of the strategy, i.e., student or compositional, the
+
+7
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+computed matrices C∗ are allowed to retain negative values. That is because the destructive property of the negatives values during the computation of the vector-matrix products are helpful in estimating the target source’s magnitude information. The pseudo-algorithm of the NCA for both strategies is given in Algorithm 1.
+
+Algorithm 1 The Neural Couplings Algorithm
+
+Require: Mixture spectra x˜, model M(·), model’s parameters W∗, b∗, N × N identity matrix IN , total number of layers in model L , number of iterations Nit, strategy S ∈ {student, compositional}, random generator function rnd, optimizer/solver A(·)
+
+y ← M(x˜)
+
+if S is student then
+
+C ← rnd
+
+else
+
+C ← IN
+
+for l := 1 to L do
+
+Pl ← rnd Gl ← g(Pl (Wl + bl )T ) C ← (Wl Gl )C end for
+
+end if
+
+for i := 1 to Nit do E ← ||y − Cx˜||
+
+if S is student then
+
+C
+
+←
+
+C
+
+−
+
+A(
+
+∂E ∂C
+
+)
+
+else
+
+C ← IN
+
+for l := 1 to L do
+
+Pl
+
+← Pl
+
+−
+
+A(
+
+∂E ∂Pl
+
+)
+
+Gl ← g(Pl (Wl + bl )T )
+
+C ← (Wl Gl )C end for
+
+end if
+
+Co ← C
+
+end for
+
+return Co
+
+4 Experimental Procedure
+
+4.1 Training & Assessing the Source Separation Models
+
+To optimize the parameters contained in Eqs. (5)–(9), we use the 100 two-channel multi-tracks available in the MUSDB18 data-set [41] that were used in the SiSEC 2018 campaign [3]. The multi-track recordings are sampled at 44100 Hz. For each multi-track, we use the mixture and singing voice signals in the data-set, and average the two available channels, i.e., monaural mixing. To construct the data-set D, the STFT analysis is performed for each mixture and corresponding source signal, using a hamming windowing 46 ms long, a factor of 2 for zero-padding, a hop-size of 8.7 ms, and a frequency analysis of N = 4096 from which only the ﬁrst N = 2049 frequency sub-bands are retained (due to the redundancies of the discrete Fourier decomposition). After computing the magnitude of the complex representation, each frequency sub-band is normalized to have a unit variance with respect to the time frames.
+
+We use a single encoding and decoding layer for all models in all approaches. The number of hidden layers for MSS-DAE is set to L = 2 (MSS-DAE has L = 4 layers in total). The dimensionality through the layers is preserved the same in order to avoid any implicit model regularization [5, 4, 24]. The number of layers for the MSS-DAE model was chosen experimentally according to the saturation in minimizing Eq. (3) during the training process, with respect to the number of hidden layers. All the weight matrices are initialized with samples drawn from a normal distribution and
+
+scaled by
+
+1 N
+
+as proposed in [42].
+
+The bias terms are
+
+initialized
+
+to zero.
+
+The data-set D
+
+is randomly shufﬂed, and the
+
+training is performed using batches of 128 time-frames. For gradient-based optimization, the Adam algorithm [43] is
+
+used with the initial learning rate set to 1e − 3, and decreased by half if no improvement to the loss was observed for
+
+8
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+two consecutive iterations over all available training data. The exponential decay rates for the ﬁrst and second-order moments of the Adam algorithm are set to 0.9 and 0.999, respectively, following the proposed settings presented in [43]. The training is terminated after no improvement is observed over four consecutive iterations throughout the training data. We iterate through the whole model training procedure 50 times using different random initialization states. This is performed in an attempt to minimize the induced bias of randomly initializing the models’ layers, thus more reliably addressing our second research question. All our experiments are carried out using NVIDIAs GeForce GTX Titan X and the PyTorch framework3.
+
+To assess the source separation models, we focus on evaluating the ability of each model to exploit the structure in music spectral representations. To do so, we use the couplings matrix computed with the NCA, which acts as a data and model-speciﬁc ﬁltering operator. According to [35], there are two broad classes of ﬁltering operators. The ﬁrst class is the vector ﬁltering operator, where the matrix responsible for ﬁltering, i.e., the couplings matrix in our case, contains high values of magnitude on off-diagonal elements. The main beneﬁt of off-diagonal elements is that they allow the exploitation of inter-frequency relationships of the spectral data. In contrast, the second class of ﬁltering operators is denoted as scalar ﬁlters. Scalar ﬁlters are characterized by magnitude only on the main diagonal of the couplings matrix. Each element on the main diagonal scales individually the corresponding frequency sub-band. The latter operation is equivalent to the application of a masking strategy [26]. In practice, source separation models are optimized using many training examples. Consequently, learning a mapping function with activity on the main diagonal could imply a limited performance in estimating the singing voice spectra.
+
+Based on the previous argument, we deﬁne an objective measure denoted the trace-to-off-diagonal-ratio (TOD-R). The
+
+TOD-R is computed as follows:
+
+√
+
+TOD-R(C∗) =
+
+N ||C∗
+
+tr(|C∗|)
+
+,
+
+(JN − IN )||
+
+(22)
+
+where tr(·) is the trace function that adds up all the elements on the main diagonal of √the matrix, IN is the N × N identity matrix, and JN is the N × N with all elements equal to one. The scaling by N is performed in order to compensate for the initialization scaling described before, and due to the expected high values of the denominator in Eq. (22) (since the norm is taken using far more matrix elements than the trace in the numerator). The element-wise absolute | · | is computed prior to the computation of the trace to avoid biasing the ratio due to the norm (sum of absolute values) in the denominator of Eq. (22). Small values of TOD-R indicate that the off-diagonal elements of the couplings matrix retain higher magnitude values than the elements on the main diagonal and vice versa. High off-diagonal activity suggests that the mapping function of the model exploits more inter-frequency relationships rather than estimating values that scale the mixture spectra as in scalar-based ﬁltering and frequency masking [35].
+
+4.2 Computing & Assessing the Neural Couplings
+
+For computing the neural couplings, i.e., solving the optimization problem in Eq.(15), we use the test subset from the MUSDB18 data-set [41]. The test subset comprises 50 additional two-channel, multi-tracks sampled at 44100 Hz. For computing the STFT we employed the same parameters as during the construction of the training data-set D
+reported in Sec. 4.1. As it is more informative to compute mapping functions that process multiple time-frame vectors
+rather than a single instance, we use a batch of adjacent magnitude vectors drawn from the test subset. The batch size is set to T = 350 (∼ 3.1 seconds long), and the hyper-parameter T is experimentally chosen based on the trade-off
+between the number of vectors and computational resources. With this, we can simply reformulate the NCA using matrix notation instead of vector notation: X˜ ∈ RN≥0×T instead of x˜ ∈ RN≥0 and Y ∈ RN≥0×T instead of y ∈ RN≥0. For the solver denoted as A(·) in Algorithm 1, we use the Adam algorithm with a learning rate equal to 4e−4 and the same exponential decay rates as in Sec. 4.1. The total number of iterations is set to 600, and the random function (rnd in
+
+Algorithm 1) refers to drawing samples from a normal distribution scaled by
+
+1 N
+
+as proposed in [42].
+
+The above
+
+mentioned hyper-parameters were chosen experimentally.
+
+In comparison to the optimization of the music source separation models presented in Section 4.1, the couplings matrix
+is computed for each model and for each batch of adjacent magnitude vectors drawn from the test subset of MUSDB18 data-set [41]. The pre-trained parameters of each one of the three models are randomly drawn from one of the 50
+training instances. In our initial experiments it was observed that the silent segments in the used multi-tracks led to randomly structured and sparse, i.e., low 1 norm values, row-vectors of the computed couplings matrix Co. Although the observed convergence of the NCA was satisfactory for the silent segments, it signiﬁcantly biased the TOD-R measure in an unpredictable manner. Therefore, from each multi-track we select the 30 seconds that all music sources
+
+3https://pytorch.org/
+
+9
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+Table 1: Assessing the mapping functions. The TOD-R metric (Eq. (22)) for each strategy and model. Model
+
+Strategy
+
+DAE
+
+MSS-DAE
+
+SF
+
+Student
+
+0.03 (±0.00) 0.03 (±0.00) 0.02 (±0.00)
+
+Compositional 0.36 (±0.13) 0.14 (±0.04) 0.03 (±0.01)
+
+available in the data-set are active. The selection of the active waveform regions, is based on the generator4 used in the music source separation evaluation campaign [3].
+As we have not provided any theoretical guarantees regarding the convergence of the NCA to an optimal solution, we conduct a quantitative analysis to assess the ability of the NCA to accurately approximate the models’ outputs. We use the signal to noise ratio (SNR) expressed in dB as an intuitive measure of the quality of the NCA approximations. For the DAE and MSS-DAE models, the SNR is computed using the singing voice magnitude spectra estimated by the NCA, and the singing voice magnitude spectra estimated by the corresponding models. For the SF model, the predicted mask using the NCA is ﬁrst applied to the input mixture, and the outcome is used to compute the SNR. This is done because the SF model does not employ any pre-computed mask during its optimization that could be used for evaluating the NCA. For baseline comparison, we use the linear composition and identity function as proxies to the couplings matrix, i.e., C is computed using Eqs. (11)–(13) and C = IN , respectively. Since the SNR is computed using the approximations of the NCA and the models’ outputs, different SNR values across the source separation models are expected.
+In addition to the above, we also compute the SNR using the NCA approximation and the true source singing voice spectra, and compare it with the SNR using the models’ outputs and the true source singing voice spectra. This is done in order to intuitively quantify the loss of information induced by the NCA. The previously mentioned analysis is performed for each strategy, model, and segment in each multi-track. It is important to note that the goal here is to understand the power of the NCA to deliver an accurate approximation of the model’s output. With this in mind, we focus our analysis on the SNR and the TOD-R, and leave an analysis of the implications of model choice on separation performance for future endeavours.
+5 Results & Discussion
+To address our research question “RQ2: Do DAEs that are commonly employed in music source separation learn trivial solutions for the given problem?”, we compute the linear composition functions for the three models (DAE, MSS-DAE, and SF) using Eqs. (11)–(13). The computation of the linear compositions follows the research ﬁndings presented in [24] that underlines the tendency of encoding and decoding functions to become symmetric, that practically leads to learning scalar ﬁltering operators. The average result across the 50 experimental iterations from the composition functions is illustrated in Fig.2. By observing Fig. 2 it is evident that the two models that map directly the mixture magnitude spectra to the singing voice spectra (DAE and MSS-DAE) have a prominent main diagonal structure. This means that through training, the corresponding encoding and decoding functions tend to become symmetric in order to provide a solution in the MSE sense. Therefore, it is plausible that the DAE and MSS-DAE models learned trivial solutions to the problem of singing voice separation, restricting the overall separation performance. On the other hand, employing the skip-connections as performed in the SF model, it can be observed that the activity has been repelled from the main diagonal (see the right column of Fig. 2). This can be explained by recalling that a solution for estimating the singing voice spectra is the scaling of the individual frequency sub-bands of the mixture, which in turn is expressed by a diagonal matrix. That statement provides a simple explanation on why skip-connections [44] and end-to-end learning [45], where the time-domain signals are used instead of spectrograms, are emerging directions in music source separation.
+Aiming to address the other research question “RQ1: Why is masking important in approaches based on the DAE model?”, we turn our focus to the computed mapping functions using the NCA, and the model assessment via the TOD-R metric. Table 1 summarizes the TOD-R results for each model, both for the student and the compositional strategies. The average TOD-R across all the segments of the test-subset is reported, and in the parentheses the standard deviation of the corresponding measurements is provided. Bold faced numbers, indicate the smallest obtained value for the TOD-R implying that the model has exploited a richer inter-frequency structure.
+4Available at: https://github.com/sigsep/sigsep-mus-cutlist-generator
+10
+
+DAE
+
+MSS-DAE
+
+PREPRINT, FOR ARCHIVING PURPOSES
+SF
+
+N = 1, . . . , 744
+Matrix Elements Values
+
+2 0
+2 4
+
+N = 1, . . . , 744
+Figure 2: The linear composition of the models’ encoding and decoding functions. The compositions are computed using the Eqs. (11)–(13), and averaged across the 50 experimental iterations. The ﬁrst 744 frequency sub-bands (∼ 8kHz) are displayed for clarity. Left Column: Composition for the denoising auto-encoder model [4] (DAE). Middle Column: Composition for the four layer extension of the DAE model, adapted to music source separation (MSS-DAE) [9, 23]. Right Column: Composition for the skip connections for ﬁltering the input mixture (SF) [16, 14, 17].
+
+Table 2: Assessing the approximation performance of the mappings computed by the NCA, compared to the models’ outputs. The mean and standard deviation of the SNR, expressed in dB, are reported. For comparison, the linear composition and identity function are used. Bold faced values denote the best approximation performance.
+Model
+
+Strategy
+
+DAE
+
+MSS-DAE
+
+SF
+
+Student
+
+6.51(±1.79) 9.11(±1.09) 6.53(±2.31)
+
+Compositional 4.78(±2.69) 9.25(±1.13) 5.98(±2.24)
+
+Baseline
+
+DAE
+
+MSS-DAE
+
+SF
+
+Linear Comp. 0.01(±0.01) −174.9(±18.4) 0(±0)
+
+Identity Funct. 2.38(±0.81) 3.05(±0.66) 2.51(±1.03)
+
+The results of Table 1 show that the SF model provides the smallest TOD-R value for both strategies. More speciﬁcally, the TOD-R for the compositional strategy and the SF model is 12 times smaller than the DAE model, which has equal number of encoding and decoding layers. In comparison to the MSS-DAE model that comprises two additional hidden layers, the TOD-R value of the SF model is decreased by approximately 4.6 times. We could conclude that skip connections can be seen as a simple method to repel source separation approaches from learning solutions that concentrate most of the activity on the main diagonal of their corresponding mapping function(s).
+Additionally, Table 2 presents the results from the evaluation of the approximation performance of the NCA strategies by means of the SNR. The corresponding values are reported in dB. The average approximation performance of the NCA for the DAE and SF models and both strategies, outperforms the linear composition by approximately 6dB, and by a very large margin, greater than 100 dB, in the case of the MSS-DAE model. Experimental observations suggest that the large margin is due to the exceeding norm of the spectra approximated by the linear composition. The exceeding norm of the spectra is itself due to the high norm of the row-vectors of C, computed using the linear composition, that are used to approximated the MSS-DAE’s output(s). This in turn, shows that by increasing the number of layers in non-linear source separation models, the linear composition is a poor proxy of the models’ mapping functions. As for the identity function, i.e., using the mixture instead of the models’ output spectral estimates, it is outperformed by the NCA on average, across strategies and models, by ∼ 4dB. The student strategy outperforms the compositional strategy on average across the source separation models by 0.7 dB. This is due to the fact that the student strategy employs gradient updates that are related only to the reconstruction error minimization.
+To further understand the approximation performance of the NCA, we also calculate the SNR values between the NCA approximation and the true singing voice spectra (see Table 3). Results suggest that the NCA approximations are marginally better than those obtained directly with the models’ outputs. More speciﬁcally and on average across strategies and models, a small improvement of ∼ 0.17 dB is observed.
+Focusing on the structure of the mapping functions that are computed using the NCA via the student strategy, illustrated in the ﬁrst row of Fig. 3, it can be seen that the couplings matrices, serving as the corresponding mapping functions, are nearly identical between the DAE and MSS-DAE models, and marginally different from the SF model. The marginal
+11
+
+Frequency sub-bands (N)
+
+Frequency sub-bands (N)
+
+Magnitude in dB
+
+Mixture
+
+700
+
+700
+
+Target
+
+NCA Approximation
+700
+
+600
+
+600
+
+600
+
+500
+
+500
+
+500
+
+10 20
+
+400
+
+400
+
+400
+
+30 40
+
+50
+
+300
+
+300
+
+300
+
+60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+N = 1, , 372
+
+N = 1, , 744
+
+1.0
+
+1.0
+
+0.5
+
+0.5
+
+0.0
+
+0.0
+
+0.5
+
+0.5
+
+1.0
+
+1.0
+
+N = 1, , 744
+
+N = 1, , 372
+
+Magnitude in dB
+
+Frequency sub-bands (N)
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+Mixture
+
+Target
+
+NCA Approximation
+
+700
+
+700
+
+700
+
+600
+
+600
+
+600
+
+500
+
+500
+
+500
+
+10 20
+
+400
+
+400
+
+400
+
+30 40
+
+50
+
+300
+
+300
+
+300
+
+60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+N = 1, , 744
+
+1.0 0.5 0.0
+0.5 1.0 1.5
+N = 1, , 744
+
+N = 1, , 372
+
+1.0 0.5 0.0
+0.5 1.0
+N = 1, , 372
+
+Magnitude in dB
+
+Mixture
+
+(a) Student: DAE
+
+Target
+
+NCA Approximation
+
+700
+
+700
+
+700
+
+600
+
+600
+
+600
+
+500
+
+500
+
+500
+
+10
+
+20
+
+400
+
+400
+
+400
+
+30 40
+
+300
+
+300
+
+300
+
+50 60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+N = 1, , 744
+
+1.0 0.5 0.0
+0.5 1.0 1.5
+N = 1, , 744
+
+N = 1, , 372
+
+1.0 0.5 0.0
+0.5 1.0 1.5
+N = 1, , 372
+
+Magnitude in dB
+
+Frequency sub-bands (N)
+
+Mixture
+
+(b) Student: MSS-DAE
+
+Target
+
+NCA Approximation
+
+700
+
+700
+
+700
+
+600
+
+600
+
+600
+
+10
+
+500
+
+500
+
+500
+
+20
+
+30
+
+400
+
+400
+
+400
+
+40
+
+50
+
+300
+
+300
+
+300
+
+60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+N = 1, , 744
+
+1.0
+
+1.0
+
+N = 1, , 372
+
+0.5
+
+0.5
+
+0.0
+
+0.0
+
+0.5
+
+0.5
+
+1.0
+
+1.0
+
+N = 1, , 744
+
+N = 1, , 372
+
+Magnitude in dB
+
+Mixture
+
+(c) Student: SF
+
+Target
+
+NCA Approximation
+
+700
+
+700
+
+700
+
+600
+
+600
+
+600
+
+10
+
+500
+
+500
+
+500
+
+20
+
+30
+
+400
+
+400
+
+400
+
+40
+
+50
+
+300
+
+300
+
+300
+
+60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+Frequency sub-bands (N)
+
+Magnitude in dB
+
+Mixture
+
+(d) Compositional: DAE
+
+Target
+
+NCA Approximation
+
+700
+
+700
+
+700
+
+600
+
+600
+
+600
+
+500
+
+500
+
+500
+
+10
+
+20
+
+400
+
+400
+
+400
+
+30 40
+
+50
+
+300
+
+300
+
+300
+
+60
+
+70
+
+200
+
+200
+
+200
+
+80
+
+100
+
+100
+
+100
+
+00
+
+50 100 150 200 250 300 350 0 0
+
+Time-frames (T) 50 100 150 200 250 300 350 0 0
+
+50 100 150 200 250 300 350
+
+Couplings
+
+Couplings (zoomed)
+
+N = 1, , 744
+
+1.0 0.5 0.0
+0.5 1.0 1.5
+N = 1, , 744
+
+N = 1, , 372
+
+1.0 0.5 0.0
+0.5 1.0
+N = 1, , 372
+
+N = 1, , 744
+
+1.0 0.5 0.00.5
+1.0 1.5 22..50 3.0
+N = 1, , 744
+
+N = 1, , 372
+
+1.0 0.5 0.0
+0.5 1.0 1.5 2.0 2.5
+N = 1, , 372
+
+(e) Compositional: MSS-DAE
+
+(f) Compositional: SF
+
+Figure 3: The outcome of the NCA for the DAE, MSS-DAE, and SF models using a ∼ 3 seconds excerpt from the ﬁle Al James - Schoolboy Fascination in the test sub-set of MUSDB18. First Row (a)–(c): The couplings matrices approximating the mapping functions and the corresponding spectral estimates using the student strategy. Second Row: (d)–(f): The couplings matrices approximating the mapping functions and the corresponding spectral estimates using the compositional strategy. A row-wise maximum value normalization, and zooming of the couplings matrices is presented for clarity.
+
+Frequency sub-bands (N)
+
+12
+
+PREPRINT, FOR ARCHIVING PURPOSES
+
+Table 3: Assessing the approximation performance of the mappings computed by the NCA, compared to the true singing voice spectra. The mean and standard deviation of the SNR, expressed in dB, are reported. For comparison, the models’ output is also reported.
+
+Model
+
+Strategy
+
+DAE
+
+MSS-DAE
+
+SF
+
+Student
+
+−4.02(±2.43) −1.94(±2.03) −4.88(±3.06)
+
+Compositional −5.50(±3.41) −2.36(±2.29) −4.15(±3.41)
+
+Model Output −5.05(±3.05) −2.17(±2.43) −4.74(±3.15)
+
+differences can be explained by the fact that the couplings matrix for the SF model was optimized according to Eq. (15) using the output masks of the SF model as target function(s) Y, as opposed to the DAE and MSS-DAE models that use the corresponding singing voice spectral estimates as target function(s).
+The above tendency is also demonstrated in Table 1, where the statistics of the TOD-R metric for the student strategy are exactly the same for the DAE and the MSS-DAE models. This shows that the mappings are nearly identical between the models. This can be explained by recalling the Eqs. (15)–(16) that depict the approximation of the mapping functions by observing only input-output and model-dependent relationships of spectral representations, and by neglecting the parameters of the model. The disuse of the model’s parameters during the optimization of the NCA is a convex problem that is experimentally shown to lead to similar solution during the experimental realization. However, according to [40] the disuse of the model parameters leads to system solutions that do not characterize the functionality of the non-linear model. Consequently, we turn our focus on the compositional strategy, that includes the knowledge of the parameters of each model.
+In the second row of Table 1 and in Figs. 3d–3e, a pattern that is evident among the mapping functions of the DAE and MSS-DAE models is the high diagonal activity when compared to the SF model that employs the skip connections. Speciﬁcally, the mapping function of the SF model has pushed most of its activity away from the main diagonal. For small N , i.e., in the ﬁrst matrix rows of the zoomed mapping function of Fig. 3f, it can be seen that elementary spectral structures are formed. Those spectral structures are related to the target spectra of Fig.3f as both the spectral and the mapping function illustrations concentrate magnitude information in same frequency sub-band regions. According to the graphical model and its expected conditional, i.e., Fig. 1c and q(x|x˜)q(x˜), we can underline that the mapping function of the SF model captures the relevant structure of the target source that has been observed in the mixture such that a time-frequency mask can be applied to suppress the interfering sources. What is not evident in our results, is the SF model’s capacity in learning spectral structures from the training data.
+To this end, Fig. 3 also shows that the additional layers that the MSS-DAE model employs are essentially used to model additional inter-frequency relationships, compared to the DAE model that comprises only two layers and concentrates most of its activity on the main diagonal. The MSS-DAE model not only pushes its activity to off-diagonal elements but also forms a structured matrix, mostly seen in the zoomed couplings matrix of Fig. 3e, that is roughly similar to a circulant matrix with sparse entries. Those types of matrices are commonly used in digital signal processing for convolutional operators. This observation somewhat justiﬁes the advantage of incorporating additional computational layers into a source separation model as proposed in [23, 9], and serves as an explanation on why convolutional layers are attractive choices in source separation models [22]. On the other hand, the DAE model has a simpler structure similar to a band matrix, with the minor off-diagonal activity denoting the spectral relationships, i.e., quasi-harmonic structures of the singing voice.
+The code for reproducing the above results and computing the gradients can be found under: https://zenodo.org/ record/2629650 and https://github.com/Js-Mim/nca_mss.
+6 Conclusions & Future Research
+In this study, we formalized two research questions related to the most commonly used neural network model in music source separation, i.e., the denoising autoencoder presented in [4]: RQ1)“Why is masking important in approaches based on the DAE model?”, and RQ2) “Do DAEs that are commonly employed in music source separation learn trivial solutions for the given problem?”. To answer those questions we focused on the examination of the mapping functions of the corresponding models applied to the particular problem of singing voice separation. For computing the mapping functions, we proposed an experimentally derived algorithm and investigated two strategies to that aim. The ﬁrst one, denoted as the student strategy, is based on the neural network distillation concept presented in [30]. It was
+13
+
+PREPRINT, FOR ARCHIVING PURPOSES
+observed that the student strategy leads to ambiguous results regarding the approximation of the mapping functions as it does not account for the model’s parameters. As an alternative, the compositional strategy was proposed for taking into account the model’s already optimized parameters for the problem of singing voice separation, similarly to the algebraic derivation of the mapping function.
+Using the compositional strategy and the computed mapping functions we investigated the denoising autoencoder (DAE) model, its multi-layered extension employed in relevant tasks (MSS-DAE) [23, 9, 21], and the denoising autoencoder with skip-connections (SF) that are used to mask the mixture spectra similarly to a time-frequency ﬁltering operation [16, 14, 17]. By examining the overall structure of the mapping functions, we conclude that the source separation models learn data-driven ﬁltering functions when they are optimized for singing voice separation. The DAE model learns trivial solutions because the corresponding encoding and decoding functions become symmetric during the training procedure. Consequently, the ﬁltering functions learned by the DAE act as scalar ﬁlters in the frequency domain potentially limiting the overall source estimation performance. Furthermore, employing skip-connections as in the SF model can be seen as a simple method to enforce DAEs to learn richer inter-frequency dependencies compared to the DAE. This can justify the empirically observed performance boost over DAEs in previous works like [14, 18, 17, 19]. Finally, the additional computational layers employed in the MSS-DAE model, seem to promote the learning of ﬁlter kernels with a sparse and circulant structure roughly similar to convolutional operations. However, those kernels share also similarities with scalar ﬁlters, as in the case of the DAE, which reduce the overall ﬁltering performance and support the experimental results in [9] that promote the usage of masking as a post-processing step for estimating the target source(s).
+Although this study does not fully reﬂect the current trends in deep learning-based music source separation, it serves as a ﬁrst step towards understanding what non-linear models learn from data when they are optimized to separate the singing voice. Furthermore, we investigated and provided the graphical model of an important skip connection that has been extensively used in signal separation. For instance, in [17] a model that uses skip connections based on ladder-like concatenations improved performance when skip-ﬁltering connections were introduced. In addition to this, the skip-ﬁltering connections are also an important ingredient in the Conv-TasNet model [46] that has surpassed the oracle performance in speech signal separation.
+Directions for future research include the linking between the demonstrated mapping functions and the spectral transportation matrices [29]. This could assist in a geometrical understanding of denoising functions in deep learning based signal separation. Transportation analysis would also allow the examination of latent information [47] that our work has not covered; however, the proposed method could be extended to that aim. Furthermore, examining another important type of skip connections that are commonly referred to as residual connections is also relevant. Residual connections play an important role in signal enhancement and denoising [44] and have been used in music source separation [22] and evaluation [21]. Finally, expanding the proposed study to more advanced architectures is also relevant. That is because the current study has solely focused on data-dependent inter-frequency relationships, whereas it is well known that temporal information conveys much information in music signals. It should be stated though, that the mappings, with respect to the frequency structure, for recurrent and convolutional neural networks are not expected to deviate signiﬁcantly from the mappings presented in this work. That is because the signal estimation is based on vector and matrix products as the models examined in this work.
+Acknowledgments
+The research leading to these results has received funding from the European Union’s H2020 Framework Programme (H2020-MSCA-ITN-2014) under grant agreement no 642685 MacSeNet. Stylianos Ioannis Mimilakis is supported by the by the German Research Foundation (AB 675/2-1, MU 2686/11-1). The authors would like to thank Rodrigo Pena (EPFL), Derry Fitzgerald (AudioSourceRE), Paul Magron (Tampere University), Luca Cuccovillo (Fraunhofer-IDMT), and the anonymous reviewers for the fruitful discussions and valuable feedback.
+References
+[1] D. Wang and J. Chen, “Supervised speech separation based on deep learning: An overview,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 26, no. 10, pp. 1702–1726, Oct 2018.
+[2] Z. Raﬁi, A. Liutkus, F. R. Stöter, S. I. Mimilakis, D. FitzGerald, and B. Pardo, “An overview of lead and accompaniment separation in music,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 26, no. 8, pp. 1307–1335, Aug 2018.
+14
+
+PREPRINT, FOR ARCHIVING PURPOSES
+[3] F.-R. Stöter, A. Liutkus, and N. Ito, “The 2018 Signal Separation Evaluation Campaign,” in Proceedings of the Latent Variable Analysis and Signal Separation: 14th International Conference on Latent Variable Analysis and Signal Separation, Surrey, United Kingdom, Jul. 2018.
+[4] P. Vincent, H. Larochelle, Y. Bengio, and P.-A. Manzagol, “Extracting and composing robust features with denoising autoencoders,” in Proceedings of the 25th International Conference on Machine Learning (ICML). New York, NY, USA: ACM, 2008, pp. 1096–1103.
+[5] P. Vincent, H. Larochelle, I. Lajoie, Y. Bengio, and P.-A. Manzagol, “Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion,” Journal of Machine Learning Research, vol. 11, pp. 3371–3408, 2010.
+[6] E. M. Grais, G. Roma, A. J. R. Simpson, and M. D. Plumbley, “Two-stage single-channel audio source separation using deep neural networks,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 25, no. 9, pp. 1773–1783, Sept 2017.
+[7] D. Williamson, Y. Wang, and D. Wang, “Complex ratio masking for monaural speech separation,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 24, no. 3, pp. 483–492, March 2016.
+[8] Y. Wang, A. Narayanan, and D. Wang, “On training targets for supervised speech separation,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 22, no. 12, pp. 1849–1858, Dec 2014.
+[9] S. Uhlich, F. Giron, and Y. Mitsufuji, “Deep neural network based instrument extraction from music,” in Proceedings of the 40th International Conference on Acoustics, Speech and Signal Processing (ICASSP 2015), 2015, pp. 2135–2139.
+[10] E.-M. Grais, G. Roma, A. Simpson, and M.-D. Plumbley, “Single-channel audio source separation using deep neural network ensembles,” in Proceedings of the 140th Audio Engineering Society Convention, May 2016.
+[11] A. Liutkus and R. Badeau, “Generalized Wiener ﬁltering with fractional power spectrograms,” in Proceedings of the 40th International Conference on Acoustics, Speech and Signal Processing (ICASSP 2015), Apr. 2015, pp. 266–270.
+[12] S. Voran, “The selection of spectral magnitude exponents for separating two sources is dominated by phase distribution not magnitude distribution,” in Proceedings of the 2017 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA 2017), Oct. 2017.
+[13] D. FitzGerald and R. Jaiswal, “On the use of masking ﬁlters in sound source separation,” in Proceedings of the 15th International Conference on Digital Audio Effects (DAFx-12), Sep. 2012.
+[14] F. Weninger, J. R. Hershey, J. L. Roux, and B. Schuller, “Discriminatively trained recurrent neural networks for single-channel speech separation,” in Proceedings of the 2014 IEEE Global Conference on Signal and Information Processing (GlobalSIP), Dec 2014, pp. 577–581.
+[15] P.-S. Huang, M. Kim, M. Hasegawa-Johnson, and P. Smaragdis, “Joint optimization of masks and deep recurrent neural networks for monaural source separation,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 23, no. 12, pp. 2136–2147, Dec. 2015.
+[16] S. I. Mimilakis, K. Drossos, G. Schuller, and T. Virtanen, “A recurrent encoder-decoder approach with skip-ﬁltering connections for monaural singing voice separation,” in Proceedings of the 27th IEEE International Workshop on Machine Learning for Signal Processing (MLSP), 2017.
+[17] A. Jansson, E. Humphrey, N. Montecchio, R. Bittner, A. Kumar, and T. Weyde, “Singing voice separation with deep U-Net convolutional networks,” in Proceedings of the 18th International Society for Music Information Retrieval Conference, Suzhou, China, Oct. 2017.
+[18] S.-I. Mimilakis, K. Drossos, J.-F. Santos, G. Schuller, T. Virtanen, and Y. Bengio, “Monaural singing voice separation with skip-ﬁltering connections and recurrent inference of time-frequency mask,” in Proceedings of the 43rd International Conference on Acoustics, Speech and Signal Processing (ICASSP 2018), 2018.
+[19] K. Drossos, S. I. Mimilakis, D. Serdyuk, G. Schuller, T. Virtanen, and Y. Bengio, “MaD TwinNet: Maskerdenoiser architecture with twin networks for monaural sound source separation,” in Proceedings of the 2018 IEEE International Joint Conference on Neural Networks (IJCNN), July 2018.
+[20] J. Lee, J. Skoglund, T. Shabestary, and H. Kang, “Phase-sensitive joint learning algorithms for deep learning-based speech enhancement,” IEEE Signal Processing Letters, vol. 25, no. 8, pp. 1276–1280, Aug 2018.
+[21] S. Uhlich, M. Porcu, F. Giron, M. Enenkl, T. Kemp, N. Takahashi, and Y. Mitsufuji, “Improving music source separation based on deep neural networks through data augmentation and network blending,” in Proceedings of the 42nd International Conference on Acoustics, Speech and Signal Processing (ICASSP 2017), 2017, pp. 261–265.
+15
+
+PREPRINT, FOR ARCHIVING PURPOSES
+[22] N. Takahashi and Y. Mitsufuji, “Multi-scale multi-band densenets for audio source separation,” in Proceedings of the 2017 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA 2017), Oct. 2017.
+[23] A. A. Nugraha, A. Liutkus, and E. Vincent, “Multichannel music separation with deep neural networks,” in Proceedings of the 24th European Signal Processing Conference (EUSIPCO), Aug 2016, pp. 1748–1752.
+[24] D.-J. Im, M. I. Belghazi, and R. Memisevic, “Conservativeness of untied auto-encoders,” in Proceedings of the 30th AAAI Conference on Artiﬁcial Intelligence, 2016.
+[25] J. Särelä and H. Valpola, “Denoising source separation,” J. Mach. Learn. Res., vol. 6, pp. 233–272, Dec. 2005.
+[26] H. Erdogan, J. R. Hershey, S. Watanabe, and J. L. Roux, “Phase-sensitive and recognition-boosted speech separation using deep recurrent neural networks,” in Proceedings of the 40th International Conference on Acoustics, Speech and Signal Processing (ICASSP 2015), Apr. 2015, pp. 708–712.
+[27] G. Montavon, W. Samek, and K.-R. Müller, “Methods for interpreting and understanding deep neural networks,” Digital Signal Processing, vol. 73, pp. 1–15, 2018.
+[28] S. Kolouri, S. R. Park, M. Thorpe, D. Slepcev, and G. K. Rohde, “Optimal mass transport: Signal processing and machine-learning applications,” IEEE Signal Processing Magazine, vol. 34, no. 4, pp. 43–59, July 2017.
+[29] R. Flamary, C. Févotte, N. Courty, and V. Emiya, “Optimal spectral transportation with application to music transcription,” in Proceedings of the 29th International Conference on Neural Information Processing Systems, ser. NIPS’16, Barcelona, Spain, Dec. 2016.
+[30] G. Hinton, O. Vinyals, and J. Dean, “Distilling the knowledge in a neural network,” in Proceedings of the 28th International Conference on Neural Information Processing Systems, Workshop on Deep Learning and Representation Learning, ser. NIPS’15, 2015.
+[31] D. Giannoulis, D. Barchiesi, A. Klapuri, and M. D. Plumbley, “On the disjointess of sources in music using different time-frequency representations,” in Proceedings of the 2011 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA 2011), Oct. 2011, pp. 261–264.
+[32] A. Liutkus, D. Fitzgerald, Z. Raﬁi, B. Pardo, and L. Daudet, “Kernel additive models for source separation,” IEEE Transactions on Signal Processing, vol. 62, no. 16, pp. 4298–4310, Aug 2014.
+[33] Y. Wang and D. Wang, “A deep neural network for time-domain signal reconstruction,” in Proceedings of the 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), April 2015, pp. 4390–4394.
+[34] G. Naithani, J. Nikunen, L. Bramsløw, and T. Virtanen, “Deep neural network based speech separation optimizing an objective estimator of intelligibility for low latency applications,” in Proceedings of the 2018 IEEE International Workshop on Acoustic Signal Enhancement, Sep. 2018.
+[35] W. K. Pratt, “Generalized Wiener ﬁltering computation techniques,” IEEE Transactions on Computers, vol. C-21, no. 7, pp. 636–641, July 1972.
+[36] S. I. Mimilakis, E. Cano, D. Fitzgerald, K. Drossos, and G. Schuller, “Examining the perceptual effect of alternative objective functions for deep learning based music source separation,” in Proceedings of the 52nd Asilomar Conference on Signals, Systems, and Computers, 2018.
+[37] R. Pascanu, G. Montufar, and Y. Bengio, “On the number of response regions of deep feedforward networks with piecewise linear activations,” in Proceedings of the International Conference on Learning Representations (ICLR’14), 2014.
+[38] V. Papyan, Y. Romano, J. Sulam, and M. Elad, “Theoretical foundations of deep learning via sparse representations: A multilayer sparse model and its connection to convolutional neural networks,” IEEE Signal Processing Magazine, vol. 35, no. 4, pp. 72–89, July 2018.
+[39] S. Theodoridis, Machine Learning: A Bayesian and Optimization Perspective, 1st ed. Orlando, FL, USA: Academic Press, Inc., 2015.
+[40] S. Wang, A.-R. Mohamed, R. Caruana, J. Bilmes, M. Plilipose, M. Richardson, K. Geras, G. Urban, and O. Aslan, “Analysis of deep neural networks with the extended data jacobian matrix,” in Proceedings of the 33rd International Conference on Machine Learning, ser. ICML’16, vol. 48, 2016, pp. 718–727.
+[41] Z. Raﬁi, A. Liutkus, F. Stöter, S. I. Mimilakis, and R. Bittner, “The MUSDB18 corpus for music separation,” Dec 2017. [Online]. Available: https://doi.org/10.5281/zenodo.1117372
+[42] X. Glorot and Y. Bengio, “Understanding the difﬁculty of training deep feedforward neural networks,” in Proceedings of the International Conference on Artiﬁcial Intelligence and Statistics (AISTATS’10), 2010, pp. 249–256.
+16
+
+PREPRINT, FOR ARCHIVING PURPOSES [43] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in Proceedings of the International
+Conference on Learning Representations (ICLR-15), 2015. [44] J. Santos and T. Falk, “Investigating the effect of residual and highway connections in speech enhancement models,”
+in Proceedings of the 32nd International Conference on Neural Information Processing Systems, Workshop on Interpretability and Robustness in Audio, Speech, and Language, ser. NIPS’18, Montreal, Canada, Dec. 2018. [45] S. Dieleman and B. Schrauwen, “End-to-end learning for music audio,” in Proceedings of the 39th International Conference on Acoustics, Speech and Signal Processing (ICASSP 2014), May 2014, pp. 6964–6968. [46] Y. Luo and N. Mesgarani, “Conv-TasNet: Surpassing ideal time–frequency magnitude masking for speech separation,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 27, no. 8, pp. 1256–1266, Aug 2019. [47] S. Sonoda and N. Murata, “Transportation analysis of denoising autoencoders: A novel method for analyzing deep neural networks,” in Proceedings of the 2nd NeurIPS Workshop on Optimal Transport and Machine Learning (OTML 2017), 2017.
+17
+

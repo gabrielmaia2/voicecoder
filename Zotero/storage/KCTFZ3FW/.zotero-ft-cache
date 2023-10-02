@@ -1,0 +1,83 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > eess > arXiv:1909.06805
+
+Help | Advanced Search
+Search
+Electrical Engineering and Systems Science > Audio and Speech Processing
+(eess)
+[Submitted on 15 Sep 2019 ( v1 ), last revised 2 Feb 2020 (this version, v4)]
+Title: Many-to-Many Voice Conversion using Cycle-Consistent Variational Autoencoder with Multiple Decoders
+Authors: Keonnyeong Lee , In-Chul Yoo , Dongsuk Yook
+Download a PDF of the paper titled Many-to-Many Voice Conversion using Cycle-Consistent Variational Autoencoder with Multiple Decoders, by Keonnyeong Lee and 2 other authors
+Download PDF
+
+    Abstract: One of the obstacles in many-to-many voice conversion is the requirement of the parallel training data, which contain pairs of utterances with the same linguistic content spoken by different speakers. Since collecting such parallel data is a highly expensive task, many works attempted to use non-parallel training data for many-to-many voice conversion. One of such approaches is using the variational autoencoder (VAE). Though it can handle many-to-many voice conversion without the parallel training, the VAE based voice conversion methods suffer from low sound qualities of the converted speech. One of the major reasons is because the VAE learns only the self-reconstruction path. The conversion path is not trained at all. In this paper, we propose a cycle consistency loss for VAE to explicitly learn the conversion path. In addition, we propose to use multiple decoders to further improve the sound qualities of the conventional VAE based voice conversion methods. The effectiveness of the proposed method is validated using objective and the subjective evaluations. 
+
+Comments: 	6 pages
+Subjects: 	Audio and Speech Processing (eess.AS) ; Computation and Language (cs.CL)
+Cite as: 	arXiv:1909.06805 [eess.AS]
+  	(or arXiv:1909.06805v4 [eess.AS] for this version)
+  	https://doi.org/10.48550/arXiv.1909.06805
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Keonnyeong Lee [ view email ]
+[v1] Sun, 15 Sep 2019 14:03:40 UTC (664 KB)
+[v2] Tue, 17 Sep 2019 07:05:43 UTC (664 KB)
+[v3] Tue, 5 Nov 2019 23:38:33 UTC (159 KB)
+[v4] Sun, 2 Feb 2020 05:24:56 UTC (248 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Many-to-Many Voice Conversion using Cycle-Consistent Variational Autoencoder with Multiple Decoders, by Keonnyeong Lee and 2 other authors
+    Download PDF 
+
+( view license )
+Current browse context:
+eess.AS
+< prev   |   next >
+new | recent | 1909
+Change to browse by:
+cs
+cs.CL
+eess
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

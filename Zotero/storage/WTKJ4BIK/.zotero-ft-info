@@ -1,0 +1,16 @@
+Title:          A Bottleneck Auto-Encoder for F0 Transformations on Speech and Singing Voice
+Subject:        In this publication, we present a deep learning-based method to transform the f0 in speech and singing voice recordings. f0 transformation is performed by training an auto-encoder on the voice signal's mel-spectrogram and conditioning the auto-encoder on the f0. Inspired by AutoVC/F0, we apply an information bottleneck to it to disentangle the f0 from its latent code. The resulting model successfully applies the desired f0 to the input mel-spectrograms and adapts the speaker identity when necessary, e.g., if the requested f0 falls out of the range of the source speaker/singer. Using the mean f0 error in the transformed mel-spectrograms, we define a disentanglement measure and perform a study over the required bottleneck size. The study reveals that to remove the f0 from the auto-encoder's latent code, the bottleneck size should be smaller than four for singing and smaller than nine for speech. Through a perceptive test, we compare the audio quality of the proposed auto-encoder to f0 transformations obtained with a classical vocoder. The perceptive test confirms that the audio quality is better for the auto-encoder than for the classical vocoder. Finally, a visual analysis of the latent code for the two-dimensional case is carried out. We observe that the auto-encoder encodes phonemes as repeated discontinuous temporal gestures within the latent code. -9pt
+Keywords:       convolutional neural networks; attribute transformation; f0 transformation; voice conversion; auto-encoder 
+Author:         Frederik Bous and Axel Roebel
+Creator:        LaTeX with hyperref
+Producer:       pdfTeX-1.40.21
+CreationDate:   02/24/22 18:41:22
+ModDate:        02/24/22 11:49:47
+Tagged:         no
+Form:           none
+Pages:          19
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      2051885 bytes
+Optimized:      no
+PDF version:    1.7

@@ -1,0 +1,83 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > eess > arXiv:2306.06814
+
+Help | Advanced Search
+Search
+Electrical Engineering and Systems Science > Audio and Speech Processing
+(eess)
+[Submitted on 12 Jun 2023]
+Title: HiddenSinger: High-Quality Singing Voice Synthesis via Neural Audio Codec and Latent Diffusion Models
+Authors: Ji-Sang Hwang , Sang-Hoon Lee , Seong-Whan Lee
+Download a PDF of the paper titled HiddenSinger: High-Quality Singing Voice Synthesis via Neural Audio Codec and Latent Diffusion Models, by Ji-Sang Hwang and 2 other authors
+Download PDF
+
+    Abstract: Recently, denoising diffusion models have demonstrated remarkable performance among generative models in various domains. However, in the speech domain, the application of diffusion models for synthesizing time-varying audio faces limitations in terms of complexity and controllability, as speech synthesis requires very high-dimensional samples with long-term acoustic features. To alleviate the challenges posed by model complexity in singing voice synthesis, we propose HiddenSinger, a high-quality singing voice synthesis system using a neural audio codec and latent diffusion models. To ensure high-fidelity audio, we introduce an audio autoencoder that can encode audio into an audio codec as a compressed representation and reconstruct the high-fidelity audio from the low-dimensional compressed latent vector. Subsequently, we use the latent diffusion models to sample a latent representation from a musical score. In addition, our proposed model is extended to an unsupervised singing voice learning framework, HiddenSinger-U, to train the model using an unlabeled singing voice dataset. Experimental results demonstrate that our model outperforms previous models in terms of audio quality. Furthermore, the HiddenSinger-U can synthesize high-quality singing voices of speakers trained solely on unlabeled data. 
+
+Comments: 	11 pages, 5 figures, 5 tables, under review
+Subjects: 	Audio and Speech Processing (eess.AS) ; Artificial Intelligence (cs.AI); Sound (cs.SD); Signal Processing (eess.SP)
+Cite as: 	arXiv:2306.06814 [eess.AS]
+  	(or arXiv:2306.06814v1 [eess.AS] for this version)
+  	https://doi.org/10.48550/arXiv.2306.06814
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Ji-Sang Hwang [ view email ]
+[v1] Mon, 12 Jun 2023 01:21:41 UTC (1,364 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled HiddenSinger: High-Quality Singing Voice Synthesis via Neural Audio Codec and Latent Diffusion Models, by Ji-Sang Hwang and 2 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+Current browse context:
+eess.AS
+< prev   |   next >
+new | recent | 2306
+Change to browse by:
+cs
+cs.AI
+cs.SD
+eess
+eess.SP
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

@@ -1,0 +1,123 @@
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Conferences > 2021 IEEE 21st International ...
+Style-transfer Autoencoder for Efficient Deep Voice Conversion
+Publisher: IEEE
+Cite This
+PDF
+Ilya Makarov ; Denis Zuenko
+All Authors
+2
+Cites in
+Papers
+113
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction
+    II.
+    Related Works
+    III.
+    Problem Statement
+    IV.
+    Architecture
+    V.
+    Experiments
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Abstract:
+We consider the problem of voice cloning, which is desirable in many film-related industries, and developed a new modification of the AutoVC state-of-the-art model in the task of voice conversion. We studied the replacement of recurrent modules with convolutional layers while maintaining the quality of the original model. The result of our work showed the speed improvement on longer voice tracks and faster training with the tiniest deterioration in sound quality, as evidenced by the reconstitution loss and Mel-cepstral distortion.
+Published in: 2021 IEEE 21st International Symposium on Computational Intelligence and Informatics (CINTI)
+Date of Conference: 18-20 November 2021
+Date Added to IEEE Xplore : 12 January 2022
+ISBN Information:
+ISSN Information:
+INSPEC Accession Number: 21570529
+DOI: 10.1109/CINTI53070.2021.9668528
+Publisher: IEEE
+Conference Location: Budapest, Hungary
+I. Introduction
+
+Deep learning models have become useful in many fields of applied machine learning. In our studies, we showed the advances of deep learning approaches in various computer science fields, for e.g., in depth estimation deep learning helps to reconstruct depth from various input sources in an end-to-end manner [1]–[7]; in graph machine learning deep neural networks aggregate information from similar nodes [8]-[11]; in deep reinforcement learning agents extract meaningful state representations to propagate reward into action policies or model human behavior in video-games [12]–[20]; in graph recommender systems meaningful features are extracted and fused from attribute and structural information [21]–[29].
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+Prediction and Visualisation of Viral Genome Antigen Using Deep Learning & Artificial Intelligence
+
+2021 5th International Conference on Computing Methodologies and Communication (ICCMC)
+
+Published: 2021
+Combined IASI-NG and MWS Observations for the Retrieval of Cloud Liquid and Ice Water Path: A Deep Learning Artificial Intelligence Approach
+
+IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing
+
+Published: 2022
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

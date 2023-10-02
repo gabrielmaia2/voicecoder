@@ -1,0 +1,124 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > IEEE Transactions on Circuits... > Volume: 31 Issue: 4
+Wavelet-Based Deep Auto Encoder-Decoder (WDAED)-Based Image Compression
+Publisher: IEEE
+Cite This
+PDF
+Dipti Mishra ; Satish Kumar Singh ; Rajat Kumar Singh
+All Authors
+28
+Cites in
+Papers
+1309
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction
+    II.
+    The Proposed Framework
+    III.
+    Experimental Details
+    IV.
+    Results & Discussions
+    V.
+    Conclusion
+
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+Abstract:
+In this work, we propose a Wavelet-based Deep Auto Encoder-Decoder Network (WDAED) based image compression which takes care of the various frequency components present in an image. Specifically, we demonstrate improvements over prior approaches utilizing this framework by introducing: (a) wavelet transform pre-processing for decomposing image into different frequencies for their separate processing (b) a very deep super-resolution network as a decoder of the convolutional autoencoder in order to achieve a good quality decompressed image. The end-to-end learning is performed for four wavelet sub-bands in parallel, minimizing the computational time. The encoder compresses the image by generating the latent space representations, whereas the decoder transforms the latent space to image space. The algorithm has been tested on various standard datasets i.e., ImageNet, Set 5, Set 14, Live 1, Kodak, Classic 5, General 100 and CLIC 2019 dataset. The proposed algorithm clearly exhibited the compression performance improvement of approximately 5%, 5.5%, and 13% in terms of PSNR, PSNRB and SSIM respectively.
+Published in: IEEE Transactions on Circuits and Systems for Video Technology ( Volume: 31 , Issue: 4 , April 2021 )
+Page(s): 1452 - 1462
+Date of Publication: 20 July 2020
+ISSN Information:
+INSPEC Accession Number: 20850723
+DOI: 10.1109/TCSVT.2020.3010627
+Publisher: IEEE
+I. Introduction
+
+In this modern era of big and large data, we have a lot of data on the web server, posing a big issue on data size. Due to the limited storage capability and bandwidth of the transmission channel, the compression is becoming a necessity to reduce the size of the files needed to store or transmit. Various standard algorithms i.e., JPEG [1], JPEG 2000 [2] and their variants [3]–[7] are being used for image compression and decompression purposes. All the methods [1]–[7] are based on the typical compression pipeline i.e., transformation, quantization and entropy coding steps, whereas the decompression pipeline follows the reverse scheme to produce the decompressed images. All these methods [1]–[7] are classical and still being used due to simplicity. But at the same time, many problems are posed by these methods i.e., blocking artifacts; ringing; blurring; side information; edge-loss; and perceptual distortions. All the problems as highlighted above become more prominent at lower bit-rates. For resolving or minimizing the effect of above problems after decompression, some post processing methods are needed. Many post processing methods have been reported in last decade [8]–[15]. All the compression-decompression and post processing methods [1]–[15] are model driven and data adaptability is missing. With the advent of deep learning methods, which are basically data driven, many compression-decompression methods including the post-processing methods have been reported in recent past [16]–[26]. Some of the deep learning oriented intra-prediction based image compression schemes have also been proposed recently which were based on HEVC and in-loop filtering techniques [27]–[29]. The accuracy of such data driven approaches depends upon the availability of the huge data and sufficient computational power to train such models. In today’s era, either data or computational power is not a big problem, which motivated the researchers to report such advanced deep learning methods in recent past. The basic framework for compression-decompression for deep learning based methods include the encoder and decoder. The role of deep encoder is to provide the most compact representation in latent space whereas the role of decoder is to reconstruct the images from latent space representation. The compression efficiency of such models and the quality of reconstructed image depends upon the design and training of encoder and decoder respectively. Apart from the principle of dimensionality reduction through these autoencoder like architectures, nowadays, researchers are widely using the principle of super-resolution. This is due to its excellent performance [30]–[34] for generating high resolution images in various computer vision and image processing. Like, Dong et al. [34] proposed a sparse coding method based on the concept of super-resolution; however, the approach resulted in the unwanted noise patterns in decompressed images. In the direction of reducing the challenges faced in above scheme, the author further proposed an “easy-to-hard” transfer learning approach [14] of training a shallower network and then transferring the features to deeper network for further fine-tuning. However, it was observed that it is difficult to train a network containing more than four layers for low-level vision applications. In 2017, Cavigelli et al. [35] stated that “it is a well-known fact that at higher compression rates the differences between the original and reconstructed images are quite visible due to blocking artifact”. The idea is not appropriate and lead to a poor accuracy result when applied for computer vision and biometric algorithms. Later on, Zhang et al. [36] proposed an image denoising method based on residual learning. The network in [36] is deployed to manage Gaussian denoising, image deblocking, and super-resolution. All these artifacts removal based models attempted to enhance or improve the quality of the decoded image while ignoring the joint optimization of the encoder-decoder structure. Also, the approaches mentioned above were not optimal and flexible for all types of images and applications. Secondly, very few algorithms have tried to build a hybrid model of traditional compression algorithms with the deep CNN architectures. Galteri et al. [37] proposed an artifact removal technique using GAN by transforming images with deep convolutional residual network for generating images with finer consistent details. But the method did not compare the results with the state-of-the-art artifacts removal techniques. In 2018, Jiang et al. [38] proposed a hybrid algorithm using CNN with existing codecs. The method was quite effective in reducing the artifacts, but failed to highlight the edges and fine details in the image, especially at bit-rate less than 0.1. The cause of artifacts is the suppression of high frequency components which leads to the blurriness at the edges in the images. To solve this, Chen et al. [20] proposed wavelet based deep neural network algorithm for the soft decoding of JPEG images. The work in [20] used wavelet preprocessing to decompose images into four sub-bands. However, weight sharing technique was used to train all sub-bands i.e. network is same for all sub-bands. This network sharing may be considered as inappropriate as each of the sub-bands contains different levels of information. The recently reported wavelet-based convolutional autoencoder (WCAE) network has been used for the compression by Akyazi and Ebrahimi [39] to encode the images into latent space representation. The latent space representation is quantized, to obtain codes which are further reduced with the entropy encoding. Quantization is performed at the testing time, once the networks are trained, making it a non end-to-end learning approach. WCAE method used Daubechies wavelet transform at level-3 as a pre-processing step. Since the learning based network was applied, hence going upto level-3 introduced unnecessary complexity. The method uses the same network for all the sub-bands after wavelet decomposition, by ignoring the fact that all sub-bands carry different level of information. The network is optimized using mean square error (MSE) which is scale independent error metric and very prone to outliers in the datasets. Hence, it is pertinent to mention that image compression-decompression model is typically a regression problem. The outliers play very important role while optimizing using MSE for regression as it grows quadratically and large differences between actual and predicted values are penalized more compared to small differences. The algorithm used random weight initialization for training the network. To solve all these above mentioned problems, we have proposed an algorithm which use wavelet transform to analyze low along with high frequencies separately to preserve them after decompression. The convolutional autoencoder is utilized to compress and decompress the image sub-bands, in which the a very deep CNN network is used as decoder to learn the contextual information. The network is trained end-to-end with mean absolute error (MAE) with He’s weight initialization scheme instead of random weight initialization scheme.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+More Like This
+Curved wavelet transform for image coding
+
+IEEE Transactions on Image Processing
+
+Published: 2006
+Scalable medical data compression and transmission using wavelet transform for telemedicine applications
+
+IEEE Transactions on Information Technology in Biomedicine
+
+Published: 2003
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

@@ -1,0 +1,376 @@
+TGAVC: IMPROVING AUTOENCODER VOICE CONVERSION WITH TEXT-GUIDED AND ADVERSARIAL TRAINING
+Huaizhen Tang1,2, Xulong Zhang1, Jianzong Wang1∗, Ning Cheng1, Zhen Zeng1, Edward Xiao3, Jing Xiao1
+1Ping An Technology (Shenzhen) Co., Ltd. 2 University of Science and Technology of China.
+3 Aquinas International Academy, CA, USA
+
+arXiv:2208.04035v1 [cs.SD] 8 Aug 2022
+
+ABSTRACT Non-parallel many-to-many voice conversion remains an interesting but challenging speech processing task. Recently, AutoVC, a conditional autoencoder based method, achieved excellent conversion results by disentangling the speaker identity and the speech content using informationconstraining bottlenecks. However, due to the pure autoencoder training method, it is difﬁcult to evaluate the separation effect of content and speaker identity. In this paper, a novel voice conversion framework, named T ext Guided AutoVC(TGAVC), is proposed to more effectively separate content and timbre from speech, where an expected content embedding produced based on the text transcriptions is designed to guide the extraction of voice content. In addition, the adversarial training is applied to eliminate the speaker identity information in the estimated content embedding extracted from speech. Under the guidance of the expected content embedding and the adversarial training, the content encoder is trained to extract speaker-independent content embedding from speech. Experiments on AIShell-3 dataset show that the proposed model outperforms AutoVC in terms of naturalness and similarity of converted speech. Index Terms: voice conversion, autovc, adversarial training, speech synthesis
+1. INTRODUCTION
+Voice conversion (VC) aims to modify the voice characteristic and speaking style of a source speech while preserving the linguistic information [1, 2]. According to the characteristic of training data, these methods can be roughly categorized into two class, i.e. parallel VC and non-parallel VC [3]. More researchers focus on the solutions of non-parallel VC due to the lack of paired source-target speech datasets which is required for parallel VC.
+In recent years, due to the advance of deep learning, various voice conversion solutions are proposed. Since the task of
+∗Corresponding author: Jianzong Wang, jzwang@188.com. This paper is supported by National Key Research and Development Program of China under grant No. 2018YFB0204403, No. 2017YFB1401202 and No. 2018YFB1003500.
+
+voice conversion is very similar to that of image style transfer in computer vision, many generative adversarial networks (GAN) that have been successfully applied in the ﬁeld of image conversion also were been adapted to achieve voice conversion, such as CycleGAN-VC [4], StarGAN-VC [5]. These GAN-based models jointly train a generator network with a discriminator, where an adversarial loss derived from the discriminator is used to encourage the generator to build outputs that are indistinguishable from real speech. Due to the design of the cycle consistency training, GAN-based VC models can be trained with non-parallel speech datasets. In CycleGANVC [4], an identity mapping loss is designed to force the generator to ﬁnd the mapping that preserves the linguistic information. CycleGAN-VC2 [6] proposes two-step adversarial losses and improved the network structure for the generator and discriminator. In StarGAN-VC [5], many-to-many conversion is achieved through using a speaker identity vector as an additional input of the generator to control the generated speech identity. And, GAZEV [7] improved the VC performance of StarGAN-VC for unseen speakers by the adoption of style embedding methods.
+In addition, Flow-based models like blow[8] are also been studied, and they transform waveforms directly rather than using acoustic features.
+Both GAN and Flow-based models have in common is that they all bypass the problem of feature decoupling and convert speech directly, while there are also some other works[9, 10, 11, 12, 13, 14] attempting to disentangle the styling unit and content unit in the embedding space. The purpose is obvious, with content information and timbre information are obtained respectively, it is easy for us to ﬁx the content embedding while replacing the style embedding to convert the voice.
+One type of methods is based on the automatic speech recognition (ASR) model [9, 10, 11, 15]. Firstly, a pretrained speaker-independent ASR model was employed to extract linguistic-related features (e.g. phonetic posteriorgrams) from the source speech. Then, a synthesis model is applied to generate an utterance, of which pronunciation characteristic is very similar to the target speech. Especially
+
+in [11], the pronunciation characteristic of the target speech is represented by the d-vector extracted by a pre-trained speaker recognition model, and an adversarial learning approach is used to get more pure linguistic information from phonetic posteriorgrams.
+Vector Quantization (VQ)[12], a very important technology of signal compression, can quantify continuous data into discrete data. Recently, this technology has been proved that the quantized discrete data from the input continuous data is closely related with the phoneme information[16]. As a result, this technology is also applied to extract the content information, and learn to obtain style embedding by the difference between original continuous space and the discrete codes. D.-Y. Wu et al. introduced this technology in the task of voice conversion. Besides, VQVC+[13] proposed a new architecture combined with VQ, IN, and U-Net, which has achieved satisfactory results in the ﬁeld of voice conversion.
+Variational Autoencoders (VAEs)[17, 18, 19] are also popular choices for conversion models, the network structure of VAE consists of an encoder and a decoder network. During training, the encoder learns a speciﬁc latent space from the input speech while the decoder reconstructs the speech based on that latent space. The most serious problem is that they often suffer from overly smoothed results since the fact that they impose their latent encoding to follow some prior distribution. Besides, it can also not guarantee the match between the latent distribution and the output distribution.
+Recently, AutoVC[14], a many-to-many non-parallel VC model, has gained a lot of attention due to its simple training process and simple network structure, which applies a simple vanilla autoencoder with a properly tuned informationconstraining bottleneck to force disentanglement between the linguistic content and the speaker identity by training only on self-reconstruction. Compared with the previous methods, AutoVC can not only guarantee the distribution matching as GANs but also train as easily as VAEs.
+Unfortunately, although the above four methods have their advantages, they all have their disadvantages. For example, in the task of feature separation of content information and voice information, those PPG-based methods have good works, but they need to introduce a complex and huge pre-training ASR network, which makes the system very complicated. On the other hand, the decoupling effect and conversion effect of VQVC is unsatisfactory. The training of AutoVC is simple enough, but its conversion effect is still not as well as expected.
+In this paper, we proposed a novel voice conversion framework that combining the idea from AutoVC, text-tospeech system, and adversarial training, named TGAVC.
+Compared with AutoVC, our proposed model adds a text encoder and a speaker classiﬁer. According to the text transcription, the text encoder produces the desired content embedding, which is used to guide the training of the content encoder. Meanwhile, the speaker classiﬁer distinguishes
+
+xi i
+
+D
+
+ℋsi
+
+ℋci
+
+Es
+
+Ec
+
+x'i
+
+xi (a) Training
+
+xi j
+
+D
+
+ℋsj
+
+ℋci
+
+Es
+
+Ec
+
+xj
+
+xi (b) Conversion
+
+Fig. 1. Framework of AutoVC.
+
+speaker identity from the estimated content embedding output by the content encoder, and the adversarial training is applied between the speaker classiﬁer and the content encoder to eliminate the speaker style information in the estimated content embedding. Experiments on AIShell-3 dataset show that our proposed model outperforms AutoVC in terms of naturalness and similarity of converted speech. The main contributions of our works as follows:
+• The desired content embedding produced based on the text transcription, is designed to guide the training of VC model, which makes the model more efﬁcient and superior.
+• The adversarial training is applied into autoencoder voice conversion model to further separate the linguistic information and the voice characteristic from speech.
+• Compared to AutoVC, our proposed model reduced 1.72 score (the lower the better) in objective evaluation.
+2. PROPOSED METHODS
+Our purpose is to design a many-to-many voice conversion model, which can be trained with non-parallel and multispeaker speech datasets. We use xi to denote the speech sample, and (ti, ui) to denote the text transcription and the corresponding speaker identity. Different from conventional VC models, our proposed method makes full use of the information of the text transcription ti to get better conversion results. For ease of presentation, the speech xi represents its acoustic features (e.g. mel-spectrogram) in this section.
+2.1. AutoVC
+AutoVC designs an autoencoder framework to solve the voice conversion task, as shown in Figure 1. The framework is composed of three modules: a content encoder Ec that outputs a content embedding Hc from source speech xi, a style encoder Es that outputs a style embedding Hs from target speech xj,
+
+and a decoder that produces the converted speech xi→j from the content and style embeddings. In the training phase, two different speeches of the same speaker are fed into the content encoder and the style encoder respectively. Besides, the design of the self-reconstruction loss and the content code reconstruction loss enables the model to separate the content and style information from speech.
+Self-reconstruction loss: The self-reconstruction loss is used to render the converted speech xi→i, which is generated from the input content embedding Hc extracted from a source speech xi and the style embedding extracted from another speech xi as similar as the input speech xi:
+
+Lrecon = E( xˆi→i − xi 22)
+
+(1)
+
+Content code-reconstruction loss: The aim of content code-reconstruction loss is to encourage the content encoder Ec to output content embedding from input speech. What’s more, it’s also an effective way to guarantee that the converted speech will preserve the input composition. The content codereconstruction loss is deﬁned as:
+
+Lcontent = E( Ec(xˆi→i) − Ec(xi) 1)
+
+(2)
+
+Noted that the style encoder is taken off-the-shelf, we only need to train the content encoder Ec and the decoder D. The full objective is then formulated as:
+
+min L = Lrecon + λLcontent
+
+(3)
+
+Ec (·),D(·,·)
+
+where λ denotes the weights of Lcontent . In conversion, we can use two speeches from different two
+speakers are denoted as the source and target speech. We input the source speech into the trained content encoder and the target speech into the trained style encoder, then we would get the content embedding of the source speech and the voice characteristic of the target speech, and the decoder could produce a converted speech with the linguistic information from source speech and the voice characteristic from target speech.
+There is an obvious fact that the separation effect of feature decoupling is very important for all the work of speech conversion using feature decoupling. However, although AutoVC has a simple training scheme and can produce the distribution-matching voice conversion, the pure autoencoder learning process makes it difﬁcult for us to evaluate the separation effect of content and voice characteristic.
+What’s more, in order to separate the content information from the input speech with only one encoder, AutoVC sets a carefully designed bottleneck dimension of the content encoder to force the encoder to disentangle the speakerindependent features. And in the decoding phase, Both content and style embedding are restored to the original temporal resolution by simple replication, we think it is not rigorous enough. Motivated by the above reasons, we focused our attention on guiding the output of the content encoder.
+
+pi
+
+xi
+
+C
+
+D
+
+ℋsi
+
+ℋci
+
+ℋci
+
+Es
+
+Ec
+
+Et
+
+xi
+
+xi
+
+ti
+
+(a) Training
+
+xi j
+
+D
+
+ℋsj
+
+ℋci
+
+Es
+
+Ec
+
+xj
+
+xi (b) Conversion
+
+Fig. 2. Framework of TGAVC.
+
+2.2. Architecture of TGAVC
+2.2.1. Framework
+Since the mainstream multi-speaker speech datasets provide the text transcription of each speech, we design a novel framework for voice conversion to make full use of the transcription.
+Text-to-speech(TTS) and voice conversion share the same goal to generate natural speech. Especially today, TTS models have been expanded to multi-speaker scenarios by introducing style embedding. This process is very similar to the synthesis phrase of AutoVC. In addition, since the input of the TTS models is the sequence of text, the hidden feature outputs from the encoder of TTS model must be speaker-independent. Coincidentally, the goal of AutoVC is to extract the speakerindependent feature. We naturally thought that TTS models could be used to improve the effect of AutoVC disentanglement.
+Our proposed VC framework combines the design ideas of AutoVC, text-to-speech systems and the adversarial training. As shown in Figure 2(a), our framework contains ﬁve modules: a content encoder Ec that produces a content embedding Hc from speech, a text encoder Et that produces a text embedding Hc from text transcription (e.g. phonemes), we regard the output of text encoder as the ideal desired content embedding, note that there is a length regulator in the text encoder, this module is introduced to get alignment from the text embedding Hc and the content embeddingHc. A style encoder Es that produces a style embedding Hs from speech, a decoder D that produces the converted speech xi→j from the desired content and style embedding, and a speaker classiﬁer C that distinguishes speaker identity from content embedding.
+In training, the speech xi is fed into the content encoder and the style encoder, the text ti is fed into the text encoder and the speaker identity ui is fed into the speaker classiﬁer. The text encoder and the content encoder output the desired and estimated content embedding separately, which are expected to be as closed as possible. The predicted speech from the decoder is the reconstruction of the input speech xi. At the same time, the speaker classiﬁer predicts the probability
+
+of the speaker identity according to the estimated content embedding, and the adversarial training is applied between the content encoder and the speaker classiﬁer, which can eliminate the speaker style information in the estimated content embedding. The training process is shown in Figure 2(a).
+
+Hc = Et(ti), Hc = Ec(xi)
+
+(4)
+
+xˆi = D(Hc, Es(xi))
+
+(5)
+
+pi = C(Hc, ui)
+
+(6)
+
+The loss function of our proposed framework consists of three-part: the reconstruction error between the predicted speech and the input speech, the estimated error between the desired and estimated content embeddings, and the adversarial loss from the speaker classiﬁer. Instead of simply integrate all the losses into one loss function, we split them into L1 and L2. An interesting phenomenon is that in each training step, if we use L1 to train text encoder and decoder ﬁrst, then we ﬁx their network parameters, and then use L2 to update the parameters of the content encoder, the conversion effect will be much better. The loss function can be expressed as
+
+L1 = Lrecon
+
+= E(
+
+xˆi − xi
+
+2 2
+
+)
+
+(7)
+
+L2 = Lcontent + λLadv = E( Hc − Hc 1) + λ
+
+K
+
+I
+k=1
+
+(yspeaker
+
+==
+
+k) log pk
+
+(8)
+
+where I(·) is the indicator function, K is the number of speakers and yspeaker denotes speaker who produced xi. Since λ is the trade-off parameters. Then, our optimization goal is
+
+Es∗, Et∗, D
+
+=
+
+arg
+
+min
+Es ,Et ,D
+
+L1
+
+(9)
+
+Ec∗
+
+=
+
+arg
+
+min
+Ec
+
+max
+C
+
+L2
+
+(10)
+
+In conversion, we just need to use the content encoder, the style encoder and the decoder to implement a many-to-many voice conversion system. Same as AutoVC, the source speech and the target speech are fed into the content encoder and the style encoder separately, and the decoder could produce a converted speech with the linguistic information from source speech and voice characteristic from target speech, as shown in Figure 2(b).
+Notice that the combination of the text encoder, the style encoder and the decoder is a multi-speaker text-to-speech system, similar to [20, 21]. In our framework, the desired content embedding from the text encoder is used to guide the training of the content encoder. Theoretically, our VC model can achieve the performance equivalent to the multi-speaker speech synthesis system if the estimated error between the desired and estimated content embedding is small enough.
+
+2.2.2. Network
+The network structure of our proposed model is shown in Figure 3. The design of the text encoder and the decoder mainly
+
+Fig. 3. Network structure of TGAVC. Hc and Hc denotes the estimated and desired content embedding respectively. The style embedding Hs and Hc are concatenated during training. Noted that N means the number of multihead-attention and Conv1d layers in encoder and decoder.
+draws on FastSpeech2, which is a good model based on FastSpeech[22] and has shown a great effect on the TTS task. The text encoder consists of a character embedding, a stack of four FFTBlock layers which contains a multi-head attention and a two-feed-forward layer module, a full-connected layer and a Sinusoid position encoding table. this table is used to add positional embedding before we put the input feature into the FFTBlock layer stack as same as FastSpeech2. The length regulator is the same as that in FastSpeech2[21], where the required alignment between text and speech is extracted by the Montreal forced aligner tool [MFA].
+The style encoder is similar to that in AutoVC, which consists of a stack of two LSTM layers. Only the output of the last time is selected and fed into a fully connected layer to output the style embedding. The style encoder is pre-trained on the GE2E loss [GE2E][23], which maximizes the embedding similarity among different utterances of the same speaker, and minimizes the similarity among different speaker. This loss will force the style encoder to learn features closely related to the speaker information.
+The network structure of the decoder is similar to that of the encoder, but the difference is that the decoder has six layers of FFTBlock layers while in the encoder, the number of FFTBlock layers is four.
+The style embedding is ﬁrst copied to the same length as the content embedding, and then concatenated with it in the channel dimension. The concatenated embedding is passed into the decoder to generate the speech. The content encoder is composed of a stack of 3 convolution layers and a BiLSTM layer. The speaker classiﬁer consists of a stack of two LSTM
+
+layers, a fully connected layer and a softmax layer to predict the probability for each speaker’s identity.
+3. EXPERIMENTS
+3.1. Conﬁgurations
+In order to evaluate our proposed method, comparative experiments are conducted on AISHELL-3, a high-ﬁdelity multi-speaker Mandarin speech corpus. This corpus contains 88035 recordings (roughly 85 hours) from 218 native Chinese mandarin speakers and includes hand-labeled full pinyin annotations. The entire dataset is randomly divided into 3 sets: 63262 recordings from 174 speakers for training, 3480 recordings for validation and other recordings for testing. It is worth noting that these voice of speakers that do not appear in training sets are used to conduct zero-shot VC experiments. In our experiments, the sampling rate of all recordings is 22.05kHz, and the mel-spectrograms are computed through a short-time Fourier transform (STFT) with Hann windowing, where 1024 for FFT size, 1024 for window size and 256 for hop size. The STFT magnitude is transformed to the mel scale using 80 channel mel ﬁlter bank spanning 90 Hz to 7.6 kHz.
+We train TGAVC model with a batch size of sixteen for 100k steps on one NVIDIA V100 GPU, and use the ADAM optimizer with β1 = 0.9, β2 = 0.98, ε = 10−9. The style embedding is generated by feeding 10 two-second utterances of the same speaker to the style encoder and averaging the resulting embedding. The weights in Eq.(8) are set to λ = 0.1. The VQVC model and AutoVC are chosen as the baseline model, of which training follows the description in [14]. In addition, for our proposed TGAVC, we propose two different training processes, the ﬁrst one is that we train the content encoder jointly with the text-to-speech model. Speciﬁcally, for each training step, we ﬁrst perform a text-to-speech task to train the text encoder and the decoder, and then we use the output of the text encoder of the TTS system with no grad to get the estimated error between the estimated content embedding outputs from the content encoder and the desired content embedding. The other training process is that we have trained a TTS system in advance, and then we freeze the pre-trained TTS network so that we only need to train the content encoder network in the training stage. We call this type of training ”TGAVCs”.
+To compare the performance of different models, we used the Mel-Cepstral Distortion(MCD) between our converted speech and the ground truth target speech as our objective evaluation. Since the MCD test needs our converted speech and ground truth target speech to say the same linguistic content, we selected 10 utterances of the target speaker which have the same linguistic content as the source speaker. What’s more, we also performed two subjective tests. The ﬁrst test is the mean opinion score (MOS) test, where each converted
+
+utterance is rated with a score of 1-5 on the naturalness by 20 native mandarin testers. The second test is the speaker similarity test, where groups of utterances are rated with a score of 1-5 on the voice similarity. In each group, there are four converted utterances generated from AutoVC, VQVC, TGAVC and TGAVCs respectively, and one real utterance from the target speaker. Since our method does not need parallel corpus for training, the content information of ground-truth utterances from the target speaker is different from our converted speech. To evaluate the performance of Non-parallel voice conversion of our proposed method, we calculate the score according to the timbre similarity given by the tester. Thus the similarity score of 5 corresponds to the converted speech most similar to the ground-truth utterances, while the similarity score of 1 corresponds to the least similarity one.
+
+3.2. Many-to-Many conversion
+
+When we want to convert multiple source speakers to multiple target speakers, and both the source speaker and the target speaker are all appear in the training set, we call this type of task many-to-many conversion. We evaluate our proposed method by comparing it with AutoVC and VQVC. We did not compare it to other non-parallel many-to-many VC methods, because AutoVC has shown its advantages compared with previous work and the performance of AutoVC we used to compare is the same as that of the original work. To avoid unfair comparison, we trained AutoVC and VQVC with the same datasets. Since the style embedding of AutoVC and our proposed method are all produced by the same style encoder, it is not necessary for us to use one-hot embedding as the style embedding.
+To construct the utterances for multi many-to-many conversion evaluation, 4 speakers, 2 male and 2 female, are selected randomly from the 174 speakers in the training set. Then, we convert the test utterances of each of the 4 speakers to the other 3 speakers. So we can produce 4×3 = 12 conversion utterances contains the same content information of one of the 4 speakers while carrying the other 3 speaker’s voice. Results from the MOS test and the speaker similarity test are summarized in Table 1.
+
+Table 1. Comparison of different methods in many-to-many
+
+VC evaluation. Method
+
+MCD
+
+MOS Similarity
+
+AutoVC 9.93±1.14 3.25±0.87 3.08±0.29
+
+VQVC 11.04±0.82 2.64±0.67 3.15±0.68
+
+TGAVCs 8.73±0.95 3.28±1.04 3.77±0.62
+
+TGAVC 8.21±0.97 3.64±0.72 3.84±0.49
+
+As is quoted in Table 1, the speech produced by TGAVC is much better than the baselines’. The results show that in all 4 gender groups, the MOS of TGAVC is higher than the baseline.
+In terms of similarity, TGAVC, the method we proposed,
+
+has also achieved a satisfactory result. Compared with AutoVC and VQVC, our method makes the converted speech learn better timbre information, which improves the conversion effect. The data in the table above reﬂect the excellent performance of TGAVC in voice conversion over the baseline.
+
+3.3. Zero-shot conversion
+
+In addition to good performance in traditional voice conversion tasks, the current system is also expected to have a better adaptive ability. Therefore, we carried out the zero-shot conversion task. That is, the target speaker is unseen in the training set, and only a few utterances of each target speaker are available in inference.
+In the past, many methods usually used one-hot coding as style embedding, which makes them unable to encode unseen speakers to do zero-shot conversion, but AutoVC, VQVC and our proposed TGAVC are special, by using a learnable style embedding, we can easily accomplish the conversion task. The baseline we used to compare are still AutoVC and VQVC.
+For one-shot conversion evaluation, we select a few speakers from the test set who have never appeared in the training set as our target timbre. To get the target style embedding, we input 10 utterances of the target speaker into the trained style encoder. Since it is difﬁcult for us to ﬁnd parallel data in the dataset, we no longer conduct objective analysis. Besides, for a more comprehensive comparison of our proposed method and AutoVC conversion effect, we divide the converted audio into two gender groups, the one is same-sex transformation, including male to male and female to female, the other one is opposite-sex transformation, including female to male and male to female, and we summarized our results of conversion evaluation in Table 2.
+
+Table 2. Comparison of different methods in zero-shot VC
+
+evaluation. (SIM:Similarity)
+
+Method
+
+MOS same-sex SIM oppo-sex SIM
+
+AutoVC 3.04±1.07 2.88±0.29
+
+3.01±0.45
+
+VQVC 2.49±0.73 3.15±0.56
+
+3.52±0.39
+
+TGAVCs 3.17±0.96 3.42±0.67
+
+3.33±0.67
+
+TGAVC 3.42±1.13 3.64±0.52
+
+3.62±0.39
+
+The result shows that even for unseen speakers, the proposed method is still better than the baseline in natural evaluation. In addition, compared with baseline synthesized speech, there are lots of people who think that the synthesized speech conversion by our method is more similar to the ground truth, which demonstrates TGAVC’s competence in zero-shot conversion. To compare the differences between our method and baseline more intuitively, we draw the MOS Score results into the following histogram.
+
+AutoVC VQVC TGAVC TGAVCs
+
+4
+
+3.88
+
+3.71
+
+3.5 3.45 3.3
+
+3.75 3.52
+
+3 2.85
+
+3.08
+
+2.95 2.95
+
+2.7 2.75
+
+2.5
+
+2.48
+
+2.45
+
+2.49
+
+2.2
+
+2
+
+F-F
+
+F-M
+
+M-F
+
+M-M
+
+Fig. 4. MOS score results for zero-shot conversion.
+
+3.4. Analysis
+In this section, we will focus on the performance differences between TGAVC and TGAVCs. As is shown in the Figure 4, both TGAVC and TGAVCs have better performance when they are converted to female voice, but worse when the target speaker is male, which may be caused by the imbalance of samples. By comparison, The proposed TGAVC is always better than TGAVCs while the training time of TGAVC is less than that of the latter. That is why we choose TGAVC.
+It is worth noting that we have considered using only one optimizer to optimize all network modules at the same time, but as we mentioned above, this kind of training method makes the result of VC synthesizes very poor. We estimate that this may be because when we update the parameters of the content encoder and text encoder at the same time to make their outputs as close as possible, the content encoder will ﬁnally learn an intermediate vector between desired content embedding and estimated content embedding instead of the expected content embedding.
+4. CONCLUSION
+We have proposed TGAVC, a novel VC system combining AutoVC and the TTS system. During training, the content encoder output is guided to become more and more similar to the text embedding outputs from the encoder of the TTS system. We also introduce an adversarial learning approach to improve speaker identity in non-parallel many to many voice conversion. The encoder output is optimized to be more speaker-independent to improve the decoupling of content and timbre of input speech. We conducted both objective and subjective evaluation on traditional many to many VC and one-shot VC. The result shows that the method we proposed signiﬁcantly improves the acoustic quality of the synthesized speech in VC task and the similarity with the target voice under both conditions.
+
+5. REFERENCES
+[1] Donald G Childers, Ke Wu, DM Hicks, and B Yegnanarayana, “Voice conversion,” Speech Communication, vol. 8, no. 2, pp. 147–158, 1989.
+[2] Yannis Stylianou, Olivier Cappe´, and Eric Moulines, “Continuous probabilistic transform for voice conversion,” IEEE Transactions on speech and audio processing, vol. 6, no. 2, pp. 131–142, 1998.
+[3] Seyed Hamidreza Mohammadi and Alexander Kain, “An overview of voice conversion systems,” Speech Communication, vol. 88, pp. 65–82, 2017.
+[4] Takuhiro Kaneko and Hirokazu Kameoka, “CycleGANVC: Non-parallel voice conversion using cycleconsistent adversarial networks,” in European Signal Processing Conference (EUSIPCO). IEEE, 2018, pp. 2100–2104.
+[5] Hirokazu Kameoka, Takuhiro Kaneko, Kou Tanaka, and Nobukatsu Hojo, “StarGAN-VC: Non-parallel many-tomany voice conversion using star generative adversarial networks,” in IEEE Spoken Language Technology Workshop (SLT). IEEE, 2018, pp. 266–273.
+[6] Takuhiro Kaneko, Hirokazu Kameoka, Kou Tanaka, and Nobukatsu Hojo, “CycleGAN-VC2: Improved cyclegan-based non-parallel voice conversion,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2019, pp. 6820–6824.
+[7] Zining Zhang, Bingsheng He, and Zhenjie Zhang, “GAZEV: Gan-based zero-shot voice conversion over non-parallel speech corpus,” in Annual Conference of the International Speech Communication Association (INTERSPEECH), 2020, pp. 791–795.
+[8] Joan Serra`, Santiago Pascual, and Carlos Segura Perales, “Blow: a single-scale hyperconditioned ﬂow for nonparallel raw-audio voice conversion,” Advances in Neural Information Processing Systems, vol. 32, pp. 6793– 6803, 2019.
+[9] Lifa Sun, Kun Li, Hao Wang, Shiyin Kang, and Helen Meng, “Phonetic posteriorgrams for many-to-one voice conversion without parallel data training,” in 2016 IEEE International Conference on Multimedia and Expo (ICME). IEEE, 2016, pp. 1–6.
+[10] Hui Lu, Zhiyong Wu, Dongyang Dai, Runnan Li, Shiyin Kang, Jia Jia, and Helen Meng, “One-shot voice conversion with global speaker embeddings.,” in Annual Conference of the International Speech Communication Association (INTERSPEECH), 2019, pp. 669–673.
+
+[11] Shaojin Ding, Guanlong Zhao, and Ricardo GutierrezOsuna, “Improving the speaker identity of nonparallel many-to-many voice conversion with adversarial speaker recognition,” in Annual Conference of the International Speech Communication Association (INTERSPEECH), 2020, pp. 776–780.
+[12] Da-Yi Wu and Hung-yi Lee, “One-shot voice conversion by vector quantization,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2020, pp. 7734–7738.
+[13] Da-Yi Wu, Yen-Hao Chen, and Hung-yi Lee, “VQVC+: one-shot voice conversion by vector quantization and unet architecture,” in 21st Annual Conference of the International Speech Communication Association, Helen Meng, Bo Xu, and Thomas Fang Zheng, Eds. 2020, pp. 4691–4695, ISCA.
+[14] Kaizhi Qian, Yang Zhang, Shiyu Chang, Xuesong Yang, and Mark Hasegawa-Johnson, “AutoVC: Zero-shot voice style transfer with only autoencoder loss,” in International Conference on Machine Learning (ICML). PMLR, 2019, pp. 5210–5219.
+[15] Songxiang Liu, Jinghua Zhong, Lifa Sun, Xixin Wu, Xunying Liu, and Helen Meng, “Voice conversion across arbitrary speakers based on a single targetspeaker utterance.,” in Annual Conference of the International Speech Communication Association (INTERSPEECH), 2018, pp. 496–500.
+[16] Jan Chorowski, Ron J Weiss, Samy Bengio, and Aa¨ron van den Oord, “Unsupervised speech representation learning using wavenet autoencoders,” IEEE/ACM transactions on audio, speech, and language processing, vol. 27, no. 12, pp. 2041–2053, 2019.
+[17] Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu, “Neural discrete representation learning,” in Annual Conference on Neural Information Processing Systems 2017 (NIPS), 2017, pp. 6309–6318.
+[18] Chin-Cheng Hsu, Hsin-Te Hwang, Yi-Chiao Wu, Yu Tsao, and Hsin-Min Wang, “Voice conversion from non-parallel corpora using variational auto-encoder,” in 2016 Asia-Paciﬁc Signal and Information Processing Association Annual Summit and Conference (APSIPA). IEEE, 2016, pp. 1–6.
+[19] Wei-Ning Hsu, Yu Zhang, and James Glass, “Unsupervised learning of disentangled and interpretable representations from sequential data,” in Annual Conference on Neural Information Processing Systems 2017(NIPS), 2017, pp. 1876–1887.
+
+[20] Andrew Gibiansky, Sercan O¨ mer Arik, Gregory Frederick Diamos, John Miller, Kainan Peng, Wei Ping, Jonathan Raiman, and Yanqi Zhou, “Deep voice 2: Multi-speaker neural text-to-speech.,” in Annual Conference on Neural Information Processing Systems 2017(NIPS), 2017, vol. 30.
+[21] Yi Ren, Chenxu Hu, Xu Tan, Tao Qin, Sheng Zhao, Zhou Zhao, and Tie-Yan Liu, “Fastspeech 2: Fast and high-quality end-to-end text to speech,” in International Conference on Learning Representations(ICLR), 2020.
+[22] Yi Ren, Yangjun Ruan, Xu Tan, Tao Qin, Sheng Zhao, Zhou Zhao, and Tie-Yan Liu, “Fastspeech: fast, robust and controllable text to speech,” in Proceedings of the 33rd International Conference on Neural Information Processing Systems(NeurIPS), 2019, pp. 3171–3180.
+[23] Li Wan, Quan Wang, Alan Papir, and Ignacio Lopez Moreno, “Generalized end-to-end loss for speaker veriﬁcation,” in 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2018, pp. 4879–4883.
+

@@ -1,0 +1,1100 @@
+Accepted Manuscript
+
+An Overview of Voice Conversion Systems
+
+Seyed Hamidreza Mohammadi, Alexander Kain
+
+PII: DOI: Reference:
+
+S0167-6393(15)30069-8 10.1016/j.specom.2017.01.008 SPECOM 2435
+
+To appear in:
+
+Speech Communication
+
+Received date: Revised date: Accepted date:
+
+22 November 2015 10 January 2017 15 January 2017
+
+Please cite this article as: Seyed Hamidreza Mohammadi, Alexander Kain, An Overview of Voice Conversion Systems, Speech Communication (2017), doi: 10.1016/j.specom.2017.01.008
+
+This is a PDF ﬁle of an unedited manuscript that has been accepted for publication. As a service to our customers we are providing this early version of the manuscript. The manuscript will undergo copyediting, typesetting, and review of the resulting proof before it is published in its ﬁnal form. Please note that during the production process errors may be discovered which could affect the content, and all legal disclaimers that apply to the journal pertain.
+
+ACCEPTED MANUSCRIPT
+An Overview of Voice Conversion Systems
+Seyed Hamidreza Mohammadi and Alexander Kain
+Center for Spoken Language Understanding, Oregon Health & Science University, Portland, OR, USA
+
+ACCEPTED MANUSCRIPT
+
+Abstract
+Voice transformation (VT) aims to change one or more aspects of a speech signal while preserving linguistic information. A subset of VT, Voice conversion (VC) speciﬁcally aims to change a source speaker’s speech in such a way that the generated output is perceived as a sentence uttered by a target speaker. Despite many years of research, VC systems still exhibit deﬁciencies in accurately mimicking a target speaker spectrally and prosodically, and simultaneously maintaining high speech quality. In this work we provide an overview of real-world applications, extensively study existing systems proposed in the literature, and discuss remaining challenges.
+Keywords: Voice conversion; Overview; Survey
+
+1. Introduction
+Voice transformation refers to the various modiﬁcations one may apply to human-produced speech [1]; speciﬁcally, VT aims to modify one or more aspects of the speech signal while retaining its linguistic information. Voice conversion is a special type of VT whose goal is to modify a speech signal uttered by a source speaker to sound as if it was uttered by a target speaker, while keeping the linguistic contents unchanged [2]. In other words, VC modiﬁes speaker-dependent characteristics of the speech signal, such as spectral and prosodic aspects, in order to modify the perceived speaker identity while keeping the speaker-independent information (linguistic contents) the same. There is also another class of voice transformations called voice morphing where the voices of two speakers are blended to form a virtual third speaker [3]. VT approaches can be applied to solve related problems, such as changing one emotion into another [4], improving the intelligibility of speech [5], or changing whisper/murmur into speech without modifying speaker identity and linguistic content. For more information regarding applications, please see Section 8. In this work, we will focus on studies pertaining to VC systems, since the majority of important milestones of the VT ﬁeld have been studied in the VC literature.
+An overview of a typical VC system is presented in Figure 1 [6]. In the training phase, the VC system is presented with a set of utterances recorded from the source and target speakers (the training utterances). The speech analysis and mapping feature computation steps encode the speech waveform signal into a representation that allows modiﬁcation of speech properties. Source and target speakers’ speech segments are aligned (with respect to time) such that segments with similar phonetic content are associated with each other. The mapping or conversion function is trained on these aligned mapping features. In the conversion phase, after computing the mapping features from a new source speaker
+
+utterance, the features are converted using the trained conversion function. The speech features are computed from the converted features which are then used to synthesize the converted utterance waveform.
+There are various ways to categorize VC methods. One factor is whether they require parallel or non-parallel recordings during their training phase. Parallel recordings are deﬁned as utterances that have the same linguistic content, and only vary in the aspect that needs to be mapped (speaker identity, in the VC case) [7]. A second factor is whether they are text-dependent or text-independent [8]. Text-dependent approaches require word or phonetic transcriptions along with the recordings. These approaches may require parallel sentences recorded from both source and target speakers. For text-independent approaches, there is no transcription available, therefore these approaches require ﬁnding speech segments with similar content before building a conversion function [9]. A third factor is based on the language that source and target speakers speak. Languageindependent or cross-language VC assumes that source and target speakers speak in diﬀerent languages [10, 11]. Because of the diﬀerences in languages, some phonetic classes may not correspond to each other, resulting in problems during mapping. To solve this issue, a combination of nonparallel, text-independent approaches can been used. Another important factor for VC categorization is the amount of the training data that is available. Typically, for larger training data, conversion functions that memorize better are more eﬀective; however, for smaller training data, techniques that generalize better are more preferable.
+Some investigators have studied the contributions of several speech features such as of pitch, formant frequencies, spectral envelope and others to speaker individuality [12, 13]. The three most relevant factors were found to be average spectrum, formants, and the average pitch level. As a result, the majority of VC systems aim to mod-
+
+Preprint submitted to Elsevier
+
+January 10, 2017
+
+ACCEPTED MANUSCRIPT
+
+ify short-time spectral envelopes and the pitch value. In this study, we present the spectral and prosodic mappings that have been proposed for VC in Sections 5 and 6, respectively. We also review prominent approaches for evaluating the performance of VC systems in Section 7. We then review the diﬀerent applications that use VC and VT methods in Section 8. Finally, we conclude with reviewing the remaining VC and VT challenges and future directions.
+
+Source Target Speaker Speaker
+
+Input Utterance
+
+Speech Analysis
+
+Conversion Phase
+
+Training Phase
+
+Speech Features Mapping Feature Computation
+
+Mapping Features
+
+Time Alignment
+Conversion Function Training
+Conversion Model
+
+Conversion Function
+Converted Features
+Speech Feature Computation and Speech Synthesis
+Converted Utterance
+
+Figure 1: Training and conversion phases of a typical VC system
+
+M
+
+ANUSCRIPT
+
+speech is modeled as a combination of a excitation or source signal (representing the vocal cords, not to be confused with the source speaker), and a spectral envelope ﬁlter (representing the vocal tract). The model assumes that speech is produced by passing an excitation signal (related to vocal cord movements and frication noise) through the vocal tract (represented by a ﬁlter), or, in other words, ﬁltering the excitation signal with the vocal tract ﬁlter. The excitation signal and ﬁlter are assumed to be independent of each other. Two prominent ﬁlter models are commonly used: all-pole and log-spectrum ﬁlters. Linear predictive coding (LPC) is an implementation of all-pole models, and mel-log spectrum approximation (MLSA) is an implementation of logspectrum ﬁlters [14]. SPTK is a publicly available toolkit that provides linear predictive and MLSA analysis/synthesis [15]. When estimating the spectral envelope, the pitch periods present in the speech signal can show up as harmonics (sharp peaks and valleys) in the spectral envelope. This phenomenon can be problematic when performing any further modiﬁcations to the spectrum, since the presence of pitch information in the spectrum would fail the assumption of the independence of source signal and ﬁlter. In an attempt to alleviate the interference between signal periodicity and the spectrum, STRAIGHT proposes a pitchadaptive time-frequency spectral smoothing [16], which was later extended to TANDEM-STRAIGHT to provide a uniﬁed computation of spectrum, fundamental frequency, and aperiodicity [17]. The advantage of a smooth spectrum is that it provides a representation that is easier to model and manipulate. CheapTrick and WORLD propose some improvements over TANDEM-STRAIGHT [18, 19]. The excitation signal can be modeled in various ways. A simple implementation is the pulse/noise model in which the voiced speech segments are modeled using a periodic pulse and the unvoiced speech segments are modeled using noise. More complex excitation signal models such as glottal excitation models [20, 21, 22, 23, 24], residual signals [25, 26, 27, 28, 29], mixed excitation [30, 31], and band aperiodicity [32, 33] have been used.
+
+ACCEPTED
+
+2. Speech Features
+As shown in Figure 1, in order to perform voice conversion, analysis/synthesis of the speech signal is necessary. The goal is to extract speech features that allow a good degree of modiﬁcation with respect to the acoustic properties of speech. Most techniques work on the frame-level (or frame-by-frame), deﬁned as short time segments (~20 milliseconds), in which the length of the frame is chosen so that it satisﬁes the assumption that the speech signal is stationary (the statistical parameters of the signal over time are ﬁxed) in that frame. The frame can be ﬁxed length throughout the analysis or it can be have a length relative to the pitch periods of the signal (pitch-synchronous analysis). Speech models can be broadly categorized into source-ﬁlter models and signal-based models. In source-ﬁlter models,
+
+Signal-based analysis/synthesis approaches model the speech signal by not making any restrictive assumptions (such as the independence of source signal and ﬁlter); hence they usually have higher quality. The downside is that they are less ﬂexible for modiﬁcation. A simple analysis/synthesis technique is pitch-synchronous overlap-add (PSOLA) [34]. PSOLA uses varying frame sizes related to the fundamental frequency (F0) to create short frames of the signal, keeping the signal in time-domain. PSOLA allows for prosodic transformations of pitch and duration. Linear Predictive PSOLA adds the ability to perform simple vocal tract modiﬁcations [35]. Harmonic plus noise models (HNM) assume that the speech signal can be decomposed into harmonics (sinusoids with frequencies relevant to pitch). HNMs generate high quality speech but they are not as ﬂexible as source-ﬁlter models for modiﬁcation, mainly because of the diﬃculty of dealing with phase [36]. AHOCODER is a pub-
+
+2
+
+ACCEPTED MANUSCRIPT
+
+licly available toolkit that provides high-quality HNM synthesis [37]. Speech signals can also be represented as a sum of non-stationary modulated sinusoids; this has shown to signiﬁcantly improve the synthesized speech quality in lowresource settings [38].
+3. Mapping Features
+
+which are of high importance to speaker identity; however, because of their compact nature, they can result in low speech quality during more complex acoustic events.
+The local pitch features are typically represented by F0, or alternatively by logarithm of F0 which is considered to be more perceptually relevant.
+
+ACCEPTED MANUSCRIPT
+
+One might directly use speech analysis output features for training the mapping function. More commonly, the speech features are further processed to allow better representation of speech. As shown in Figure 1, following the speech analysis step, the mapping features are computed from the speech features. The aim is to obtain representations that allow for more eﬀective manipulation of the acoustic properties of speech.
+3.1. Local Features
+Local features represent speech in short-time segments. The following features are commonly utilized to represent local spectral features:
+Spectral envelope: the logarithm of the magnitude spectrum can be used directly for representing the spectrum. Because of the high dimensionality of these parameters, more constrained VC mapping functions are commonly used [35, 10, 39]. The frequency scale can be warped to Mel- or Bark-scale, which are frequency scales that emphasize perceptually relevant information. Recently, due to the prevalence of neural network techniques and their ability to handle high-dimensional data, these features are becoming more popular. Spectral parameters have high intercorrelation.
+Cepstrum: a spectral envelope can be represented in the cepstral domain using a ﬁnite number of coeﬃcients computed by the Discrete Cosine Transform of the log-spectrum. Commonly, mel-cepstrum is used in the literature [40]. Mel-cepstrum (MCEP) is a more commonly used variation. Cepstral parameters have low inter-correlation.
+Line spectral frequencies (LSF): manipulating LPC coeﬃcients may cause unstable ﬁlters, which is the reason that usually LSF coeﬃcients are used for modiﬁcation. LSFs are more related to frequency (and formant structure), and they also have better quantization and interpolation properties [41]. These properties make them more appropriate when statistical methods are used [42]. LSF parameters have high inter-correlation. These parameters are also known as Line spectral pairs (LSP).
+Formants: formant frequencies and bandwidths can be used to represent a simpliﬁed version of the spectrum [43, 44, 45, 46]. They represent spectral features
+
+3.2. Contextual Features
+Most of the mapping functions assume frame-by-frame processing. Human speech is highly dynamic over longer segments and the frame-by-frame assumption restricts the modeling power of the mapping function. Ideally, speech segments with similar static features but diﬀerent dynamic features should not be treated the same. Techniques that add contextual information to the features are proposed: appending multiple frames, appending delta (and delta-delta) features, and event-based encodings. Appending multiple frames forms a new super-vector feature [47, 48, 49] on which the mapping function is trained. This new multiframe feature would allow the mapping function to capture the transitions within the short (but longer than a single frame) segments, since the number of neighboring frames that are appended is chosen in a way that meaningful transitional information is present within the segment. In another approach, appending delta and delta-delta features has been proposed [50]; this allows the mapping function to also consider the dynamic information in the training phase [51]. Moreover, during computing speech features from the converted features, this dynamic information can be utilized to generate a local feature trajectory that considers both static and dynamic information [52]. Event-based approaches decompose local feature sequence into event targets and event transitions to eﬀectively model the speech transition. Temporal decomposition (TD) decomposes local feature sequence into event targets and event functions [53, 54, 55]. The event functions connect the event targets through time. Similarly, Asynchronous interpolation model (AIM) proposes to encode local feature sequence by a set of basis vectors and connection weights [56]. The connection weights connect the basis vectors through time to model feature transition. The main diﬃculty with the event-based approaches is to correctly identify event locations in the sequence.
+Analogous to spectral parameterization, contextual information can be added to the local pitch features as well. More meaningful speech units such as syllables can be considered to encode contextual information. We present pitch parametrization and mapping approaches in more detail in Section 6.
+In addition to these techniques that explicitly encode the speech dynamics, some mapping functions implicitly model dynamics from a local feature sequence. Examples of these implicit dynamic models are hidden Markov models (HMMs) and recurrent neural networks (RNNs). These models typically encompass a concept of state. The state
+
+3
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+that the model is currently in is determined by the previously seen samples in the sequence, hence allowing the model to capture context. We will mention these approaches at the end of their relevant spectral mapping subsections in Section 5.
+4. Time-alignment
+As shown in Figure 1, VC techniques commonly utilize parallel source-target feature vectors for training the mapping function between source and target features. The most common approach uses recordings of a set of parallel sentences (sentences including the same linguistic contents) from both source and target speakers. However, the source and target speakers are likely to have diﬀerent-length recordings, and have dissimilar phoneme durations within the utterance as well. Therefore, a time-alignment approach must be used to address the temporal diﬀerences. Manual or automatic phoneme transcriptions can be utilized for time alignment. Most often, a dynamic time warping (DTW) algorithm is used to compute the best time alignment between each utterance pair [57, 58], or within each phoneme pair. The ﬁnal product of this step is a pair of source and target feature sequences of equal length. The DTW alignment strategy assumes that the same phonemes of the speakers have similar features (when using a particular distance measure). This assumption however is not always true and might result in sub-optimal alignments, since the speech features are typically not speaker-independent. For improving the alignment output, one can iteratively perform the alignment between the target features and the converted features (instead of source features), followed by training and conversion, until a convergence condition is satisﬁed. There are various methods that perform time alignment in diﬀerent conditions, depending on the availability of parallel recordings, the availability of phonetic transcription, the language of the recordings, and whether the alignment is implicit in training or is performed separately. An overview of some time-alignment methods is given in Table 1. More complicated approaches are required for non-parallel alignment. One set of alignment methods use transcribed, non-parallel recordings for training purposes. For alignment, a unit-selection text-to-speech (TTS) system can be used to synthesize the same sentences for both source and target speakers [62]. The resulting speech is completely aligned, since the duration of the phonemes can be speciﬁed to the TTS system beforehand [63]. These approaches usually require a relatively large number of training utterances and they are usually more suited for adapting an already trained parametric TTS system to new speakers/styles. These approaches, however, are text-dependent. For textindependent, non-parallel alignment, a unit-selection approach that selects units based on input source features is proposed to select the best-matching source-target feature pairs [70]. The INCA algorithm [68, 6] iteratively ﬁnds the best feature pairs between the converted source and the target utterances using a nearest neighbors algorithm, and then
+
+trains the conversion on those pairs. This process is iterated until the converted source converges and stops changing signiﬁcantly.
+Researchers have studied the impact of frame alignment on VC performance, speciﬁcally the situation where one frame aligns with multiple other frames (hence making the source-target feature relationship not one-to-one), and approaches to reduce the resulting eﬀects were proposed [74, 75, 76, 77]; notably, some studies suggested to ﬁlter out the source-target training pairs that are unreliable, based on a conﬁdence measure [78, 79].
+
+5. Spectral modeling
+
+This section discusses the mappings that are used for VC
+task to learn the associations between the spectral mapping
+features. We assume that the mapping features are aligned
+using one of the techniques described in Section 4. In addi-
+tion, we assume that the training source and target speaker features are sequences of length N represented by Xtrain = [xt1rain, . . . , xtNrain] and Ytrain = [yt1rain, . . . , ytNrain], respectively, where each element is a D-dimensional vector x = (x1, . . . , xD). Each element of the sequence represents the feature computed in a certain frame, where the features can
+be any of the mapping features described in Section 3. The goal is to build a feature mapping function F(X) that maps the source feature sequence to be more similar the target
+speaker feature sequence, as shown in Equation 1. At conversion time, an unseen source feature X = [x1, . . . , xNtest ] of length N test will be passed to the function in order to
+predict target features,
+
+F (X) = Yˆ = [y^1, . . . , y^Ntest ]
+
+(1)
+
+Traditionally we assume that the mappings are performed frame-by-frame, meaning that each frame is mapped independent of other frames,
+
+y^ = F(x)
+
+(2)
+
+however, more recent models consider more context to go beyond frame-by-frame mapping, which are mentioned at the end of their relevant subsections.
+In Figure 2, we devise a toy example to show the performance of some conversion techniques. We utilize 40 sentences from a male (source) and a female (target) speaker from the Voice Conversion Challenge corpus (refer to Section 7). We extract 24th-order MCEP features and use principal component analysis (PCA) on both speaker’s data to reduce the dimensionality to two for easier two-dimensional visualization. The yellow and green dots represent source and target training features. The input data, represented as magenta, is a grid over the source data distribution in the top row, and the feature sequence of a word uttered by the source speaker (excluded from the training data) in the bottom row. The original target and converted features are represented as blue and red, respectively.
+
+4
+
+ACCEPTED MANUSCRIPT
+
+method
+DTW [57] DTW including phonetics [58]
+Forced alignment [59, 60] Time Sequence Matching [61] TTS with same duration [62, 63] ASR-TTS with same duration [64, 65]
+Model Alignment [66] Unit-selection alignment [59, 67, 68, 69]
+Iterative (INCA) [68, 6] Unit-selection VC [70, 71] Model Adaptation [72, 73]
+
+parallel recording
+yes yes yes yes no no no no no no no
+
+phonetic transcription
+no yes forced alignment no yes ASR no no no no no
+
+cross-language
+no no no no no no yes yes yes yes no
+
+implicit in training
+no no no yes no no yes no no yes yes
+
+Table 1: Overview of time-alignment methods for VC
+
+ACCEPTED MANUSCRIPT
+
+5.1. Codebook mapping
+
+Vector quantization (VQ) can be used to reduce the num-
+
+ber of source-target pairs in an optimized way [57]. This
+
+approach creates M code vectors based on hard clustering
+
+using vector quantization on source and target features separately. These code vectors are represented as cxm and cym for source and target speakers, for m = [1, . . . , M ], respectively.
+
+At conversion time, the closest centroid vector of the source
+
+codebook is found and the corresponding target codebook
+
+is selected
+
+FVQ(x) = cym,
+
+(3)
+
+where m = argη=[1,M] min d(cxη, x). The VQ approach is compact and covers the acoustic space appropriately since
+
+a clustering approach is used to determine the codebook.
+
+However, this simple approach still has the disadvantage
+
+of generating discontinuous feature sequences. This phe-
+
+nomenon can be solved by using a large M but this requires
+
+a large amount of parallel-sentence utterances. The quanti-
+
+zation error can be reduced by using a fuzzy VQ, which uses
+
+soft clustering [80, 81, 78]. For an incoming new source mapping feature, a continuous weight wmx is computed for each
+codebook based on a weight function. The mapped feature
+
+is calculated as a weighted sum of the centroid vectors
+
+M
+
+Ffuzzy VQ(x) =
+
+wmx cym,
+
+(4)
+
+m=1
+
+where wmx = weight(cxm, xnew). This weight function can be computed using various methods, including Euclidian distance [80], phonetic information [82], exponential decay [83], vector ﬁeld smoothing [84], and statistical approaches [85]. Simple VQ is a special case of fuzzy-VQ in which only one of the vectors is assigned the weight value of one, and the rest have zero contribution.
+Alternatively, to allow the model to capture more variability and reduce quantization error, a diﬀerence vector between the source and target centroids can be stored as codebook (VQ-DIFF) and added to the incoming mapping feature [86]
+
+FVQ-DIFF(x) = x + (cym − cxm).
+
+(5)
+
+Similar to fuzzy-VQ, a soft-clustering extension can be applied. For associating the source and target codebooks vectors, the joint-density (JD) can be modeled, in which the source and target vectors are ﬁrst stacked and then the joint codebook vectors are estimated using the clustering algorithm. As a result, the computed source-target codebook vectors will be associated together. In Figures 2b and 2c JDVQ and JDVQ-DIFF conversions are applied to the toy example data. As can be seen in the ﬁgure, the JDVQDIFF is able to generate samples that were not present in the target training data, however, JDVQ can not make this extrapolation. JDVQ exhibits high quantization error. Both JDVQ and JDVQ-DIFF are prone to generating discontinuous feature sequences.
+
+5.2. Mixture of Linear Mappings
+Valbret et al. [35] proposed to use linear multivariate regression (LMR) for each code vector. In this approach, the linear transformation is calculated based on a hard clustering of the source speaker space
+
+FLMR(x) = Amx + bm,
+
+(6)
+
+where m = argη=[1,M] min d(cxη, x), and Am and bm are regression parameters. This method, however, suﬀers from discontinuities in the output when the clusters change between neighboring frames. To solve this issue, an idea similar to fuzzy-VQ is proposed, but for linear regression. The previous equation then changes to
+
+M
+
+Fweighted LMR(x) =
+
+wmx (Amx + bm),
+
+(7)
+
+m=1
+
+where wmx = weight(cxm, x). Various approaches have been proposed to estimate the parameters of the mapping func-
+tion. Kain and Macon [58] proposed to estimate the joint
+density of the source-target mapping feature vectors in
+an approach called joint-density Gaussian mixture model (JDGMM). A joint feature vector zt = [xt , yt ] is created, and a Gaussian mixture model (GMM) is ﬁt to the joint
+
+5
+
+ACCEPTED MANUSCRIPT
+
+a) Source Features
+
+b) JDVQ M=16
+
+c) JDVQ-DIFF M=16 d) JDGMM M=8 diagonal covariance e) JDGMM M=4 full covariance f) ANN hidden layer size = 16
+
+ACCEPTED MANUSCRIPT
+
+Figure 2: A toy example comparing JDVQ, JDVQ-DIFF, JDGMM, and ANN. The x- and y-axis are ﬁrst and second dimensions of PCA, respectively. Color codes for source, target, input, original target, and converted samples are represented as yellow, green, magenta, blue, and red, respectively. The top row shows an example with a grid as input and the bottom row shows an example with a real speech trajectory as input.
+
+data. The parameters of the weighted linear mapping are estimated as
+Am = ΣmxyΣmxx−1, bm = µym − Amµxm, wmx = P (m|xnew), (8) where Σmxy, Σmxx, µxm, µym, and P (m|x) are the mth training cross-covariance matrix, source covariance matrix, source mean vector, target mean vector, and conditional probability of cluster m given input x, respectively. Stylianou et al. [87] proposed a similar formulation as Equation 7, however the GMM mixture components are estimated on source feature vectors only, rather than the joint feature vectors. Additionally, instead of computing the cross-covariance matrix and the target means directly from the joint data, they are computed by solving a matrix equations to minimize the least squares via
+Am = ΓmΣmxx−1, bm = vm − Amµxm, wmx = P (m|xnew), (9) where Γ and v are the mapping function parameters which are estimated by solving a least squares optimization problem. In the case of JDGMM, Γ = Σmxy and v = µym, which are computed from the joint distribution. JDGMM has the advantage of considering both the source and the target space during training, giving opportunity for more judicious allocation of individual components. Furthermore, the parameters of the conversion function can be directly estimated from the joint GMM and thus a potentially very large matrix inversion problem can be avoided. The derivation of the mapping function parameters are derived similar to Equation 8. GMM approaches are compared in [88]. In Figure 2d and 2e, the JDGMM conversion for M = 8 with diagonal covariance and M = 4 with full covariance matrices are ap-
+
+plied to the toy example data, respectively. Both approaches
+
+result in smoother trajectories compared to JDVQ methods.
+
+The full covariance matrix seems to capture the distribution
+
+of the target speaker better.
+
+One major disadvantage of GMMs is the requirement
+
+of computing covariance matrices [88]. If we assume a full
+
+covariance matrix, the number of parameters is on the order of m multiplied by the square of the dimension of the
+
+features. If we don’t have suﬃcient data (which is usually
+
+the case in VC), the estimation might result in over-ﬁtting.
+
+To overcome this issue, diagonal covariance matrices are
+
+commonly used in the literature. Due to the assumption
+
+of independence between the individual vector components,
+
+diagonal matrices might not be appropriate for some map-
+
+ping features such as LSFs or the raw spectrum. To pro-
+
+pose a middle ground between diagonal and full covariance
+
+matrices, some studies use a mixture of factor analyzers,
+
+which assumes that the covariance structure of the high-
+
+dimensional data can be represented using a small number
+
+of latent variables [89]. There also exists an extension of
+
+this approach that utilizes non-parallel a priori data [90].
+
+Another study proposes to use partial least squares (PLS)
+
+regression in the transformation [91]. PLS is a technique
+
+that combines principles from principal component analysis
+
+(PCA) and multivariate regression (MLR), and is most use-
+
+ful in cases where the feature dimensionality of xttrain and yttrain is high and the features exhibit multicollinearity. The
+
+underlying assumption of PLS is that the observed variable
+
+xttrain is generated by a small number of latent variables rt
+
+which explain most of the variation in the other words xttrain = Qrt + ext and yttrain =
+
+target Prt +
+
+eyyttt,rawinh,erine
+
+Q and P are speaker speciﬁc transformation matrices and
+
+ext and eyt are residual terms. Solving Q and P, and ex-
+
+6
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+tending the model to handle multiple weighted regressions, result in the computation of regression parameters Am, bm, and wmx , as detailed in [91]. The approach is later extended to use kernels and dynamic information, in order to capture non-linear relationships and time-dependencies [32].
+Various other approaches to estimate regression parameters have been proposed. In the Bag of Gaussian model (BGM) [92], two types of distributions are present. The basic distributions are GMMs, but the approach also uses some complex distributions to handle the samples that are far from the center of their distribution. Other approaches based on Radial Basis Functions (RBFs) [93, 94] and Support vector regression (SVR) [95, 96] have also been proposed; these use non-linear kernels (such as Gaussian or polynomial) to transform the source mapping features to a high-dimensional space, followed by one linear mapping in that space. Finally, some approaches are physically motivated mappings [97, 98] and local linear transformations [99].
+One eﬀect of over-ﬁtting, mentioned earlier, is the presence of discontinuity in the generated features. For example, if the number of parameters is high, the converted feature sequence might be discontinuous. For solving this phenomenon, post-ﬁltering of the posterior probabilities [100] or the generated features themselves [52, 91] has been proposed. Another known eﬀect of GMM-based mappings is generating speech with a muﬄed quality. This is due to averaging features that are not fully interpolable, which results in wide formant bandwidths in the converted spectra. For example, LSF vectors can use diﬀerent vector components to track the same formant, and thus averaging across such vectors produces vectors that do not represent realistic speech. This problem is also known as over-smoothing, since the converted spectral envelopes are typically smoothened to a degree where important spectral details become lost. The problem can be seen in Figure 2c where the predicted samples fall well within the probability distribution of the target features and fail to move to the edges of the distribution, thus failing to capture the variability of the target features. To solve this issue, some studies have proposed to post-process the converted features. A selection of postprocessing techniques is given in Table 2.
+Another framework for solving the VC problem is to view it as a noisy channel model [110]. In this framework, the output is computed from the conditional maximumlikelihood Fnoisy-channel(x) = argmaxyP (y|x), where the conditional probability is deﬁned using Bayes’ rule P (y|x) = P (x|y)P (y). The conditional probability P (x|y) represents the channel properties and is trained on the parallel sourcetarget data, whereas P (y) represents the target properties and is trained on the non-parallel target speaker data. Finally, the problem reduces to decoding of the target features given the observed features, the channel properties, and the target properties. In another framework, the idea of separating style from content is explored using bilinear models [111, 112]. For the VC task, style is the speaker identity and content is the linguistic content of the sentence. In this
+
+method, two linear mappings are performed, one for style and one for content. During conversion, the speaker identity information of the input utterance is replaced with the target speaker identity information computed during training.
+In order to better model dynamics of speech, various approaches such as HMMs have been proposed [113, 51, 114, 115]. These approaches consider some context when decoding the HMM states but the ﬁnal conversion is usually performed frame-by-frame. Another approach is to append dynamic features (delta and delta-delta, i. e. velocity and acceleration, respectively [50]) to the static features [51], as described in Section 3. A very prominent approach called maximum likelihood parameter generation (MLPG) [116] has been used for generating feature trajectory using dynamic features [52]. MLPG can be used as a post-processing step of a JDGMM mapping. It generates a sequence with maximum likelihood criterion given the static features, the dynamic features, and the variance of the features. This approach is usually coupled with GV to increase the variance of the generated feature sequence. Ideally, MLPG needs to consider the entire trajectory of an utterance to generate the target feature sequence. This property is not desirable for real-time applications. Low-delay parameter generation algorithms without GV [117] and with GV [118] have also been proposed. Recently, considering the modulation spectrum of the converted feature trajectory (as a feature correlated with over-smoothing) has been proposed, which resulted in signiﬁcant quality improvements [119]. Incorporating parameter generation into the training phase itself has also been studied [120, 121].
+5.3. Neural network mapping
+Another group of VC mapping approaches use artiﬁcial neural networks (ANNs). ANNs consist of multiple layers, each performing a (usually non-linear) mapping of the type y = f (Wx + b) where f (·) is called the activation function that can be implemented as a sigmoid, tangent hyperbolic, rectiﬁed linear units, or linear function. A shallow (twolayered) ANN mapping can be deﬁned as
+FANN (x) = f2(W2f1(W1x + b1) + b2)), (10)
+where Wi, bi, and fi represent the weight, bias and activation function for the ith layer, respectively. ANNs with more than two layers are typically called deep neural networks (DNNs) in the literature. The input and output size are usually ﬁxed depending on the application. (For VC, the input and output size are the source and target mapping feature dimensions.) However, the size of the middle layer and activation function are chosen depending on the experiment and data distributions. The ﬁrst layer activation function is almost always non-linear and the activation function of the last layer is linear or non-linear, depending on the design. If the last layer is linear, the ANN approach can be viewed as an LMR approach, with the diﬀerence that the linear regression is applied on a data space that is mapped
+
+7
+
+ACCEPTED MANUSCRIPT
+
+Method Global Variance(GV) [101, 102, 103]
+ML parameter generation [52] MMI parameter generation [104]
+Modulation Spectrum [105] Monte Carlo [106] L2-norm [107]
+Error Compensation [108] Residual addition [109]
+
+Description Adjusts the variance of generated features to match that of target’s Maximizes the likelihood during parameter generation using dynamic features Maximizes the mutual information during parameter generation using dynamic features
+Adjusts the spectral shape of the generated features Minimizing the conversion error and the sequence smoothness together
+Sharpens the formant peaks in spectrum Models error and compensate for it
+Maps the envelope residual and adds it to the GMM-generated spectrum
+
+Table 2: Post-processing techniques for reducing the over-smoothing
+
+ACCEPTED MANUSCRIPT
+
+non-linearly from the mapping feature space, and not directly on the mapping features (similar to RBF and SVR). The weights and biases can be estimated by minimizing an objective function, such as mean squared error, perceptual error [122], or sequence error [123].
+ANNs are a very powerful tool, but the training and network design is where most care needs to be exercised since the training can easily get stuck in local minima. In general, both GMMs and ANNs are universal approximators [124, 125]. The non-linearity in GMMs stems from forming the posterior-probability-weighted sum of classbased linear transformations. The non-linearity in ANNs is due to non-linear activation functions. Laskar et al. [126] compare ANN and GMM approaches in the VC framework in more detail. In Figure 2f, the ANN conversion for a hidden layer of size 16 is applied to the toy example data. The ANN trajectory is performing similar to JDGMM with full covariance matrix, which is expected since both are universal approximators.
+The very ﬁrst attempt for using ANNs utilized formant frequencies as mapping features [127], i. e. the source speaker’s formant frequencies were transformed towards target speaker’s formant frequencies using a ANN followed by a formant synthesizer. Later, Makki et al. [128] successfully mapped a compact representation of speech features using ANNs. A more typical approach used a three-layered ANN to map mel-cepstral features directly [129].Various other ANN architectures have been used for VC [130]: Feedforward architectures [129, 131, 132, 133, 134], restricted Boltzmann machines (RBMs) and their variations [135, 136, 137], joint architectures [135, 49, 138], and recurrent architectures [139, 140].
+Traditionally, DNN weights are initialized randomly; however, it has been shown in the literature that deep architectures do not converge well due to a vanishing gradient and the likelihood of being stuck in a local minimum solution [141]. A regularization technique is typically used to solve this issue. One solution is pre-training the network. DNN training converges faster and to a better-performing solution if their initial parameter values are set via pretraining instead of random initialization [142]. This especially important for the VC task since the amount of training data is typically smaller compared to other tasks such
+
+as ASR or TTS. Stacked RBMs are used to build speakerdependent representations of cepstral features for source and target speakers before DNN training [143, 144, 145]. Similarly, layer-wise generative pre-training using RBMs for VC has been proposed [48, 146]. Mohammadi and Kain [133] proposed a speaker-independent pre-training of the DNN using multiple speakers other than source and target speakers using de-noising stacked autoencoders. This approach is later extended to use speakers that sound similar to source and target speakers to pre-train the DNN using joint-autoencoders [49]. In a related study, using multiple speakers as source for training the DNN was proposed [147]. Alternatively, other regularization techniques such as dropout [148] and using rectiﬁed linear units [149] have shown to be successful.
+For capturing more context, Xie et al. [123] proposed a sequence error minimization instead of a frame error minimization to train a neural network. The architecture of RNNs allows the network to learn patterns over time. They implicitly model temporal behavior by considering the previous hidden layer state in addition to the current frame [150, 139, 140, 151].
+
+5.4. Dictionary mapping
+One of the simplest mapping functions is a look-up table that has source features as entry keys and target features as entry values. For an incoming feature, the function will look up to ﬁnd the most similar key based on a distance criterion, e. g. an objective distortion measure d(·) similar to one described in Section 7.1. In other words, it will look for the nearest neighbor of the incoming source feature and select its corresponding entry value
+
+Flookup(x) = yttrain,
+
+(11)
+
+where t = argτ=[1,T ] min d(xtτrain, x). A major concern is that the similarity of the source feature does not necessarily guarantee similarity in neighboring target features. This phenomenon will cause discontinuities between the generated target parameter sequence. One approach to overcome the discontinuity of the target feature sequence is to assign a weight to all target feature vectors (computed based on the new source feature vector), which will generate a smoother feature sequence. This category of approaches is called
+
+8
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+exemplar-based VC in the literature [152, 153, 154, 155] and the mapping function is given by
+
+T
+
+Fexemplar(x) =
+
+wtxyttrain,
+
+t=1
+
+(12)
+
+with wtx = ω(xttrain, x), where ω(·) can potentially be any distortion measure. A generic objective distortion measure might result in over-smoothing, since many frames may be assigned non-zero weights and will thus be averaged (unless the mapping features are completely interpolable). Commonly, non-negative matrix factorization (NMF) techniques have been used to compute sparse weights. The goal of NMF is to compute an activation matrix H which represents how well we can reconstruct x by a non-negative weighted addition of all xttrain vectors, such that X = XtrainH. The activation matrix H is calculated iteratively [152]. NMF computes a non-negative weight for each entry in the table, which results in the mapping function
+
+FNMF(X) = YtrainH.
+
+(13)
+
+This relatively sparse weighting over all vectors results in smooth generated feature sequences while reducing oversmoothing. This approach however has the disadvantage of computational complexity, which might not be suitable for some applications. To address this issue, computing the activation matrix in a more compact dimension has been proposed [152]. The NMF methods are also inherently well-suited for noisy environments [156, 157, 158]. Several other extensions of NMF approaches have been proposed, such as mapping the activation matrix [159], many-to-many VC [160], including contextual information [161, 152, 162], and local linear embeddings [163].
+Another approach to combat discontinuities in the generated features is to take the similarity of the target feature sequence into consideration by using a unit-selection (US) paradigm. US approaches make use of a target cost (similar to a table look-up distortion measure) and a concatenation cost (to ensure the neighboring target features are most similar to each other). Since the units are frames, this method is also referred to as frame-selection (FS). The goal is to ﬁnd be best sequence of indices of training target vectors S = [s1, . . . , sN ] which minimizes the following cost function [164, 165, 166]:
+
+FFS (X) =
+
+Nn=tae1srtgαS=·[tsa1,r..g.,estN(txesstn]
+
+min , xnnew
+
+)+
+
+(1 − α) · concatenation(ysn , ysn−1 )
+
+(14)
+
+where α is used for adjusting the tradeoﬀ between ﬁtting accuracy and the spectral continuity criterion. Since there is an exponential number of permutation of index sequences, a dynamic programming approach such as Viterbi is used to ﬁnd the optimal target sequence. This can be used for aligning frames before any other type of training, or directly used as a mapping function.
+
+The US/FS approach can be adjusted to create text-
+independent, non-parallel VC systems [70, 71]. In this variation, a vector x˜cnmp is compared to a target training vector in the dictionary to compute the target cost
+
+FUS (X) =
+
+Nna=tre1gstSα=[·s1t,a..r.,gsN ett(esyts]nm, ix˜ncnm=p)+ (1 − α) · concatenation(ysn , ysn−1 )
+
+(15)
+
+where x˜cnmp is either the input source vector (in the absence of any parallel data) [70] or a naive conversion to target (in the presence of real or artiﬁcial parallel data) [167]. As mentioned in Section 4, these techniques can be used for parallelizing the training data as well.
+Combinations and variants of US/FS approaches combined with other mapping approaches have been proposed, such as: dictionary mapping [168], codebook mapping [113, 169], frequency warping [170, 171], GMM mapping [51], segmental GMM [172], k-histogram [173], exemplar-based VC [161], and grid-based approximation [162]. These approaches have some limitations, speciﬁcally they can generate discontinuous features. Helander et al. [174] studied the coverage of speech features when using FS as a mapping for VC, and concluded that a small number of training utterances (which is typical in VC tasks) is not adequate for representing the speaker space.
+
+5.5. Frequency warping mappings
+The estimation of linear regression parameters described in Section 5.2 is typically unconstrained; this can lead to overﬁtting. There exist a class of constrained mapping methods which are physically motivated [98]. One common motivation is that two diﬀerent speakers have diﬀerent formant frequencies and bandwidths, and diﬀerent energies in each frequency band. Thus, for conversion, a constrained mapping only allows manipulation of formant location/bandwidths and energy in certain frequency bands. This reduces over-ﬁtting, while allowing the use of high-dimensional mapping features, which is beneﬁcial since vocoders that utilize high-dimensional speech features (e. g. harmonic vocoders) usually have higher speech quality compared to more compact vocoders (e. g. LSF vocoders). The motivation behind the frequency warping (FW) methods is that a mapping of a source speaker spectrum to a target speaker spectrum can be performed by warping the frequency axis, to adjust the location and bandwidth of the formants, and applying amplitude scaling, to adjust the energy in each frequency bands [175, 176, 177]; this approach is more physically interpretable than an unconstrained mapping. Although these approaches can be implemented as constrained linear transformations (for certain features, such as cepstral features), we dedicate a separate chapter to them due to their slightly diﬀerent motivation.
+In a ﬁrst attempt, Valbret et al. [178] proposed to warp the frequency axis based on pre-computed warping functions between source and target, using log-spectral features. The source speaker spectral tilt is subtracted before warping and
+
+9
+
+ACCEPTED MANUSCRIPT
+
+Source ACCEPTED Hz M ANUSCRIPT
+
+the target speaker spectral tilt is added after warping. Some studies directly model and manipulate formant frequencies and bandwidths [43, 179, 180, 181] so that they match the target formants, as shown in Figure 3. Maeda et al. [182] proposed to cluster the acoustic space into diﬀerent classes (similar to VQ) and perform a non-linear frequency warping on the STRAIGHT spectrum for each class. Later, Sündermann et al. [10] studied various vocal tract length normalization (VTLN) approaches that were used in ASR to perform VC, including piecewise linear, power, quadratic, and bilinear VTLN functions. Erro et al. [183] extended this VTLN approach to multiple classes and proposed an iterative algorithm to estimate the VTLN parameters. Přibilová and Přibil [184] experimented with various linear and non-linear warping functions, with application to TTS adaptation. Erro and Moreno [175] proposed weighted frequency warping (WFW) to perform a piecewise linear frequency warping in each mixture components of a GMM, weighted by the posterior probability. It is worth noting that they used a pitch-asynchronous harmonic model (a high-quality vocoder) and performed phase manipulation to achieve high quality speech. Toda et al. [185] proposed to convert the source spectrum using a GMM and then warp the source spectrum to be similar to the converted spectrum with the aim of keeping the spectral details intact.
+Other than the formant frequency locations, the average energy of the spectral bands is also an important factor in speaker individuality. Previously, this has been partly taken care of by subtracting source spectral tilt before frequency warping and adding the target spectral tilt. In an extension of WFW work, it was shown that in addition to frequency warping, an energy correction ﬁlter is required to increase the ﬂexibility of the mapping function [176]. Tamura et al. [186] proposed a simpler amplitude scaling by adding a shift value to the converted vector. In another extensive study, amplitude scaling in addition to frequency warping was proposed to add more degrees of freedom to the mapping [187, 177].
+Hz
+Target
+Figure 3: Piece-wise linear frequency warping function
+
+the ability to mimic very diﬀerent voices. Erro et al. [189] studied this idea using bilinear warping function (similar to the VTLN approach) and constrained amplitude scaling, and extended it [190].
+Numerous extensions of the FW approach have been proposed, such as in combination with GMMs [191, 98, 39, 192], dictionary-based methods [170, 171, 193], and maximizing spectral correlation [194].
+5.6. Adaptation techniques
+In this section, we describe the techniques that are used when only limited or non-parallel training data are available. These approaches typically utilize the mappings or models learned from some pre-deﬁned set of speakers to aid the training of the conversion mapping. Most of these approaches use mixture of linear mappings, however, the ideas could be generalized to other approaches such as neural networks.
+Adaptation techniques perform mean adaptation on the means of GMM mixture components that are trained on the source speaker [100] to move the GMM means towards the target speaker’s probability distribution. Mouchtaris et al. [72] proposed an adaptation technique for non-parallel VC, in which a JDGMM is trained on a pre-deﬁned set of source and target speakers that have parallel recordings. For building the mapping function using non-parallel recordings, the means and covariances of the GMMs are adapted to the new source and target speakers. In a neural network-based approach, a semi-supervised learning approach is proposed in which ﬁrst speakers that sound similar to the source and target speakers are used for training the network, and then the pre-trained neural network is further trained using the source and target speaker data [49]. In another study, an adaptive RBM approach was proposed in which it is assumed that features are produced from a model where phonological information and speaker-related information are deﬁned explicitly. During conversion, the phonetic and speaker information are separated and the speaker information is replaced with that of the target’s [195].
+Another scheme for voice conversion is to utilize the conversions built on multiple pre-stored speakers (diﬀerent from the target speaker) to create the mapping function. A ﬁrst attempt called speaker interpolation generates the target features using a weighted linear addition (interpolation) of multiple conversions towards multiple other pre-deﬁned target speakers, by minimizing the diﬀerence between the target features and the converted features [196, 197]. The interpolation coeﬃcients are estimated using only one word from the target speaker.
+The eigenvoice VC (EVC) approach represents the joint probability density similar to the conventional GMM, except that the target means are deﬁned as [198, 199]
+
+Some frequency warping functions can be reformulated as a weighted linear mapping approach [188]. The linear mappings are usually constrained, so that the mapping is less prone to over-ﬁtting. However, the constraints will limit
+
+µym = Gmw + gm
+
+(16)
+
+where gm is the bias vector and the matrix Gm = [g1m, . . . , gJm] consists of basis vectors gjm for the mth mix-
+
+10
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+ture. The total number of basis vectors is J and the target speaker identity is controlled with the J-dimensional weight vector w = [w1, . . . , wJ ] . For a given target speaker, a weight is computed and assigned to each eigenvoice; the weight represents the eigenvoice’s contribution to generating features [198, 199]. In the traditional eigenvoice approach, weights are estimated during training and are ﬁxed during conversion. For lowering the computational cost, a multistep approach has been proposed [200]. For further improving the robustness of this approach to the amount of adaptation data, a maximum-a-posteriori adaptation approach has also been proposed [201]. The eigenvoice approach has also been extended to many-to-one VC, where the target speaker is always the same but the source speaker can be an arbitrary speaker with minimal adaptation data [202]. Finally, oneto-many eigenvoice VC based on a tensor representation of the space of all speakers has been proposed [203]. Many-tomany conversion has also been proposed in which the goal is to perform a conversion using an arbitrary source speaker to an arbitrary target speaker with minimal parallel [204] and non-parallel data [205].
+
+5.7. Other mappings
+Various other mapping approaches have been proposed. The K-histogram approach is a non-parametric approach which deﬁnes the mapping via the cumulative distribution function (CDF) of the source followed by an inverse CDF of the target [173]
+
+FK-Histogram(x) = CDFy−1(CDFx(x))
+
+(17)
+
+A Gaussian processes (GP) approach has also beens proposed [206, 207]. GPs are kernel-based, non-parametric approaches that can be viewed as distribution over functions, which relieves the need to specify the parametric form beforehand. For example, it is possible to deﬁne how to describe the mean and covariance functions [206]. Another non-parametric approach based on topological maps has been proposed which estimates the joint distribution of the spectral space of source and target speakers [208, 209]. The topological map is a type of a neural network where each node is topologically located on a 2D map in a grid-like fashion. In the training step, the value of these nodes are learned. For each node in the source speaker map, a corresponding node in the target speaker map is computed. This correspondence is used to map an incoming source vector to a target vector. This approach has some similarities to the VQ method.
+
+6. Prosodic modeling
+Most of the VC literature focuses on mapping spectral features, despite the fact that prosodic aspects (pitch, duration, spectral balance, energy) are also important for speaker identity [210, 211]. For modeling duration, a global speaking rate adjustment is not suﬃcient since it has been observed that phoneme durations diﬀer somewhat arbitrarily
+
+between source and target speakers [59]. Modeling duration using decision trees [23] and duration-embedded HMMs has been studied [63].
+The most common method to transform pitch is to globally match the average and standard deviation of the pitch contour. Pitch can be converted by mapping the log-scaled F0 using a linear transformation
+
+Fˆ0y
+
+=
+
+σy σx
+
+(F0x
+
+−
+
+µx)
+
++
+
+µy
+
+(18)
+
+where µ and σ represent mean and standard deviation of the log-scaled F0 [212]. Several studies have looked into modeling F0 and spectral features jointly [213, 214, 215]; this has shown improvements for both spectral and F0 conversions. Conversely, predicting pitch values from the target speaker spectrum using a GMM has also been studied [216].
+When we use simple linear mapping techniques, such as globally changing the speaking rate or adjusting the pitch mean and variance, the supra-segmental information is not modiﬁed eﬀectively. Prosody modeling is a complex problem that depends on linguistic and semantic information. As an example, the emphasis that speakers put on certain speech units (such as words) does not necessarily have a similar pattern for other speakers depending on the context and high level information. In VC tasks, this high level information is typically not available. ASR can be used to automatically compute textual information, but the error that it is likely to introduce may become a detrimental factor for prosodic mapping performance. Pitch modeling for VC has been studied on diﬀerent acoustic/linguistic levels: framelevel, syllable-level, and utterance-level. Moreover, various pitch representations have been used, such as F0 contour, the discrete cosine transform (DCT) of the F0 contour, the Wavelet transformation of the F0 contour, and other compact parameterizations of the F0 contour. In order to model the dynamics of the pitch contour in frame-level representations, mapping F0 using multi-space probability distribution (MSD) HMMs [218] and LSTM networks [33] have been proposed. Syllable-level representations model the pitch movements at the syllable level, which is a more meaningful representation for modeling pitch events. The most prominent pitch conversion approaches for VC are presented in Table 3. Wu et al. [217] studied some of these approaches in more detail.
+
+7. Performance evaluation
+When evaluating the performance of VC systems several aspects can be evaluated:
+Speaker similarity: Answers the question of “How similar is the converted speech to the target?”. This is also known as conversion accuracy or speaker individuality.
+Speech quality: This describes the quality of the generated speech with respect to naturalness and audible artifacts.
+
+11
+
+ACCEPTED MANUSCRIPT
+
+Method
+Mean and variance matching [212] Predicting from spectrum [216]
+Joint modeling with spectrum[213, 214, 215] Histogram equalization [217] MSD-HMM [218] LSTM [33, 151] Syllable-based codebook [219] Syllable-based MLLR [220] Syllable-based CART [221]
+Syllable-based weighted linear [222] Hierarchical modeling of F0 [223]
+Contour codebook + DTW [212, 225] Weighting contours [226, 225] SHLF parametrization [227] OSV parametrization [229]
+
+level
+frame-level frame-level frame-level frame-level frame-level frame-level syllable-level syllable-level syllable-level syllable-level utterance-level utterance-level utterance-level utterance-level utterance-level
+
+pitch representation
+F0 contour F0 contour F0 contour F0 contour F0 contour F0 contour F0 contour F0 contour
+DCT DCT Wavelet transform [224] F0 contour F0 contour Patterson [228] Oﬀset, Slope and Variance
+
+other info
+spectrum spectrum
+spectrum spectrum syllable boundary syllable boundary syllable boundary syllable boundary
+-
+
+mapping function
+linear weighted linear weighted linear histogram equalization weighted linear
+LSTM codebook mapping MLLR adaptation
+CART weighted linear
+KPLS [32] codebook mapping weighting codebooks
+piecewise linear linear
+
+Table 3: An overview of pitch mapping methods for VC
+
+ACCEPTED MANUSCRIPT
+
+Speech intelligibility: Assesses the intelligibility of the (mel-CD), also measured in dB
+
+generated speech. This is a lesser-studied aspect in
+
+the VC literature
+
+mel-CD(y, y^) = (10/ ln 10) 2(y − y^) (y − y^) (19)
+
+In experimental voice conversion evaluations, a distinction is often made between intra-gender conversion (femaleto-female or male-to-male) and inter-gender conversion (female-to-male or male-to-female).
+A standard corpus for VC evaluation does not exist. Several databases have been used for VC including TIMIT [230], VOICES [42], CMU-Arctic [231], MOCHA [232], and the MSRA mandarin corpus [27]. Very recently, the VC Challenge (VCC) 2016 prepared a standard dataset for a VC task, which has the potential to become the standard for VC studies [233]. The VCtools available in the Festvox toolkit [234] can be used for implementing baseline VC techniques such as GMM and MLPG/GV processing.
+It has been shown that the performance of the system depends on the selection of source speaker. Turk and Arslan [235] has studied the problem of automatic source speaker (“donor”) selection from a set of available speakers that will result in the best quality output for a speciﬁc target speaker’s voice. This problem is also studied by proposing a selection measure [84, 236].
+In the following subsections, we study the objective and subjective measures used for evaluating VC performance.
+7.1. Objective evaluation
+For evaluating VC performance objectively, a parallelsentence corpus is required. First, the conversion and the associated target utterances have to be time-aligned. The diﬀerence between the converted speech and target can then be calculated using various general spectral diﬀerence measures. An example is the log-spectral distortion (in dB), which can be computed on unwarped, or warped (using the mel or Bark scale) spectra [87]. The most prominent measure used in the VC literature is the mel-cepstrum distance
+
+where y and y^ are target and converted MCEP feature vectors, respectively.
+The mel-CD is suitable for evaluating preliminary experiments, deﬁning training criterions, and validation purposes, but not for evaluating the ﬁnal system regarding quality due to the low correlation with human perception [237]. Other objective speech quality assessment techniques exist [238]. These measures aim to have higher correlation with human judgment. Recently, an automatic voice conversion evaluation strategy was proposed, wherein both speech quality and speaker similarity were automatically computed [239]. The speaker similarity score was computed using a speaker veriﬁcation method. These scores were shown to have higher correlation with subjective scores. However, optimizing mapping functions based on these criterions is more diﬃcult, due to their the complex mathematical formulation.
+7.2. Subjective Evaluation
+Unfortunately, objective evaluations do not necessarily correspond to human judgments. Thus, in most studies, subjective evaluations are performed; during such evaluations human listeners asses the performance of the VC system. The listeners should ideally perform their task in ideal listening environments; however, ,statistical requirements often necessitate a large number of listeners. Therefore, listeners are often hired that perform the task through a crowd-sourcing website such as Amazon Mechanical Turk (AMT).
+The mean opinion score (MOS) test is an evaluation using 5-scale grading. Both the speech quality and similarity to the target voice can be evaluated. The grades are as follows: 5=excellent, 4=good, 3=fair, 2=poor, 1=bad. The project TC-STAR proposes a standard perceptual MOS test as a measure of both quality and similarity [240].
+
+12
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+The comparative MOS (CMOS) can also be used to directly compare the speech quality of two VC techniques. The listener is asked to choose the better sounding utterance. The measure is computed as the percentage where each techniques is selected over the other. The grading can also be 5-scale as follows: 5=deﬁnitely better, 4=better, 3=same, 2=worse, 1=deﬁnitely worse. This would give a good indication of any improvements. However, the absolute quality score is not calculated, making it diﬃcult to judge the closeness to ideal quality (natural speech).
+The ABX test is often used in comparing similarity between converted and target utterances. In this test, the listeners hears a pair of utterances A and B, followed by hearing a given utterance X, and have to decide is whether X is closer to A or B. The A and B utterances are uttered by source and target speakers but the ordering that the listener hears them is randomized. The measure is computed as the percentage of correct assignment of X to the target speaker. The main problem with interpreting ABX scores is that the subjects do not have the option to answer that the sentence X is not similar to neither A nor B [241]. For example, given A=”mosquito”, B=”zebra”, X=”horse”, subjects may be forced to equate B with X; however, B is still very dissimilar from X.
+The ABX test can compare two VC techniques directly by setting X, A, and B to the target utterance, ﬁrst VC, and second VC. This measure is computed for each VC technique as the percentage of the utterances for which that technique has been chosen as closer to the target utterance. The MOS and ABX scores of various VC techniques have been published [241].
+Another technique for testing similarity is to do use the CMOS for same-diﬀerent testing [42]. In this test, listeners hear two stimuli A and B with diﬀerent content, and were then asked to indicate wether they thought that A and B were spoken by the same, or by two diﬀerent speakers, using a ﬁve-point scale comprised of +2 (deﬁnitely same), +1 (probably same), 0 (unsure), −1 (probably diﬀerent), and −2 (deﬁnitely diﬀerent). One stimulus is the converted sample and the other is a reference speaker. Half of all stimuli pairs are created with the reference speaker identical to the target speaker of the conversion (the “same” condition); the other half were created with the reference speaker being of the same gender, but not identical to the target speaker of the conversion (the “diﬀerent” condition). There has to be careful consideration in picking the proper speaker for the diﬀerent condition.
+Finally, the Multiple Stimuli with Hidden Reference and Anchor (MUSHRA) test has been proposed to evaluate the speech quality of multiple stimuli. In this test, the subject is presented with a reference stimulus and multiple choices of test audio (stimuli), which they can listen to as many time as they want. The subjects are asked to score the stimuli according to a 5-scale score. This test is especially useful if one wants to test multiple system outputs in regards to speech quality.
+
+As with all subjective testing, there is a lot of variability in the responses and it is highly recommended to perform proper signiﬁcant testing on any subjective scores to show the reliability of improvements over baseline approaches. For crowd-sourcing experiments, it is best to incorporate certain sanity checks to exclude listeners that are performing below a minimum performance threshold, or inconsistently. A possible implementation of these recommendations is to include obviously good/bad stimuli in the experiment , and to duplicate a small percentage of trials.
+An extensive subjective evaluation was performed during the 2016 VCC, with multiple submitted systems [242]. It was concluded that “there is still a lot of work to be done in voice conversion, it is not a solved problem. Achieving both high levels of naturalness and a high degree of similarity to a target speaker –within one VC system– remains a formidable task” [242]. The average quality MOS score was about 3.2 for top submissions. The similarity average score was around 70% correctly identiﬁed as target for top submissions. Due to the high number of entries, techniques to compare and visualize the high number of stimuli, such as multidimensional scaling, were utilized [242, 243].
+8. Applications
+VT and VC techniques can be applied to solve a variety of applications. We list some of these applications in this section:
+Transforming speaker identity: The typical application of VT is to transform speaker identity from one source speaker to a target speaker, which is referred to as VC [244]. For example, a high-quality VC system could be used by dubbing actors to assume the original actor’s voice characteristics. VT methods can also be applied for singing voice conversion [245, 246, 247, 248].
+Transforming speaking type: VT can be applied to transform the speaking type of a speaker. The goal is to retain the speaker identity but to transform emotion [249, 250, 251, 252], speaking style [253, 254], speaker accent [255], and speaker character [256]. Prosodic aspects are considered a more prominent factor in perceiving emotion and accent, thus some studies focus on prosodic aspects [4, 257, 258, 259, 260, 250, 252, 261, 262].
+Personalizing TTS systems: A major application of VC is to personalize a TTS systems to new speakers, using limited amounts of training data from the desired speaker (typically the end-user if the TTS is used as an augmentative and alternative communications device) [263, 264]. Another option is to create a TTS system with new emotions [4, 265, 266, 267, 268].
+Speech-to-Speech translation: The goal of these systems is to translate speech spoken in one language
+
+13
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+to another language, while preserving speaker identity [269, 270]. These systems are usually a combination of ASR, followed by machine translation. Then, the translated sentence is synthesized using a TTS system in the destination language, followed by a crosslanguage VC system [62, 240, 271, 70].
+Biometric voice authentication systems: VC presents a threat to speaker veriﬁcation systems [272]. Some studies have reported on the relation between the two systems and the vulnerabilities that VC poses for speaker veriﬁcation, along with some solutions [273, 274, 275, 276].
+Speaking- and Hearing-aid devices: VT systems can potentially be used to help people with speech disorders by synthesizing more intelligible or more typical speech [5, 277, 278, 279, 280, 281, 282, 283]. VT is also applied in speaking-aid devices that use electrolarynx devices [284, 285, 286]. Similar approaches can be used to increase the intelligibility of speech especially in noisy environments with application to increasing the performance of future hearing-aid devices [253, 287, 288]. Other applications are devices that convert murmur to speech [289, 290, 278], or whisper to speech [291, 292].
+Telecommunications: VT approaches have been used to reconstruct wide-band speech from its narrowband version [293]. This can enhance speech quality without modifying existing communication networks. Spectral conversion approaches have also been successfully used for speech enhancement [294].
+9. Challenges
+Many unsolved problems exist in the area of VC. Some of them have been identiﬁed in previous studies [244, 13, 237, 1, 241]. As concluded in the VC Challenge 2016, there is still a signiﬁcant performance gap between the current stateof-the-art performance levels and the human user expectations [233]. There are a lot of similarities between components of VC and statistical TTS systems, since both aim to generate speech features and synthesizing waveforms [295]. Consequently, some of the challenges and issues are shared in both systems.
+Analysis/Synthesis issues: One major VC component that limits the quality of the generated speech is the analysis/synthesis part. STRAIGHT is a high-quality vocoder, but compared to natural speech, there is a still a quality gap [17]. Recently, new high-quality vocoders were proposed, such as AHOCODER [37] and VOCAINE [38], both of which have shown improvements in statistical TTS. Recently, several ﬁrst attempts for direct waveform modeling using neural networks for statistical parametric TTS were proposed [296, 297, 298]. These eﬀorts may be a ﬁrst step
+
+towards a new scheme for speech modeling/modiﬁcation; however, the situation in VC is diﬀerent since we have access to a valid source speaker utterance, which potentially allows copying certain aspects of speech without modiﬁcations.
+Feature Interpolation issues: To represent spectral envelopes, various features are used, such as spectral magnitude, all-pole representations (LSFs, LPCs), and cepstral features. One major issue with these features is that interpolating two spectral representations may not result in spectral representations that are generated by the human vocal tract. For example, when using cepstra, if we interpolate two diﬀerent vowel regions, the outcome would sound as if the two sections are overlapping, and not as a single sound that lies perceptually between the two initial vowels. This limitation is one of the reasons for over-smoothing when multiple frames are averaged together. A spectral representation that represents meaningful features are formants locations and bandwidth. The two major problems of this representation is that formant extraction is still an unsolved problem, especially in noisy environments, and the inability of formants alone to represent ﬁner spectral details.
+One-to-many issues: The one-to-many problem in VC happens when two very similar speech segments of the source speaker have corresponding speech segments in the target speaker that are not similar to each other. As a result, the mapping function usually oversmoothes the generated features in order to be similar to both target speech segments. Some studies have attempted to solve this problem [74, 75, 77].
+Over-smoothing issues: In most VC approaches, the feature mapping is a result of averaging many parameters which results in over-smoothed features. This phenomenon is a symptom of the feature interpolation issue and one-to-many issue. This eﬀect reduces both speech quality and speaker similarity. A lot of approaches such as GV have been proposed to increase the variability of the spectrum. Approaches like dictionary mapping and unit-selection don’t suﬀer as much since they retain raw parameters and the feature manipulation is minimal; however, they typically require a larger training corpus and might suﬀer from discontinuous features and resulting audible discontinuities in the speech waveform.
+Prosodic mapping issues: For converting prosodic aspects of speech, various methods have been proposed. However, most of them simply adjust some global statistics, such as average and standard deviation. The conversion is usually performed in the frame-level domain. As mentioned in the previous sections, these naive modiﬁcations can not eﬀectively convert suprasegmental features. There are some challenges to mod-
+
+14
+
+ACCEPTED MANUSCRIPT
+
+eling prosody for parametric VC. The main challenge is the absence of certain high-level features during conversion, which hugely aﬀect human prosody. These features might be linguistic features (such as information about phonemes and syllables), or more abstract features (such as sarcasm and emotion). For TTS systems, textual information is available during conversion, which facilitates predicting prosodic features from more prosodically relevant representations such as syllable-level or word-level information. Especially foot-level information modeling might be helpful for conversion [299]. These types of data, extracted from the input text, are not available to a stand-alone VC system, but could be extracted using ASR systems with some degree of error. The main challenge is to transform pitch contours by considering more context than one frame at a time, i. e. segmentally.
+
+seem to be a good representation since they decompose a sequence into events and transitions, and these can be individually modeled. However, detection of event locations is a challenging task and requires more research. Additionally, some models such as HMMs and RNNs implicitly model the speech dynamics from a sequence of local features. Typically, these models have higher number of parameters compared to frameby-frame models. These sequence mapping approaches seem to be a major future direction.
+Prosody Modeling: Developing more complex prosody models that can capture speaker’s intonation and segmental duration in an eﬀective way is an important research direction. Most of the literature performs simple linear transformations of the pitch contour (typically in log domain) [217] and the speaking rate. Developing more sophisticated prosody models would enable the capture of complex prosodic patterns and thus enable more eﬀective transformations.
+
+ACCEPTED MANUSCRIPT
+
+10. Future Directions
+In the previous section, we presented several challenges that current VC technology faces. In this section, we list some future research directions.
+Non-Parallel VC: Most of the studies in the literature use parallel corpora. However, to make VC systems more mainstream, building transformation systems from non-parallel corpora is essential. The reason is that average users are hesitant to record numerous speech prompts with speciﬁc contents, which might be laborious for some. Several attempts for doing nonparallel VC is reported [6, 195].
+Text-dependent VC: VC systems that utilize phonetic information are another research area. One example is to use phoneme identity before clustering the acoustic space [300, 301]. Using phonetic information to identify classes using a CART model instead of spectral information has also been proposed [51]. These systems could use the output of ASR to help the eﬀectiveness of VC. These systems would likely use a combination of techniques from ASR, VC and parametric TTS.
+Database size: An important research direction is capturing the voice using very limited recordings. Some studies propose methods for dealing with limited amounts of data [236, 89, 302, 303, 111, 186, 110, 207, 304]. Utilizing additional unsupervised data have been proposed; for example, techniques that separate phonetic content and speaker identity are an elegant approach [111, 110, 195].
+Modeling dynamics: Typically, most VC systems focus on performing transformations frame-by-frame. One approach to this consists of adding dynamic information to the mapping features. Event-based approaches
+
+Many-to-one conversion: In practice, most VC systems can only convert speech from the source speaker that they have been trained on. A more practical approach is to have a system that converts speech from anybody to the target speaker. Several attempts to accomplish this have been studied [202].
+Articulatory features: Most of the current literature studies the VC problem from a perceptual standpoint. However, it may be worthwhile to approach the problem from a speech production point of view. Several attempts to model and synthesize articulatory properties of the human vocal tract have been proposed [305, 306]. These approaches have some limitations, such as being speaker-dependent, or requiring hard-to-collect data such as MRI 3D images, electromagnetic articulography, and X-rays. Overcoming these limitations would open up an important set of tools for articulatory conversion and synthesis.
+Perceptual optimization: The optimizations that are performed in statistical methods during learning source-target feature mapping function typically optimize criterions that are not highly correlated with human perception. An attempt at performing perceptual error optimization for DNN-based TTS has been proposed [122]; similar approaches could be adopted to VC.
+Real-world situations: Most of the corpora used in the literature are recorded in clean conditions. In realworld situations, speech is often encountered in noisy environments. Attempts to perform VC on these noisy data would result in even more distorted synthesized speech. Creating corpora for these situations and developing noise-robust systems are an essential step to allowing VC systems to become mainstream.
+
+15
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[1] Y. Stylianou. Voice transformation: a survey. In Proceedings of the ICASSP, 2009.
+[2] D. G. Childers, K. Wu, D. Hicks, and B. Yegnanarayana. Voice conversion. Speech Communication, 8(2):147–158, 1989.
+[3] P. Cano, A. Loscos, J. Bonada, M. De Boer, and X. Serra. Voice morphing system for impersonating in karaoke applications. In Proceedings of the ICMC, 2000.
+[4] H. Kawanami, Y. Iwami, T. Toda, H. Saruwatari, and K. Shikano. GMM-based voice conversion applied to emotional speech synthesis. In Proceedings of the EUROSPEECH, 2003.
+[5] A. B. Kain, J.-P. Hosom, X. Niu, J. P. van Santen, M. Fried-Oken, and J. Staehely. Improving the intelligibility of dysarthric speech. Speech communication, 49(9):743–759, 2007.
+[6] D. Erro, A. Moreno, and A. Bonafonte. INCA algorithm for training voice conversion systems from nonparallel corpora. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):944–953, 2010.
+[7] A. Mouchtaris, J. Van der Spiegel, and P. Mueller. Non-parallel training for voice conversion by maximum likelihood constrained adaptation. In Proceedings of the ICASSP, 2004.
+[8] D. Sündermann, A. Bonafonte, H. Ney, and H. Höge. A ﬁrst step towards text-independent voice conversion. In Proceedings of the ICSLP, 2004.
+[9] D. Sündermann. Text-independent voice conversion. PhD thesis, Universitätsbibliothek der Universität der Bundeswehr München, 2008.
+[10] D. Sündermann, H. Ney, and H. Hoge. VTLN-based cross-language voice conversion. In Proceedings of the ASRU, 2003.
+[11] O. Türk. Cross-lingual voice conversion. PhD thesis, Bogaziçi University, 2007.
+[12] H. Matsumoto, S. Hiki, T. Sone, and T. Nimura. Multidimensional representation of personal quality of vowels and its acoustical correlates. IEEE Transactions on Audio and Electroacoustics, 21(5):428–436, 1973.
+[13] H. Kuwabara and Y. Sagisak. Acoustic characteristics of speaker individuality: Control and conversion. Speech communication, 16(2):165–173, 1995.
+[14] S. Imai, K. Sumita, and C. Furuichi. Mel log spectrum approximation (MLSA) ﬁlter for speech synthesis. Electronics and Communications in Japan (Part I: Communications), 66(2):10–18, 1983.
+
+[15] S. Imai, T. Kobayashi, K. Tokuda, T. Masuko, K. Koishida, S. Sako, and H. Zen. Speech signal processing toolkit (SPTK), version 3.3, 2009.
+[16] H. Kawahara, I. Masuda-Katsuse, and A. De Cheveigné. Restructuring speech representations using a pitch-adaptive time–frequency smoothing and an instantaneous-frequency-based f0 extraction: Possible role of a repetitive structure in sounds. Speech communication, 27(3):187–207, 1999.
+[17] H. Kawahara, M. Morise, T. Takahashi, R. Nisimura, T. Irino, and H. Banno. TANDEM-STRAIGHT: A temporally stable power spectral representation for periodic signals and applications to interference-free spectrum, f0, and aperiodicity estimation. In Proceedings of the ICASSP, 2008.
+[18] M. Morise. Cheaptrick, a spectral envelope estimator for high-quality speech synthesis. Speech Communication, 67:1–7, 2015.
+[19] M. Morise, F. Yokomori, and K. Ozawa. World: a vocoder-based high-quality speech synthesis system for real-time applications. IEICE Transactions on Information and Systems, 2016.
+[20] D. G. Childers. Glottal source modeling for voice conversion. Speech communication, 16(2):127–138, 1995.
+[21] D. Vincent, O. Rosec, and T. Chonavel. A new method for speech synthesis and transformation based on an arx-lf source-ﬁlter decomposition and hnm modeling. In Proceedings of the ICASSP, 2007.
+[22] A. Del Pozo and S. Young. The linear transformation of lf glottal waveforms for voice conversion. In Proceedings of the INTERSPEECH, 2008.
+[23] A. Pozo. Voice source and duration modelling for voice conversion and speech repair. PhD thesis, University of Cambridge, 2008.
+[24] Y. Agiomyrgiannakis and O. Rosec. ARX-LF-based source-ﬁlter methods for voice modiﬁcation and transformation. In Proceedings of the ICASSP, 2009.
+[25] A. Kain and M. W. Macon. Design and evaluation of a voice conversion algorithm based on spectral envelope mapping and residual prediction. In Proceedings of the ICASSP, 2001.
+[26] D. Sündermann, A. Bonafonte, H. Ney, and H. Höge. A study on residual prediction techniques for voice conversion. In Proceedings of the ICASSP, 2005.
+[27] J. Zhang, J. Sun, and B. Dai. Voice conversion based on weighted least squares estimation criterion and residual prediction from pitch contour. In Aﬀective Computing and Intelligent Interaction, pages 326–333. Springer, 2005.
+
+16
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[28] H. Duxans and A. Bonafonte. Residual conversion versus prediction on voice morphing systems. In Proceedings of the ICASSP, 2006.
+[29] W. S. Percybrooks and E. Moore. Voice conversion with linear prediction residual estimaton. In Proceedings of the ICASSP, 2008.
+[30] Y. Ohtani, T. Toda, H. Saruwatari, and K. Shikano. Maximum likelihood voice conversion based on GMM with STRAIGHT mixed excitation. In Proceedings of the INTERSPEECH, 2006.
+[31] J. Nurminen, J. Tian, and V. Popa. Voicing level control with application in voice conversion. In Proceedings of the INTERSPEECH, 2007.
+[32] E. Helander, H. Silén, T. Virtanen, and M. Gabbouj. Voice conversion using dynamic kernel partial least squares regression. IEEE Transactions on Audio, Speech, and Language Processing, 20(3):806–817, 2012.
+[33] L.-H. Chen, L.-J. Liu, Z.-H. Ling, Y. Jiang, and L.-R. Dai. The USTC system for voice conversion challenge 2016: Neural network based approaches for spectrum, aperiodicity and F0 conversion. In Proceedings of the INTERSPEECH, 2016.
+[34] E. Moulines and F. Charpentier. Pitch-synchronous waveform processing techniques for text-to-speech synthesis using diphones. Speech communication, 9 (5):453–467, 1990.
+[35] H. Valbret, E. Moulines, and J.-P. Tubach. Voice transformation using PSOLA technique. In Proceedings of the ICASSP, 1992.
+[36] I. Stylianou. Harmonic plus noise models for speech, combined with statistical methods, for speech and speaker modiﬁcation. PhD thesis, Ecole Nationale Supérieure des Télécommunications, 1996.
+[37] D. Erro, I. Sainz, E. Navas, and I. Hernáez. Improved HNM-based vocoder for statistical synthesizers. In Proceedings of the INTERSPEECH, 2011.
+[38] Y. Agiomyrgiannakis. VOCAINE the vocoder and applications in speech synthesis. In Proceedings of the ICASSP, 2015.
+[39] S. H. Mohammadi and A. Kain. Transmutative voice conversion. In Proceedings of the ICASSP, 2013.
+[40] S. Imai. Cepstral analysis synthesis on the mel frequency scale. In Proceedings of the ICASSP, 1983.
+[41] K. K. Paliwal. Interpolation properties of linear prediction parametric representations. In Proceedings of the EUROSPEECH, 1995.
+
+[42] A. B. Kain. High resolution voice transformation. PhD thesis, Oregon Health & Science University, 2001.
+[43] H. Mizuno and M. Abe. Voice conversion algorithm based on piecewise linear conversion rules of formant frequency and spectrum tilt. Speech Communication, 16(2):153–164, 1995.
+[44] P. Zolfaghari and T. Robinson. A formant vocoder based on mixtures of gaussians. In Proceedings of the ICASSP, 1997.
+[45] D. Rentzos, S. V. Qin, C.-H. Ho, and E. Turajlic. Probability models of formant parameters for voice conversion. In Proceedings of the EUROSPEECH, 2003.
+[46] E. Godoy, O. Rosec, and T. Chonavel. Speech spectral envelope estimation through explicit control of peak evolution in time. In Proceedings of the ISSPA, 2010.
+[47] Z. Wu, T. Virtanen, T. Kinnunen, E. S. Chng, and H. Li. Exemplar-based voice conversion using nonnegative spectrogram deconvolution. In Proceedings of the SSW, 2013.
+[48] L.-H. Chen, Z.-H. Ling, and L.-R. Dai. Voice conversion using generative trained deep neural networks with multiple frame spectral envelopes. In Proceedings of the INTERSPEECH, 2014.
+[49] S. H. Mohammadi and A. Kain. Semi-supervised training of a voice conversion mapping function using a joint-autoencoder. In Proceedings of the INTERSPEECH, 2015.
+[50] S. Furui. Speaker-independent isolated word recognition using dynamic features of speech spectrum. IEEE Transactions on Acoustics, Speech and Signal Processing, 34(1):52–59, 1986.
+[51] H. Duxans, A. Bonafonte, A. Kain, and J. Van Santen. Including dynamic and phonetic information in voice conversion systems. In Proceedings of the ICSLP, 2004.
+[52] T. Toda, A. W. Black, and K. Tokuda. Voice conversion based on maximum-likelihood estimation of spectral parameter trajectory. IEEE Transactions on Audio, Speech, and Language Processing, 15(8): 2222–2235, 2007.
+[53] B. P. Nguyen and M. Akagi. Spectral modiﬁcation for voice gender conversion using temporal decomposition. Journal of Signal Processing, 2007.
+[54] B. P. Nguyen and M. Akagi. Phoneme-based spectral voice conversion using temporal decomposition and gaussian mixture model. In Proceedings of the ICCE, 2008.
+
+17
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[55] B. P. Nguyen. Studies on spectral modiﬁcation in voice transformation. PhD thesis, Japan Advanced Institute of Science and Technology, 2009.
+[56] A. Kain and J. P. van Santen. Unit-selection text-tospeech synthesis using an asynchronous interpolation model. In Proceedings of the SSW, 2007.
+[57] M. Abe, S. Nakamura, K. Shikano, and H. Kuwabara. Voice conversion through vector quantization. In Proceedings of the ICASSP, 1988.
+[58] A. Kain and M. W. Macon. Spectral voice conversion for text-to-speech synthesis. In Proceedings of the ICASSP, 1998.
+[59] L. M. Arslan and D. Talkin. Speaker transformation using sentence HMM based alignments and detailed prosody modiﬁcation. In Proceedings of the ICASSP, 1998.
+[60] H. Ye and S. Young. Quality-enhanced voice morphing using maximum likelihood transformations. IEEE Transactions on Audio, Speech, and Language Processing, 14(4):1301–1312, 2006.
+[61] Y. Nankaku, K. Nakamura, T. Toda, and K. Tokuda. Spectral conversion based on statistical models including time-sequence matching. In Proceedings of the SSW, 2007.
+[62] H. Duxans, D. Erro, J. Pérez, F. Diego, A. Bonafonte, and A. Moreno. Voice conversion of non-aligned data using unit selection. In TC-STAR WSST, 2006.
+[63] C.-H. Wu, C.-C. Hsia, T.-H. Liu, and J.-F. Wang. Voice conversion using duration-embedded bi-HMMs for expressive speech synthesis. IEEE Transactions on Audio, Speech, and Language Processing, 14(4): 1109–1116, 2006.
+[64] H. Ye and S. Young. Voice conversion for unknown speakers. In Proceedings of the INTERSPEECH, 2004.
+[65] J. Tao, M. Zhang, J. Nurminen, J. Tian, and X. Wang. Supervisory data alignment for text-independent voice conversion. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):932–943, 2010.
+[66] M. Zhang, J. Tao, J. Tian, and X. Wang. Textindependent voice conversion based on state mapped codebook. In Proceedings of the ICASSP, 2008.
+[67] D. Sündermann and H. Ney. An automatic segmentation and mapping approach for voice conversion parameter training. In Proceedings of the AST, 2003.
+[68] D. Erro and A. Moreno. Frame alignment method for cross-lingual voice conversion. In Proceedings of the INTERSPEECH, 2007.
+
+[69] D. Sündermann, A. Bonafonte, H. Höge, and H. Ney. Voice conversion using exclusively unaligned training data. In Proceedings of the ACL/SEPLN, 2004.
+[70] D. Sündermann, H. Hoge, A. Bonafonte, H. Ney, A. Black, and S. Narayanan. Text-independent voice conversion based on unit selection. In Proceedings of the ICASSP, 2006.
+[71] D. Sündermann, H. Höge, A. Bonafonte, H. Ney, and J. Hirschberg. Text-independent cross-language voice conversion. In Proceedings of the INTERSPEECH, 2006.
+[72] A. Mouchtaris, J. Van der Spiegel, and P. Mueller. Nonparallel training for voice conversion based on a parameter adaptation approach. IEEE Transactions on Audio, Speech, and Language Processing, 14(3): 952–963, 2006.
+[73] C.-H. Lee and C.-H. Wu. Map-based adaptation for speech conversion using adaptation data selection and non-parallel training. In Proceedings of the INTERSPEECH, 2006.
+[74] A. Mouchtaris, Y. Agiomyrgiannakis, and Y. Stylianou. Conditional vector quantization for voice conversion. In Proceedings of the ICASSP, 2007.
+[75] E. Helander, J. Schwarz, J. Nurminen, H. Silen, and M. Gabbouj. On the impact of alignment on voice conversion performance. In Proceedings of the INTERSPEECH, 2008.
+[76] E. Godoy, O. Rosec, and T. Chonavel. Alleviating the one-to-many mapping problem in voice conversion with context-dependent modelling. In Proceedings of the INTERSPEECH, 2009.
+[77] S. Hamidreza Mohammadi. Reducing one-to-many problem in Voice Conversion by equalizing the formant locations using dynamic frequency warping. ArXiv eprints, Oct. 2015.
+[78] O. Turk and L. M. Arslan. Robust processing techniques for voice conversion. Computer Speech & Language, 20(4):441–467, 2006.
+[79] S. V. Rao, N. J. Shah, and H. A. Patil. Novel preprocessing using outlier removal in voice conversion. In Proceedings of the SSW, 2016.
+[80] K. Shikano, S. Nakamura, and M. Abe. Speaker adaptation and voice conversion by codebook mapping. In IEEE International Sympoisum on Circuits and Systems, pages 594–597, 1991.
+[81] L. M. Arslan and D. Talkin. Voice conversion by codebook mapping of line spectral frequencies and excitation spectrum. In Proceedings of the EUROSPEECH, 1997.
+
+18
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[82] Z.-W. Shuang, Z.-X. Wang, Z.-H. Ling, and R.-H. Wang. A novel voice conversion system based on codebook mapping with phoneme-tied weighting. In Proceedings of the ICSLP, 2004.
+[83] L. M. Arslan. Speaker transformation algorithm using segmental codebooks (STASC). Speech Communication, 28(3):211–226, 1999.
+[84] M. Hashimoto and N. Higuchi. Spectral mapping method for voice conversion using speaker selection and vector ﬁeld smoothing. In Proceedings of the EUROSPEECH, 1995.
+[85] K.-S. Lee. Statistical approach for voice personality transformation. IEEE Transactions on Audio, Speech, and Language Processing, 15(2):641–651, 2007.
+[86] H. Matsumoto and Y. Yamashita. Unsupervised speaker adaptation from short utterances based on a minimized fuzzy objective function. Journal of the Acoustical Society of Japan (E), 14(5):353–361, 1993.
+[87] Y. Stylianou, O. Cappé, and E. Moulines. Continuous probabilistic transform for voice conversion. IEEE Transactions on Speech and Audio Processing, 6(2): 131–142, 1998.
+
+[95] R. H. Laskar, F. A. Talukdar, R. Bhattacharjee, and S. Das. Voice conversion by mapping the spectral and prosodic features using support vector machine. In Applications of Soft Computing, pages 519–528. Springer, 2009.
+[96] P. Song, Y. Bao, L. Zhao, and C. Zou. Voice conversion using support vector regression. Electronics letters, 47(18):1045–1046, 2011.
+[97] H. Ye and S. Young. Perceptually weighted linear transformations for voice conversion. In Proceedings of the INTERSPEECH, 2003.
+[98] T.-C. Zorilă, D. Erro, and I. Hernaez. Improving the quality of standard gmm-based voice conversion systems by considering physically motivated linear transformations. In Advances in Speech and Language Technologies for Iberian Languages, pages 30–39. Springer, 2012.
+[99] V. Popa, H. Silen, J. Nurminen, and M. Gabbouj. Local linear transformation for voice conversion. In Proceedings of the ICASSP, 2012.
+[100] Y. Chen, M. Chu, E. Chang, J. Liu, and R. Liu. Voice conversion with smoothed GMM and MAP adaptation. In Proceedings of the EUROSPEECH, 2003.
+
+[88] L. Mesbahi, V. Barreaud, and O. Boeﬀard. Comparing GMM-based speech transformation systems. In Proceedings of the INTERSPEECH, 2007.
+[89] Y. Uto, Y. Nankaku, T. Toda, A. Lee, and K. Tokuda. Voice conversion based on mixtures of factor analyzers. In Proceeding of the ICSLP, 2006.
+[90] Z. Wu, T. Kinnunen, E. S. Chng, and H. Li. Mixture of factor analyzers using priors from non-parallel speech for voice conversion. IEEE Signal Processing Letters, 19(12):914–917, 2012.
+[91] E. Helander, T. Virtanen, J. Nurminen, and M. Gabbouj. Voice conversion using partial least squares regression. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):912–921, 2010.
+[92] Y. Qiao, T. Tong, and N. Minematsu. A study on bag of gaussian model with application to voice conversion. In Proceedings of the INTERSPEECH, pages 657–660, 2011.
+
+[101] T. Toda, A. W. Black, and K. Tokuda. Spectral conversion based on maximum likelihood estimation considering global variance of converted parameter. In Proceedings of the ICASSP, 2005.
+[102] H. Benisty and D. Malah. Voice conversion using gmm with enhanced global variance. In Proceedings of the INTERSPEECH, 2011.
+[103] H.-T. Hwang, Y. Tsao, H.-M. Wang, Y.-R. Wang, and S.-H. Chen. Incorporating global variance in the training phase of gmm-based voice conversion. In Proceedings of the APSIPA, 2013.
+[104] H.-T. Hwang, Y. Tsao, H.-M. Wang, Y.-R. Wang, S.H. Chen, et al. A study of mutual information for GMM-based spectral conversion. In Proceedings of the INTERSPEECH, 2012.
+[105] S. Takamichi, T. Toda, A. W. Black, and S. Nakamura. Modulation spectrum-based post-ﬁlter for gmm-based voice conversion. In Proceedings of the APSIPA, 2014.
+
+[93] T. Watanabe, T. Murakami, M. Namba, T. Hoya, and Y. Ishida. Transformation of spectral envelope for voice conversion based on radial basis function networks. In Proceedings of the ICSLP, 2002.
+
+[106] E. Helander, H. Silén, J. Míguez, and M. Gabbouj. Maximum a posteriori voice conversion using sequential monte carlo methods. In Proceedings of the INTERSPEECH, 2010.
+
+[94] J. Nirmal, S. Patnaik, and M. A. Zaveri. Voice trans- [107] A. Sorin, S. Shechtman, and V. Pollet. Uniform speech
+
+formation using radial basis function. In Proceedings
+
+parameterization for multi-form segment synthesis. In
+
+of the TITC, pages 345–351. Springer, 2013.
+
+Proceedings of the INTERSPEECH, 2011.
+
+19
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[108] F. Villavicencio, J. Bonada, and Y. Hisaminato. Observation-model error compensation for enhanced spectral envelope transformation in voice conversion. In Proceedings of the MLSP, 2015.
+[109] Y. Kang, Z. Shuang, J. Tao, W. Zhang, and B. Xu. A hybrid gmm and codebook mapping method for spectral conversion. In Aﬀective Computing and Intelligent Interaction, pages 303–310. Springer, 2005.
+[110] D. Saito, S. Watanabe, A. Nakamura, and N. Minematsu. Statistical voice conversion based on noisy channel model. IEEE Transactions on Audio, Speech, and Language Processing, 20(6):1784–1794, 2012.
+[111] V. Popa, J. Nurminen, and M. Gabbouj. A novel technique for voice conversion based on style and content decomposition with bilinear models. In Proceedings of the INTERSPEECH, 2009.
+[112] V. Popa, J. Nurminen, M. Gabbouj, et al. A study of bilinear models in voice conversion. Journal of Signal and Information Processing, 2(02):125, 2011.
+[113] E.-K. Kim, S. Lee, and Y.-H. Oh. Hidden markov model based voice conversion using dynamic characteristics of speaker. In Proceedings of the EUROSPEECH, 1997.
+[114] Z. Yue, X. Zou, Y. Jia, and H. Wang. Voice conversion using HMM combined with GMM. In Proceedings of the CISP, 2008.
+[115] M. Zhang, J. Tao, J. Nurminen, J. Tian, and X. Wang. Phoneme cluster based state mapping for text-independent voice conversion. In Proceedings of the ICASSP, 2009.
+[116] K. Tokuda, T. Kobayashi, and S. Imai. Speech parameter generation from HMM using dynamic features. In Proceedings of the ICASSP, 1995.
+[117] T. Muramatsu, Y. Ohtani, T. Toda, H. Saruwatari, and K. Shikano. Low-delay voice conversion based on maximum likelihood estimation of spectral parameter trajectory. In Proceedings of the INTERSPEECH, 2008.
+
+[121] D. Erro, A. Alonso, L. Serrano, D. Tavarez, I. Odriozola, X. Sarasola, E. Del Blanco, J. Sanchez, I. Saratxaga, E. Navas, et al. Ml parameter generation with a reformulated mge training criterion—participation in the voice conversion challenge 2016. In Proceedings of the INTERSPEECH, 2016.
+[122] C. Valentini-Botinhao, Z. Wu, and S. King. Towards minimum perceptual error training for DNNbased speech synthesis. In Proceedings of the INTERSPEECH, 2015.
+[123] F.-L. Xie, Y. Qian, Y. Fan, F. K. Soong, and H. Li. Sequence error (se) minimization training of neural network for voice conversion. In Proceedings of the INTERSPEECH, 2014.
+[124] D. M. Titterington, A. F. Smith, U. E. Makov, et al. Statistical analysis of ﬁnite mixture distributions, volume 7. Wiley New York, 1985.
+[125] K. Hornik, M. Stinchcombe, and H. White. Multilayer feedforward networks are universal approximators. Neural networks, 2(5):359–366, 1989.
+[126] R. Laskar, D. Chakrabarty, F. Talukdar, K. S. Rao, and K. Banerjee. Comparing ANN and GMM in a voice conversion framework. Applied Soft Computing, 12(11):3332–3342, 2012.
+[127] M. Narendranath, H. A. Murthy, S. Rajendran, and B. Yegnanarayana. Transformation of formants for voice conversion using artiﬁcial neural networks. Speech communication, 16(2):207–216, 1995.
+[128] B. Makki, S. Seyedsalehi, N. Sadati, and M. N. Hosseini. Voice conversion using nonlinear principal component analysis. In Proceedings of the CIISP, 2007.
+[129] S. Desai, A. W. Black, B. Yegnanarayana, and K. Prahallad. Spectral mapping using artiﬁcial neural networks for voice conversion. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):954–964, 2010.
+[130] M. V. Ramos. Voice conversion with deep learning. Master’s thesis, Tecnico Lisboa, 2016.
+
+[118] T. Toda, T. Muramatsu, and H. Banno. Implementation of computationally eﬃcient real-time voice conversion. In Proceedings of the INTERSPEECH, 2012.
+[119] S. Takamichi, T. Toda, A. W. Black, and S. Nakamura. Modulation spectrum-constrained trajectory training algorithm for gmm-based voice conversion. In Proceedings of the ICASSP, 2015.
+[120] H. Zen, Y. Nankaku, and K. Tokuda. Continuous stochastic feature mapping based on trajectory hmms. IEEE Transactions on Audio, Speech, and Language Processing, 19(2):417–430, 2011.
+
+[131] E. Azarov, M. Vashkevich, D. Likhachov, and A. Petrovsky. Real-time voice conversion using artiﬁcial neural networks with rectiﬁed linear units. In Proceedings of the INTERSPEECH, 2013.
+[132] L.-J. Liu, L.-H. Chen, Z.-H. Ling, and L.-R. Dai. Using bidirectional associative memories for joint spectral envelope modeling in voice conversion. In Proceedings of the ICASSP, 2014.
+[133] S. H. Mohammadi and A. Kain. Voice conversion using deep neural networks with speaker-independent pretraining. In Proceedings of the SLT, 2014.
+
+20
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[134] J. Nirmal, M. Zaveri, S. Patnaik, and P. Kachare. Voice conversion using general regression neural network. Applied Soft Computing, 24:1–12, 2014.
+[135] L.-H. Chen, Z.-H. Ling, Y. Song, and L.-R. Dai. Joint spectral distribution modeling using restricted boltzmann machines for voice conversion. In Proceedings of the INTERSPEECH, 2013.
+[136] Z. Wu, E. S. Chng, and H. Li. Conditional restricted boltzmann machine for voice conversion. In Proceedings of the ChinaSIP, 2013.
+[137] T. Nakashika, T. Takiguchi, and Y. Ariki. Sparse nonlinear representation for voice conversion. In Proceedings of the ICME, 2015.
+[138] S. H. Mohammadi and A. Kain. A voice conversion mapping function based on a stacked jointautoencoder. In Proceedings of the INTERSPEECH, 2016.
+[139] T. Nakashika, T. Takiguchi, and Y. Ariki. Voice conversion using rnn pre-trained by recurrent temporal restricted boltzmann machines. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 23(3):580–587, March 2015. ISSN 2329-9290. doi: 10.1109/TASLP.2014.2379589.
+[140] L. Sun, S. Kang, K. Li, and H. Meng. Voice conversion using deep bidirectional long short-term memory based recurrent neural networks. In Proceedings of the ICASSP, 2015.
+[141] X. Glorot and Y. Bengio. Understanding the diﬃculty of training deep feedforward neural networks. In International conference on artiﬁcial intelligence and statistics, pages 249–256, 2010.
+[142] D. Erhan, Y. Bengio, A. Courville, P. A. Manzagol, P. Vincent, and S. Bengio. Why does unsupervised pre-training help deep learning? The Journal of Machine Learning Research, 11:625–660, 2010.
+[143] T. Nakashika, R. Takashima, T. Takiguchi, and Y. Ariki. Voice conversion in high-order eigen space using deep belief nets. In Proceedings of the INTERSPEECH, 2013.
+[144] T. Nakashika, Toru, T. Takiguchi, Tetsuya, and Y. Ariki, Yasuo. Voice conversion based on speakerdependent restricted boltzmann machines. IEICE Transactions on Information and Systems, 97(6): 1403–1410, 2014.
+
+[146] L.-H. Chen, Z.-H. Ling, L.-J. Liu, and L.-R. Dai. Voice conversion using deep neural networks with layer-wise generative training. IEEE/ACM Transactions on Audio, Speech and Language Processing (TASLP), 22 (12):1859–1872, 2014.
+[147] L.-J. Liu, L.-H. Chen, Z.-H. Ling, and L.-R. Dai. Spectral conversion using deep neural networks trained with multi-source speakers. In Proceedings of the ICASSP, 2015.
+[148] N. Srivastava, G. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov. Dropout: A simple way to prevent neural networks from overﬁtting. The Journal of Machine Learning Research, 15(1):1929–1958, 2014.
+[149] X. Glorot, A. Bordes, and Y. Bengio. Deep sparse rectiﬁer neural networks. In Aistats, 2011.
+[150] T. Nakashika, T. Takiguchi, and Y. Ariki. High-order sequence modeling using speaker-dependent recurrent temporal restricted boltzmann machines for voice conversion. In Proceedings of the INTERSPEECH, 2014.
+[151] H. Ming, D. Huang, L. Xie, J. Wu, and M. D. H. Li. Deep bidirectional lstm modeling of timbre and prosody for emotional voice conversion. In Proceedings of the INTERSPEECH, 2016.
+[152] Z. Wu, T. Virtanen, E. S. Chng, and H. Li. Exemplarbased sparse representation with residual compensation for voice conversion. IEEE/ACM Transactions on Audio, Speech and Language Processing (TASLP), 22(10):1506–1521, 2014.
+[153] R. Aihara, T. Nakashika, T. Takiguchi, and Y. Ariki. Voice conversion based on non-negative matrix factorization using phoneme-categorized dictionary. In Proceedings of the ICASSP, 2014.
+[154] Z. Wu, E. S. Chng, and H. Li. Joint nonnegative matrix factorization for exemplar-based voice conversion. In Proceedings of the INTERSPEECH, 2014.
+[155] R. Aihara, R. Ueda, T. Takiguchi, and Y. Ariki. Exemplar-based emotional voice conversion using non-negative matrix factorization. In Proceedings of the APSIPA, Dec 2014. doi: 10.1109/APSIPA.2014.7041640.
+[156] R. Takashima, T. Takiguchi, and Y. Ariki. Exemplarbased voice conversion in noisy environment. In Proceedings of the SLT, 2012.
+[157] R. Takashima, R. Aihara, T. Takiguchi, and Y. Ariki. Noise-robust voice conversion based on spectral mapping on sparse space. In Proceedings of the SSW, 2013.
+
+[145] T. Nakashika, T. Takiguchi, and Y. Ariki. Voice conversion using speaker-dependent conditional restricted boltzmann machine. EURASIP Journal on Audio, Speech, and Music Processing, 2015(1):1–12, 2015.
+
+[158] K. Masaka, R. Aihara, T. Takiguchi, and Y. Ariki. Multimodal voice conversion using non-negative matrix factorization in noisy environments. In Proceedings of the ICASSP, 2014.
+
+21
+
+ACCEPTED MANUSCRIPT
+
+[159] R. AIHARA, T. TAKIGUCHI, and Y. ARIKI. Activity-mapping non-negative matrix factorization for exemplar-based voice conversion. In Proceedings of the ICASSP, 2015.
+[160] R. Aihara, T. Takiguchi, and Y. Ariki. Many-tomany voice conversion based on multiple non-negative matrix factorization. In Proceedings of the INTERSPEECH, 2015.
+[161] Z. Wu, T. Virtanen, T. Kinnunen, E. Chng, and H. Li. Exemplar-based unit selection for voice conversion utilizing temporal information. In Proceedings of the INTERSPEECH, 2013.
+[162] H. Benisty, D. Malah, and K. Crammer. Sequential voice conversion using grid-based approximation. In Proceedings of the IEEEI, 2014.
+[163] Y.-C. Wu, H.-T. Hwang, C.-C. Hsu, Y. Tsao, and H.-M. Wang. Locally linear embedding for exemplarbased spectral conversion. In Proceedings of the INTERSPEECH, 2016.
+
+[173] A. J. Uriz, P. D. Agüero, A. Bonafonte, and J. C. Tulli. Voice conversion using k-histograms and frame selection. In Proceedings of the INTERSPEECH, 2009.
+[174] E. Helander, J. Nurminen, and M. Gabbouj. Analysis of lsf frame selection in voice conversion. In Proceedings of the SPECOM, 2007.
+[175] D. Erro and A. Moreno. Weighted frequency warping for voice conversion. In Proceedings of the INTERSPEECH, 2007.
+[176] D. Erro, A. Moreno, and A. Bonafonte. Voice conversion based on weighted frequency warping. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):922–931, 2010.
+[177] E. Godoy, O. Rosec, and T. Chonavel. Voice conversion using dynamic frequency warping with amplitude scaling, for parallel or nonparallel corpora. IEEE Transactions on Audio, Speech, and Language Processing, 20(4):1313–1323, 2012.
+
+ACCEPTED MANUSCRIPT
+
+[164] Ö. Salor and M. Demirekler. Dynamic programming [178] H. Valbret, E. Moulines, and J. P. Tubach. Voice
+
+approach to voice transformation. Speech communica-
+
+transformation using PSOLA technique. Speech Com-
+
+tion, 48(10):1262–1272, 2006.
+
+munication, 11(2):175–187, 1992.
+
+[165] A. Uriz, P. D. Agüero, D. Erro, and A. Bonafonte. Voice conversion using frame selection. Reporte Interno Laboratorio de Comunicaciones-UNMdP, 2008.
+[166] K.-S. Lee. A unit selection approach for voice transformation. Speech Communication, 60:30–43, 2014.
+[167] T. Dutoit, A. Holzapfel, M. Jottrand, A. Moinet, J. Perez, and Y. Stylianou. Towards a voice conversion system based on frame selection. In Proceedings of the ICASSP, 2007.
+[168] K. Fujii, J. Okawa, and K. Suigetsu. Highindividuality voice conversion based on concatenative speech synthesis. World Academy of Science, Engineering and Technology, 2:1, 2007.
+[169] M. Eslami, H. Sheikhzadeh, and A. Sayadiyan. Quality improvement of voice conversion systems based on trellis structured vector quantization. In Twelfth Annual Conference of the International Speech Communication Association, 2011.
+[170] Z. Shuang, F. Meng, and Y. Qin. Voice conversion by combining frequency warping with unit selection. In Proceedings of the ICASSP, 2008.
+[171] A. Uriz, P. Aguero, J. Tulli, E. Gonzalez, and A. Bonafonte. Voice conversion using frame selection and warping functions. Proceedings of the RPIC, 2009.
+[172] H.-Y. Gu and S.-F. Tsai. Improving segmental gmm based voice conversion method with target frame selection. In Proceedings of the ISCSLP, 2014.
+
+[179] E. Turajlic, D. Rentzos, S. Vaseghi, and C.-H. Ho. Evaluation of methods for parameteric formant transformation in voice conversion. In Proceeding of the ICASSP, 2003.
+[180] Z. Shuang, R. Bakis, and Y. Qin. Voice conversion based on mapping formants. In TC-STAR WSST, pages 219–223, 2006.
+[181] E. Godoy, O. Rosec, and T. Chonavel. On transforming spectral peaks in voice conversion. In Proceedings of the SSW, 2010.
+[182] N. Maeda, H. Banno, S. Kajita, K. Takeda, and F. Itakura. Speaker conversion through non-linear frequency warping of straight spectrum. In Proceedings of the EUROSPEECH, 1999.
+[183] D. Erro, E. Navas, and I. Hernáez. Iterative MMSE estimation of vocal tract length normalization factors for voice transformation. In Proceedings of the INTERSPEECH, 2012.
+[184] A. Přibilová and J. Přibil. Non-linear frequency scale mapping for voice conversion in text-to-speech system with cepstral description. Speech Communication, 48 (12):1691–1703, 2006.
+[185] T. Toda, H. Saruwatari, and K. Shikano. Voice conversion algorithm based on gaussian mixture model with dynamic frequency warping of straight spectrum. In Proceedings of the ICASSP, 2001.
+
+22
+
+ACCEPTED MANUSCRIPT
+
+[186] M. Tamura, M. Morita, T. Kagoshima, and M. Akamine. One sentence voice adaptation using gmm-based frequency-warping and shift with a subband basis spectrum model. In Proceedings of the ICASSP, 2011.
+[187] E. Godoy, O. Rosec, and T. Chonavel. Spectral envelope transformation using DFW and amplitude scaling for voice conversion with parallel or nonparallel corpora. In Proceeding of the INTERSPEECH, 2011.
+[188] M. Pitz and H. Ney. Vocal tract normalization equals linear transformation in cepstral space. Speech and Audio Processing, IEEE Transactions on, 13(5):930–944, 2005.
+[189] D. Erro, A. Alonso, L. Serrano, E. Navas, and I. Hernáez. Towards physically interpretable parametric voice conversion functions. In Advances in Nonlinear Speech Processing, pages 75–82. Springer, 2013.
+
+[198] T. Toda, Y. Ohtani, and K. Shikano. Eigenvoice conversion based on gaussian mixture model. In Proceedings of the INTERSPEECH, 2006.
+[199] Y. Ohtani. Techniques for improving voice conversion based on eigenvoices. PhD thesis, Nara Institute of Science and Technology, 2010.
+[200] T. Masuda and M. Shozakai. Cost reduction of training mapping function based on multistep voice conversion. In Proceedings of the ICASSP, 2007.
+[201] D. Tani, T. Toda, Y. Ohtani, H. Saruwatari, and K. Shikano. Maximum a posteriori adaptation for many-to-one eigenvoice conversion. In Proceedings of the INTERSPEECH, 2008.
+[202] T. Toda, Y. Ohtani, and K. Shikano. One-to-many and many-to-one voice conversion based on eigenvoices. In Proceedings of the ICASSP, 2007.
+
+ACCEPTED MANUSCRIPT
+
+[190] D. Erro, A. Alonso, L. Serrano, E. Navas, and I. Hernaez. Interpretable parametric voice conversion functions based on gaussian mixture models and constrained transformations. Computer Speech & Language, 30(1):3–15, 2015.
+[191] D. Erro, T. Polyakova, and A. Moreno. On combining statistical methods and frequency warping for high-quality voice conversion. In Proceedings of the ICASSP, 2008.
+[192] X. Tian, Z. Wu, S. W. Lee, N. Q. Hy, M. Dong, and E. S. Chng. System fusion for high-performance voice conversion. In Proceedings of the INTERSPEECH, 2015.
+[193] X. Tian, Z. Wu, S. W. Lee, N. Q. Hy, E. S. Chng, and M. Dong. Sparse representation for frequency warping based voice conversion. In Proceedings of the ICASSP, 2015.
+[194] X. Tian, Z. Wu, S. Lee, and E. S. Chng. Correlationbased frequency warping for voice conversion. In Proceedings of the ISCSLP, pages 211–215. IEEE, 2014.
+[195] T. Nakashika, T. Takiguchi, and Y. Minami. Nonparallel training in voice conversion using an adaptive restricted boltzmann machine. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 24 (11):2032–2045, 2016.
+[196] N. Iwahashi and Y. Sagisaka. Speech spectrum transformation by speaker interpolation. In Proceedings of the ICASSP, volume 1, pages I–461. IEEE, 1994.
+[197] N. Iwahashi and Y. Sagisaka. Speech spectrum conversion based on speaker interpolation and multifunctional representation with weighting by radial basis function networks. Speech Communication, 16(2): 139–151, 1995.
+
+[203] D. Saito, K. Yamamoto, N. Minematsu, and K. Hirose. One-to-many voice conversion based on tensor representation of speaker space. In Proceedings of the INTERSPEECH, 2011.
+[204] Y. Ohtani, T. Toda, H. Saruwatari, and K. Shikano. Many-to-many eigenvoice conversion with reference voice. In Proceedings of the INTERSPEECH, 2009.
+[205] Y. Ohtani, T. Toda, H. Saruwatari, and K. Shikano. Non-parallel training for many-to-many eigenvoice conversion. In Proceedings of the ICASSP, 2010.
+[206] N. C. Pilkington, H. Zen, M. J. Gales, et al. Gaussian process experts for voice conversion. In Proceedings of the INTERSPEECH, 2011.
+[207] N. Xu, Y. Tang, J. Bao, A. Jiang, X. Liu, and Z. Yang. Voice conversion based on gaussian processes by coherent and asymmetric training with limited training data. Speech Communication, 58:124–138, 2014.
+[208] A. Rinscheid. Voice conversion based on topological feature maps and time-variant ﬁltering. In Proceedings of the ICSLP, 1996.
+[209] E. Uchino, K. Yano, and T. Azetsu. A self-organizing map with twin units capable of describing a nonlinear input–output relation applied to speech code vector mapping. Information Sciences, 177(21):4634–4644, 2007.
+[210] E. E. Helander and J. Nurminen. On the importance of pure prosody in the perception of speaker identity. In Proceedings of the INTERSPEECH, 2007.
+[211] E. Morley, E. Klabbers, J. P. van Santen, A. Kain, and S. H. Mohammadi. Synthetic f0 can eﬀectively convey speaker id in delexicalized speech. In Proceedings of the INTERSPEECH, 2012.
+
+23
+
+ACCEPTED MANUSCRIPT
+
+[212] D. T. Chappell and J. H. Hansen. Speaker-speciﬁc [226] O. Türk and L. M. Arslan. Voice conversion meth-
+
+pitch contour modeling and modiﬁcation. In Proceed-
+
+ods for vocal tract and pitch contour modiﬁcation. In
+
+ings of the ICASSP, 1998.
+
+Proceedings of the INTERSPEECH, 2003.
+
+ACCEPTED MANUSCRIPT
+
+[213] T. En-Najjary, O. Rosec, and T. Chonavel. A voice conversion method based on joint pitch and spectral envelope transformation. In Proceedings of the INTERSPEECH, 2004.
+[214] Z. Hanzlíček and J. Matoušek. F0 transformation within the voice conversion framework. In Proceedings of the INTERSPEECH, 2007.
+[215] F.-L. Xie, Y. Qian, F. K. Soong, and H. Li. Pitch transformation in neural network based voice conversion. In Proceedings of the ISCSLP, 2014.
+[216] T. En-Najjary, O. Rosec, and T. Chonavel. A new method for pitch prediction from spectral envelope and its application in voice conversion. In Proceedings of the INTERSPEECH, 2003.
+[217] Z. Wu, T. Kinnunen, E. Chng, and H. Li. Textindependent F0 transformation with non-parallel data for voice conversion. In Proceedings of the INTERSPEECH, 2010.
+[218] K. Yutani, Y. Uto, Y. Nankaku, A. Lee, and K. Tokuda. Voice conversion based on simultaneous modelling of spectrum and f0. In Proceedings of the ICASSP, 2009.
+[219] K. S. Rao, R. Laskar, and S. G. Koolagudi. Voice transformation by mapping the features at syllable level. In Pattern Recognition and Machine Intelligence, pages 479–486. Springer, 2007.
+[220] D. Lolive, N. Barbot, and O. Boeﬀard. Pitch and duration transformation with non-parallel data. In Proceedings of the Speech Prosody, 2008.
+[221] E. E. Helander and J. Nurminen. A novel method for prosody prediction in voice conversion. In Proceedings of the ICASSP, 2007.
+[222] C. Veaux and X. Rodet. Intonation conversion from neutral to expressive speech. In Proceedings of the INTERSPEECH, 2011.
+[223] G. Sanchez, H. Silen, J. Nurminen, and M. Gabbouj. Hierarchical modeling of f0 contours for voice conversion. In Proceedings of the INTERSPEECH, 2014.
+[224] A. S. Suni, D. Aalto, T. Raitio, P. Alku, M. Vainio, et al. Wavelets for intonation modeling in hmm speech synthesis. In Proceedings of the SSW, 2013.
+[225] Z. Inanoglu. Transforming pitch in a voice conversion framework. Master’s Thesis, St. Edmunds College, University of Cambridge, 2003.
+
+[227] B. Gillett and S. King. Transforming f0 contours. In Proceedings of the EUROSPEECH, 2003.
+[228] D. J. Patterson. linguistic approach to pitch range modelling. PhD thesis, Edinburgh University, 2000.
+[229] T. Ceyssens, W. Verhelst, and P. Wambacq. On the construction of a pitch conversion system. In Proceedings of the EUSIPCO, page 2002.
+[230] J. S. Garofolo, L. F. Lamel, W. M. Fisher, J. G. Fiscus, and D. S. Pallett. DARPA TIMIT acoustic-phonetic continous speech corpus cd-rom. nist speech disc 11.1. NASA STI/Recon Technical Report N, 93:27403, 1993.
+[231] J. Kominek and A. W. Black. The CMU arctic speech databases. In Proceedings of the SSW, 2004.
+[232] A. Wrench. The MOCHA-TIMIT articulatory database. Queen Margaret University College, 1999.
+[233] T. Toda, D. Saito, F. Villavicencio, J. Yamagishi, M. Wester, Z. Wu, L.-H. Chen, et al. The voice conversion challenge 2016. In Proceedings of the INTERSPEECH, 2016.
+[234] G. K. Anumanchipalli, K. Prahallad, and A. W. Black. Festvox: Tools for creation and analyses of large speech corpora. In Workshop on Very Large Scale Phonetics Research, UPenn, Philadelphia, 2011.
+[235] O. Turk and L. M. Arslan. Donor selection for voice conversion. In Proceedings of the EUSIPCO, 2005.
+[236] M. Hashimoto and N. Higuchi. Training data selection for voice conversion using speaker selection and vector ﬁeld smoothing. In Proceedings of the ICSLP, 1996.
+[237] D. Sündermann. Voice conversion: State-of-the-art and future work. Fortschritte der Akustik, 31(2):735, 2005.
+[238] A. W. Rix, J. G. Beerends, M. P. Hollier, and A. P. Hekstra. Perceptual evaluation of speech quality (PESQ)-a new method for speech quality assessment of telephone networks and codecs. In Proceedings of the ICASSP, 2001.
+[239] D.-Y. Huang, L. Xie, Y. Siu, W. Lee, J. Wu, H. Ming, X. Tian, S. Zhang, C. Ding, M. Li, Q. H. Nguyen, M. Dong, and H. Li. An automatic voice conversion evaluation strategy based on perceptual background noise distortion and speaker similarity. In Proceedings of the SSW, 2016.
+
+24
+
+ACCEPTED MANUSCRIPT
+
+[240] D. Sündermann, H. Höge, A. Bonafonte, H. Ney, and J. Hirschberg. TC-Star: Cross-language voice conversion revisited. In TC-Star Workshop. TC-Star Workshop, 2006.
+
+[254] E. Godoy, M. Koutsogiannaki, and Y. Stylianou. Assessing the intelligibility impact of vowel space expansion via clear speech-inspired frequency warping. In Proceedings of the INTERSPEECH, 2013.
+
+ACCEPTED MANUSCRIPT
+
+[241] A. F. Machado and M. Queiroz. Voice conversion: A critical survey. Proceedings of the SMC, 2010.
+[242] M. Wester, Z. Wu, and J. Yamagishi. Analysis of the voice conversion challenge 2016 evaluation results. In Proceedings of the INTERSPEECH, 2016.
+[243] M. Wester, Z. Wu, and J. Yamagishi. Multidimensional scaling of systems in the voice conversion challenge 2016. In Proceedings of the SSW, 2016.
+[244] D. Childers, B. Yegnanarayana, and K. Wu. Voice conversion: Factors responsible for quality. In Proceedings of the ICASSP, 1985.
+[245] O. Turk, O. Buyuk, A. Haznedaroglu, and L. M. Arslan. Application of voice conversion for crosslanguage rap singing transformation. In Proceedings of the ICASSP, 2009.
+[246] F. Villavicencio and J. Bonada. Applying voice conversion to concatenative singing-voice synthesis. In Proceedings of the INTERSPEECH, 2010.
+
+[255] S. Aryal, D. Felps, and R. Gutierrez-Osuna. Foreign accent conversion through voice morphing. In Proceedings of the INTERSPEECH, 2013.
+[256] T. Pongkittiphan. Eigenvoice-based character conversion and its evaluations. Master’s thesis, The University of Tokyo, 2012.
+[257] J. Tao, Y. Kang, and A. Li. Prosody conversion from neutral speech to emotional speech. IEEE Transactions on Audio, Speech, and Language Processing, 14 (4):1145–1154, 2006.
+[258] Y. Kang, J. Tao, and B. Xu. Applying pitch target model to convert f0 contour for expressive mandarin speech synthesis. In Proceedings of the ICASSP, 2006.
+[259] Z. Inanoglu and S. Young. A system for transforming the emotion in speech: combining data-driven conversion techniques for prosody and voice quality. In Proceedings of the INTERSPEECH, pages 490–493, 2007.
+
+[247] H. Doi, T. Toda, T. Nakano, M. Goto, and S. Nakamura. Singing voice conversion method based on many-to-many eigenvoice conversion and training data generation using a singing-to-singing synthesis system. In Proceedings of the APSIPA, 2012.
+
+[260] R. Barra, J. M. Montero, J. Macias-Guarasa, J. Gutiérrez-Arriola, J. Ferreiros, and J. M. Pardo. On the limitations of voice conversion techniques in emotion identiﬁcation tasks. In Proceedings of the INTERSPEECH, 2007.
+
+[248] K. Kobayashi, H. Doi, T. Toda, T. Nakano, M. Goto, G. Neubig, S. Sakti, and S. Nakamura. An investigation of acoustic features for singing voice conversion based on perceptual age. In Proceedings of the INTERSPEECH, 2013.
+[249] C.-C. Hsia, C.-H. Wu, and T.-H. Liu. Durationembedded bi-HMM for expressive voice conversion. In Proceedings of the INTERSPEECH, 2005.
+[250] C.-C. Hsia, C.-H. Wu, and J.-Q. Wu. Conversion function clustering and selection using linguistic and spectral information for emotional voice conversion. IEEE Transactions on Computers, 56(9):1245–1254, 2007.
+[251] F. Tesser, E. Zovato, M. Nicolao, and P. Cosi. Two vocoder techniques for neutral to emotional timbre conversion. In Proceedings of the SSW, 2010.
+[252] B. Li, Z. Xiao, Y. Shen, Q. Zhou, and Z. Tao. Emotional speech conversion based on spectrum-prosody dual transformation. In Proceedings of the ICSP, 2012.
+
+[261] M. Wang, M. Wen, K. Hirose, and N. Minematsu. Emotional voice conversion for mandarin using tone nucleus model–small corpus and high eﬃciency. In Proceedings of the Speech Prosody, 2012.
+[262] Z. Wang and Y. Yu. Multi-level prosody and spectrum conversion for emotional speech synthesis. In Proceedings of the ICSP, 2014.
+[263] A. Kain and M. W. Macon. Text-to-speech voice adaptation from sparse training data. In Proceedings of the ICSLP, 1998.
+[264] H. Duxans. Voice Conversion applied to Text-toSpeech systems. PhD thesis, Universitat Politecnica de Catalunya, Barcelona, Spain, 2006.
+[265] O. Türk and M. Schröder. A comparison of voice conversion methods for transforming voice quality in emotional speech synthesis. In Proceedings of the INTERSPEECH, 2008.
+
+[253] S. H. Mohammadi, A. Kain, and J. P. van Santen. [266] Z. Inanoglu and S. Young. Data-driven emotion con-
+
+Making conversational vowels more clear. In Proceed-
+
+version in spoken english. Speech Communication, 51
+
+ings of the INTERSPEECH, 2012.
+
+(3):268–283, 2009.
+
+25
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[267] O. Turk and M. Schroder. Evaluation of expressive speech synthesis with voice conversion and copy resynthesis techniques. IEEE Transactions on Audio, Speech, and Language Processing, 18(5):965–973, 2010.
+[268] J. Latorre, V. Wan, and K. Yanagisawa. Voice expression conversion with factorised HMM-TTS models. In Proceedings of the INTERSPEECH, 2014.
+[269] W. Wahlster. Verbmobil: foundations of speech-tospeech translation. Springer Science & Business Media, 2000.
+[270] A. Bonafonte, H. Höge, I. Kiss, A. Moreno, U. Ziegenhain, H. van den Heuvel, H.-U. Hain, X. S. Wang, and M.-N. Garcia. TC-STAR: Speciﬁcations of language resources and evaluation for speech synthesis. In Proceedings of the LREC, 2006.
+[271] J. Nurminen, V. Popa, J. Tian, Y. Tang, and I. Kiss. A parametric approach for voice conversion. In TCSTAR WSST, pages 225–229, 2006.
+[272] B. L. Pellom and J. H. Hansen. An experimental study of speaker veriﬁcation sensitivity to computer voicealtered imposters. In Proceedings of the ICASSP, 1999.
+[273] F. Alegre, A. Amehraye, and N. Evans. Spooﬁng countermeasures to protect automatic speaker veriﬁcation from voice conversion. In Proceedings of the ICASSP, 2013.
+[274] Z. Wu, A. Larcher, K.-A. Lee, E. Chng, T. Kinnunen, and H. Li. Vulnerability evaluation of speaker veriﬁcation under voice conversion spooﬁng: the eﬀect of text constraints. In Proceedings of the INTERSPEECH, 2013.
+[275] M. J. R. F. Correia. Anti-spooﬁng: Speaker veriﬁcation vs. voice conversion. Master’s Thesis, Instituto Superior Técnico, 2014.
+[276] Z. Wu and H. Li. Voice conversion versus speaker veriﬁcation: an overview. APSIPA Transactions on Signal and Information Processing, 3:e17, 2014.
+[277] D. Hironori, K. Nakamura, T. Tomoki, H. Saruwatari, and K. Shikano. Esophageal speech enhancement based on statistical voice conversion with gaussian mixture models. IEICE TRANSACTIONS on Information and Systems, 93(9):2472–2482, 2010.
+[278] T. Toda, M. Nakagiri, and K. Shikano. Statistical voice conversion techniques for body-conducted unvoiced speech enhancement. IEEE Transactions on Audio, Speech, and Language Processing, 20(9): 2505–2517, 2012.
+
+[279] J. Yamagishi, C. Veaux, S. King, and S. Renals. Speech synthesis technologies for individuals with vocal disabilities: Voice banking and reconstruction. Acoustical Science and Technology, 33(1):1–5, 2012.
+[280] R. Aihara, R. Takashima, T. Takiguchi, and Y. Ariki. Individuality-preserving voice conversion for articulation disorders based on non-negative matrix factorization. In Proceedings of the ICASSP, 2013.
+[281] K. Tanaka, T. Toda, G. Neubig, S. Sakti, and S. Nakamura. A hybrid approach to electrolaryngeal speech enhancement based on spectral subtraction and statistical voice conversion. In Proceedings of the INTERSPEECH, 2013.
+[282] T. Toda, K. Nakamura, H. Saruwatari, K. Shikano, et al. Alaryngeal speech enhancement based on oneto-many eigenvoice conversion. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 22 (1):172–183, 2014.
+[283] A. Kain and J. Van Santen. Using speech transformation to increase speech intelligibility for the hearingand speaking-impaired. In Proceedings of the ICASSP, 2009.
+[284] N. Bi and Y. Qi. Application of speech conversion to alaryngeal speech enhancement. IEEE Transactions on Speech and Audio Processing, 5(2):97–105, 1997.
+[285] K. Nakamura, T. Toda, H. Saruwatari, and K. Shikano. A speech communication aid system for total laryngectomies using voice conversion of body transmitted artiﬁcial speech. The Journal of the Acoustical Society of America, 120(5):3351–3351, 2006.
+[286] K. Nakamura, T. Toda, H. Saruwatari, and K. Shikano. Speaking-aid systems using gmm-based voice conversion for electrolaryngeal speech. Speech Communication, 54(1):134–146, 2012.
+[287] M. Koutsogiannaki and Y. Stylianou. Simple and artefact-free spectral modiﬁcations for enhancing the intelligibility of casual speech. In Proceedings of the ICASSP, 2014.
+[288] E. Godoy, M. Koutsogiannaki, and Y. Stylianou. Approaching speech intelligibility enhancement with inspiration from lombard and clear speaking styles. Computer Speech & Language, 28(2):629–647, 2014.
+[289] T. Toda and K. Shikano. NAM-to-speech conversion with gaussian mixture models. In Proceedings of the INTERSPEECH, 2005.
+[290] M. Nakagiri, T. Toda, H. Kashioka, and K. Shikano. Improving body transmitted unvoiced speech with statistical voice conversion. In Proceedings of the INTERSPEECH, 2006.
+
+26
+
+ACCEPTED MANUSCRIPT
+
+ACCEPTED MANUSCRIPT
+
+[291] R. W. Morris and M. A. Clements. Reconstruction of speech from whispers. Medical Engineering & Physics, 24(7):515–520, 2002.
+[292] V.-A. Tran, G. Bailly, H. Lœvenbruck, and T. Toda. Improvement to a nam-captured whisper-to-speech system. Speech communication, 52(4):314–326, 2010.
+[293] K.-Y. Park and H. S. Kim. Narrowband to wideband conversion of speech using gmm based transformation. In Proceedings of the ICASSP, 2000.
+[294] A. Mouchtaris, J. Van der Spiegel, and P. Mueller. A spectral conversion approach to the iterative wiener ﬁlter for speech enhancement. In Proceedings of the ICME, 2004.
+[295] Z.-H. Ling, S.-Y. Kang, H. Zen, A. Senior, M. Schuster, X.-J. Qian, H. M. Meng, and L. Deng. Deep learning for acoustic modeling in parametric speech generation: A systematic review of existing techniques and future trends. Signal Processing Magazine, IEEE, 32 (3):35–52, 2015.
+[296] K. Tokuda and H. Zen. Directly modeling speech waveforms by neural networks for statistical parametric speech synthesis. In Proceedings of the ICASSP, 2015.
+[297] K. Kobayashi, T. Toda, G. Neubig, S. Sakti, and S. Nakamura. Statistical singing voice conversion based on direct waveform modiﬁcation with global variance. In Proceedings of the INTERSPEECH, 2015.
+
+[299] M. S. E. Langarani and J. van Santen. Speaker intonation adaptation for transforming text-to-speech synthesis speaker identity. In Proceedings of the ASRU, 2015.
+[300] A. Kumar and A. Verma. Using phone and diphone based acoustic models for voice conversion: a step towards creating voice fonts. In Proceedings of the ICME, 2003.
+[301] A. Verma and A. Kumar. Voice fonts for individuality representation and transformation. ACM Transactions on Speech and Language Processing (TSLP), 2 (1):4, 2005.
+[302] L. Mesbahi, V. Barreaud, and O. Boeﬀard. Gmmbased speech transformation systems under data reduction. In Proceedings of the SSW, 2007.
+[303] E. Helander, J. Nurminen, and M. Gabbouj. Lsf mapping for voice conversion with very small training sets. In Proceedings of the ICASSP, 2008.
+[304] M. Ghorbandoost, A. Sayadiyan, M. Ahangar, H. Sheikhzadeh, A. S. Shahrebabaki, and J. Amini. Voice conversion based on feature combination with limited training data. Speech Communication, 67: 113–128, 2015.
+[305] T. Toda, A. W. Black, and K. Tokuda. Acoustic-toarticulatory inversion mapping with gaussian mixture model. In Proceedings of the INTERSPEECH, 2004.
+
+[298] B. Fan, S. W. Lee, X. Tian, L. Xie, and M. Dong. A waveform representation framework for high-quality statistical parametric speech synthesis. arXiv preprint arXiv:1510.01443, 2015.
+
+[306] T. Toda, A. W. Black, and K. Tokuda. Statistical mapping between articulatory movements and acoustic spectrum using a gaussian mixture model. Speech Communication, 50(3):215–227, 2008.
+
+27
+

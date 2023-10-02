@@ -1,0 +1,196 @@
+
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (183)
+    Cited by (142)
+    Recommended articles (6) 
+
+Elsevier
+Computer Networks
+Volume 53, Issue 12 , 13 August 2009, Pages 2050-2090
+Computer Networks
+VoIP: A comprehensive survey on a promising technology
+Author links open overlay panel Stylianos Karapantazis , Fotini-Niovi Pavlidou
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.comnet.2009.03.010 Get rights and content
+Abstract
+
+The Internet has burgeoned into a worldwide information superhighway during the past few years, giving rise to a host of new applications and services. Among them, Voice over IP (VoIP) is the most prominent one. Beginning more as a frolic among computer enthusiasts, VoIP has set off a feeding frenzy in both the industrial and scientific communities and has the potential to radically change telephone communications. In this article, we survey all these aspects that have the greatest impact on the quality of voice communications over IP networks. The survey begins with the merits and demerits of VoIP, followed by the Quality of Service (QoS) requirements that voice imposes and a description of test methods for the assessment of speech quality. We then proceed with a delineation of the issues related to the conversion of analog voice to packets, namely we spell out the details of the most well-known voice codecs, while light is also thrown on voice activity detection and voice packetization. Header compression schemes receive intense scrutiny as well. We also provide an overview of the signaling protocols that are tailored to the needs of VoIP, and we continue with the comparison of the call admission schemes that are geared towards the QoS constraints of VoIP. The pivotal issue of security is then discussed, pointing out potential threats as well as approaches for tackling them. Finally, the survey concludes with a discussion on the feasibility of providing VoIP over challenging satellite links.
+Introduction
+
+The Internet has burgeoned into a worldwide information superhighway during the past few years and wrought significant changes in the telecommunications arena. This unprecedented growth motivated the development of innovative applications with high bandwidth and low end-to-end delay requirements. One of the applications that thrived is Voice over IP (VoIP). VoIP, also known as IP or Internet telephony, is the technology that enables people to use the Internet as the transmission medium for voice communications. Beginning as a frolic among computer enthusiasts, VoIP has set off a feeding frenzy in both the industrial and scientific communities. Since its inception, huge strides have been made and now VoIP enjoys widespread popularity as an alternative to traditional telephony in homes and enterprises.
+
+VoIP has the potential to revolutionize telephone communications. The trend toward voice communications over the Internet is mainly fuelled by the salient advantages Internet telephony offers. VoIP opens up exciting possibilities for users. In particular, it paved the way for monetary savings. It is cheaper for end-users to make an Internet telephone call than a circuit-switched call since most VoIP providers offer affordable long distance and international calling. Moreover, a significant amount of money can be saved on the monthly phone service considering that IP telephony service is less expensive than the traditional phone service. In addition, VoIP offers service flexibility since there are no dependencies between the application and the underlying network. VoIP users can already enjoy a variety of features, which they previously had to pay for, for free. Some of these features are voicemail, caller ID, call conferencing, call waiting and call forwarding. This kind of users can also enjoy some new features like e-mailed voicemail and the easy management of contacts. Moreover, new services will commence to flourish as the market matures that will break the shackles of the Public Switched Telephone Network (PSTN) for voice services. One service that is expected to catch on is voice e-mail. Another key asset of IP telephony is flexibility. A user can move the IP Phone wherever he/she needs and still keep the same phone number. In addition, this technology offers a big step forward in available features and functions and allows end-users to control different media and different types of terminals from their Web browsers. Users will be able to set up conference calls from their homes, check the state of their accounts at any time and so on.
+
+Several compelling reasons also impelled service providers to consider providing voice communications over the Internet. First and foremost, VoIP promises them new revenue sources. Further, new operators can capitalize upon this technology since it gives them an easy and cost-efficient way to compete with incumbent operators by undercutting their pricing regimes, while avoiding the regulatory hindrance to standard voice provision. From an engineering viewpoint, VoIP also holds considerable appeal because it gives carriers the ability to manage a single network that supports both voice and data.
+
+Notwithstanding the aforementioned advantages, several issues must be accounted for while designing a VoIP system. VoIP is sometimes likened to mobile telephony because they both present some clear advantages over voice communications over PSTN. Mobile networks provide mobility and flexibility, whereas VoIP has an edge in cost savings. Moreover, VoIP performance is on a par with the performance of mobile cellular systems. On this account, there are some circumstances where the quality is considered acceptable. However, several strides remain to be made in order for VoIP to match the performance of the well-engineered PSTN. A laudable aim is to provide the same level of quality as PSTN does.
+
+In this paper, rather than glossing over this promising technology, we aim to shed light to all these aspects that have the greatest bearing on voice quality (Fig. 1). We begin our survey with a reference to the Quality of Service (QoS) requirements that VoIP imposes, followed by a description of how certain performance metrics affect speech quality. Remedies are discussed as well. Before elaborating upon the factors that affect the performance of a VoIP system, we also spell out several test methods that have been devised to gage voice quality. Then, a plethora of voice codecs are delineated and their performance disparities are accentuated, along with all the aspects that should be contemplated before opting for a codec. Closely related to the selection of voice codecs are also the issues of silence suppression and voice packetization. Thus, we touch upon them as well. Another issue that receives intense scrutiny in our study is header compression techniques. Header compression techniques are the stepping stone to efficient bandwidth utilization. All the compression schemes that have been proposed thus far are compared against each other in order to come up with the most efficacious one.
+
+Next we turn our attention to signaling protocols. Signaling protocols lay the foundations for high-quality voice communications since they are responsible for establishing and tearing down calls. We describe the salient features of all the well-known protocols with a view to listing their pros and cons. Moreover, we touch on the way Skype works, albeit information about Skype’s signaling protocol is hard to procure. We also cast light to the way VoIP systems interface with PSTN. Next, we lay particular emphasis on an aspect that has often been considered as the downside of VoIP, that is, end-to-end QoS. Development of end-to-end QoS presents numerous challenges and is contingent upon the ability of the underlying network to provide differentiated QoS to various applications and users. Our attention is drawn towards call admission control (CAC) techniques. CAC and QoS are inextricably interwoven. A plurality of CAC techniques can be found in the literature. We describe all the schemes that are geared towards VoIP and some important conclusions are drawn. The next issue that we treat in this survey is security of VoIP networks. It is beyond the realms of possibility that a system will not experience malicious attacks that will aim to impair its performance. Contrary to the PSTN, VoIP systems are exposed to a number of threats. We first analyze the potential threats and then discuss several approaches on how to protect a VoIP network. We also dwell on the impact of security measures on QoS. Last but not least, we conclude this survey with a discussion on the feasibility of providing VoIP over satellite links. Next generation telecommunications systems can be viewed as an ultimate amalgamation of all existing and emerging fixed and mobile systems. In this context, satellite systems will be called to support Internet telephony and we aim to cast light on the main problems that arise in this case.
+Section snippets
+QoS requirements of voice
+
+Owing to advancement in technology over the years, traditional voice communication over the PSTN is characterized by high quality, often referred to as toll quality. When it comes to VoIP, stringent QoS constraints must be met in order to provide the same level of quality. Three are the main performance indicators that characterize the quality of voice communications over the Internet. The first one is average end-to-end delay, also referred to as one-way delay or mouth-to-ear delay. It is the
+Quality assessment
+
+Since the current Internet was not designed to transport voice traffic, an important aspect in VoIP communications is the assessment of voice quality. It is imperative that new voice services undergo a significant amount of testing to evaluate their performance. In this section we outline the test methods that are geared towards the evaluation of VoIP systems.
+
+Testing methods can be classified into subjective and objective tests [7], [11]. Subjective methods rely on the opinion of a panel of
+Voice codecs
+
+Since the early days of networking bandwidth has been considered a resource at a premium. Therefore, significant efforts have been drawn towards the minimization of the amount of bandwidth required by specific services in order for the network to be able to serve a greater number of users. In this context, compressing voice signals while keeping the quality perceived by users at acceptable levels represents a daunting challenge. This section is devoted to the methods that either are currently
+Voice Activity Detection
+
+The Voice Activity Detection (VAD) technique stops sending data when there is no voice signal. This can normally achieve a 30–35% saving of the bandwidth, and can be implemented either directly into the codec or at the voice concentrator. However, the variety and the varying nature of speech and background noise makes VAD a daunting challenge. Real speech is distorted by background noise, especially in distant-talking situations. Inaccurate detection of the speech periods causes deterioration
+Packetization efficiency
+
+Related to the problem of choosing the most appropriate codec is also the question of how much speech can be placed in an IP packet. Voice is loss-tolerant and delay sensitive, therefore voice is carried over the User Datagram Protocol (UDP). In addition, since VoIP applications are real-time, the Real-Time Transport Protocol (RTP) runs on top of UDP [55]. On the one hand, sending small packets is inefficient due to the increased header overhead. On the other hand, large packets lead to long
+Header compression
+
+As mentioned earlier, in applications such as VoIP the payload of the IP packet is roughly of the same size or even smaller than the headers. Even though these headers are important over the end-to-end path, they serve no significant purpose over just one link. Thus, it is possible to compress them in order to utilize bandwidth more efficiently.
+
+The information carried in each header is necessary for a successful communication of applications over long paths comprising multiple links. This
+Signaling protocols
+
+For the establishment of telephone calls over the Internet, a signaling protocol is of paramount importance because it enables network components to communicate with each other, set up and tear down calls. In the case of IP telephony, a call can be defined as the multimedia session between two or more participants, while signaling associated with a call is referred to as a connection. The role of a signaling protocol can be broken down into four functions:
+
+    –
+
+    User location: The caller first has to
+
+QoS via call admission control
+
+The advent of IP networks has given service providers tremendous opportunity to offer both traditional services and a range of new services. However, providers need to find incentives for users to use and pay for these services. In this context, QoS represents an issue of utmost importance. VoIP poses substantial challenges, the most important one being perhaps resource management. As befits a subject of such importance, Call Admission Control (CAC) techniques for VoIP have been the subject of
+Security
+
+While most of the technical hurdles appear to have been overcome, security still constitutes a major concern. Security hinges on allowing only authorized users to make calls as well as ensuring that the content of a conversation is not eavesdropped. VoIP brought a new set of protocols that expose the network to the whim of technically savvy users. Several groups have pointed out several design and implementation flaws in VoIP’s building blocks. In the following section we provide a cursory
+VoIP over satellite links
+
+So far we have surveyed many different areas of VoIP systems. Although the presentation was made in a general context, usually when one refers to VoIP, terrestrial systems spring to mind. This section aims to shed light to the potential of providing VoIP over satellite links. Fourth generation (4G) systems can be viewed as an ultimate amalgamation of existing and wireless fixed and mobile systems. Satellite systems can be instrumental in this future network infrastructure beyond any doubt,
+Conclusions and future perspectives
+
+Users and service providers are lured by the voices that praise countless benefits and new business opportunities, but can VoIP compete with traditional telephony systems? Albeit there is no clear-cut answer to this trite question, it is indisputable that Internet telephony is endowed with some outstanding characteristics and has the potential to revolutionize telephone communications. VoIP nowadays enjoys the fruits of labors during the past few years and it can be considered a mature
+Acknowledgement
+
+This work was supported by the IST FP6 VIVALDI project “Advancing interactive Broadband satellite access by optimal convergence of session based services over DVB-RCS” (FP6-2004-IST-4).
+
+Stylianos Karapantazis received a Diploma (in 2003) and a Ph.D. degree (in 2007) in Electrical and Computer Engineering from the Aristotle University of Thessaloniki, where he is currently a researcher. His interests lie in the fields of radio resource management and Multicast/Broadcast protocols for High Altitude Platforms (HAPs), call admission control, handover management and routing in satellite networks, as well as traffic management and header compression for Voice over IP (VoIP)
+References (183)
+
+    L. Zhang et al.
+    Effect of delay and delay jitter on voice/video over IP
+    Comput. Commun.
+    (2002)
+    D. Houck et al.
+    Call admission control and load balancing for voice over IP
+    Perform. Eval.
+    (2002)
+    T. Uhl
+    Quality of service in VoIP communication
+    Int. J. Electron. Commun.
+    (2004)
+    E. Altman et al.
+    Queuing analysis of simple FEC schemes for voice over IP
+    Comput. Network
+    (2002)
+    F. Wang et al.
+    Using differentiated services to support internet telephony
+    Comput. Commun.
+    (2001)
+    ITU-R Recommendation G.114, General Characteristics of International Telephone Connections and International Telephone...
+    ETSI TIPHON, End-to-End Quality of Service in TIPHON Systems; Part 2: Definition of Quality of Service (QoS) Classes,...
+    M.J. Karam, F.A. Tobagi, Analysis of the delay and jitter of voice traffic over the internet, in: Proceedings of the...
+    ETSI DTR/TIPHON-05001, Telecommunications and Internet Protocol Harmonization Over Networks (TIPHON); General Aspects...
+    L. Zheng, L. Zhang, D. Xu, Characteristics of network delay and delay jitter and its effect over IP (VoIP), in:... 
+
+View more references
+Cited by (142)
+
+    CO-CAC: A new approach to Call Admission Control for VoIP in 5G/WiFi UAV-based relay networks
+    2023, Computer Communications
+    Citation Excerpt :
+
+    Similarly, modern cellular networks have also been migrating to VoIP since UMTS (3G). In comparison with traditional voice calls, ensuring QoS in VoIP networks is challenging due to the best effort service of IP and the strict bounds in network delay, packet loss and jitter required by VoIP [41–43]. Thus, telco operators used dedicated bandwidth and traffic prioritization in their well-provisioned IP transport networks to guarantee an adequate QoS level.
+    Show abstract
+
+    We have simulated CO-CAC in a 50 m   50 m scenario with four UAVs providing VoIP service to up to 200 ground users with IEEE 802.11ac WiFi terminals. Our results show that without CAC, the number of calls that did not meet a minimum quality level during the simulation was 10% and 90%, for 50 and 200 users, respectively. However, when CO-CAC was in place, all calls achieved minimum quality for up to 90 users without rejecting any call. For 200 users, only 25% of call attempts were rejected by the admission control scheme. These results were narrowly worse when the ground users moved randomly in the scenario.
+    Deployment of UAV-mounted Access Points for VoWiFi Service with guaranteed QoS
+    2022, Computer Communications
+    Show abstract
+    Unified call admission control in corporate domains
+    2020, Computer Communications
+    Show abstract
+    Telephony speech system performance based on the codec effect
+    2023, Annales des Telecommunications/Annals of Telecommunications
+    MFCCGAN: A Novel MFCC-Based Speech Synthesizer Using Adversarial Learning
+    2023, arXiv
+    Performance Improvement for VOIP Based Systems
+    2023, Research Square
+
+View all citing articles on Scopus
+Recommended articles (6)
+
+    Research article
+    Optimal layered representation for adaptive interactive multiview video streaming
+    Journal of Visual Communication and Image Representation, Volume 33, 2015, pp. 255-264
+    Show abstract
+    Research article
+    Moving measurements: Measuring network characteristics of mobile cellular networks on the move
+    Computer Communications, Volume 97, 2017, pp. 81-95
+    Show abstract
+    Research article
+    Steganalysis of adaptive multi-rate speech streams with distributed representations of codewords
+    Journal of Information Security and Applications, Volume 68, 2022, Article 103250
+    Show abstract
+    Research article
+    Learning to Win in Evolutionary Two-person Boolean Game with Fixed Strategy Updating Rule
+    IFAC-PapersOnLine, Volume 48, Issue 28, 2015, pp. 520-525
+    Show abstract
+    Research article
+    MFPD-LSTM: A steganalysis method based on multiple features of pitch delay using RNN-LSTM
+    Journal of Information Security and Applications, Volume 74, 2023, Article 103469
+    Show abstract
+    Research article
+    Preface
+    Procedia Computer Science, Volume 128, 2018, p. iv
+
+Stylianos Karapantazis received a Diploma (in 2003) and a Ph.D. degree (in 2007) in Electrical and Computer Engineering from the Aristotle University of Thessaloniki, where he is currently a researcher. His interests lie in the fields of radio resource management and Multicast/Broadcast protocols for High Altitude Platforms (HAPs), call admission control, handover management and routing in satellite networks, as well as traffic management and header compression for Voice over IP (VoIP) networks. He has served as a reviewer in several journals and conferences. He has been involved in several projects supported by the Greek General Secretariat for Research and Development as well as in European projects in regard to HAP and satellite communications.
+
+Fotini-Niovi Pavlidou received the Ph.D. degree in Telecommunications Networks (1988) and the Diploma in Mechanical/Electrical Engineering (1979) from the Aristotle University of Thessaloniki (AUTh), Greece, where she is currently a Professor engaged in teaching and research. Her interests include traffic analysis and design of wireless networks, performance evaluation and QoS, multimedia applications over the Internet, satellite and high altitude platforms, etc. She has been the Delegate of Greece in the European COST Program on Telecommunications (1998–2006) and served as Chairperson for the COST262 Action “Spread Spectrum systems and techniques for wired and wireless System”. She is involved in many European Research and Educational Projects (Telematics, Tempus, ACTS, IST FP5, IST FP6, etc.). She is a Senior Member of IEEE currently chairing the Joint VTS & AES Greece Chapter. She has also served as the Chairperson of the several International conferences. Furthermore, she currently serves as Editor for the JCN (Journal of Communications Networks) and Wireless Personal Communications journals and has served in the editorial board of many special issues.
+View full text
+Copyright © 2009 Elsevier B.V. All rights reserved.
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

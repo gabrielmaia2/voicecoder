@@ -1,0 +1,313 @@
+Interspeech 2018 2-6 September 2018, Hyderabad
+
+Joint Learning using Denoising Variational Autoencoders for Voice Activity Detection
+Youngmoon Jung, Younggwan Kim, Yeunju Choi, Hoirin Kim School of Electrical Engineering, KAIST, Daejeon, South Korea
+{dudans,cleanthink,wkadldppdy,hoirkim}@kaist.ac.kr
+
+Abstract
+Voice activity detection (VAD) is a challenging task in very low signal-to-noise ratio (SNR) environments. To address this issue, a promising approach is to map noisy speech features to corresponding clean features and to perform VAD using the generated clean features. This can be implemented by concatenating a speech enhancement (SE) and a VAD network, whose parameters are jointly updated. In this paper, we propose denoising variational autoencoder-based (DVAE) speech enhancement in the joint learning framework. Moreover, we feed not only the enhanced feature but also the latent code from the DVAE into the VAD network. We show that the proposed joint learning approach outperforms conventional denoising autoencoder-based joint learning approach. Index Terms: voice activity detection, speech enhancement, joint learning, joint training, denoising variational autoencoders
+1. Introduction
+Voice activity detection (VAD), the process of classifying a frame into speech or non-speech, is an important module in many speech applications such as speech coding, automatic speech recognition (ASR), speech enhancement (SE), speaker recognition, and speaker diarization.
+Most of the early VAD approaches were based on raw acoustic features, including time domain energy, pitch, and zero-crossing rate. Another type of conventional VAD methods is a statistical model-based approach in which the distributions of speech and noise frames are modeled by Gaussian distributions in discrete Fourier transform (DFT) domain and the likelihood ratio is used to decide whether a frame is speech or non-speech [1]. Later, machine learning-based methods, such as support vector machine (SVM) and hidden Markov model (HMM) were applied for VAD. Recently, deep learning architectures, such as fully connected deep neural networks (DNNs) [2], convolutional neural networks (CNNs) [3] and Long Short-Term Memory (LSTM) recurrent neural networks [4] have achieved tremendous success in VAD, which have become popular for VAD modeling.
+Despite the ongoing development over the years, VAD is still challenging in very low signal-to-noise ratio (SNR). To improve the robustness against noisy environments, we employ a joint learning method for VAD. The joint learning of a speech enhancement and a voice activity detection DNN was ﬁrst introduced in [5] which shows that the joint learning approach yields better results for VAD. This approach was motivated by several previous works for noise robust speech recognition [6, 7, 8].
+In this work, we extend the existing joint learning method in three ways: Firstly, we employ batch normalization [9] to reduce the internal covariate shift during training. In [10], it is already proven that the batch normalization is effective in reducing the internal covariate shift for the joint learning approach in
+
+speech recognition tasks. We show that this is also true for VAD tasks. Secondly, the parameter updates of the SE network depend not only on the SE cost function but also on the VAD cost function, which is motivated by [10]. Because of this, the frontend is able to provide enhanced features which is more suitable for the subsequent VAD task. Finally, we apply a denoising variational autoencoder (DVAE) for speech enhancement. The DVAE maps noisy features to a latent code and then reconstructs clean features by decoding the latent code. We feed not only the enhanced feature but also the latent code into the VAD network. Experimental results show that the proposed approach outperforms the conventional joint learning-based method.
+The rest of this paper is organized as follows. Section 2 describes the variational autoencoder (VAE) and the proposed architecture. Section 3 introduces our joint learning approach. The experimental setup is described in Section 4. The results and analysis are provided in Section 5. We conclude this work in Section 6.
+2. Model
+2.1. Variational Autoencoder The variational autoencoder (VAE) [11] is a latent variable generative model, which couples the approach of variational inference with deep learning. Here the latent variable generative model pθ(x|z) (also called decoder) for observed variable x is parametrized by a deep neural network with parameters θ. An inference model qφ(z|x) (also called encoder) is parametrized by a second deep neural network with parameters φ. A latent variable z is deﬁned to embed the compressed information of the data x, and the encoder maps a data space into its corresponding latent space. The decoder reconstructs the data from a sample point in the latent space. The parameters, θ and φ, are jointly learned by maximizing the variational lower bound L(θ, φ; x) of the log marginal likelihood with
+log pθ(x) = DKL(qφ(z|x)||pθ(z|x)) + L(θ, φ; x) ≥ L(θ, φ; x) = −DKL(qφ(z|x)||p(z)) + Eqφ(z|x)[log(pθ(x|z)] (1)
+In the VAE framework of this paper, both the encoder and the decoder are parametrized using diagonal Gaussian distributions, which are qφ(z|x) = N (z; µz, σz2I) and pθ(x|z) = N (x; µx, σx2 I), respectively. The prior is assumed to be an isotropic Gaussian distribution p(z) = N (z; 0, I) that lacks free parameters.
+To yield a differentiable network after sampling, we use the reparameterization trick in which the random variable z ∼ qφ(z|x) is reparametrized as a deterministic variable z = µz + σz , where denotes an element-wise product and an (auxiliary) noise variable is sampled from N (0, I). Modelling the
+
+1210
+
+10.21437/Interspeech.2018-1151
+
+VAD
+
+𝒚𝒑𝒓𝒆𝒅
+
+𝒚𝒑𝒓𝒆𝒅
+
+𝒚𝒑𝒓𝒆𝒅
+
+SE
+
+Hidden layers (ReLU, BN, dropout)
+Encoder
+
+Hidden layers (ReLU, BN, dropout)
+Decoder
+
+Figure 1: The denoising variational autoencoder architecture for speech enhancement (SE-DVAE).
+
+latent variable in this way allows the KL divergence in (1) to be integrated analytically, resulting in the following estimator:
+
+L(θ, φ; x)
+
+J
+(1 + log(σz2j ) − µ2zj − σz2j )
+j=1
+
+−
+
+D i=1
+
+1 2
+
+log(σx2i )
+
++
+
+(xi − µxi )2 2σx2i
+
+(2)
+
+where J and D are the dimensionalities of z and x, respectively,
+
+and xi is the i-th element of the vector x. µxi and σxi denote
+
+the i-th element of dσeztjaidleednodteertihveatjio-tnh
+
+the vector element of
+
+µx the
+
+avnedctoσrxµ. zLainkdewσizse. ,Fµorzjmaonrde
+
+of the above equation, please refer to the
+
+appendix in [11].
+
+2.2. Proposed Architecture In this work, we present a denoising variational autoencoder (DVAE) [12] framework that introduces a denoising process in training the VAE by using noisy-clean speech pairs. The training procedure is similar to how the vanilla denoising autoencoder (DAE) is trained. The input is corrupted according to some noise distribution and the model needs to learn to reconstruct the original input (e.g., by maximizing the log-probability of the clean input x, given the corrupted input x). This procedure is akin to the regular VAE except that the input is corrupted.
+In [13], the authors show the results of reconstructing the ﬁlter-bank features using VAE and AE. It is clear that VAE reconstructs better than AE. The VAE preserves the clearer harmonic structure and spectral envelope, while the AE provides more blurred results. This motivated us to apply the DVAE to speech enhancement instead of the DAE which is employed in the conventional joint learning approach.
+The structure of the speech enhancement DVAE (SEDVAE) is shown in Figure 1. The encoder takes a noisy speech feature x as input and predicts 64-dimensional mean µz and log-variance log(σz2) that parametrize the posterior distribution qφ(z|x). The decoder takes sampled z as input, and predicts the mean µx and the log-variance log(σx2 ) that parametrize the conditional likelihood pθ(x|z). As in the case of z, the enhanced
+
+(a)
+
+(b)
+
+(c)
+
+Figure 2: Three types of proposed joint learning methods: (a) JL-DVAE-1, (b) JL-DVAE-2, and (c) JL-DVAE-3. The dotted boxes represent the SE-DVAE architecture which is shown in the Figure 1. The thick arrows indicate the input of the SE and VAD network.
+
+feature x ∼ pθ(x|z) is reparametrized as x = µx + σx using the reparameterization trick.
+
+The encoder and decoder DNNs both consist of two hidden
+
+layers of 2048 units. All the hidden layers use ReLU activations
+
+and no activation function is applied to Gaussian parameter lay-
+
+ers. In order to guarantee a stable optimization of the DVAE,
+
+we put a constraint on the value of log(σx2i ) to be greater than
+
+a certain threshold to zero, the DVAE
+
+lαo.ssT(hwishiicshbeiscathueseniefgσatx2ivi eovf aErqia.ti(o2n)ails
+
+close lower
+
+bound) becomes close to inﬁnity. We solve this problem by
+
+using the shifted ReLU with activation f (x) = max(x, α) for
+
+log(σx2i ). We set α to -9, which makes σx2i greater than or equal to 10−4. The SE-DVAE is fed with 21 consecutive frames and
+
+predicts 21 consecutive frames of enhanced features.
+
+Batch normalization (BN) and dropout are used at every
+
+hidden layers except for the Gaussian parameter layers. As dis-
+
+cussed in Introduction, it is known that BN has a great effect
+
+on the joint learning. When we jointly train the architecture, the
+
+output distribution of the SE network (i.e., the input distribution
+
+of the VAD network) changes signiﬁcantly during the training
+
+process. This problem called internal covariate shift makes it
+
+difﬁcult to train the entire networks. The VAD module would
+
+have to deal with an input distribution that is non-stationary and
+
+unnormalized. Thanks to BN, we are able to reduce internal co-
+
+variate shift, especially at the boundary between two modules,
+
+and effectively train the whole network without pre-training.
+
+3. Joint Learning
+A joint DNN is built by concatenating an SE-DVAE and a VADDNN. Here, we propose three kinds of joint learning methods as shown in Figure 2 (a), (b), and (c). The input to the SE-DVAE is the noisy features x, surrounded by a context window. To reconstruct the corresponding clean features x, the SE-DVAE is trained on parallel x and x to minimize the SE loss which is the negative variational lower bound. The VAD-DNN is fed by the enhanced feature (shown in Figure 2 (a)), latent code z (shown in Figure 2 (b)), or both of them (shown in Figure 2 (c)) from the SE-DVAE. After that, the VAD-DNN makes a framewise binary speech / non-speech prediction ypred and is trained
+
+1211
+
+to minimize the cross entropy criterion. The input is batch normalized before feeding into the VAD-DNN. The VAD-DNN has 2 hidden layers, each of which has 2048 units with ReLU activations. Like the SE-DVAE, we apply BN and dropout to every hidden layers. The joint learning procedure can be summarized as follows:
+1. Compute the loss functions at the output of the SEDVAE and the VAD-DNN.
+2. Compute the cost gradients using backpropagation. 3. Update the parameters of the SE-DVAE and the VAD-
+DNN. In step 2, the VAD gradient is also back-propagated through the SE-DVAE. Therefore, the parameter updates of the SEDVAE depend not only on the SE cost function but also on the VAD cost function, as shown below:
+
+θSE ← θSE − α1 ∗ [gSE + λgV AD]
+
+(3)
+
+In Eq. (3), θSE are the parameters of the SE-DVAE, gSE are the SE cost gradients with respect to θSE, while gV AD are the VAD cost gradients with respect to θSE. Finally, λ is a hyperparameter which weights gV AD and α1 is the learning rate for θSE. Since the enhancement process is partly guided by the VAD cost function, the front-end would hopefully be able to provide the enhanced feature which is more suitable and discriminative for the subsequent VAD task. The parameter updates of the VADDNN only depend on the VAD cost function, as shown below:
+
+θV AD ← θV AD − α2 ∗ gV AD
+
+(4)
+
+In Eq. (4), θV AD are the parameters of the VAD-DNN, gV AD are the VAD cost gradients with respect to θV AD, and α2 is the learning rate for θV AD. Notice that gV AD in Eq. (4) differs from gV AD in Eq. (3).
+
+4. Experimental Setup
+4.1. Datasets We used clean utterances of the Aurora4 database [14] which contains 7138 continuous speech utterances for training and 330 utterances for testing. To construct the 35 hours training set, all the 7138 utterances of the clean training set were used. The utterances of the Aurora4 corpus are short and around 80% of which are speech; this may introduce a bias when comparing the distributions of speech and non-speech. To reduce this effect, one second of silence were inserted at the begining and the end of the utterance, which makes the ratio of speech frames around 60%. The clean speech corpus was corrupted by the public 100 noise types 1 at SNR levels varying in -5dB, 0dB, 5dB, 10dB, 15dB, 20dB. For the test data, all the 330 utterances of the clean utterances were used. They were corrupted by four unseen noises (babble, factory, destroyer-engine and F16 cockpit noise) in the NOISEX-92 noise corpus [15] at four low SNR levels : -5dB, 0dB, 5dB, 10dB. We applied Sohn VAD [1] to the clean speech corpus and the results were used as labels of the corresponding noisy corpus. This method was proved to be sufﬁciently reasonable to generate labels [16].
+1web.cse.ohio-state.edu/pnl/corpus/HuNonspeech/HuCorpus.html The noise types (100) : Crowd (17), Machine (12), Alarm and siren (14), Trafﬁc and car (3), Animal sound (9), Water sound (14), Wind (9), Bell (4), Cough (3), Clap (1), Snore (1), Click (1), Laugh (3), Yawn (2), Cry (1), Shower (1), Tooth brushing (1), Footsteps (1), Door moving (2), Phone dialing (1). In parenthesis is the number of distinct noise ﬁles.
+
+4.2. Features
+The features used are 32-dimensional multi-resolution cochleagram (MRCG) features, surrounded by a context of 10 past frames and 10 future frames. MRCG features were ﬁrst proposed for a speech separation problem [17] and later employed for a VAD task [18]. For all models used in our experiments, delta and delta-delta coefﬁcients are appended to create 96dimensional features, which is the same setting as in [16].
+4.3. Optimization
+All models are trained using Adam optimizer with a mini-batch size of 512. The learning rates α1 and α2 start from 10−5 and 10−6 respectively. When the validation performance does not increase after one epoch, learning rates decrease to half. All the weights of the networks are initialized with Xavier initialization in [19]. We use a constant dropout rate of 0.2. The gradient weighting factor λ in Eq. (3) is set to 0.1.
+5. Results
+5.1. Comparison among different approaches
+Table 1 lists the results of six different methods for the four unseen noises with different SNRs. The area under the ROC curve (AUC) [20] is adopted as the evaluation metric. The values in bold indicate the best results among all compared methods under each condition. Here we consider three baseline approaches (DNN, JL-DNN and JL-DAE) and the three proposed approaches (JL-DVAE-1, JL-DVAE-2 and JL-DVAE-3).
+DNN denotes the conventional DNN-based VAD without joint learning scheme. It has the same network structure as our proposed VAD-DNN architecture in Section 2.2.
+JL-DNN denotes the conventional denoising autoencoderbased joint learning approach which was proposed in [5]. In this method, after training the SE-DNN and VAD-DNN separately, we concatenate them and jointly train the whole network. Among the various conﬁgurations in the paper, we choose JTDNN with 2+2 conﬁguration (2 hidden layers for the SE-DNN and 2 hidden layers for the VAD-DNN with 2048 hidden nodes) without post-processing. We follow the same training procedure used in [5].
+To compare the DVAE with the DAE, we replace the DVAE with the DAE in JL-DVAE-1 approach (which we refer to as JL-DAE). JL-DAE has the same structure as our proposed JLDVAE-1 except for the two Gaussian parameter layers, which are replaced by fully-connceted layers of 64 and 2016 units, respectively. JL-DVAE-1 is shown in Figure 2 (a) where the VAD-DNN is fed by the enhanced feature. JL-DVAE-2 and JLDVAE-3 are illustrated in Figure 2 (b) and (c), respectively.
+As can be seen in the table, DNN shows lower performance than other ﬁve joint learning-based VADs in all noise conditions, especially at low SNRs. JL-DNN, which shows the lowest performance among all the joint learning methods, provides 1.9% relative improvement over DNN at SNR = -5 dB on average for all noises. These results indicate that the speech enhancement front-end is beneﬁcial for the VAD task.
+By comparing JL-DNN and JL-DAE, we observe that JLDAE performs better than JL-DNN in almost all noise conditions. JL-DAE provides 0.5% relative improvement over JL-DNN at SNR = -5 dB on average for all noises. Even though both are denoising autoencoder-based joint learning approaches, their structures and learning methods are different.
+JL-DVAE-1 provides 1.1% relative improvement over JL-
+
+1212
+
+Table 1: AUC (%) comparison between the conventional approaches and the proposed joint learning approaches.
+
+Noise Babble
+Factory Destroyer
+engine F16
+cockpit
+
+SNR -5 0 5 10
+Avg. -5 0 5 10
+Avg. -5 0 5 10
+Avg. -5 0 5 10
+Avg.
+
+DNN 85.92 93.99 97.12 98.02 93.76 77.43 87.50 94.95 97.31 89.29 92.85 96.53 97.37 98.05 96.20 90.67 95.51 97.20 97.84 95.30
+
+JL-DNN 87.78 94.00 97.14 98.29 94.30 81.08 90.16 95.19 97.26 90.92 93.07 96.60 97.96 98.46 96.52 91.43 96.14 97.69 98.27 95.88
+
+JL-DAE 88.38 94.58 97.46 98.35 94.69 82.27 91.25 96.26 97.75 91.88 93.24 96.93 97.85 98.29 96.58 91.20 96.06 97.73 98.25 95.81
+
+JL-DVAE-1 89.15 94.87 97.39 98.30 94.93 83.95 91.29 95.96 97.41 92.15 94.01 96.72 97.57 98.43 96.68 92.04 96.14 97.62 98.25 96.01
+
+JL-DVAE-2 88.72 94.68 97.22 98.28 94.73 83.68 91.26 95.68 97.30 91.98 93.38 96.42 97.50 98.32 96.41 91.31 96.11 97.60 98.23 95.81
+
+JL-DVAE-3 89.85 95.10 97.52 98.34 95.20 84.22 92.75 96.78 97.49 92.81 94.12 96.81 97.64 98.46 96.76 92.14 96.20 97.71 98.30 96.09
+
+Table 2: AUC (%) comparison of the three proposed joint learning methods on average for all noise types.
+
+SNR -5 0 5 10
+Avg.
+
+JL-DVAE-1 89.79 94.76 97.13 98.10 94.95
+
+JL-DVAE-2 89.27 94.62 97.00 98.03 94.73
+
+JL-DVAE-3 90.08 95.21 97.41 98.15 95.21
+
+Table 3: AUC (%) comparison with and without batch normalization for JL-DVAE-3.
+
+SNR -5 0 5 10
+Avg.
+
+λ=0
+
+no BN with BN
+
+87.56
+
+89.47
+
+93.01
+
+94.81
+
+96.33
+
+97.14
+
+97.14
+
+98.12
+
+93.51
+
+94.89
+
+λ = 0.1
+
+no BN with BN
+
+88.12
+
+90.08
+
+93.09
+
+95.21
+
+96.50
+
+97.41
+
+97.37
+
+98.15
+
+93.75
+
+95.21
+
+DAE at SNR = -5 dB on average for all noises. These results indicate that we can achieve better performance by replacing the DAE with the DVAE for speech enhancement, especially in very low SNR conditions. As we expected in Section 2.2, we can see that the DVAE performs better than the DAE for reconstructing the clean features. To summarize, our proposed approach (JLDVAE-1) shows higher performance than the baselines. Both JL-DVAE-2 and JL-DVAE-3 will be discussed in Section 5.2.
+5.2. Comparison among the proposed approaches Table 2 compares the results of three proposed approaches on average for all noise types. The results show that JL-DVAE-1 achieves higher performance than JL-DVAE-2 in all conditions and JL-DVAE-3 is consistently better in all conditions achieving 0.3% and 0.5% relative improvement (averaging the four SNR levels) compared to JL-DVAE-1 and JL-DVAE-2, respectively.
+This implies that the enhanced feature and the latent representation z from the SE-DVAE complement each other and using those two features together is better than using only the enhanced feature. The learned latent representation z captures the factors that result in the variability of speech segments, such as the content being spoken, speaker identity, and environment. [13]. This would provide additional information to the VADDNN, which is useful to discriminate speech and non-speech.
+
+5.3. Impact of batch normalization Table 3 shows the impact of batch normalization (BN) on the joint learning. It is clear that BN is particularly helpful as explained in Section 2.2. When the gradient weighting factor λ in Eq. (3) is set to zero, JL-DVAE-3 with BN provides 1.5% relative improvement over JL-DVAE-3 without BN on average over all SNR levels. Likewise, when the gradient weighting factor λ is set to 0.1, JL-DVAE-3 with BN provides 1.6% relative improvement over JL-DVAE-3 without BN on average over all SNR levels.
+5.4. Impact of the gradient weighting The impact of the gradient weighting on the joint learning is shown in Table 3 as well. As explained in Section 3, the parameter updates of speech enhancement depend on the VAD cost function (if λ is not zero). We compare the two cases, λ = 0.1 and λ = 0. When the batch normalization is applied, JL-DVAE3 with λ = 0.1 provides 0.3% relative improvement over JLDVAE-3 with λ = 0 on average over all SNR levels. Likewise, when the batch normalization is not applied, JL-DVAE-3 with λ = 0.1 provides 0.3% relative improvement over JL-DVAE-3 with λ = 0 on average over all SNR levels.
+6. Conclusions
+This study was motivated by the result that VAD tasks are challenging in very low SNR. To overcome this problem, we employed a denoising variational autoencoder-based joint learning with batch normalization and the gradient weighting. We showed that our joint learning method performs better than the conventional denoising autoencoder-based joint learning method. As for the future work, we will focus on enabling joint learning without paired noisy-clean training data.
+7. Acknowledgements
+This material is based upon work supported by the Ministry of Trade, Industry and Energy (MOTIE, Korea) under Industrial Technology Innovation Program (No.10063424, Development of distant speech recognition and multi-task dialog processing technologies for in-door conversational robots).
+
+1213
+
+8. References
+[1] J. Sohn, N. S. Kim, and W. Sung, “A statistical model-based voice activity detection,” IEEE Signal Processing Letters, vol. 6, no. 1, pp. 1–3, 1999.
+[2] N. Ryant, M. Y. Liberman, J. Yuan, N. Ryant, M. Y. Liberman, and J. Yuan, “Speech activity detection on YouTube using deep neural networks,” in Proceedings of Interspeech 2013, 2013, pp. 728–731.
+[3] S. Thomas, S. Ganapathy, G. Saon, and H. Soltau, “Analyzing convolutional neural networks for speech activity detection in mismatched acoustic conditions,” in Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2014, pp. 2519–2523.
+[4] F. Eyben, F. Weninger, S. Squartini, and B. Schuller, “Real-life voice activity detection with LSTM recurrent neural networks and an application to hollywood movies,” in Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2013, pp. 483–487.
+[5] Q. Wang, J. Du, X. Bao, Z. R. Wang, L. R. Dai, and C. H. Lee, “A universal VAD based on jointly trained deep neural networks,” in Proceedings of Interspeech 2015, 2015, pp. 2282–2286.
+[6] A. Narayanan and D. Wang, “Joint noise adaptive training for robust automatic speech recognition,” in Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2014, pp. 2504–2508.
+[7] J. Du, Q. Wang, T. Gao, Y. Xu, L. Dai, and C.-h. Lee, “Robust speech recognition with speech enhanced deep neural networks,” in Proceedings of Interspeech 2014, Sep. 2014, pp. 616–620.
+[8] T. Gao, J. Du, L.-r. Dai, and C.-h. Lee, “Joint training of frontend and back-end deep neural networks for robust speech recognition,” in Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2015, pp. 4375–4379.
+[9] S. Ioffe and C. Szegedy, “Batch normalization: Accelerating deep network training by reducing internal covariate shift,” in Proceedings of International Conference on Machine Learning (ICML 2015), 2015, pp. 448–456.
+[10] M. Ravanelli, P. Brakel, M. Omologo, and Y. Bengio, “Batchnormalized joint training for DNN-based distant speech recognition,” in 2016 IEEE Workshop on Spoken Language Technology (SLT), 2017, pp. 28–34.
+[11] D. P. Kingma and M. Welling, “Auto-encoding variational Bayes,” in Proceedings of International Conference on Learning Representations (ICLR 2014), 2014.
+[12] D. J. Im, S. Ahn, R. Memisevic, and Y. Bengio, “Denoising criterion for variational auto-encoding framework,” in AAAI, 2015, pp. 2059–2065.
+[13] W.-N. Hsu, Y. Zhang, and J. Glass, “Learning latent representations for speech generation and transformation,” in Proceedings of Interspeech 2017, 2017, pp. 1273–1277.
+[14] D. Pearce and J. Picone, “Aurora working group: DSR front end LVCSR evaluation AU/384/02,” Institue for Signal and Information Process, Mississippi State University, Technical Roport, 2002.
+[15] A. Varga and H. J. Steeneken, “Assessment for automatic speech recognition: II. NOISEX-92: A database and an experiment to study the effect of additive noise on speech recognition systems,” Speech communication, vol. 12, no. 3, pp. 247–251, 1993.
+[16] X.-L. Zhang and D. Wang, “Boosting contextual information for deep neural network based voice activity detection,” IEEE/ACM Transactions on Audio Speech and Language Processing, vol. 24, no. 2, pp. 252–264, 2016.
+[17] J. Chen, Y. Wang, and D. Wang, “A feature study for classiﬁcation-based speech separation at low signal-to-noise ratios,” IEEE/ACM Transactions on Audio Speech and Language Processing, vol. 22, no. 12, pp. 1993–2002, 2014.
+
+[18] X.-L. Zhang and D. Wang, “Boosted deep neural networks and multi-resolution cochleagram features for voice activity detection,” in Proceedings of Interspeech 2014, 2014, pp. 1534–1538.
+[19] X. Glorot and Y. Bengio, “Understanding the difﬁculty of training deep feedforward neural networks,” in Proceedings of the International Conference on Artiﬁcial Intelligence and Statistics (AISTATS), 2010, pp. 249–256.
+[20] J. A. Hanley and B. J. McNeil, “The meaning and use of the area under a receiver operating characteristic (ROC) curve,” Radiology, vol. 143, pp. 29–36, 1982.
+
+1214
+

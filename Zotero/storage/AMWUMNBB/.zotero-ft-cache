@@ -1,0 +1,340 @@
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+Stacked Autoencoder based Feature Compression for Optimal Classification of Parkinson Disease from Vocal Feature Vectors using Immune Algorithms
+
+K. Kamalakannan1
+Ph.D., Research Scholar (Part Time) PG and Research Department of Computer Science
+Adhiparasakthi College of Arts and Science Kalavai, TN, India
+
+Dr.G.Anandharaj2
+Assistant Professor & Head PG and Research Department of Computer Science
+Adhiparasakthi College of Arts and Science Kalavai, TN, India
+
+Abstract—Parkinson’s disease (PD) is a neurological progressive disorder and is most common among people who are above 60 years old. It affects the brain nerve cells due to the deficiency of dopamine secretion. Dopamine acts as a neurotransmitter and helps in the movement of the body parts. Once brain cells/neurons start dying due to aging, then it will lead to a decrease in dopamine levels. The symptoms of Parkinson’s are difficultly in doing regular/habitual movements, uncontrollable shaking of hands and limbs may encounter memory loss, stiff muscles, sudden temporary loss of control, etc. The severity of the disease will be worse if not diagnosed and treated at the early stages. This paper concentrates on developing Parkinson’s disease diagnosing system using machine learning techniques and algorithms. Machine Learning is an integral part of artificial intelligence it takes huge data as input and train by making use of existing algorithms to understand the pattern of the data. Based on the recognized pattern, the machine will act accordingly without any human intervention. In this work, two major approaches have been employed to diagnose PD. Initially, 26 vocal data of PD affected and healthy individual datasets are obtained from the UCI Machine Learning data repository, are taken as initial raw data/features. In pre-processing, the mRMR feature selection algorithm is employed to minimize the feature count and increase the accuracy rate. The selected features will further be extracted using the Stacked Autoencoder technique to improve and increase the accuracy rate and quality of classification with reduced run time. K-fold cross-validation is used to evaluate the predictive capability of the model and the effectiveness of the extracted features. Artificial Immune Recognition System – Parallel (AIRS-P), an immune inspired algorithm is employed to classify the data from the extracted features. The proposed system attained 97% accuracy, outperforms the benchmarked algorithms and proved its significance on PD classification.
+Keywords—Immune algorithms; Parkinson’s disease; stacked autoencoder; airs-parallel; machine learning
+I. INTRODUCTION
+Parkinson's disease is a complex neuro-related disorder, having more prevalence among elderly people around the world. It is essential to diagnose it early to treat it accordingly. Although it has several treatments, medications, and surgery, it is always better to recognize the symptoms at the early stages. So, it helps in better recovery of the PD affected patients.
+
+Medication plays an important role in controlling the symptoms of PD. Medications include Dopamine Promoter, Anti-depressant; Anti-tremor can help in overcoming the effects of PD. The most prescribed medicine is L-dopa (Levodopa) combined with Carbidopa. The medicine will be converted into dopamine by the brain cells and thus it balances the level of dopamine needed for the motor actions of the nervous system. However, recognizing the symptoms of PD and early diagnosis helps to control the severity before it gets worse.
+The genetic mutations and environmental factors may be the genesis for Parkinson’s disease. The usage of herbicides, fungicides, and pesticides is the emergence of acquiring Parkinson’s disease. The related studies unveiled the 70% of the people affected by the PD due to the excessive usage of the pesticides. There are several transformations obtain in the brain of Parkinson’s Disease afflicted people includes, including the clumps of some certain element in the interior of brain cells called Lewy bodies. Lewy bodies retain the key value to identify the genesis of the PD. Despite the possibility of many elements present in the Lewy bodies from the elements the vital protein termed asalpha-synuclein (a-synuclein). Alphasynuclein is encountered in Lewy bodies in a clustered form, the cells in the clumped formcould not be decomposed.Various genes are decisively linked up with the Parkinson’s disease such as LRRK2, DJ-1, PRKN (Parkin), PINK1, GBA (Glucocerebrosidase – beta) and SNCA. Parkinson's disease is closely similar to other diseases such as Progressive supranuclear palsy (PSP), Corticobasal degeneration (CBD), and Multiple System Astrophys (MSA). The above three can be described as the name of Parkinson’s plus Disease.
+Attributable to Parkinson’s plus disease, it is challenging to diagnose Parkinson’s disease from Parkinson’s plus diseases. PD diagnosis is elicited from either neurological examination, lab tests, or scans of the brain. As a consequence of not having the proper treatment to treat the PD, surgery, or medication is the possible one to improve the health of PD affected people. Several medications procedures are followed. Surgery will be prescribed when the medications are no longer good enough. Deep Brain Stimulation is the type of surgery used presently. In the future, some potential treatments will explore the areas in particularly neural (cell) transplantation, Gene therapy, and
+
+www.ijacsa.thesai.org
+
+470 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+Immunotherapy. In Neural Transplantation, displace the affected and dead brain cells with the new cells. The new cells can develop and increased. The outcome of the research holds the partial result, some peoples are getting improvement in the health and some of not. Gene therapy is another research area; this technique is also having some complications to implement effectively. Research is still on the horizon to cure Parkinson’s disease entirely [1].
+Computer-Aided Diagnosis (CAD) is rapidly emerging in these days to help people to check the early symptoms on their own with needed reports and data. This paper is one such diagnosis system developed using Artificial Intelligence, Machine Learning, and neural network schemes. For, we employ Stacked Autoencoder and AIRS parallel to extract the raw features and classify PD affected persons from healthy individuals by applying the feature vectors.
+The upcoming part of the work is compiled in the following manner. Section 1 of the paper is Introduction has already been discussed. Section 2 discusses the existing works that inspired this paper. Materials and methods will be Section 3 as it mainly concentrates on the technical aspects of the proposed work and employed algorithms. Results, Simulation, and Comparison are done on Section 4 of the paper. Section 5 concludes with the summarization, significance, and importance of the work based on the results and existing works.
+II. LITERATURE SURVEY
+In this part, the prevailing literature is conducting and preforming review and on it. The associated works mainly explore diverse feature extraction methods and classification algorithms on the healthy data.James Parkinson who wrote the initial medical depiction for Parkinson’s disease in 1817. But it was further processed by Jean-Martin Charcot Parkinson's disease. Jean-Martin dissociated Parkinson's disease from other disorders and is characterized by tremors. It is a neurological progressive disorder. The person whose age is more than 60, Parkinson’s disease is common to them. It mainly affects the brain nerve cells due to the deficiency of dopamine secretion. Dopamine acts as a neurotransmitter and helps in the movement of the body parts. Because of aging, the human brain cells start to perish, it will lead to a decrease of dopamine levels. The major symptoms of Parkinson’s are difficultly in doing regular/habitual movements, uncontrollable shaking of hands and limbs may encounter memory loss, stiff muscles, sudden temporary loss of control and facial expression changes are recognized. The severity of the disease will be worse if not diagnosed and treated at the early stages.To diagnose the PD, there is a limited diagnostic test are an avail.
+To diagnose the motor disorders of PDDaTscan is the only way out. To make the diagnosis ineffective way, machine learning provides an efficient way. In this paper, the voice dataset is used for diagnosing the PD by the use of supervised learning. The dataset found from the UCI machine learning repository. The overall dataset consists of 195 vowel voice records. Among the dataset, 48 voice records from healthy people and 147 from affected persons. 22 features are selected for preprocessing. 10 features are selected based on the FilterBased Feature Selection algorithm from 22 features. The specific algorithm used was the Pearson Correlation scoring
+
+method is implemented to correlate the features with the label. K-fold cross-validation is used to perform training and testing on all data to increase the efficiency of the outcome.The dataset employs the following models Averaged Perceptron, Bayes Point Machine, Decision Forests, Locally-Deep SVM,Boosted Decision Tree Logistic Regression,Boosted Decision Tree, Neural Networks, and SVM. From these models Boosted Decision Tree provide the most accurate result when compared to other models. This paper concludes the voice recordings are feasible to diagnose Parkinson’s disease.
+Artificial Immune Recognition System is a modern supervised learning algorithm, inspired by the immune system. AIRS provides the best outcome for classification problems. AIRS is the fusion of artificial intelligence and biological inspired computation evolved from the metaphor and the heuristic knowledge of the biological immune system [2--6]. The AIRS is the first AIS procedure used to solve the classification problems. AIRS has somespecialized characteristics such as Self – Regulation, Generalization, Performance, and Parameter Stability. AIRS has many biological terms such as antigens, B-cells, T-cells, clonal selection, etc., the implementation level of AIRS is a very complicated one. The procedure of the AIRS algorithm is needed to prepare a collection of memory cells. Those memory cells are needed to train the data. The developmental process of the AIRS algorithm has the following steps: 1) Construct the data for the training process and the data should be normalized, use Euclidean distance measures for calculating the affinity measures, then select the antigens randomly for memory pool. 2) Training the memory cells by antigens. 3) From the selected memory cells are mutated clones, such clones are moved to ARB (Artificial Recognition Ball). 4) Competing for the limited resources 4. Selecting the memory cells. 5) The classification has to be done by implementing the k nearest neighbor method. The above life cycle of AIRS produces better accuracy in diagnosing the disease early. This paperconcludes, the AIRS has provideda good accurate result when compared to the rest of the classifiers [2].
+This paper describes the Parallel AIRS. Parallel AIRS is one of the AIRS algorithms. AIRS 1 and AIRS 2 are the serial versions of the AIRS algorithm[7-9]. Both algorithms relying on a single processor to train the memory cells. But Parallel AIRS has multiple processors, so more than one processor can perform their task-parallel. AIRS 1 and AIRS 2 algorithm have the nine steps [10-13] worked in a single processor. The following steps are done by the parallel AIRS. Step1: From the root read the training data Step 2: Distribute the training the data to np (number of processes). Step 3: Each processor executes from step 1 to step 9 based on the serial processuntil the training data obtained. Now each processor holds the trained memory cells. Step 4: Collect the memory cells from each processor and the memory cells are merged and back to the root (initial stage). Speed up is achieved without any loss of accuracy in the classification. The efficiency of Parallel processor can be stated as E(P) = T(1) / P * P(T), where P is the total number of processors, T(1) is the time for AIRS 1 and AIRS 2, T(P) is the time for the algorithm of a parallel version. The AIRS algorithms (AIRS 1, AIRS 2, and Parallel AIRS) implemented on datasets in the WEKA platform [14]. The
+
+www.ijacsa.thesai.org
+
+471 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+classification accuracy of Parallel AIRS shows the best when compared to the other AIRS algorithms.
+Autoencoder is one of the unsupervised machine learning algorithmsin a deep neural network. The output values should be equal to input values. It is used to deplete the size of our inputs as a compressed form, by performing the reconstruction the original data is evolved. The architecture of the Autoencoder is of three parts, encoder, hidden layer, and decoder. The encoder compresses the input data into latent space representation [15-20]. It reduces the original dimension of the data. Hidden layers refer to code it holds the compressed input and the decoder, it reconstructs the code from latent space representation to produce the output. The autoencoder is used to extract some specific features from the data and produce the output. So, the autoencoder used as feature extraction. Stacked Autoencoder consists of various sparse encoder layers. Each is placed one after another like a hierarchical format. Each input of successive bottleneck (hidden or internal) layer connected to each bottleneck layer of output [21-22]. The algorithm of stacked autoencoder mainly follows three steps: First, obtained the trained data from the autoencoder. Second, trained data of the previous layer is used as an input to the successive layer, this process will continue until the training should be completed on all input data. Finally, after the completion of training in all internal layers, finetuning is attained. This paper employs Stacked Autoencoder to diagnose Alzheimer’s disease (AD), mild cognitive impairment (MCI). By training the data employing the Stacked Autoencoder improves the level of accuracy.
+III. MATERIALS AND METHODS
+This segment discusses the process implemented in the paper to discern the best classifier for PD. It explains the dataset, feature extraction algorithms, k – fold cross-validation, and AIRS - Parallel classification algorithm. Fig. 1 represents the complete workflow of the proposed model.
+A. Dataset Information
+The examining work is started with acquiring the samples of voice recordings of PD affected peoples and healthy peoples from the UCI repository. The dataset is taken from the University of California and the Irvine Machine Learning repository. It contains 20 patient details with healthy people has 20 samples with 10 females and 10 males and the affected people 16 females and 14 males. The finalized version of the dataset holds 1040 instances and 26 attributes. The details about the dataset are given in Table I.
+B. Feature Selection
+In pre-processing, feature selection is the first step, where the raw data will be analyzed by a particular algorithm and the features will be further reduced based on the quality and clarity of the data. mRMR is the feature selection algorithm used in this work. For comparative analysis, two further feature selection algorithms called Correlation Feature Selection and Genetic Algorithm were employed. In general, the feature selection technique with the least number of features selected will mostly be considered as an optimized one [22-25]. Table III shows the numbers of features by this technique.
+
+Fig. 1. Workflow of the Proposed System.
+
+TABLE I. DATASET DESCRIPTION
+
+Dataset Source Disease Type Total Number of Samples Total Number of Features Classes Dataset Characteristics
+
+Department of Neurology, Istanbul University Parkinson's Disease 1040 26 Binary Value 0 - Not PD, Value 1 – PD Multivariate
+
+Minimum Redundancy - Maximum Relevance (mRMR) is a technique, here used to select the optimum feature subsets. The core mechanism of the algorithms is; it selects the features highly relevant to the necessary classification yet features are mutually having less relevance it implies minimizing redundancy between the feature data. This technique fetches high accuracy with mutually unrelated features having more details about the problem. It helps in the precise classification of the data. The final subset S is identified based on the following equation.
+
+𝑚𝑅𝑀𝑅 =
+
+𝑚𝑎𝑥𝐹𝑖 ∉𝑆 [𝑀(𝐹𝑖 ;
+
+𝑡)
+
+−
+
+1 |𝑆|
+
+∑𝐹𝑗∈𝑆
+
+𝑀
+
+(𝐹𝑗
+
+;
+
+𝐹𝑖 )]
+
+(1)
+
+C. Feature Extraction
+When the input data is too large to process if it is repetitive it can be manipulated into a compressed set of features called feature extraction. Some of the feature extraction techniques are Latent semantic analysis, Partial least squares, principal component analysis, Multifactor dimensionality reduction. Autoencoder is one of feature extraction, it produces the output by eliminating unnecessary interruptions or noise. A stacked autoencoder is one of the methods of the autoencoder. In this paper, stack autoencoder is used as a feature extraction method. The stacked autoencoder receives the input as a voice signal from the big data source. The input is compressed by applying encoder layer this can be done by several layers and stored the values in the hidden layer, In the hidden layer, the data has to be trainedonce the training is done with it the output is then reconstructed from the hidden layer making use of decoder
+
+www.ijacsa.thesai.org
+
+472 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+layer and it produces the output, the output should be equal to the input. Here, the number of feature 22 is given as an input and it performs the compression and it extracts the output with 8 features, here the remaining 14 features are considered as a noisy signal and eliminate those signals. This autoencoder model employs a cross-entropy loss function, and it suits well for this binary classification task. The parameters of the SAE are given in Table II. The general equation of the cross-entropy is represented below.
+
+𝐿 (𝑥, 𝑥̅) = - ∑𝑑𝑖=1[𝑥𝑖𝑙𝑜𝑔𝑥�𝚤 + (1 − 𝑥𝑖) log(1 − 𝑥̅𝑖)]
+
+(2)
+
+D. K- Fold Cross-Validation
+
+K fold Cross Validation is also known as Rotation Estimation. It is one of the statistical methods used in machine learning to evaluate the skill of the particular model. This method holds a single variable “k”. k refers to the total number of the groups the data has to be split for validation purposes. It has a simple procedure to work with k fold cross-validation. It randomly shuffles the input dataset, then it split into 10 groups (if k=10). Acquire one group for testing the data, the remaining group is undergone training the data by applying the model on it. Once it is trained then the group moves to test the data. After the completion of the test data, evaluate the score of the test data set. The evaluated score has been reserved and eliminate the models. Based on the value of the score, the model skills have to be analyzed.
+
+Algorithm: Stacked Autoencoder Input: Si= Signal data, fsam = Factor Sampling, n = Total number of Autoencoder, Target signal (Ts) = fsam sample signals, w= Weight, In = Internal node, He = High Epchos, SR = Sparsity Regularization In = Choose the number of SAE layers He= Choose the number of SAE layers w= Choose the number of SAE layers SR= Choose the number of SAE layers Train the Stack Autoencoder Autoren = trainAutoencoder(2- n) /* Train the Autoendcoder of n */ Test the input vs output (a) Test the input signal (S) against Target Signal (b) Calculate the error from the predicted output as a Target Signal
+if |err| ≥ level of tolerance repeat step 15
+else Finish training Output: Compressed Vectors
+
+TABLE II. PARAMETERS OF STACKED DENOISING AUTOENCODER
+
+Parameters Epochs Learning Rate Momentum Activation Function Reconstruction Error
+
+Values 100 0.05 0.40 Sigmoid Cross-Entropy Measure
+
+E. AIRS-Parallel
+In this system, AIRS Parallel is used as a classifier to diagnose the disease effectively. It is one of the AIRS methods. The training data set has to be given as an input to the AIRS Parallel after the completion of k fold cross-validation runs. It divides the dataset into many processors. Each processor holds some dataset randomly. Each processor performs the serial version of the AIRS process on the dataset. After the process completion on each processor, it gathers memory cells from each processor. Performing the merging operation on the memory cells into a single pool of memory cells. The memory cells in the pool are further divided into classes. In each class, an affinity pairwise calculation has been performed between the memory cells. If the affinity is less between the two memory cells then the affinity threshold scalar is a product by affinity threshold (aff(mc1, mc2) < afft * affts). As a result, only one of the memory cells is retained in the last pool. The outcome of this algorithm provides better accuracy to diagnose Parkinson’s disease. The model skills have to be analyzed. In Table IV, the parameters of the artificial immune algorithm AIRS is given.
+
+TABLE III. NUMBER OF FEATURES SELECTED BY EACH FEATURE SELECTION TECHNIQUE
+
+Raw Feature Count 26
+
+mRMR 13
+
+GA
+
+CFS
+
+17
+
+20
+
+TABLE IV. PARAMETERS OF AIRS-PARALLEL ALGORITHM
+
+Parameters Affinity Threshold Scalar Factor Pool Size (Initial value) Clonal Rate Hyper Mutation Rate Initial Pool Size Stimulation Value Iteration Number
+
+Values 0.2 1 10 2 1 0.9 1000
+
+IV. EXPERIMENTAL RESULTS
+In this section, the classification performance of the proposed combination will be evaluated and compared with the existing techniques. In summary, initially, the training dataset contains 26 featured vocal datasets obtained from 20 PD affected patients and 20 healthy individuals. It contains various kinds of 26 sound recordings of the voluntary individuals, in turn, forms 1040 overall voice recordings. The sound recording consists of sustained vowels, words, numbers, and small sentences. The test dataset consists of 6 voice samples that have been recorded from 28 PD affected patients. These 6 voice samples contain only sustained vowels ‘a’ and ‘o’ every three times and it has a total of 168 voice recordings. The
+
+www.ijacsa.thesai.org
+
+473 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+dataset is obtained from the UCI Machine Learning repository. To narrow down the dataset for more accurate prediction and with comparatively reduced run time, the dataset will be preprocessed before the classification stage. In, pre-processing of the feature dataset, the 26 features have been reduced to 13 feature subsets. Furthermore, the selected 13 feature subset has been reduced to eight feature vectors deploying stacked autoencoder by performing compression and dimensionality reduction mechanisms. The extracted features have been estimated through the K-fold cross-validation technique to evaluate its predictive accuracy utilizing the existing dataset [26]. Here 5 folds were used to test and train the model to predict the accuracy. Fig. 2 represents the number of features selected by different feature selection methods.
+
+For comparison of the proposed with the existing techniques, quality metrics need to be employed to determine the accurate performance analysis of the proposed work and its significance. For the reason that 4 major metrics were used to evaluate the proposed Stacked Auto encoder-AIRS Parallel technique. The main goal is to attain better disease classification accuracy to prove the importance of this work. The metrics are accuracy, specificity, sensitivity, and the confusion matrix plot. The parameters of the AIRS Parallel algorithm for Parkinson’s disease need to be disclosed earlier. Table I represents the parameters used in the proposed algorithm with values
+
+A. Performance Evaluation
+Also referred to as an error matrix, it contains a table used to express the performance of the classifier on a test dataset for true known values. A confusion matrix has actual information and predicted information has been classified by applying the classification algorithm [27]. Based on the available data in the matrix, the performance of the model will be analyzed. The following table represents the confusion matrix for a binary classifier and the next table represents the outcome confusion matrix of the proposed work.
+
+True Positive (TP): Detected as a patient diagnosed with PD by medical experts.
+
+True Negative (TN): Detected as normal and categorized as healthy by medical experts.
+
+False Positive (FP): Detected as patient and categorized as healthy by the medical experts.
+
+False Negative (FN): Detected as normal who diagnosed with PD by medical experts.
+
+Accuracy decides the overall performance of the system by classifying the PD affected individuals from the healthy ones and the accuracy was determined in percentage, higher the percentage, higher the accuracy [28-30]. The classification accuracy for the datasets of this study was calculated using the below equation.
+
+Acc =
+
+TP + TN
+
+TP + TN + FP + FN
+
+(3)
+
+Fig. 2. Number of Features Selected by different Methods.
+
+The sensitivity (sen) and specificity (spec) are calculated from the following equations.
+
+Sen = TP
+
+TP + FN
+
+(4)
+
+Spec = TN
+
+TN + FP
+
+(5)
+
+The overall significance and importance of the model will be exposed only by comparing the results with the existing model's performances. Seeing, AIRS, and AIRS 2 algorithm with stacked auto encoder’s performances will be taken to compare the results with the proposed combination. The results of AIRS – Stacked Autoencoder, AIRS 2 – Stacked Autoencoder, and the proposed AIRS Parallel –Stacked Autoencoder were presented as the Table V for comparison.
+
+From the results given in Table V, it is evident thatthe proposed model outperforms the compared combinations in terms of Classification Accuracy, Specificity, and Sensitivity. Also, the proposed model can be further compared with the previous work, CFS-ACO with SVM classifier. Table VI shows the comparison values.
+
+In Fig. 3, the scores of different validation metrics attained by different immune algorithms on the selected features is plotted. It is visible the proposed work comparatively classifies the disease better than CFS-ACO- SVM combination [31]. Insensitivity, the previous work seems to perform better than the proposed work but it gives a better percentage of results in terms of accuracy and specificity. This section highlighted the peculiarity of the work and from the experimentation results; the numbers in percentage clearly show the need for the work for better progress in the future.
+
+TABLE V.
+
+COMPARISON OF RESULTS ATTAINED UNDER DIFFERENT AIRS ALGORITHMS (%)
+
+Classifiers
+
+Acc
+
+AIRS
+
+0.85
+
+AIRS 2
+
+0.9
+
+AIRS Parallel
+
+0.97
+
+Sen
+
+Spec
+
+0.82
+
+0.87
+
+0.86
+
+0.92
+
+0.94
+
+0.99
+
+www.ijacsa.thesai.org
+
+474 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+TABLE VII. PERFORMANCE OF AIRS-PARALLEL UNDER DIFFERENT FEATURE SELECTION TECHNIQUES (%)
+
+FS Techniques CFS-SAE GA-SAE Proposed
+
+Acc
+
+Sen
+
+Spec
+
+0.88
+
+0.87
+
+0.89
+
+0.92
+
+0.93
+
+0.92
+
+0.97
+
+0.94
+
+0.99
+
+Fig. 3. Performance of Classifiers under different Evaluation Metrics.
+
+TABLE VI. COMPARISON OF RESULTS FROM EXISTING STUDIES AND PROPOSED WORK (%)
+
+Classifiers CFS - ACO – SVM Proposed
+
+Acc
+
+Sen
+
+0.95
+
+0.96
+
+0.97
+
+0.94
+
+Spec 0.98 0.99
+
+V. COMPARATIVE ANALYSIS OF FEATURE SELECTION TECHNIQUES BASED ON QUALITY METRICS
+To benchmark, the performance of the proposed mRMRSAE model, two other feature selection methods have been employed over mRMR. The performance is tested with SAE having the same configuration of the proposed algorithm. The techniques are shortly briefed below.
+A. Correlation-based Feature Selection
+Correlation-based Feature Selection (CFS) evaluates and selects the feature subsets from the given data using a unique selection process. The feature selection was done based on acquiring an effective feature subset, it having more correlation with the classification and less or uncorrelated to the existing features [32].
+B. Genetic Algorithm
+Genetic Algorithm (GA) is a nature-inspired, search based selection technique derived from Charles Darwin’s evolution theory. GA resembles the ideology of nature by selecting the fittest individuals for procreation of the forthcoming generation. GA has five main phases for a successful selection process. They are Initial Population, Fitness Function, Selection, Crossover, and Mutation. Each phase plays a significant role in GA for an optimal selection, thus resulting in healthy offspring reproduction. The performance of CFS and GA with stacked autoencoder is represented in Table VII and the accuracy of feature selection methods on AIRS-P is given in Fig. 4.
+
+Fig. 4. Accuracy of Feature Selection Methods under different Classifiers.
+VI. CONCLUSION
+In this paper, the voice and speech recordings of PD affected and healthy individuals are analyzed with different statistical feature selection methods and neural network models. The 26 feature instances are pre-processed by deployingmRMR and Stacked Autoencoder - a neural networkbased auto encoder technique used to reduce the noise in the data and compress the information of the data to reduce the number of attributes present in the original dataset. After dimensionality reduction of the dataset, the classification ability of the compressed vectors was evaluated with the Kfold cross-validation technique. Finally, the 8 feature vectors will be classified by the AIRS Parallel algorithm. The result of the proposed work was compared with AIRS, AIRS 2, and CFS-ACO-SVM combination. From the comparison, we can visibly conclude, the proposed AIRS Parallel with Stacked Autoencoder technique comparatively outperforms the employed techniques in all given quality metrics with 97% accuracy. It denotes the importance of this classification system for PD. Any Artificially Intelligence machine learning system will not be able to attain a 100% classification accuracy rate. But, the run time and other aspects of the system can be improvised in the future works. As the next step to this diagnosis/classification model, a Computer-Aided Diagnosis system can be developed, inspired by this proposed model to get a better classification accuracy rate with less run time and memory space usage.
+VII. CONFLICT OF INTEREST
+Authors declare no conflict of interest.
+
+www.ijacsa.thesai.org
+
+475 | P a g e
+
+(IJACSA) International Journal of Advanced Computer Science and Applications, Vol. 12, No. 5, 2021
+
+REFERENCES
+[1] G. Eason, B. Noble, and I. N. Sneddon, “On certain integrals of Christopher G. Goetz, “The History of Parkinson's disease: Early Clinical Descriptions and Neurological Therapies,” September 2011.
+[2] Jason Brownlee, “Artificial Immune Recognition System (AIRS) A review and Analysis”, 2005.
+[3] Andrew Watkins, Jon Timmis, Lois Boggess, “Artificial Immune Recognition System (AIRS): An Immune-Inspired Supervised Learning Algorithm,” December 1, 2002.
+[4] C. M. Bishop, “Neural Networks for Pattern Recognition. Oxford University,” 1995.
+[5] L.N.de Castro and J. Timmis, “Artificial Immune Systems: A New Computational Intelligence Approach. Springer,” 2002.
+[6] S. Hofmeyr and S. Forrest, “Arichitecture for an aritifcial immune system,” Evolutionary Computation,” 2000.
+[7] Watkins, A. and Timmis, Jon, “Exploiting Parallelism Inherent in AIRS, an Artificial ImmuneClassifier,” 2004.
+[8] Basheer, Shakila; Bivi, S Mariyam Aysha; Jayakumar, S; Rathore, Arpit; Jeyakumar, Balajee. Machine Learning Based Classification of Cervical Cancer Using K-Nearest Neighbour, Random Forest and Multilayer Perceptron Algorithms,Journal of Computational and Theoretical Nanoscience, Volume 16, Numbers 5-6, May 2019, pp. 2523-2527(5).
+[9] Watkins A., Bi X., Phadke, “AParallelizing an immune-inspired algorithm for efficient pattern recognition,” 2003.
+[10] Goodman D., Boggess L., Watkins A, “Artificial immune system classification of multiple-class problem,”2002.
+[11] Heung-Il Suk,Seong-Whan Lee, Dinggang Shen, “Latent feature representation with stacked auto-encoder for AD/MCI diagnosis”, November 14, 2013.
+[12] Sultana, H Parveen; Shrivastava, Nirvishi; Dominic, Dhanapal Durai; Nalini, N; Balajee, J.M. Comparison of Machine Learning Algorithms to Build Optimized Network Intrusion Detection System, Journal of Computational and Theoretical Nanoscience, Volume 16, Numbers 5-6, May 2019, pp. 2541-2549(9).
+[13] Jae-Neung Lee, Yeong-Hyeon Byeon and Keun-Chang Kwak, “Design of Ensemble Stacked Auto-Encoder for Classification of Horse Gaits with MEMS Inertial Sensor Technology,” August 2018.
+[14] Pierre Baldi, “Autoencoders, Unsupervised Learning, and Deep Architectures,”2012.
+[15] G.E. Hinton and R.R. Salakhutdinov, “Reducing the dimensionality of data with neural networks. Science,” 2006.
+[16] Pascal Vincent, Hugo Larochelle, Isabelle Lajoie, Yoshua Bengio, Pierre-Antoine Manzagol, “Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion,” 2010.
+
+[17] D. Erhan, Y. Bengio, A. Courville, P.A. Manzagol, P. Vincent, and S. Bengio, “Why does unsupervised pre-training help deep learning? Journal of Machine Learning Research,” February 2010.
+[18] Karthikeyan T., Sekaran, K., Ranjith D., Vinoth Kumar V., & Balajee J M. (2019). Personalized Content Extraction and Text Classification Using Effective Web Scraping Techniques. International Journal of Web Portals, 11(2), 41–52.
+[19] H. Larochelle, Y. Bengio, J. Louradour, and P. Lamblin, “Exploring strategies for training deep neural networks. Journal of Machine Learning Research,” January 2009.
+[20] G. An, “The effects of adding noise during backpropagation training on a generalization performance. Neural Computation,” 1996.
+[21] Ian H. Witten and Eibe Frank, “Data Mining: Practical machine learning tools with Java implementations, San Francisco: Morgan Kaufmann,” 2000.
+[22] Donald Goodman, Lois Boggess, and Andrew Watkins, "An Investigation into the Source of Power for AIRS, an Artificial Immune Classification System," 2003.
+[23] Jon Timmis and Mark J. Neal,” A Resource Limited Artificial Immune System for Data Analysis Research and Development in Intelligent Systems XVII,” December, 2000.
+[24] Hossein, R.; Ajmal, M.; Mubarak, S., “Learning a deep model for human action recognition from novel viewpoints,” 2018.
+[25] Potapov, A.; Potapova, V. “Peterson, M. A feasibility study of an autoencoder meta-model for improving generalization capabilities on training sets of small sizes,” 2016.
+[26] G. E. Hinton, A. Krizhevsky & S. D. Wang, “Transforming Autoencoders.
+[27] Tingxi Wen, Zhongnan Zhang, “Deep Convolution Neural Network and Autoencoders-Based Unsupervised Feature Learning of EEG Signals,” May 2018.
+[28] L. Zhang, F.-N. Yuan, J.-T. Shi, X. Xia, G. Li, “Theories and Applications of Auto-Encoder Neural Networks: A Literature Survey,” January 2019.
+[29] Weixing Chen, Chaochen Cui, Xiaojing Li. “Bearing Fault Diagnosis Based on Improved Denoising Auto-encoders,” January 2020.
+[30] Abass Olaode, “Local Image Feature Extraction using StackedAutoencoder in the Bag-of-Visual Word modelling of Images”.
+[31] S. Wang, Z. Ding and Y. Fu, "Feature Selection Guided Auto-Encoder," 2017.
+[32] K. Kamalakannan, Dr. G. Anandharaj. (2020). Deep Feature Selection from the Vocal Features for Effective Classification of Parkinson ’s disease. International Journal of Advanced Science and Technology, 29(08), 1661-1672.
+
+www.ijacsa.thesai.org
+
+476 | P a g e
+

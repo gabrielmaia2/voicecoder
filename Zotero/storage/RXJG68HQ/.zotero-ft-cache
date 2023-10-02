@@ -1,0 +1,123 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > IEEE Transactions on Informat... > Volume: 12 Issue: 2
+Detection of Double Compressed AMR Audio Using Stacked Autoencoder
+Publisher: IEEE
+Cite This
+PDF
+Da Luo ; Rui Yang ; Bin Li ; Jiwu Huang
+All Authors
+33
+Cites in
+Papers
+1675
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction
+    II.
+    Double Compressed AMR Audio
+    III.
+    Proposed Detection Framework Based on SAE and UBM-GMM
+    IV.
+    Experiments
+    V.
+    Conclusions
+
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Abstract:
+The adaptive multi-rate (AMR) audio codec adopted by many portable recording devices is widely used in speech compression. The use of AMR speech recordings as evidence in court is growing. Nowadays, it is easy to tamper with digital speech recordings, which makes audio forensics increasingly important. The detection of double compressed audio is one of the key issues in audio forensics. In this paper, we propose a framework for detecting double compressed AMR audio based on the stacked autoencoder (SAE) network and the universal background model-Gaussian mixture model (UBM-GMM). Instead of hand-crafted features, we used the SAE to learn the optimal features automatically from the audio waveforms. Audio frames are used as network input and the last hidden layer's output constitutes the features of a single frame. For an audio clip with many frames, the features of all the frames are aggregated and classified by UBM-GMM. Experimental results show that our method is effective in distinguishing single/double compressed AMR audio and outperforms the existing methods by achieving a detection accuracy of 98% on the TIMIT database. Exhaustive experiments demonstrate the effectiveness and robustness of the proposed method.
+Published in: IEEE Transactions on Information Forensics and Security ( Volume: 12 , Issue: 2 , February 2017 )
+Page(s): 432 - 444
+Date of Publication: 26 October 2016
+ISSN Information:
+INSPEC Accession Number: 16486027
+DOI: 10.1109/TIFS.2016.2622012
+Publisher: IEEE
+Funding Agency:
+I. Introduction
+
+Digital speech can be easily recorded by handheld devices such as digital voice recorders and smart phones. As a result, more and more digital speech recordings appear as evidence in courts, creating the need for relevant forensic techniques. One of the most important issues is the detection of double compression since it often follows content forgery.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+Gaussian-mixture modeling of lattice-based spherical vector quantization performance in transform audio coding
+
+2010 IEEE International Conference on Acoustics, Speech and Signal Processing
+
+Published: 2010
+A Bit Allocation Method for Object-Based Audio Coding Based on G.719 Codec
+
+2022 7th International Conference on Signal and Image Processing (ICSIP)
+
+Published: 2022
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.
