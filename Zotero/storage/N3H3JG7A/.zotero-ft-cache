@@ -1,0 +1,368 @@
+STARGAN-VC: NON-PARALLEL MANY-TO-MANY VOICE CONVERSION WITH STAR GENERATIVE ADVERSARIAL NETWORKS
+Hirokazu Kameoka, Takuhiro Kaneko, Kou Tanaka, Nobukatsu Hojo
+NTT Communication Science Laboratories, NTT Corporation, Japan
+
+arXiv:1806.02169v2 [cs.SD] 29 Jun 2018
+
+ABSTRACT
+This paper proposes a method that allows non-parallel manyto-many voice conversion (VC) by using a variant of a generative adversarial network (GAN) called StarGAN. Our method, which we call StarGAN-VC, is noteworthy in that it (1) requires no parallel utterances, transcriptions, or time alignment procedures for speech generator training, (2) simultaneously learns many-to-many mappings across different attribute domains using a single generator network, (3) is able to generate converted speech signals quickly enough to allow real-time implementations and (4) requires only several minutes of training examples to generate reasonably realistic sounding speech. Subjective evaluation experiments on a non-parallel many-to-many speaker identity conversion task revealed that the proposed method obtained higher sound quality and speaker similarity than a state-of-the-art method based on variational autoencoding GANs.
+Index Terms— Voice conversion (VC), non-parallel VC, many-to-many VC, generative adversarial networks (GANs), CycleGAN-VC, StarGAN-VC
+1. INTRODUCTION
+Voice conversion (VC) is a technique for converting para/nonlinguistic information contained in a given utterance while preserving linguistic information. This technique can be applied to various tasks such as speaker-identity modiﬁcation for text-to-speech (TTS) systems [1], speaking assistance [2, 3], speech enhancement [4–6], and pronunciation conversion [7].
+One successful VC framework involves statistical methods based on Gaussian mixture models (GMMs) [8–10]. Recently, a neural network (NN)-based framework based on feed-forward deep NNs [11–13], recurrent NNs [14], and generative adversarial nets (GANs) [7], and an exemplarbased framework based on non-negative matrix factorization (NMF) [15, 16] have also proved successful. Many conventional VC methods including those mentioned above require accurately aligned parallel source and target speech data. However, in many scenarios, it is not always possible to collect parallel utterances. Even if we could collect such data, we typically need to perform time alignment procedures, which
+
+becomes relatively difﬁcult when there is a large acoustic gap between the source and target speech. Since many frameworks are weak as regards the misalignment found with parallel data, careful pre-screening and manual correction may be required to make these frameworks work reliably. To bypass these restrictions, this paper is concerned with developing a non-parallel VC method, which requires no parallel utterances, transcriptions, or time alignment procedures.
+In general, the quality and conversion effect obtained with non-parallel methods are usually limited compared with methods using parallel data due to the disadvantage related to the training condition. Thus, developing non-parallel methods with as high an audio quality and conversion effect as parallel methods can be very challenging. Recently, some attempts have been made to develop non-parallel methods [17–29]. For example, a method using automatic speech recognition (ASR) was proposed in [24]. The idea is to convert input speech under the restriction that the posterior state probability of the acoustic model of an ASR system is preserved so that the transcription of the converted speech becomes consistent with that of the input speech. Since the performance of this method depends heavily on the quality of the acoustic model of ASR, it can fail to work if ASR does not function reliably. A method using i-vectors [30], known as a feature for speaker veriﬁcation, was recently proposed in [25]. Conceptually, the idea is to shift the acoustic features of input speech towards target speech in the i-vector space so that the converted speech is likely to be recognized as the target speaker by a speaker recognizer. While this method is also free from parallel data, one limitation is that it is applicable only to speaker identity conversion tasks.
+Recently, a framework based on conditional variational autoencoders (CVAEs) [31, 32] was proposed in [22, 29]. As the name implies, variational autoencoders (VAEs) are a probabilistic counterpart of autoencoders (AEs), consisting of encoder and decoder networks. CVAEs [32] are an extended version of VAEs where the encoder and decoder networks can take an auxiliary variable c as an additional input. By using acoustic features as the training examples and the associated attribute labels as c, the networks learn how to convert an attribute of source speech to a target attribute according to the attribute label fed into the decoder. This CVAE-based VC approach is notable in that it is completely free from par-
+
+allel data and works even with unaligned corpora. However, one well-known problem as regards VAEs is that outputs from the decoder tend to be oversmoothed. For VC applications, this can be problematic since it usually results in poor quality buzzy-sounding speech.
+One powerful framework that can potentially overcome the weakness of VAEs involves GANs [33]. GANs offer a general framework for training a generator network in such a way that it can deceive a real/fake discriminator network. While they have been found to be effective for use with image generation, in recent years they have also been employed with notable success for various speech processing tasks [7, 34–38]. We previously reported a non-parallel VC method using a GAN variant called cycle-consistent GAN (CycleGAN) [26], which was originally proposed as a method for translating images using unpaired training examples [39–41]. This method, which we call CycleGAN-VC, is designed to learn the mapping G of acoustic features from one attribute X to another attribute Y , its inverse mapping F , and a discriminator D, whose role is to distinguish the acoustic features of converted speech from those of real speech, through a training loss combining an adversarial loss and a cycle consistency loss. Although this method was shown to work reasonably well, one major limitation is that it only learns oneto-one mappings. With a lot of VC application scenarios, it is desirable to obtain many-to-many mappings. One naive way of applying CycleGAN to many-to-many VC tasks would be to train different G and F pairs for all pairs of attribute domains. However, this may be ineffective since all attribute domains are common in the sense that they represent speech and so there must be common latent features that can be shared across different domains. In practice, the number of parameters will increase quadratically with the number of attribute domains, making parameter training challenging particularly when there are a limited number of training examples in each domain.
+A common limitation of CVAE-VC and CycleGAN-VC is that at test time the attribute of the input speech must be known. As for CVAE-VC, the source attribute label c must be fed into the encoder of the trained CVAE and with CycleGAN-VC, the source attribute domains at training and test times must be the same.
+To overcome the shortcomings and limitations of CVAEVC [22] and CycleGAN-VC [26], this paper proposes a nonparallel many-to-many VC method using a recently proposed novel GAN variant called StarGAN [42], which offers the advantages of CVAE-VC and CycleGAN-VC concurrently. Unlike CycleGAN-VC and as with CVAE-VC, our method, which we call StarGAN-VC, is capable of simultaneously learning many-to-many mappings using a single encoderdecoder type generator network G where the attributes of the generator outputs are controlled by an auxiliary input c. Unlike CVAE-VC and as with CycleGAN-VC, StarGAN-VC uses an adversarial loss for generator training to encourage
+
+the generator outputs to become indistinguishable from real speech and ensure that the mappings between each pair of attribute domains will preserve linguistic information. It is also noteworthy that unlike CVAE-VC and CycleGAN-VC, StarGAN-VC does not require any information about the attribute of the input speech at test time.
+The VAE-GAN framework [43] is perhaps another natural way of overcoming the weakness of VAEs. A non-parallel VC method based on this framework has already been proposed in [23]. With this approach, an adversarial loss derived using a GAN discriminator is incorporated into the training loss to encourage the decoder outputs of a CVAE to be indistinguishable from real speech features. Although the concept is similar to our StarGAN-VC approach, we will show in Section 4 that our approach outperforms this method in terms of both the audio quality and conversion effect.
+Another related technique worth noting is the vector quantized VAE (VQ-VAE) approach [27], which has performed impressively in non-parallel VC tasks. This approach is particularly notable in that it offers a novel way of overcoming the weakness of VAEs by using the WaveNet model [44], a sample-by-sample neural signal generator, to devise both the encoder and decoder of a discrete counterpart of CVAEs. The original WaveNet model is a recursive model that makes it possible to predict the distribution of a sample conditioned on the samples the generator has produced. While a faster version [45] has recently been proposed, it typically requires huge computational cost to generate a stream of samples, which can cause difﬁculties when implementing real-time systems. The model is also known to require a huge number of training examples to be able to generate natural-sounding speech. By contrast, our method is noteworthy in that it is able to generate signals quickly enough to allow real-time implementation and requires only several minutes of training examples to generate reasonably realistic-sounding speech.
+The remainder of this paper is organized as follows. We brieﬂy review the formulation of CycleGAN-VC in Section 2, present the idea of StarGAN-VC in Section 3 and show experimental results in Section 4.
+2. CYCLEGAN VOICE CONVERSION
+Since the present method is an extension of CycleGAN-VC, which we proposed previously [26], we start by brieﬂy reviewing its formulation.
+Let x ∈ RQ×N and y ∈ RQ×M be acoustic feature sequences of speech belonging to attribute domains X and Y , respectively, where Q is the feature dimension and N and M are the lengths of the sequences. The aim of CycleGAN-VC is to learn a mapping G that converts the attribute of x into Y and a mapping F that does the opposite. Now, we introduce discriminators DX and DY , whose roles are to predict whether or not their inputs are the acoustic features of real
+
+speech belonging to X and Y , and deﬁne
+
+LDadYv(DY ) = − Ey∼pY (y)[log DY (y)]
+
+− Ex∼pX (x)[log(1 − DY (G(x)))], (1)
+
+LGadv(G) =Ex∼pX(x)[log(1 − DY (G(x)))],
+
+(2)
+
+LDadXv (DX ) = − Ex∼pX (x)[log DX (x)]
+
+− Ey∼pY (y)[log(1 − DX (F (y)))], (3)
+
+LFadv(F ) =Ey∼pY (y)[log(1 − DX (F (y)))],
+
+(4)
+
+as the adversarial losses for DY , G, DX and F , respectively. LDadYv(DY ) and LDadXv (DX ) measure how indistinguishable G(x) and F (y) are from acoustic features of real speech belonging to Y and X. Since the goal of DX and DY is to correctly distinguish the converted feature sequences obtained via G and F from real speech feature sequences, DX and DY attempt to minimize these losses to avoid being fooled by G and F . Conversely, since one of the goals of G and F is to
+generate realistic-sounding speech that is indistinguishable from real speech, G and F attempt to maximize these losses or minimize LGadv(G) and LFadv(F ) to fool DY and DX . It can be shown that the output distributions of G and F trained in this way will match the empirical distributions pY (y) and pX(x). Note that since LGadv(G) and LFadv(F ) are minimized when DY (G(x)) ≃ 1 and DX (F (y)) ≃ 1, we can also use −Ex∼pX (x)[log DY (G(x))] and −Ex∼pX (x)[log DY (G(x))] as the adversarial losses for G and F .
+As mentioned in Section 1, training G and F using only the adversarial losses does not guarantee that G or F will pre-
+serve the linguistic information of the input speech since there
+are inﬁnitely many mappings that will induce the same output
+distributions. To further regularize these mappings, we intro-
+duce a cycle consistency loss
+
+Lcyc(G, F ) = Ex∼pX(x)[ F (G(x)) − x 1]
+
++ Ey∼pY (y)[ G(F (y)) − y 1],
+
+(5)
+
+to encourage F (G(x)) ≃ x and G(F (y)) ≃ y. With the same motivation, we also consider an identity mapping loss
+
+Lid(G, F ) = Ex∼pX (x)[ F (x) − x 1]
+
++ Ey∼pY (y)[ G(y) − y 1],
+
+(6)
+
+to ensure that inputs to G and F are kept unchanged when the inputs already belong to Y and X. The full objectives of CycleGAN-VC to be minimized with respect to G, F , DX and DY are thus given as
+
+IG,F (G, F ) =LGadv(G) + LFadv(F )
+
++ λcycLcyc(G, F ) + λidLid(G, F ), (7)
+
+ID(DX , DY ) =LDadXv (DX ) + LDadYv(DY ),
+
+(8)
+
+where λcyc ≥ 0 and λid ≥ 0 are regularization parameters, which weigh the importance of the cycle consistency loss and the identity mapping loss relative to the adversarial losses.
+
+3. STARGAN VOICE CONVERSION
+While CycleGAN-VC allows the generation of naturalsounding speech when a sufﬁcient number of training examples are available, one limitation is that it only learns one-to-one-mappings. Here, we propose using StarGAN [42] to develop a method that allows non-parallel many-to-many VC. We call the present method StarGAN-VC.
+
+3.1. Training objectives
+
+Let G be a generator that takes an acoustic feature sequence x ∈ RQ×N with an arbitrary attribute and a target attribute label c as the inputs and generates an acoustic feature sequence yˆ = G(x, c). We assume that a speech attribute comprises one or more categories, each consisting of multiple classes. We thus represent c as a concatenation of one-hot vectors, each of which is ﬁlled with 1 at the index of a class in a certain category and with 0 everywhere else. For example, if we consider speaker identities as the only attribute category, c will be represented as a single one-hot vector, where each element is associated with a different speaker. One of the goals of StarGAN-VC is to make yˆ = G(x, c) as realistic as real speech features and belong to attribute c. To realize this, we introduce a real/fake discriminator D as with CycleGAN and a domain classiﬁer C, whose role is to predict to which classes an input belongs. D is designed to produce a probability D(y, c) that an input y is a real speech feature whereas C is designed to produce class probabilities pC (c|y) of y. Adversarial Loss: First, we deﬁne
+
+LDadv(D) = − Ec∼p(c),y∼p(y|c)[log D(y, c)]
+
+− Ex∼p(x),c∼p(c)[log(1 − D(G(x, c), c))], (9)
+
+LGadv(G) = − Ex∼p(x),c∼p(c)[log D(G(x, c), c)],
+
+(10)
+
+as adversarial losses for discriminator D and generator G,
+respectively, where y ∼ p(y|c) denotes a training exam-
+ple of an acoustic feature sequence of real speech with at-
+tribute c and x ∼ p(x) denotes that with an arbitrary attribute. LDadv(D) takes a small value when D correctly classiﬁes G(x, c) and y as fake and real speech features whereas LGadv(G) takes a small value when G successfully deceives D so that G(x, c) is misclassiﬁed as real speech features by D. Thus, we would like to minimize LDadv(D) with respect to D and minimize LGadv(G) with respect to G. Domain Classiﬁcation Loss: Next, we deﬁne
+
+LCcls(C) = − Ec∼p(c),y∼p(y|c)[log pC (c|y)],
+
+(11)
+
+LGcls(G) = − Ex∼p(x),c∼p(c)[log pC (c|G(x, c))], (12)
+
+as domain classiﬁcation losses for classiﬁer C and generator G. LCcls(C) and LGcls(G) take small values when C correctly classiﬁes y ∼ p(y|c) and G(x, c) as belonging to attribute c. Thus, we would like to minimize LCcls(C) with respect to C and LGcls(G) with respect to G.
+
+Fig. 1. Concept of CycleGAN training.
+
+Fig. 2. Concept of StarGAN training.
+
+Cycle Consistency Loss: Training G, D and C using only the losses presented above does not guarantee that G will preserve the linguistic information of input speech. To encourage G(x, c) to be a bijection, we introduce a cycle consistency loss to be minimized
+
+Lcyc(G) = Ec′∼p(c),x∼p(x|c′),c∼p(c)[ G(G(x, c), c′) − x ρ], (13)
+where x ∼ p(x|c′) denotes a training example of an acoustic feature sequence of real speech with attribute c′ and ρ is a positive constant. We also consider an identity mapping loss
+
+Lid(G) = Ec′∼p(c),x∼p(x|c′)[ G(x, c′) − x ρ],
+
+(14)
+
+to ensure that an input into G will remain unchanged when the input already belongs to the target attribute c′.
+To summarize, the full objectives of StarGAN-VC to be minimized with respect to G, D and C are given as
+
+IG(G) =LGadv(G) + λclsLGcls(G)
+
++ λcycLcyc(G) + λidLid(G),
+
+(15)
+
+ID(D) =LDadv(D),
+
+(16)
+
+IC (C) =LCcls(C),
+
+(17)
+
+respectively, where λcls ≥ 0, λcyc ≥ 0 and λid ≥ 0 are regularization parameters, which weigh the importance of the domain classiﬁcation loss, the cycle consistency loss and the identity mapping loss relative to the adversarial losses.
+
+3.2. Conversion process
+As an acoustic feature vector, we use mel-cepstral coefﬁcients computed from a spectral envelope obtained using WORLD [46]. After training G, we can convert the acoustic feature sequence x of an input utterance with
+
+yˆ = G(x, c),
+
+(18)
+
+where c denotes the target attribute label. A na¨ıve way of obtaining a time-domain signal is simply to use yˆ to reconstruct a signal with a vocoder. Instead of directly using yˆ, we can also use the reconstructed feature sequence
+
+yˆ′ = G(x, c′),
+
+(19)
+
+to obtain a time-domain signal if the attribute c′ of the input speech is known. By using yˆ and yˆ′, we can obtain a sequence of spectral gain functions. Once we obtain the spectral gain functions, we can reconstruct a time-domain signal by multiplying the spectral envelope of input speech by the spectral gain function frame-by-frame and resynthesizing the signal using a vocoder.
+
+3.3. Network architectures
+One of the key features of our approach including [7, 26] is that we consider a generator that takes an acoustic feature sequence instead of a single-frame acoustic feature as an input and outputs an acoustic feature sequence of the same length. This allows us to obtain conversion rules that capture time dependencies. While RNN-based architectures are a natural choice for modeling time series data, we use a convolutional neural network (CNN)-based architecture to design G as detailed below. The generator G consists of encoder and decoder networks where only the decoder network takes an auxiliary input c. We also design D and C to take acoustic feature sequences as inputs and generate sequences of probabilities. Generator: Here, we treat an acoustic feature sequence x as an image of size Q × N with 1 channel and use 2D CNNs to construct G, as they are suitable for parallel computations. Speciﬁcally, we use a gated CNN [47], which was originally introduced to model word sequences for language modeling and was shown to outperform long short-term memory (LSTM) language models trained in a similar setting. We previously applied gated CNN architectures for voice conversion [7, 26] and audio source separation [48], and their
+
+effectiveness has already been conﬁrmed. In the encoder part, the output of the l-th hidden layer is described as a linear projection modulated by an output gate
+
+hl = (Wl ∗ hl−1 + bl) ⊙ σ(Vl ∗ hl−1 + dl), (20)
+
+where Wl ∈ RDl×Dl−1×Ql×Nl , bl ∈ RDl , Vl ∈ RDl×Dl−1×Ql×Nl and dl ∈ RDl are the generator network parameters to be trained, and σ denotes the elementwise sigmoid function.
+Similar to LSTMs, the output gate multiplies each element of Wl∗hl−1 +bl and control what information should be propagated through the hierarchy of layers. This gating mechanism
+is called Gated Linear Units (GLU). In the decoder part, the output of the l-th hidden layer is given by
+
+h′l−1 = [hl−1; cl−1],
+
+(21)
+
+hl = (Wl ∗ h′l−1 + bl) ⊙ σ(Vl ∗ h′l−1 + dl), (22)
+
+where [hl; cl] means the concatenation of hl and cl along the channel dimension, and cl is a 3D array consisting of a Qlby-Nl tiling of copies of c in the feature and time dimensions. The input into the 1st layer of G is h0 = x and the output of the ﬁnal layer is given as a regular linear projection
+
+h′L−1 = [hL−1; cL−1],
+
+(23)
+
+yˆ = WL ∗ h′L−1 + bL.
+
+(24)
+
+It should be noted that the entire architecture is fully convolutional with no fully-connected layers, which allows us to take an entire sequence with an arbitrary length as an input and convert the entire sequence. Real/Fake Discriminator: We leverage the idea of PatchGANs [49] to devise a real/fake discriminator D, which classiﬁes whether local segments of an input feature sequence are real or fake. More speciﬁcally, we devise D using a gated CNN, which takes an acoustic feature sequence y and an attribute label c as inputs and produces a sequence of probabilities that measures how likely each segment of y is to be real speech features of attribute c. The output of the l-th layer of D is given in the same way as (21) and (22) and the ﬁnal output D(y, c) is given by the product of all these probabilities. See Section 4 for more details. Domain Classiﬁer: We also devise a domain classiﬁer C using a gated CNN, which takes an acoustic feature sequence y and produces a sequence of class probability distributions that measures how likely each segment of y is to belong to attribute c. The output of the l-th layer of C is given in the same way as (20) and the ﬁnal output pC (c|y) is given by the product of all these distributions. See Section 4 for more details.
+
+many-to-many speaker identity conversion task. We used the Voice Conversion Challenge (VCC) 2018 dataset [50], which consists of recordings of six female and six male US English speakers. We used a subset of speakers for training and evaluation. Speciﬁcally, we selected two female speakers, ‘VCC2SF1’ and ‘VCC2SF2’, and two male speakers, ‘VCC2SM1’ and ‘VCC2SM2’. Thus, c is represented as a four-dimensional one-hot vector and there were twelve different combinations of source and target speakers in total. The audio ﬁles for each speaker were manually segmented into 116 short sentences (about 7 minutes) where 81 and 35 sentences (about 5 and 2 minutes) were provided as training and evaluation sets, respectively. All the speech signals were sampled at 22050 Hz. For each utterance, a spectral envelope, a logarithmic fundamental frequency (log F0), and aperiodicities (APs) were extracted every 5 ms using the WORLD analyzer [46]. 36 mel-cepstral coefﬁcients (MCCs) were then extracted from each spectral envelope. The F0 contours were converted using the logarithm Gaussian normalized transformation described in [51]. The aperiodicities were used directly without modiﬁcation. The network conﬁguration is shown in detail in Fig. 3. The signals of the converted speech were obtained using the method described in 3.2.
+We chose the VAEGAN-based approach [23] as a comparison for our experiments. Although we would have liked to exactly replicate the implementation of this method, we made our own design choices owing to missing details of the network conﬁguration and hyperparameters. We conducted an AB test to compare the sound quality of the converted speech samples and an ABX test to compare the similarity to target speaker of the converted speech samples, where “A” and “B” were converted speech samples obtained with the proposed and baseline methods and “X” was a real speech sample of a target speaker. With these listening tests, “A” and “B” were presented in random orders to eliminate bias in the order of stimuli. Eight listeners participated in our listening tests. For the AB test for sound quality, each listener was presented {“A”,“B”} × 20 utterances, and for the ABX test for speaker similarity, each listener was presented {“A”,“B”,“X”} × 24 utterances. Each listener was then asked to select “A”, “B” or “fair” for each utterance. The results are shown in Fig. 5. As the results show, the proposed method signiﬁcantly outperformed the baseline method in terms of both sound quality and speaker similarity. Fig. 4 shows an example of the MCC sequences of source, reconstructed, and converted speech. Audio samples are provided at http://www.kecl.ntt.co.jp/people/kameoka.hirokazu
+5. CONCLUSION
+
+4. SUBJECTIVE EVALUATION
+To conﬁrm the performance of the proposed method, we conducted subjective evaluation experiments on a non-parallel
+
+This paper proposed a method that allows non-parallel manyto-many VC by using a novel GAN variant called StarGAN. Our method, which we call StarGAN-VC, is noteworthy in that it (1) requires no parallel utterances, transcriptions, or
+
+Fig. 3. Network architectures of generator G, real/fake discriminator D and domain classiﬁer C. Here, the inputs and outputs of G, D and C are interpreted as images, where “h”, “w” and “c” denote the height, width and channel number, respectively. “Conv”, “Batch norm”, “GLU”, “Deconv” “Sigmoid”, “Softmax” and “Product” denote convolution, batch normalization, gated linear unit, transposed convolution, sigmoid, softmax, and product pooling layers, respectively. “k”, “c” and “s” denote the kernel size, output channel number and stride size of a convolution layer, respectively. Note that all the networks are fully convolutional with no fully connected layers, thus allowing inputs to have arbitrary sizes.
+
+30
+
+(a)
+
+30
+
+(b)
+
+MCC order
+
+MCC order
+
+20
+
+20
+
+10
+
+10
+
+0
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Time (s)
+
+30
+
+(c)
+
+0 01234567
+Time (s)
+
+30
+
+(d)
+
+MCC order
+
+MCC order
+
+20
+
+20
+
+10
+
+10
+
+0
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Time (s)
+
+0
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Time (s)
+
+Fig. 4. Examples of acoustic feature sequences of (a) source speech, (c) converted speech obtained with the baseline method and (d) converted speech obtained with the proposed method, along with an acoustic feature sequence of (b) the target speaker uttering the same sentence.
+
+time alignment procedures for speech generator training, (2) simultaneously learns many-to-many mappings across different voice attribute domains using a single generator network, (3) is able to generate signals of converted speech quickly enough to allow real-time implementations and (4) requires
+
+only several minutes of training examples to generate reasonably realistic sounding speech. Subjective evaluation experiments on a non-parallel many-to-many speaker identity conversion task revealed that the proposed method obtained higher sound quality and speaker similarity than a baseline
+
+Preference score (%)
+
+100
+80
+60
+40
+20
+0 Sound quality Speaker similarity Proposed Fair Baseline
+Fig. 5. Results of the AB test for sound quality and the ABX test for speaker similarity.
+method based on a VAE-GAN approach.
+6. REFERENCES
+[1] A. Kain and M. W. Macon, “Spectral voice conversion for textto-speech synthesis,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 1998, pp. 285–288.
+[2] A. B. Kain, J.-P. Hosom, X. Niu, J. P. van Santen, M. FriedOken, and J. Staehely, “Improving the intelligibility of dysarthric speech,” Speech Communications, vol. 49, no. 9, pp. 743–759, 2007.
+[3] K. Nakamura, T. Toda, H. Saruwatari, and K. Shikano, “Speaking-aid systems using GMM-based voice conversion for electrolaryngeal speech,” Speech Communications, vol. 54, no. 1, pp. 134–146, 2012.
+[4] Z. Inanoglu and S. Young, “Data-driven emotion conversion in spoken English,” Speech Communications, vol. 51, no. 3, pp. 268–283, 2009.
+[5] O. Tu¨rk and M. Schro¨der, “Evaluation of expressive speech synthesis with voice conversion and copy resynthesis techniques,” IEEE Transactions on Audio, Speech and Language Processing, vol. 18, no. 5, pp. 965–973, 2010.
+[6] T. Toda, M. Nakagiri, and K. Shikano, “Statistical voice conversion techniques for body-conducted unvoiced speech enhancement,” IEEE Transactions on Audio, Speech and Language Processing, vol. 20, no. 9, pp. 2505–2517, 2012.
+[7] T. Kaneko, H. Kameoka, K. Hiramatsu, and K. Kashino, “Sequence-to-sequence voice conversion with similarity metric learned using generative adversarial networks,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2017, pp. 1283–1287.
+[8] Y. Stylianou, O. Cappe´, and E. Moulines, “Continuous probabilistic transform for voice conversion,” IEEE Transactions on Speech and Audio Processing, vol. 6, no. 2, pp. 131–142, 1998.
+
+[9] T. Toda, A. W. Black, and K. Tokuda, “Voice conversion based on maximumlikelihood estimation of spectral parameter trajectory,” IEEE Transactions on Audio, Speech and Language Processing, vol. 15, no. 8, pp. 2222–2235, 2007.
+[10] E. Helander, T. Virtanen, J. Nurminen, and M. Gabbouj, “Voice conversion using partial least squares regression,” IEEE/ACM Transactions on Audio, Speech and Language Processing, vol. 18, no. 5, pp. 912–921, 2010.
+[11] S. Desai, A. W. Black, B. Yegnanarayana, and K. Prahallad, “Spectral mapping using artiﬁcial neural networks for voice conversion,” IEEE Transactions on Audio, Speech and Language Processing, vol. 18, no. 5, pp. 954–964, 2010.
+[12] S. H. Mohammadi and A. Kain, “Voice conversion using deep neural networks with speaker-independent pre-training,” in Proc. SLT, 2014, pp. 19–23.
+[13] Y. Saito, S. Takamichi, and H. Saruwatari, “Voice conversion using input-to-output highway networks,” IEICE Transactions on Information and Systems, vol. E100-D, no. 8, pp. 1925– 1928, 2017.
+[14] L. Sun, S. Kang, K. Li, and H. Meng, “Voice conversion using deep bidirectional long short-term memory based recurrent neural networks,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2015, pp. 4869–4873.
+[15] R. Takashima, T. Takiguchi, and Y. Ariki, “Exemplar-based voice conversion using sparse representation in noisy environments,” IEICE Transactions on Information and Systems, vol. E96-A, no. 10, pp. 1946–1953, 2013.
+[16] Z. Wu, T. Virtanen, E. S. Chng, and H. Li, “Exemplar-based sparse representation with residual compensation for voice conversion,” IEEE/ACM Transactions on Audio, Speech and Language Processing, vol. 22, no. 10, pp. 1506–1521, 2014.
+[17] L.-H. Chen, Z.-H. Ling, L.-J. Liu, and L.-R. Dai, “Voice conversion using deep neural networks with layer-wise generative training,” IEEE/ACM Transactions on Audio, Speech and Language Processing, vol. 22, no. 12, pp. 1859–1872, 2014.
+[18] T. Nakashika, T. Takiguchi, and Y. Ariki, “Voice conversion based on speaker-dependent restricted Boltzmann machines,” IEICE Transactions on Information and Systems, vol. 97, no. 6, pp. 1403–1410, 2014.
+[19] T. Nakashika, T. Takiguchi, and Y. Ariki, “High-order sequence modeling using speaker-dependent recurrent temporal restricted Boltzmann machines for voice conversion,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2014, pp. 2278–2282.
+[20] T. Nakashika, T. Takiguchi, and Y. Ariki, “Parallel-data-free, many-to-many voice conversion using an adaptive restricted Boltzmann machine,” in Proc. IEEE International Workshop on Machine Learning for Signal Processing (MLSP), 2015.
+[21] M. Blaauw and J. Bonada, “Modeling and transforming speech using variational autoencoders,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2016, pp. 1770–1774.
+[22] C.-C. Hsu, H.-T. Hwang, Y.-C. Wu, Y. Tsao, and H.-M. Wang, “Voice conversion from non-parallel corpora using variational
+
+auto-encoder,” in Proc. Asia Paciﬁc Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC), 2016, pp. 1–6.
+[23] C.-C. Hsu, H.-T. Hwang, Y.-C. Wu, Y. Tsao, and H.-M. Wang, “Voice conversion from unaligned corpora using variational autoencoding Wasserstein generative adversarial networks,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2017, pp. 3364–3368.
+[24] F.-L. Xie, F. K. Soong, and H. Li, “A KL divergence and DNNbased approach to voice conversion without parallel training sentences,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2016, pp. 287–291.
+[25] T. Kinnunen, L. Juvela, P. Alku, and J. Yamagishi, “Nonparallel voice conversion using i-vector PLDA: Towards unifying speaker veriﬁcation and transformation,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2017, pp. 5535–5539.
+[26] T. Kaneko and H. Kameoka, “Parallel-data-free voice conversion using cycle-consistent adversarial networks,” arXiv:1711.11293 [stat.ML], Nov. 2017.
+[27] A. van den Oord and O. Vinyals, “Neural discrete representation learning,” in Adv. Neural Information Processing Systems (NIPS), 2017, pp. 6309–6318.
+[28] T. Hashimoto, H. Uchida, D. Saito, and N. Minematsu, “Parallel-data-free many-to-many voice conversion based on dnn integrated with eigenspace using a non-parallel speech corpus,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2017.
+[29] Y. Saito, Y. Ijima, K. Nishida, and S. Takamichi, “Non-parallel voice conversion using variational autoencoders conditioned by phonetic posteriorgrams and d-vectors,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2018, pp. 5274–5278.
+[30] N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, and P. Ouellet, “Front-end factor analysis for speaker veriﬁcation,” IEEE Transactions on Audio, Speech and Language Processing, vol. 19, no. 4, pp. 788–798, 2011.
+[31] D. P. Kingma and M. Welling, “Auto-encoding variational Bayes,” in Proc. International Conference on Learning Representations (ICLR), 2014.
+[32] D. P. Kingma and D. J. Rezendey, S. Mohamedy, and M. Welling, “Semi-supervised learning with deep generative models,” in Adv. Neural Information Processing Systems (NIPS), 2014, pp. 3581–3589.
+[33] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. WardeFarley, S. Ozair, A. Courville, and Y. Bengio, “Generative adversarial nets,” in Adv. Neural Information Processing Systems (NIPS), 2014, pp. 2672–2680.
+[34] T. Kaneko, H. Kameoka, N. Hojo, Y. Ijima, K. Hiramatsu, and K. Kashino, “Generative adversarial network-based postﬁlter for statistical parametric speech synthesis,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2017, pp. 4910–4914.
+
+[35] Y. Saito, S. Takamichi, and H. Saruwatari, “Statistical parametric speech synthesis incorporating generative adversarial networks,” IEEE/ACM Trans. Audio, Speech, Language Process., vol. 26, no. 1, pp. 84–96, Jan. 2018.
+[36] S. Pascual, A. Bonafonte, and J. Serra´, “SEGAN: Speech enhancement generative adversarial network,” arXiv:1703.09452 [cs.LG], Mar. 2017.
+[37] T. Kaneko, S. Takaki, H. Kameoka, and J. Yamagishi, “Generative adversarial network-based postﬁlter for STFT spectrograms,” in Proc. Annual Conference of the International Speech Communication Association (Interspeech), 2017, pp. 3389–3393.
+[38] K. Oyamada, H. Kameoka, T. Kaneko, K. Tanaka, N. Hojo, and H. Ando, “Generative adversarial network-based approach to signal reconstruction from magnitude spectrograms,” arXiv:1804.02181 [eess.SP], Apr. 2018.
+[39] J.-Y. Zhu, T. Park, P. Isola, and A. A. Efros, “Unpaired image-to-image translation using cycle-consistent adversarial networks,” in Proc. ICCV, 2017, pp. 2223–2232.
+[40] T. Kim, M. Cha, H. Kim, J. K. Lee, and J. Kim, “Learning to discover cross-domain relations with generative adversarial networks,” in Proc. International Conference on Machine Learning (ICML), 2017, pp. 1857–1865.
+[41] Z. Yi, H. Zhang, P. Tan, and M. Gong, “DualGAN: Unsupervised dual learning for image-to-image translation,” in Proc. ICCV, 2017, pp. 2849–2857.
+[42] Y. Choi, M. Choi, M. Kim, J.-W. Ha, S. Kim, and J. Choo, “StarGAN: Uniﬁed generative adversarial networks for multidomain image-to-image translation,” arXiv:1711.09020 [cs.CV], Nov. 2017.
+[43] A. B. L. Larsen, S. K. Sønderby, H. Larochelle, and O. Winther, “Autoencoding beyond pixels using a learned similarity metric,” arXiv:1512.09300 [cs.LG], Dec. 2015.
+[44] A. van den Oord, S. Dieleman, H. Zen, K. Simonyan, O. Vinyals, A. Graves, N. Kalchbrenner, A. Senior, and K. Kavukcuoglu, “WaveNet: A generative model for raw audio,” arXiv:1609.03499 [cs.SD], Sept. 2016.
+[45] A. van den Oord, Y. Li, I. Babuschkin, K. Simonyan, O. Vinyals, K. Kavukcuoglu, G. van den Driessche, E. Lockhart, L. C. Cobo, F. Stimberg, N. Casagrande, D. G., S. Noury, S. Dieleman, E. Elsen, N. Kalchbrenner, H. Zen, A. Graves, H. King, T. Walters, D. Belov, and D. Hassabis, “Parallel WaveNet: Fast high-ﬁdelity speech synthesis,” arXiv:1711.10433 [cs.LG], Nov. 2017.
+[46] M. Morise, F. Yokomori, and K. Ozawa, “WORLD: a vocoderbased high-quality speech synthesis system for real-time applications,” IEICE Transactions on Information and Systems, vol. E99-D, no. 7, pp. 1877–1884, 2016.
+[47] Y. N. Dauphin, A. Fan, M. Auli, and D. Grangier, “Language modeling with gated convolutional networks,” in Proc. International Conference on Machine Learning (ICML), 2017, pp. 933–941.
+[48] L. Li and H. Kameoka, “Deep clustering with gated convolutional networks,” in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2018, pp. 16–20.
+
+[49] P. Isola, J.-Y. Zhu, T. Zhou, and A. A. Efros, “Image-to-image translation with conditional adversarial networks,” in Proc. IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2017.
+[50] J. Lorenzo-Trueba, J. Yamagishi, T. Toda, D. Saito, F. Villavicencio, T. Kinnunen, and Z. Ling, “The voice conversion challenge 2018: Promoting development of parallel and nonparallel methods,” arXiv:1804.04262 [eess.AS], Apr. 2018.
+[51] K. Liu, J. Zhang, and Y. Yan, “High quality voice conversion through phoneme-based linear mapping functions with STRAIGHT for mandarin,” in Proc. International Conference on Fuzzy Systems and Knowledge Discovery (FSKD), 2007, pp. 410–414.
+

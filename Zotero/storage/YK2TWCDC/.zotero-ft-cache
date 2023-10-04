@@ -1,0 +1,82 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:2201.03898
+
+Help | Advanced Search
+Search
+Computer Science > Machine Learning
+(cs)
+[Submitted on 11 Jan 2022]
+Title: An Introduction to Autoencoders
+Authors: Umberto Michelucci
+Download a PDF of the paper titled An Introduction to Autoencoders, by Umberto Michelucci
+Download PDF
+
+    Abstract: In this article, we will look at autoencoders. This article covers the mathematics and the fundamental concepts of autoencoders. We will discuss what they are, what the limitations are, the typical use cases, and we will look at some examples. We will start with a general introduction to autoencoders, and we will discuss the role of the activation function in the output layer and the loss function. We will then discuss what the reconstruction error is. Finally, we will look at typical applications as dimensionality reduction, classification, denoising, and anomaly detection. This paper contains the notes of a PhD-level lecture on autoencoders given in 2021. 
+
+Comments: 	26 pages; lecture notes; introductory paper
+Subjects: 	Machine Learning (cs.LG) ; Artificial Intelligence (cs.AI)
+Cite as: 	arXiv:2201.03898 [cs.LG]
+  	(or arXiv:2201.03898v1 [cs.LG] for this version)
+  	https://doi.org/10.48550/arXiv.2201.03898
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Umberto Michelucci [ view email ]
+[v1] Tue, 11 Jan 2022 11:55:32 UTC (718 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled An Introduction to Autoencoders, by Umberto Michelucci
+    Download PDF
+    PostScript
+    Other Formats 
+
+Current browse context:
+cs.LG
+< prev   |   next >
+new | recent | 2201
+Change to browse by:
+cs
+cs.AI
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

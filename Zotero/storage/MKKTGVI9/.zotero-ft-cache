@@ -1,0 +1,82 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > stat > arXiv:1610.04019
+
+Help | Advanced Search
+Search
+Statistics > Machine Learning
+(stat)
+[Submitted on 13 Oct 2016]
+Title: Voice Conversion from Non-parallel Corpora Using Variational Auto-encoder
+Authors: Chin-Cheng Hsu , Hsin-Te Hwang , Yi-Chiao Wu , Yu Tsao , Hsin-Min Wang
+Download a PDF of the paper titled Voice Conversion from Non-parallel Corpora Using Variational Auto-encoder, by Chin-Cheng Hsu and 3 other authors
+Download PDF
+
+    Abstract: We propose a flexible framework for spectral conversion (SC) that facilitates training with unaligned corpora. Many SC frameworks require parallel corpora, phonetic alignments, or explicit frame-wise correspondence for learning conversion functions or for synthesizing a target spectrum with the aid of alignments. However, these requirements gravely limit the scope of practical applications of SC due to scarcity or even unavailability of parallel corpora. We propose an SC framework based on variational auto-encoder which enables us to exploit non-parallel corpora. The framework comprises an encoder that learns speaker-independent phonetic representations and a decoder that learns to reconstruct the designated speaker. It removes the requirement of parallel corpora or phonetic alignments to train a spectral conversion system. We report objective and subjective evaluations to validate our proposed method and compare it to SC methods that have access to aligned corpora. 
+
+Subjects: 	Machine Learning (stat.ML) ; Machine Learning (cs.LG); Sound (cs.SD)
+Cite as: 	arXiv:1610.04019 [stat.ML]
+  	(or arXiv:1610.04019v1 [stat.ML] for this version)
+  	https://doi.org/10.48550/arXiv.1610.04019
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Chin-Cheng Hsu [ view email ]
+[v1] Thu, 13 Oct 2016 10:52:25 UTC (338 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Voice Conversion from Non-parallel Corpora Using Variational Auto-encoder, by Chin-Cheng Hsu and 3 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+stat.ML
+< prev   |   next >
+new | recent | 1610
+Change to browse by:
+cs
+cs.LG
+cs.SD
+stat
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

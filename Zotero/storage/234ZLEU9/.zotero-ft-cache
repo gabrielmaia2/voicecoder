@@ -1,0 +1,571 @@
+k -Sparse Autoencoders
+
+arXiv:1312.5663v2 [cs.LG] 22 Mar 2014
+
+Alireza Makhzani
+
+makhzani@psi.utoronto.ca
+
+Brendan Frey
+
+frey@psi.utoronto.ca
+
+University of Toronto, 10 King’s College Rd. Toronto, Ontario M5S 3G4, Canada
+
+Abstract
+Recently, it has been observed that when representations are learnt in a way that encourages sparsity, improved performance is obtained on classiﬁcation tasks. These methods involve combinations of activation functions, sampling steps and diﬀerent kinds of penalties. To investigate the eﬀectiveness of sparsity by itself, we propose the “k sparse autoencoder”, which is an autoencoder with linear activation function, where in hidden layers only the k highest activities are kept. When applied to the MNIST and NORB datasets, we ﬁnd that this method achieves better classiﬁcation results than denoising autoencoders, networks trained with dropout, and RBMs. k -sparse autoencoders are simple to train and the encoding stage is very fast, making them well-suited to large problem sizes, where conventional sparse coding algorithms cannot be applied.
+1. Introduction
+Sparse feature learning algorithms range from sparse coding approaches (Olshausen & Field, 1997) to training neural networks with sparsity penalties (Nair & Hinton, 2009; Lee et al., 2007). These methods typically comprise two steps: a learning algorithm that produces a dictionary W that sparsely represents the data {xi}Ni=1, and an encoding algorithm that, given the dictionary, deﬁnes a mapping from a new input vector x to a feature vector.
+A practical problem with sparse coding is that both the dictionary learning and the sparse encoding steps are computationally expensive. Dictionaries are usually learnt oﬄine by iteratively recovering sparse codes
+International Conference on Learning Representations, ICLR 2014
+
+and updating the dictionary. Sparse codes are computed using the current dictionary W and a pursuit algorithm to solve
+
+zˆi = argmin
+
+xi − W z
+
+2 2
+
+s.t.
+
+z 0<k
+
+(1)
+
+z
+
+where zi, i = 1, .., N are the columns of Z. Convex relaxation methods such as ℓ1 minimization or greedy methods such as OMP (Tropp & Gilbert, 2007) are used to solve the above optimization. While greedy algorithms are faster, they are still slow in practice. The current sparse codes are then used to update the dictionary, using techniques such as the method of optimal directions (MOD) (Engan et al., 1999) or K-SVD (Aharon et al., 2005). These methods are computationally expensive; MOD requires inverting the data matrix at each step and K-SVD needs to compute a SVD in order to update every column of the dictionary.
+
+To achieve speedups, in (Gregor & LeCun, 2010; Kavukcuoglu et al., 2010), a parameterized non-linear encoder function is trained to explicitly predict sparse codes using a soft thresholding operator. However, they assume that the dictionary is already given and do not address the oﬄine phase.
+
+Another approach that has been taken recently is to train autoencoders in a way that encourages sparsity. However, these methods usually involve combinations of activation functions, sampling steps and diﬀerent kinds of penalties, and are sometimes not guaranteed to produce sparse representations for each input. For example, in (Lee et al., 2007; Nair & Hinton, 2009), a “lifetime sparsity” penalty function proportional to the negative of the KL divergence between the hidden unit marginals and the target sparsity probability is added to the cost function. This results in sparse activation of hidden units across training points, but does not guarantee that each input has a sparse representation.
+
+The contributions of this paper are as follows. (i) We describe “k -sparse autoencoders” and show that they can be eﬃciently learnt and used for sparse coding.
+
+k -Sparse Autoencoders
+
+(ii) We explore how diﬀerent sparsity levels (k) impact representations and classiﬁcation performance. (iii) We show that by solely relying on sparsity as the regularizer and as the only nonlinearity, we can achieve much better results than the other methods, including RBMs, denoising autoencoders (Vincent et al., 2008) and dropout (Hinton et al., 2012). (iv) We demonstrate that k -sparse autoencoders are suitable for pretraining and achieve results comparable to state-ofthe-art on MNIST and NORB datasets.
+In this paper, Γ is an estimated support set and Γc is its complement. W † is the pseudo-inverse of W and suppk (x) is an operator that returns the indices of the k largest coeﬃcients of its input vector. zΓ is the vector obtained by restricting the elements of z to the indices of Γ and WΓ is the matrix obtained by restricting the columns of W to the indices of Γ.
+
+2. Description of the Algorithm
+
+2.1. The Basic Autoencoder
+
+A shallow autoencoder maps an input vector x to a
+
+hidden representation using the function z = f (P x+b),
+
+parameterized by {P, b}. f is the activation function,
+
+e.g., linear, sigmoidal or ReLU. The hidden represen-
+
+tation is then mapped linearly to the output using
+
+xˆ = W z + b′. The parameters are optimized to mini-
+
+mize the mean square error of
+
+xˆ −x
+
+2 2
+
+over all training
+
+points. Often, tied weights are used, so that P = W ⊺.
+
+2.2. The k -Sparse Autoencoder
+The k-sparse autoencoder is based on an autoencoder with linear activation functions and tied weights. In the feedforward phase, after computing the hidden code z = W ⊺x+b, rather than reconstructing the input from all of the hidden units, we identify the k largest hidden units and set the others to zero. This can be done by sorting the activities or by using ReLU hidden units with thresholds that are adaptively adjusted until the k larges activities are identiﬁed. This results in a vector of activities with the support set of suppk (W ⊺x+b). Note that once the k largest activities are selected, the function computed by the network is linear. So the only non-linearity comes from the selection of the k largest activities. This selection step acts as a regularizer that prevents the use of an overly large number of hidden units when reconstructing the input.
+Once the weights are trained, the resulting sparse representations may be used for learning to perform downstream classiﬁcation tasks. However, it has been observed that often, better results are obtained when the
+
+sparse encoding stage used for classiﬁcation does not
+exactly match the encoding used for dictionary train-
+ing (Coates & Ng, 2011). For example, while in k -
+means, it is natural to have a hard-assignment of the
+points to the nearest cluster in the encoding stage, it
+has been shown in (Van Gemert et al., 2008) that soft
+assignments result in better classiﬁcation performance.
+Similarly, for the k -sparse autoencoder, instead of using the k largest elements of W ⊺x+b as the features, we have observed that slightly better performance is obtained by using the αk largest hidden units where α ≥ 1
+is selected using validation data. So at the test time, we use the support set deﬁned by suppαk(W ⊺x + b). The algorithm is summarized as follows.
+
+k -Sparse Autoencoders:
+
+Training:
+
+1) Perform the feedforward phase and compute z = W ⊺x + b
+
+2) Find the k largest activations of z and set
+
+the rest to zero. z(Γ)c = 0 where Γ = suppk (z)
+3) Compute the output and the error using the
+
+sparsiﬁed z.
+
+xˆ = W z + b′
+
+E=
+
+x − xˆ
+
+2 2
+
+3) Backpropagate the error through the k largest
+
+activations deﬁned by Γ and iterate.
+
+Sparse Encoding: Compute the features h = W ⊺x + b. Find its αk
+
+largest activations and set the rest to zero. h(Γ)c = 0 where Γ = suppαk (h)
+
+3. Analysis of the k -Sparse Autoencoder
+In this section, we explain how the k -sparse autoencoder can be viewed in the context of sparse coding with incoherent matrices. This perspective sheds light on why the k -sparse autoencoders work and why they achieve invariant features and consequently good classiﬁcation results. We ﬁrst explain a sparse recovery algorithm and then show that the k -sparse autoencoder iterates between an approximation of this algorithm and a dictionary update stage.
+
+3.1. Iterative Thresholding with Inversion (ITI)
+Iterative hard thresholding (Blumensath & Davies, 2009) is a class of low complexity algorithms, which has recently been proposed for the reconstruction of sparse signals. In this work, we use a variant called “iterative thresholding with inversion” (Maleki, 2009). Given a ﬁxed x and W , starting from z0 = 0, ITI iteratively ﬁnds the sparsest solution of x = W z using the
+
+k -Sparse Autoencoders
+
+following steps.
+
+1. Support Estimation Step:
+
+Γ = suppk (zn + W ⊺(x − W zn))
+
+(2)
+
+2. Inversion Step:
+
+znΓ+1 = WΓ†x = (WΓ⊺WΓ)−1WΓ⊺x
+
+z
+
+n+1 (Γ)c
+
+=
+
+0
+
+(3)
+
+Assume H = W ⊺W − I and z0 is the true sparse so-
+
+lution. The ﬁrst step of ITI estimates the support
+
+set as Γ = suppk (W ⊺x) = suppk (z0 + Hz0). If W was orthogonal, we would have Hz0 = 0 and the algo-
+
+rithm would succeed in the ﬁrst iteration. But if W
+
+is overcomplete, Hz0 behaves as a noise vector whose
+
+variance decreases after each iteration. After estimat-
+
+ing the support set of z as Γ, we restrict W to the
+
+indices included in Γ and form WΓ. We then use the
+
+pseudo-inverse of WΓ to estimate the non-zero values
+
+minimizing
+
+x − WΓ zΓ
+
+2 2
+
+.
+
+Lastly, we reﬁne the support
+
+estimation and repeat the whole process until conver-
+
+gence.
+
+3.2. Sparse Coding with the k -Sparse Autoencoder
+
+Here, we show that we can derive the k -sparse autoencoder tarining algorithm by approximating a sparse coding algorithm that uses the ITI algorithm jointly with a dictionary update stage.
+
+The conventional approach of sparse coding is to ﬁx
+
+the sparse code matrix Z, while updating the dictio-
+
+nary. However, here, after estimating the support set
+
+in the ﬁrst step of the ITI algorithm, we jointly per-
+
+form the inversion step of ITI and the dictionary up-
+
+date step, while ﬁxing just the support set of the sparse
+
+code Z. In other words, we update the atoms of the
+
+dictionary and allow the corresponding non-zero values
+
+to change at the same time to minimize
+
+X − WΓZΓ
+
+2 2
+
+over both WΓ and ZΓ.
+
+When we are performing sparse recovery with the ITI algorithm using a ﬁxed dictionary, we should perform a ﬁxed number of iterations to get the perfect reconstruction of the signal. But, in sparse coding, since we learnt a dictionary that is adapted to the signals, as shown in Section 3.3, we can ﬁnd the support set just with the ﬁrst iteration of ITI:
+
+Γz = suppk (W ⊺x)
+
+(4)
+
+In the inversion step of the ITI algorithm, once we estimate the support set, we use the pseudo-inverse of
+
+WΓ to ﬁnd the non-zero values of the support set. The pseudo-inverse of the matrix WΓ is a matrix, such as PΓ, that minimizes the following cost function.
+
+WΓ†
+
+= arg
+
+min
+
+x − WΓzΓ
+
+2 2
+
+PΓ
+
+(5)
+
+= arg
+
+min
+
+x − WΓPΓx
+
+2 2
+
+PΓ
+
+Finding the exact pseudo-inverse of WΓ is computationally expensive, so instead, we perform a single step of gradient descent. The gradient with respect to PΓ is found as follows:
+
+∂
+
+x − WΓzΓ
+
+2 2
+
+=
+
+∂
+
+x − WΓzΓ
+
+2
+2x
+
+(6)
+
+∂PΓ
+
+∂zΓ
+
+The ﬁrst term of the right hand side of the Equation (6) is the dictionary update stage, which is computed as follows:
+
+∂
+
+x − WΓzΓ ∂zΓ
+
+2 2
+
+= (WΓzΓ − x)z⊺Γ
+
+(7)
+
+Therefore, in order to approximate the pseudo-inverse, we ﬁrst ﬁnd the dictionary derivative and then “backpropagate” it to ﬁnd the update of the pseudo-inverse.
+
+We can view these operations in the context of an autoencoder with linear activations where P is the encoder weight matrix and W is the decoder weight matrix. At each iteration, instead of back-propagating through all the hidden units, we just back-propagate through the units with the k largest activities, deﬁned by suppk (W ⊺x), which is the ﬁrst iteration of ITI. Keeping the k largest hidden activities and ignoring the others is the same as forming WΓ by restricting W to the estimated support set. Back-propagation on the decoder weights is the same as gradient descent on the dictionary and back-propagation on the encoder weights is the same as approximating the pseudoinverse of the corresponding WΓ.
+
+We can perform support estimation in the feedforward phase by assuming P = W ⊺ (i.e., the autoencoder has tied weights). In this case, support estimation can be done by computing z = W ⊺x + b and picking the k largest activations; the bias just accounts for the mean
+and subtracts its contribution. Then the “inversion”
+and “dictionary update” steps are done at the same
+time by back-propagation through just the units with
+the k largest activities.
+
+In summary, we can view k -sparse autoencoders as the approximation of a sparse coding algorithm which uses ITI in the sparse recovery stage.
+
+k -Sparse Autoencoders
+
+3.3. Importance of Incoherence
+The coherence of a dictionary indicates the degree of similarity between diﬀerent atoms or diﬀerent collections of atoms. Since the dictionary is overcomplete, we can represent each column of the dictionary as a linear combination of other columns. But what incoherence implies is that we should not be able to represent a column as a sparse linear combination of other columns and the coeﬃcients of the linear combination should be dense. For example, if two columns are exactly the same, then the dictionary is highly coherent since we can represent one of those columns as the sparse linear combination of the rest of the columns. A naive measure of coherence that has been proposed in the literature is the mutual coherence µ(W ) which is deﬁned as the maximum absolute inner product across all the possible pairs of the atoms of the dictionary.
+
+µ(W ) = max
+i≠j
+
+⟨wi, wj⟩
+
+(8)
+
+There is a close relationship between the coherency of
+the dictionary and the uniqueness of the sparse solution of x = W z. In (Donoho & Elad, 2003), it has been proven that if k ≤ (1 + µ−1), then the sparsest
+solution is unique.
+
+We can show that if the dictionary is incoherent enough, there is going to be an attraction ball around the signal x and there is only one unique sparse linear combination of the columns that can get into this attraction ball. So even if we perturb the input with a small amount of noise, translation, rotation, etc., we can still achieve perfect reconstruction of the original signal and the sparse features are always roughly conserved. Therefore, incoherency of the dictionary is a measure of invariance and stability of the features. This is related to the denoising autoencoder (Vincent et al., 2008) in which we achieve invariant features by trying to reconstruct the original signal from its noisy versions.
+
+Here we show that if the dictionary is incoherent enough, the ﬁrst step of the ITI algorithm is suﬃcient for perfect sparse recovery.
+
+Theorem 3.1. Assume x = W z and the columns of
+
+the dictionary have unit ℓ2-norm. Also without loss of
+
+generality, assume that the non-zero elements of z are
+
+its ﬁrst k elements and are sorted as z1 ≥ z2 ≥ ... ≥ zk .
+
+Then, using
+
+if k µ suppk
+
+(≤W2zz⊺k1x, )w. e
+
+can
+
+recover
+
+the
+
+support
+
+set
+
+of
+
+z
+
+Proof : Let us assume 0 ≤ i ≤ k and y = W ⊺x. Then, we can write:
+
+k
+
+yi = zi +
+
+⟨wi, wj ⟩zj
+
+j=1,j≠i
+
+k
+
+≥ zi − µ
+
+zj ≥ zk − k µz1
+
+j=1,j≠i
+
+(9)
+
+On the other hand:
+
+max
+i>k
+
+{yi} = max
+i>k
+
+⎧⎪⎪⎨⎪⎪⎩jk=1⟨wi, wj⟩zj⎫⎪⎪⎬⎪⎪⎭
+
+≤ k µz1
+
+(10)
+
+So if teed
+
+kµ ≤ to be
+
+2gzzkr1e,aatlelrtthheaﬁnrstthek
+
+elements rest of its
+
+of y are guaranelements.
+
+As we can see from Theorem 3.1, the chances of ﬁnding the true support set with the encoder part of the k -
+sparse autoencoder depends on the incoherency of the
+learnt dictionary. As the k -sparse autoencoder converges (i.e., the reconstruction error goes to zero), the algorithm learns a dictionary that satisﬁes x ≈ W z, so the support set of z can be estimated using the ﬁrst step of ITI. Since suppk (W ⊺x) succeeds in ﬁnding the support set when the algorithm converges, the learnt dictionary must be suﬃciently incoherent.
+
+4. Experiments
+In this section, we evaluate the performance of k sparse autoencoders in both unsupervised learning and in shallow and deep discriminative learning tasks.
+4.1. Datasets
+We use the MNIST handwritten digit dataset, which consists of 60,000 training images and 10,000 test images. We randomly separate the training set into 50,000 training cases and 10,000 cases for validation.
+We also use the small NORB normalized-uniform dataset (LeCun et al., 2004), which contains 24,300 training examples and 24,300 test examples. This database contains images of 50 toys from 5 generic categories: four-legged animals, human ﬁgures, airplanes, trucks, and cars. Each image consists of two channels, each of size 96 × 96 pixels. We take the inner 64 × 64 pixels of each channel and resize it using bicubic interpolation to the size of 32 × 32 pixels from which we form a vector with 2048 dimensions as the input. Data points are subtracted by the mean and divided by the standard deviation along each input dimension across the whole training set to normalize the contrast. The training set is separated into 20,000 for training and 4,300 for validation.
+We also test our method on natural image patches extracted from CIFAR-10 dataset. We randomly extract 1000000 patches of size 8×8 from the 50000 32×32 im-
+
+k -Sparse Autoencoders
+
+ages of CIFAR-10. Each patch is then locally contrastnormalized and ZCA whitened. This preprocessing pipeline is the same as the one used in (Coates et al., 2011) for feature extraction.
+
+4.2. Training of k -Sparse Autoencoders
+4.2.1. Scheduling of the Sparsity Level
+When we are enforcing low sparsity levels in k -sparse autoencoders (e.g., k =15 on MNIST), one issue that might arise is that in the ﬁrst few epochs, the algorithm greedily assigns individual hidden units to groups of training cases, in a manner similar to kmeans clustering. In subsequent epochs, these hidden units will be picked and re-enforced and other hidden units will not be adjusted. That is, too much sparsity can prevent gradient back-propagation from adjusting the weights of these other ‘dead’ hidden units. We can address this problem by scheduling the sparsity level over epochs as follows.
+Suppose we are aiming for a sparsity level of k = 15. Then, we start oﬀ with a large sparsity level (e.g. k = 100) for which the k -sparse autoencoder can train all the hidden units. We then linearly decrease the sparsity level from k = 100 to k = 15 over the ﬁrst half of the epochs. This initializes the autoencoder in a good regime, for which all of the hidden units have a signiﬁcant chance of being picked. Then, we keep k = 15 for the second half of the epochs. With this scheduling, we can train all of the ﬁlters, even for low sparsity levels.
+
+4.2.2. Training Hyper-parameters
+
+We optimized the model parameters using stochastic gradient descent with momentum as follows.
+
+vk+1 = mk vk − ηk ∇f (xk ) xk+1 = xk + vk
+
+(11)
+
+Here, vk is the velocity vector, mk is the momentum
+and ηk is the learning rate at the k -th iteration. We
+also use a Gaussian distribution with a standard devi-
+ation of σ for initialization of the weights. We use dif-
+ferent momentum values, learning rates and initializa-
+tions based on the task and the dataset, and validation
+is used to select hyperparameters. In the unsupervised MNIST task, the values were σ = 0.01 , mk = 0.9 and ηk = 0.01, for 5000 epochs. In the supervised MNIST task, training started with mk = 0.25 and ηk = 1, and
+then the learning rate was linearly decreased to 0.001
+over 200 epochs. In the unsupervised NORB task, the values were σ = 0.01, mk = 0.9 and ηk = 0.0001, for
+5000 epochs. In the supervised NORB task, training
+
+started with mk = 0.9 and ηk = 0.01, and then the learning rate was linearly decreased to 0.001 over 200 epochs.
+4.2.3. Implementations
+While most of the conventional sparse coding algorithms require complex matrix operations such as matrix inversion or SVD decomposition, the k -sparse autoencoders only need matrix multiplications and sorting operations in both dictionary learning stage and the sparse encoding stage. (For a parallel, distributed implementation, the sorting operation can be replaced by a method that recursively applies a threshold until k values remain.) We used an eﬃcient GPU implementation obtained using the publicly available gnumpy library (Tieleman, 2010) on a single Nvidia GTX 680 GPU.
+4.3. Eﬀect of Sparsity Level
+In k -sparse autoencoders, we are able to tune the value of k to obtain the desirable sparsity level which makes the algorithm suitable for a wide variety of datasets. For example, one application could be pre-training a shallow or deep discriminative neural network. For large values of k (e.g., k = 100 on MNIST), the algorithm tends to learn very local features as is shown in Figure 1a and 2a. These features are too primitive to be used for classiﬁcation using a shallow architecture since a naive linear classiﬁer does not have enough capacity to combine these features and achieve a good classiﬁcation rate. However, these features could be used for pre-training deep neural nets.
+As we decrease the the sparsity level (e.g., k = 40 on MNIST), the output is reconstructed using a smaller number of hidden units and thus the features tend to be more global, as can be seen in Figure 1b,1c and 2b. For example, in the MNIST dataset, the lengths of the strokes increase when the sparsity level is decreased. These less local features are suitable for classiﬁcation using a shallow architecture. Nevertheless, forcing too much sparsity (e.g., k = 10 on MNIST), results in features that are too global and do not factor the input into parts, as depicted Figure 1d and 2c.
+Fig. 3 shows the visualization of ﬁlters of the k -sparse autoencoder with 1000 hidden units and sparsity level of k = 50 learnt from random image patches extracted from CIFAR-10 dataset. We can see that the k -sparse autoencoder has learnt localized Gabor ﬁlters from natural image patches.
+Fig. 4 plots histograms of the hidden unit activities for various unsupervised learning algorithms, includ-
+
+k -Sparse Autoencoders (a) k = 70 (b) k = 40 (c) k = 25 (d) k = 10
+Figure 1. Filters of the k -sparse autoencoder for diﬀerent sparsity levels k, learnt from MNIST with 1000 hidden units.
+(a) k = 200
+(b) k = 150
+(c) k = 50 Figure 2. Filters of the k -sparse autoencoder for diﬀerent sparsity levels k, learnt from NORB with 4000 hidden units.
+
+k -Sparse Autoencoders
+
+Raw Pixels RBM Dropout Autoencoder (50% hidden) Denoising Autoencoder (20% input dropout) Dropout + Denoising Autoencoder
+(20% input and 50% hidden) k -Sparse Autoencoder, k = 40 k -Sparse Autoencoder, k = 25 k -Sparse Autoencoder, k = 10
+
+Error Rate 7.20% 1.81% 1.80% 1.95%
+1.60%
+1.54% 1.35% 2.10%
+
+Table 1. Performance of unsupervised learning methods (without ﬁne-tuning) with 1000 hidden units on MNIST.
+
+Raw Pixels RBM (weight decay) Dropout Autoencoder Denoising Autoencoder
+(20% input dropout) k -Sparse Autoencoder, k = 200 k -Sparse Autoencoder, k = 150 k -Sparse Autoencoder, k = 75
+
+Error Rate 23%
+10.6% 10.1%
+9.5%
+10.4% 8.6% 9.5%
+
+Table 2. Performance of unsupervised learning methods (without ﬁne-tuning) with 4000 hidden units on NORB.
+
+ing the k -sparse autoencoder (k =70 and k =15), applied to the MNIST data. This ﬁgure contrasts the sparsity achieved by the k -sparse autoencoder with that of other algorithms.
+
+8
+
+Log histogram of hidden activities
+
+ReLU Autoencoder
+
+7
+
+Dropout Autoencoder, 50% hidden and 20% input
+
+k-Sparse Autoencoder, k=70
+
+6
+
+k-Sparse Autoencoder, k=15
+
+5
+
+4
+
+3
+
+2
+
+1
+
+00
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+Figure 3. Filters of k -sparse autoencoder with 1000 hidden units and k = 50, learnt from CIFAR-10 random patches.
+4.4. Unsupervised Feature Learning Results
+In order to compare the quality of the features learnt by our algorithm with those learnt by other unsupervised learning methods, we ﬁrst extracted features using each unsupervised learning algorithm. Then we ﬁxed the features and trained a logistic regression classiﬁer using those features. The usefulness of the features is then evaluated by examining the error rate of the classiﬁer.
+We trained a number of architectures on the MNIST and NORB datasets, including RBM, dropout autoencoder and denoising autoencoder. In dropout, after ﬁnding the features using dropout regularization with a dropout rate of 50%, we used all of the hidden units as the features (this worked best). For the denoising autoencoder, after training the network by dropping the input pixels with a rate of 20%, we used
+
+Figure 4. Histogram of hidden unit activities for various unsupervised learning methods.
+all of the uncorrupted input pixels to ﬁnd the features for classiﬁcation (this worked best). In the k sparse autoencoder, after training the dictionary, we used h = suppαk(W ⊺x + b) to ﬁnd the features as explained in Section 2.2, where α was determined using validation data. Results for diﬀerent architectures are compared in Tables 1, 2. We can see that the performance of our k -sparse autoencoder is better than the rest of the algorithms. In our algorithm, the best result is achieved by k = 25, α = 3 with 1000 hidden units on MNIST dataset and by k = 150, α = 2 with 4000 hidden units on NORB dataset.
+4.5. Shallow Supervised Learning Results
+In supervised learning, it is a common practice to use the encoder weights learnt by an unsupervised learning method to initialize the early layers of a multilayer discriminative model (Erhan et al., 2010). The back-propagation algorithm is then used
+
+k -Sparse Autoencoders
+
+Without Pre-Training RBM + F.T. Shallow Dropout AE + F.T. (%50 hidden) Denoising AE + F.T. (%20 input dropout) Deep Dropout AE + F.T. (Layer-wise pre-training, %50 hidden) k -Sparse AE + F.T. (k =25) Deep k -Sparse AE + F.T. (Layer-wise pre-training)
+
+Error 1.60% 1.24% 1.05%
+1.20%
+0.85%
+1.08%
+0.97%
+
+Table 3. Performance of supervised learning methods on MNIST. Pre-training was performed using the corresponding unsupervised learning algorithm with 1000 hidden units, and then the model was ﬁne-tuned.
+
+Without Pre-Training DBN DBM third-order RBM Shallow Dropout AE + F.T. (%50 hidden) Shallow Denoising AE + F.T. (%20 input dropout) Deep Dropout AE + F.T. (Layer-wise pre-training, %50 hidden) Shallow k -Sparse AE + F.T. (k =150) Deep k -Sparse AE + F.T. (k =150, Layer-wise pre-training)
+
+Error 12.7% 8.3% 7.2% 6.5% 8.2%
+7.9%
+7.0%
+7.8%
+7.4%
+
+Table 4. Performance of supervised learning methods on NORB. Pre-training was performed using the corresponding unsupervised learning algorithm with 4000 hidden units, and then the model was ﬁne-tuned.
+
+to adjust the weights of the last hidden layer and also to ﬁne-tune the weights in the previous layers. This procedure is often referred to as discriminative ﬁne-tuning. In this section, we report results using unsupervised learning algorithms such as RBMs, DBNs (Salakhutdinov & Larochelle, 2010), DBMs (Salakhutdinov & Larochelle, 2010), third-order RBM (Nair & Hinton, 2009), dropout autoencoders, denoising autoencoders and k -sparse autoencoders to initialize a shallow discriminative neural network for the MNIST and NORB datasets. We used backpropagation to ﬁne-tune the weights. The regularization method used in the ﬁne-tuning stage of diﬀerent algorithms is the same as the one used in the training of the corresponding unsupervised learning task. For instance, we ﬁne-tuned the weights obtained from dropout autoencoder with dropout regularization or in denoising autoencoder, we ﬁne-tuned the discriminative neural net by adding noise to the input. In a similar manner, in the ﬁne-tuning stage of the k -sparse autoencoder, we used the αk largest hidden units in the corresponding discriminative neural network, as explained in Section 2.2. Tables 3 and 4 reports the error rates obtained by diﬀerent methods.
+4.6. Deep Supervised Learning Results
+The k -sparse autoencoder can be used as a building block of a deep neural network, using greedy layerwise pre-training (Bengio et al., 2007). We ﬁrst train a shallow k -sparse autoencoder and obtain the hidden codes. We then ﬁx the features and train another k -
+
+sparse autoencoder on top of them to obtain another set of hidden codes. Then we use the parameters of these autoencoders to initialize a discriminative neural network with two hidden layers.
+In the ﬁne-tuning stage of the deep neural net, we ﬁrst ﬁx the parameters of the ﬁrst and second layers and train a softmax classiﬁer on top of the second layer. We then hold the weights of the ﬁrst layer ﬁxed and train the second layer and softmax jointly using the initialization of the softmax that we found in the previous step. Finally, we jointly ﬁne-tune all of the layers with the previous initialization. We have observed that this method of layer-wise ﬁne-tuning can improve the classiﬁcation performance compared to the case where we ﬁne-tune all the layers at the same time.
+In all of the ﬁne-tuning steps, we keep the αk largest hidden codes, where k = 25, α = 3 in MNIST and k = 150, α = 2 in NORB in both hidden layers. Tables 3 and 4 report the classiﬁcation results of diﬀerent deep supervised learning methods.
+5. Conclusion
+In this work, we proposed a very fast sparse coding method called k -sparse autoencoder, which achieves exact sparsity in the hidden representation. The main message of this paper is that we can use the resulting representations to achieve state-of-the-art classiﬁcation results, solely by enforcing sparsity in the hidden units and without using any other nonlinearity or regularization. We also discussed how the k -sparse autoencoder could be used for pre-training shallow and
+
+k -Sparse Autoencoders
+
+deep supervised architectures.
+6. Acknowledgment
+We would like to thank Andrew Delong, Babak Alipanahi and Lei Jimmy Ba for the valuable comments.
+References
+Aharon, Michal, Elad, Michael, and Bruckstein, Alfred. K-svd: Design of dictionaries for sparse representation. Proceedings of SPARS, 5:9–12, 2005.
+Bengio, Yoshua, Lamblin, Pascal, Popovici, Dan, and Larochelle, Hugo. Greedy layer-wise training of deep networks. Advances in neural information processing systems, 19:153, 2007.
+Blumensath, Thomas and Davies, Mike E. Iterative hard thresholding for compressed sensing. Applied and Computational Harmonic Analysis, 27(3):265– 274, 2009.
+Coates, Adam and Ng, Andrew. The importance of encoding versus training with sparse coding and vector quantization. In Proceedings of the 28th International Conference on Machine Learning (ICML-11), pp. 921–928, 2011.
+Coates, Adam, Ng, Andrew Y, and Lee, Honglak. An analysis of single-layer networks in unsupervised feature learning. In International Conference on Artiﬁcial Intelligence and Statistics, pp. 215–223, 2011.
+Donoho, David L and Elad, Michael. Optimally sparse representation in general (nonorthogonal) dictionaries via 1 minimization. Proceedings of the National Academy of Sciences, 100(5):2197–2202, 2003.
+Engan, Kjersti, Aase, Sven Ole, and Hakon Husoy, J. Method of optimal directions for frame design. In Acoustics, Speech, and Signal Processing, 1999. Proceedings., 1999 IEEE International Conference on, volume 5, pp. 2443–2446. IEEE, 1999.
+Erhan, Dumitru, Bengio, Yoshua, Courville, Aaron, Manzagol, Pierre-Antoine, Vincent, Pascal, and Bengio, Samy. Why does unsupervised pre-training help deep learning? The Journal of Machine Learning Research, 11:625–660, 2010.
+Gregor, Karol and LeCun, Yann. Learning fast approximations of sparse coding. In Proceedings of the 27th International Conference on Machine Learning (ICML-10), pp. 399–406, 2010.
+Hinton, Geoﬀrey E, Srivastava, Nitish, Krizhevsky, Alex, Sutskever, Ilya, and Salakhutdinov, Ruslan R. Improving neural networks by preventing
+
+co-adaptation of feature detectors. arXiv preprint arXiv:1207.0580, 2012.
+Kavukcuoglu, Koray, Ranzato, Marc’Aurelio, and LeCun, Yann. Fast inference in sparse coding algorithms with applications to object recognition. arXiv preprint arXiv:1010.3467, 2010.
+LeCun, Yann, Huang, Fu Jie, and Bottou, Leon. Learning methods for generic object recognition with invariance to pose and lighting. In Computer Vision and Pattern Recognition, CVPR, volume 2, pp. II–97. IEEE, 2004.
+Lee, Honglak, Ekanadham, Chaitanya, and Ng, Andrew. Sparse deep belief net model for visual area v2. In Advances in neural information processing systems, pp. 873–880, 2007.
+Maleki, Arian. Coherence analysis of iterative thresholding algorithms. In Communication, Control, and Computing, 2009. Allerton 2009. 47th Annual Allerton Conference on, pp. 236–243. IEEE, 2009.
+Nair, Vinod and Hinton, Geoﬀrey E. 3d object recognition with deep belief nets. In Advances in Neural Information Processing Systems, pp. 1339–1347, 2009.
+Olshausen, Bruno A and Field, David J. Sparse coding with an overcomplete basis set: A strategy employed by v1? Vision research, 37(23):3311–3325, 1997.
+Salakhutdinov, Ruslan and Larochelle, Hugo. Eﬃcient learning of deep boltzmann machines. In International Conference on Artiﬁcial Intelligence and Statistics, pp. 693–700, 2010.
+Tieleman, Tijmen. Gnumpy: an easy way to use gpu boards in python. Department of Computer Science, University of Toronto, 2010.
+Tropp, Joel A and Gilbert, Anna C. Signal recovery from random measurements via orthogonal matching pursuit. Information Theory, IEEE Transactions on, 53(12):4655–4666, 2007.
+Van Gemert, Jan C, Geusebroek, Jan-Mark, Veenman, Cor J, and Smeulders, Arnold WM. Kernel codebooks for scene categorization. In Computer Vision– ECCV 2008, pp. 696–709. Springer, 2008.
+Vincent, Pascal, Larochelle, Hugo, Bengio, Yoshua, and Manzagol, Pierre-Antoine. Extracting and composing robust features with denoising autoencoders. In Proceedings of the 25th international conference on Machine learning, pp. 1096–1103. ACM, 2008.
+

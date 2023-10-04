@@ -1,0 +1,85 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > stat > arXiv:1606.05908
+
+Help | Advanced Search
+Search
+Statistics > Machine Learning
+(stat)
+[Submitted on 19 Jun 2016 ( v1 ), last revised 3 Jan 2021 (this version, v3)]
+Title: Tutorial on Variational Autoencoders
+Authors: Carl Doersch
+Download a PDF of the paper titled Tutorial on Variational Autoencoders, by Carl Doersch
+Download PDF
+
+    Abstract: In just three years, Variational Autoencoders (VAEs) have emerged as one of the most popular approaches to unsupervised learning of complicated distributions. VAEs are appealing because they are built on top of standard function approximators (neural networks), and can be trained with stochastic gradient descent. VAEs have already shown promise in generating many kinds of complicated data, including handwritten digits, faces, house numbers, CIFAR images, physical models of scenes, segmentation, and predicting the future from static images. This tutorial introduces the intuitions behind VAEs, explains the mathematics behind them, and describes some empirical behavior. No prior knowledge of variational Bayesian methods is assumed. 
+
+Subjects: 	Machine Learning (stat.ML) ; Machine Learning (cs.LG)
+Cite as: 	arXiv:1606.05908 [stat.ML]
+  	(or arXiv:1606.05908v3 [stat.ML] for this version)
+  	https://doi.org/10.48550/arXiv.1606.05908
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Carl Doersch [ view email ]
+[v1] Sun, 19 Jun 2016 21:02:30 UTC (617 KB)
+[v2] Sat, 13 Aug 2016 12:33:43 UTC (600 KB)
+[v3] Sun, 3 Jan 2021 16:56:46 UTC (600 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Tutorial on Variational Autoencoders, by Carl Doersch
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+stat.ML
+< prev   |   next >
+new | recent | 1606
+Change to browse by:
+cs
+cs.LG
+stat
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+6 blog links
+( what is this? )
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

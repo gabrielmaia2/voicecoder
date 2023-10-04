@@ -1,0 +1,90 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1509.00519
+
+Help | Advanced Search
+Search
+Computer Science > Machine Learning
+(cs)
+[Submitted on 1 Sep 2015 ( v1 ), last revised 7 Nov 2016 (this version, v4)]
+Title: Importance Weighted Autoencoders
+Authors: Yuri Burda , Roger Grosse , Ruslan Salakhutdinov
+Download a PDF of the paper titled Importance Weighted Autoencoders, by Yuri Burda and 2 other authors
+Download PDF
+
+    Abstract: The variational autoencoder (VAE; Kingma, Welling (2014)) is a recently proposed generative model pairing a top-down generative network with a bottom-up recognition network which approximates posterior inference. It typically makes strong assumptions about posterior inference, for instance that the posterior distribution is approximately factorial, and that its parameters can be approximated with nonlinear regression from the observations. As we show empirically, the VAE objective can lead to overly simplified representations which fail to use the network's entire modeling capacity. We present the importance weighted autoencoder (IWAE), a generative model with the same architecture as the VAE, but which uses a strictly tighter log-likelihood lower bound derived from importance weighting. In the IWAE, the recognition network uses multiple samples to approximate the posterior, giving it increased flexibility to model complex posteriors which do not fit the VAE modeling assumptions. We show empirically that IWAEs learn richer latent space representations than VAEs, leading to improved test log-likelihood on density estimation benchmarks. 
+
+Comments: 	Submitted to ICLR 2015
+Subjects: 	Machine Learning (cs.LG) ; Machine Learning (stat.ML)
+Cite as: 	arXiv:1509.00519 [cs.LG]
+  	(or arXiv:1509.00519v4 [cs.LG] for this version)
+  	https://doi.org/10.48550/arXiv.1509.00519
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Yuri Burda [ view email ]
+[v1] Tue, 1 Sep 2015 22:33:13 UTC (1,146 KB)
+[v2] Tue, 10 Nov 2015 19:43:20 UTC (1,152 KB)
+[v3] Mon, 11 Jan 2016 05:47:05 UTC (1,417 KB)
+[v4] Mon, 7 Nov 2016 17:29:24 UTC (1,418 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Importance Weighted Autoencoders, by Yuri Burda and 2 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.LG
+< prev   |   next >
+new | recent | 1509
+Change to browse by:
+cs
+stat
+stat.ML
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+Yuri Burda
+Roger B. Grosse
+Ruslan Salakhutdinov
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

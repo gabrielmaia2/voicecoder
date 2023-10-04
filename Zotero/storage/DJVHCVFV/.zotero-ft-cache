@@ -1,0 +1,124 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Conferences > ICASSP 2020 - 2020 IEEE Inter...
+Voice Conversion with Transformer Network
+Publisher: IEEE
+Cite This
+PDF
+Ruolan Liu ; Xiao Chen ; Xue Wen
+All Authors
+7
+Cites in
+Papers
+770
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    1.
+    INTRODUCTION
+    2.
+    BACKGROUND
+    3.
+    PROPOSED METHOD
+    4.
+    EXPERIMENT
+    5.
+    CONCLUSION AND FUTURE WORK
+
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Abstract:
+This paper describes an end-to-end voice conversion system, which involves three main ideas: transformer, context preservation mechanisms, and model adaptation. Self-attention in the transformer architecture directly connects all positions, making it easier to learn long range dependencies and improve training efficiency. Context preservation mechanisms accelerate and stabilize training. Adaptation techniques are conductive to the training of the conversion mapping with limited training data. The results show that the proposed method obtains a higher MOS and the training speed is 2.72 times faster than LSTM based baseline system.
+Published in: ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+Date of Conference: 04-08 May 2020
+Date Added to IEEE Xplore : 09 April 2020
+ISBN Information:
+ISSN Information:
+INSPEC Accession Number: 19787269
+DOI: 10.1109/ICASSP40776.2020.9054523
+Publisher: IEEE
+Conference Location: Barcelona, Spain
+1. INTRODUCTION
+
+Voice conversion (VC) modifies a speech signal uttered by a source speaker to sound like a target speaker, while keeping the linguistic contents unchanged [1]. VC can be applied to various tasks, such as impersonating or hiding a speaker’s identity [2], speaking aid for people with vocal impairments [3], and personalized text-to-speech (TTS) system using limited training data from the desired speaker [4].
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+Efficient Deep Learning for Pathological Speech Recognition
+
+2023 IEEE Conference on Artificial Intelligence (CAI)
+
+Published: 2023
+Light Gated Recurrent Units for Speech Recognition
+
+IEEE Transactions on Emerging Topics in Computational Intelligence
+
+Published: 2018
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

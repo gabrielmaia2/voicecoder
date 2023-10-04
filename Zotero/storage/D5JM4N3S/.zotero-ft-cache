@@ -1,0 +1,81 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > eess > arXiv:2006.04154
+
+Help | Advanced Search
+Search
+Electrical Engineering and Systems Science > Audio and Speech Processing
+(eess)
+[Submitted on 7 Jun 2020]
+Title: VQVC+: One-Shot Voice Conversion by Vector Quantization and U-Net architecture
+Authors: Da-Yi Wu , Yen-Hao Chen , Hung-Yi Lee
+Download a PDF of the paper titled VQVC+: One-Shot Voice Conversion by Vector Quantization and U-Net architecture, by Da-Yi Wu and 2 other authors
+Download PDF
+
+    Abstract: Voice conversion (VC) is a task that transforms the source speaker's timbre, accent, and tones in audio into another one's while preserving the linguistic content. It is still a challenging work, especially in a one-shot setting. Auto-encoder-based VC methods disentangle the speaker and the content in input speech without given the speaker's identity, so these methods can further generalize to unseen speakers. The disentangle capability is achieved by vector quantization (VQ), adversarial training, or instance normalization (IN). However, the imperfect disentanglement may harm the quality of output speech. In this work, to further improve audio quality, we use the U-Net architecture within an auto-encoder-based VC system. We find that to leverage the U-Net architecture, a strong information bottleneck is necessary. The VQ-based method, which quantizes the latent vectors, can serve the purpose. The objective and the subjective evaluations show that the proposed method performs well in both audio naturalness and speaker similarity. 
+
+Subjects: 	Audio and Speech Processing (eess.AS) ; Machine Learning (cs.LG); Sound (cs.SD)
+Cite as: 	arXiv:2006.04154 [eess.AS]
+  	(or arXiv:2006.04154v1 [eess.AS] for this version)
+  	https://doi.org/10.48550/arXiv.2006.04154
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Da Yi Wu [ view email ]
+[v1] Sun, 7 Jun 2020 14:01:16 UTC (711 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled VQVC+: One-Shot Voice Conversion by Vector Quantization and U-Net architecture, by Da-Yi Wu and 2 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+Current browse context:
+eess.AS
+< prev   |   next >
+new | recent | 2006
+Change to browse by:
+cs
+cs.LG
+cs.SD
+eess
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+
