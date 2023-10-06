@@ -5,8 +5,15 @@ Autoencoder model for voice compression.
 Tools:
 
 - LaTeX Editor: Overleaf;
-- Reference manager: Zotero with Zotero Connector, Better BibTeX for Zotero, Zotero Citation Counts Manager and Sci-Hub plugins;
+- Reference manager: Zotero with Zotero Connector;
 - Google Drive: To store other important files.
+
+Zotero plugins:
+
+- Better BibTeX for Zotero;
+- Zotero Citation Counts Manager;
+- Sci-Hub plugins;
+- Zotero DOI Manager.
 
 Links:
 
