@@ -1,0 +1,226 @@
+END-TO-END OPTIMIZED SPEECH CODING WITH DEEP NEURAL NETWORKS
+Srihari Kankanahalli
+Bloomberg LP skankanahall@bloomberg.net
+
+ABSTRACT
+Modern compression algorithms are often the result of laborious domain-speciﬁc research; industry standards such as MP3, JPEG, and AMR-WB took years to develop and were largely hand-designed. We present a deep neural network model which optimizes all the steps of a wideband speech coding pipeline (compression, quantization, entropy coding, and decompression) end-to-end directly from raw speech data – no manual feature engineering necessary, and it trains in hours. In testing, our DNN-based coder performs on par with the AMR-WB standard at a variety of bitrates (∼9kbps up to ∼24kbps). It also runs in realtime on a 3.8GhZ Intel CPU.
+Index Terms— speech coding, deep learning, neural networks, end-to-end training, compression
+1. INTRODUCTION
+The everyday applications of data compression are ubiquitous: streaming live videos and music in realtime across the planet, storing thousands of images and songs on a single tiny thumb drive, and more. In a way, improved compression was what made these innovations possible in the ﬁrst place, and designing better and more efﬁcient methods of compression could help expand them even further (to developing nations with slower Internet speeds, for example).
+Essentially all modern compression standards are handdesigned, including the most prominent wideband speech coder: AMR-WB [1]. It was created by eight speech coding researchers working at the VoiceAge Corporation (in Montreal) and the Nokia Research Center (in Finland) over two years, and it provides speech at a wide variety of bitrates ranging from 7kbps through 24kbps. (For reference, uncompressed wideband speech has a bitrate of 256kbps.)
+Recently, deep neural networks have shown an incredible ability to learn directly from data, circumventing traditional feature engineering to produce state-of-the-art results in a variety of areas [2]. Neural networks have seen signiﬁcant historical interest from compression researchers, but almost always as an intermediate pipeline step, or as a way to optimize the parameters of an intermediate step [3]. For example, Krishnamurthy et al. [4] used a neural network to perform vector quantization on speech features; Wu et al. [5] used an ANN
+
+as part of a predictive speech coder; and Cernak et al. [6] used a deep neural network as a phonological vocoder.
+Our proposal is different in nature from all of these: we reframe the entire compression pipeline, from start to ﬁnish, as a neural network optimization problem (along the lines of classical autoencoders). As far as we know, this is only the second published work to learn an audio compression pipeline end-to-end – the previous being an obscure early attempt by Morishima et al. in 1990 [7] – and the ﬁrst to compete with a contemporary standard. Cernak et al. [8] proposed a nearly end-to-end design for a very-low-bitrate low-quality speech coder in 2016; however, their pipeline still required extraction of acoustic features and pitch (and was also quite complex, composing several different deep and spiking neural networks together). All other related designs we know of employ ANNs as a mere component of a larger hand-designed system.
+In the domain of image compression, there has been some interest in training ANN-based systems since the 1990s [9], but this has not yielded state-of-the-art results until fairly recently either (starting August 2016, when Toderici et al. trained a neural network model outperforming JPEG [10]). Thus, it seems our work is on the cutting edge of both deep learning research and compression research.
+2. NETWORK ARCHITECTURE AND TRAINING METHODOLOGY
+Our network architecture, shown in Figure 1, is inspired by both residual neural networks [11] and autoencoders. The model is composed of an encoder subnetwork and a decoder subnetwork; it takes in a vector of 512 speech samples (a 32ms speech window) and outputs another vector of 512 speech samples (the reconstructed window after compression and decompression). The network is composed of 4 different types of residual blocks [11], shown in Figure 2. All convolutions use 1D ﬁlters of size 9 and PReLU activations [12]; the upsample block uses subpixel convolutions [13]. (We were unable to successfully incorporate batch normalization.)
+2.1. Softmax Quantization
+Quantization – mapping the real-valued output of a neural network into discrete bins – is an essential part of our pipeline.
+
+978-1-5386-4658-8/18/$31.00 ©2018 IEEE
+
+2521
+
+ICASSP 2018
+
+(a) residual
+
+(b) channel change
+
+Fig. 1: Simpliﬁed network architecture.
+
+However, quantization is inherently non-differentiable, and therefore incompatible with the standard gradient-descentbased methods used to train neural networks.
+In order to circumvent this, we use a differentiable approximation ﬁrst discussed by Agustsson et al. [14]. Specifically, we reframe scalar quantization as nearest-neighbor assignment: given a list B of N bins, we quantize a scalar x by assigning it to the nearest quantization bin. This operation still isn’t differentiable, but can be approximated as follows:
+
+D = [|x − B1|, ..., |x − BN |] ∈ RN
+
+(1)
+
+S = sof tmax(−σD)
+
+(2)
+
+S is a soft assignment over the N quantization bins, which becomes a hard assignment as σ → ∞ (and can later be rounded into one). On the decoder side, we can ”dequantize” S back into a real value Sˆ by taking the dot product of S and B. Since Agustsson et al. did not give this approximation a name, we hereby dub it softmax quantization.
+In practice, we noticed no problems training with very high temperature values from the start. For all experiments, we initialized with σ = 300, making σ and B trainable parameters of the network. (We also found that scalar quantization gave better-sounding results than the vector quantization more prominently discussed by Agustsson et al.)
+
+2.2. Objective Function The network’s objective function is as follows:
+
+O(x, y, c) =λmse 2(x, y)
+
++λperceptualP (x, y)
+
+(3)
+
++λquantizationQ(c)
+
++λentropy E (c)
+
+(c) downsample
+
+(d) upsample Fig. 2: The four block types used in our network architecture.
+
+where x is the original signal, y is the reconstructed signal, c is the encoder’s output (the soft assignments to quantization bins), 2(x, y) is mean-squared error, and λ corresponds to weights for each loss. P (x, y), Q(c), and E(c) are supplemental losses, which we now discuss in more depth.
+
+• Perceptual loss. Training a model solely to minimize mean-squared error often leads to blurry reconstructions lacking in high-frequency content [15] [16]. Therefore, we augment our model with a perceptual loss. We compute MFCCs [17] for both the original and reconstructed signals, and use the 2 distance between MFCC vectors as a proxy for perceptual distance. To allow for both coarse and ﬁne differentiation, we use 4 MFCC ﬁlterbanks of sizes 8, 16, 32, and 128:
+
+14
+
+P (x, y) = 4
+
+2(Mi(x), Mi(y)) (4)
+
+i=1
+
+where Mi is the MFCC function for ﬁlterbank i.
+
+• Quantization penalty. Because softmax quantization is a continuous approximation, it is possible for the network to learn how to generate values outside the intended quantization bins – and it almost always will,
+
+2522
+
+if there is no additional penalty for doing so. Therefore, we deﬁne a loss function favoring soft assignments close to one-hot vectors:
+
+1 255 N−1 √
+
+Q(c) =
+
+[(
+
+256
+
+ci,j) − 1.0 ] (5)
+
+i=0 j=0
+
+Q(c) is zero when all 256 encoded symbols are one-hot vectors, and nonzero otherwise.
+
+• Entropy control. We apply entropy coding to the quantized symbols, which provides a simple way to specify different bitrates without having to engineer entirely different network architectures for each one. Depending on our desired bitrate, we can constrain the entropy of the encoder’s output to be higher or lower (by modifying the loss weight λentropy appropriately).
+To estimate the encoder’s entropy, we compute a probability distribution h specifying how often each quantized symbol appears in the encoder’s output, by averaging all of the soft assignments the encoder generates over one minibatch. Thus, our entropy estimate is:
+
+E(c) =
+
+−hi log2(hi) (6)
+
+h = histogram(c)
+
+2.3. Training Process
+We train the network on samples from the TIMIT speech corpuzs [18], which contains over 6,000 wideband recordings of 630 American English speakers from 8 major dialects. We create smaller training/validation/test sets from the preexisting train/test split: our training set consists of 3,000 ﬁles from the original train set, our validation set consists of 200 ﬁles from the original train set, and our test set consists of 500 ﬁles from the original test set. Each set contains an even distribution over the 8 dialects, and they do not share any speakers. Additionally, we preprocess each speech ﬁle by maximizing its volume.
+We extract raw speech windows of length 32ms (512 speech samples), with an overlap of 2ms (32 samples), using a Hann window in the overlap region. This means that each speech window covers a total of 480 unique samples, or 30ms of speech. Our training process takes place in two stages:
+1. Quantization off. The network is trained without quantization; in this stage, only the 2 and perceptual losses are enabled. After 5 epochs, the quantization bins are initialized using K-means clustering, λentropy is set to an initial value τinitial, and quantization is turned on. We found that this ”pre-training” period improved the stability and quality of the network’s output.
+2. Quantization on. The network is trained for 145 more epochs, targeting a speciﬁed bitrate. At the end of each
+
+epoch, we evaluate the model’s mean PESQ over our validation set, and save the best-performing one. We also estimate the average bitrate of the encoder:
+
+bitrate = (windows/sec) ∗
+
+(symbols/window) ∗
+
+(bits/symbol) bps
+
+(7)
+
+16000
+
+=
+
+∗ 256 ∗ E(c) bps
+
+512 − 32
+
+If the estimated bitrate is above the target bitrate region, then λentropy is increased by a small value τchange; if it is below the target region, then λentropy is decreased by τchange. This removes the need to manually ﬁnd the optimal λentropy for each target bitrate. (The target region is deﬁned as our target bitrate ± 0.45kbps.)
+
+During training, we also slowly lower the network’s learning rate from an initial value αinitial to a ﬁnal value αfinal, using cosine annealing [19] [20]. We repeat the training process for each bitrate we want to target; for example, if we want to target 4 different bitrates, we train 4 networks (using the same architecture, but ending up with different sets of weights). The training process takes about 20 hours per network, on a GeForce GTX 1080 Ti.
+
+3. RESULTS
+3.1. Objective Quality Evaluation
+We evaluated the average PESQ of our speech coder versus the AMR-WB standard around 4 different target bitrates. The results are shown in Figure 3, and we reproduce them below:
+
+Dataset Training set
+Validation set
+Test set
+
+AMR-WB Bitrate PESQ
+8.85 3.478 15.85 4.012 19.85 4.103 23.85 4.138 8.85 3.674 15.85 4.176 19.85 4.244 23.85 4.290 8.85 3.521 15.85 4.063 19.85 4.145 23.85 4.178
+
+DNN Bitrate PESQ
+9.02 3.643 16.24 4.123 20.06 4.202 24.06 4.283 9.02 3.730 16.24 4.225 19.70 4.298 23.71 4.372 9.02 3.629 16.24 4.133 20.06 4.215 24.06 4.296
+
+Our speech coder outperforms AMR-WB at all bitrates, especially higher rates. The gap is bigger on the training set than on the validation or test sets, indicating possible overﬁtting (note that we did not use dropout or weight regularization).
+
+2523
+
+Our speech coder runs in realtime (under 30ms for combined encode and decode) without any optimizations beyond those already provided by TensorFlow and Keras. However, it’s important to note that real speech coders will need to run on processors much slower than the CPU we used.
+
+(a) training set
+
+(b) validation set
+
+(c) test set
+Fig. 3: Mean PESQ of our encoder, compared with AMR-WB at different bitrates.
+
+3.2. Subjective Quality Evaluation
+
+We conducted a simple preference test using Amazon Mechanical Turk. 20 speech ﬁles were randomly selected from the test set and processed with both AMR-WB and our method, at the same 4 target bitrates as before. Then, 20 listeners were presented the original speech signal plus both processed versions (unlabeled and randomly switched). Each listener was asked to pick which of the two he or she preferred. The subjects’ average preferences are recorded below:
+
+Target Bitrate 9kbps 16kbps 20kbps 24kbps
+
+DNN 25.50% 24.50% 23.50% 23.75%
+
+No Preference 32.00% 37.00% 41.75% 39.00%
+
+AMR-WB 42.50% 38.50% 34.75% 37.25%
+
+Overall, the subjects slightly preferred AMR-WB to our DNN-based coder, with the gap narrowing at higher bitrates. This indicates that more work needs to be done in order to increase our model’s subjective quality.
+
+3.3. Computational Complexity
+We evaluated the average time our model takes to encode and decode one 30ms window, on an Intel i7-4970K CPU (3.8GhZ) and a GeForce GTX 1080 Ti GPU:
+Processor Encoder Decoder Total CPU 10.52ms 10.90ms 21.42ms GPU 2.43ms 2.35ms 4.78ms
+
+4. CONCLUSION
+We have shown a proof-of-concept applying deep neural networks (DNNs) to speech coding, with very promising results. Our wideband speech coder is learned end-to-end from raw signal, with almost no audio-speciﬁc processing aside from a relatively simple perceptual loss; nevertheless, it manages to compete with current standards.
+The key to further increasing quality probably lies in our perceptual model, which could be signiﬁcantly more complex and nuanced. This is where psychoacoustic theory can come into the picture once again: to develop a differentiable perceptual loss for this and other audio processing tasks. In addition, expanding the training data to include music and background noise instead of solely clean speech may be fruitful.
+Finally, while our DNN-based coder already runs in realtime on a modern desktop CPU, it’s still a far cry from running on embedded systems or cellphones. Model compression, transfer learning, and clever architecture designs are all interesting areas which could be explored here.
+
+5. HYPERPARAMETERS
+
+For purposes of reproducibility, we now make available the list of parameters used for all experiments:
+
+σinitial αinitial αf inal λperceptual λquantization λmse τinitial τchange
+N
+Batch size
+Optimizer
+
+300 0.025 0.01 5.0 10.0 30.0 0.5 0.025
+32 128 Adam
+
+The parameters are listed in roughly descending order by how much manual tuning they required. Source code will be made public after the reviewers’ decision. Speech samples are available at: http://srik.tk/speech-coding
+
+6. REFERENCES
+[1] Bruno Bessette, Redwan Salami, Roch Lefebvre, Milan Jelinek, Jani Rotola-Pukkila, Janne Vainio, Hannu Mikkola, and Kari Jarvinen, “The adaptive multirate
+
+2524
+
+wideband speech codec (amr-wb),” IEEE transactions on speech and audio processing, vol. 10, no. 8, pp. 620– 636, 2002.
+[2] Yann LeCun, Yoshua Bengio, and Geoffrey Hinton, “Deep learning,” Nature, vol. 521, no. 7553, pp. 436– 444, 2015.
+[3] Robert D Dony and Simon Haykin, “Neural network approaches to image compression,” Proceedings of the IEEE, vol. 83, no. 2, pp. 288–303, 1995.
+[4] Ashok K. Krishnamurthy, Stanley C. Ahalt, Douglas E. Melton, and Prakoon Chen, “Neural networks for vector quantization of speech and images,” IEEE journal on selected areas in Communications, vol. 8, no. 8, pp. 1449–1457, 1990.
+[5] Lizhong Wu, Mahesan Niranjan, and Frank Fallside, “Fully vector-quantized neural network-based codeexcited nonlinear predictive speech coding,” IEEE transactions on speech and audio processing, vol. 2, no. 4, pp. 482–489, 1994.
+[6] Milos Cernak, Blaise Potard, and Philip N Garner, “Phonological vocoding using artiﬁcial neural networks,” in Acoustics, Speech and Signal Processing (ICASSP), 2015 IEEE International Conference on. IEEE, 2015, pp. 4844–4848.
+[7] Shigeo Morishima, H Harashima, and Y Katayama, “Speech coding based on a multi-layer neural network,” in Communications, 1990. ICC’90, Including Supercomm Technical Sessions. SUPERCOMM/ICC’90. Conference Record., IEEE International Conference on. IEEE, 1990, pp. 429–433.
+[8] Milos Cernak, Alexandros Lazaridis, Afsaneh Asaei, and Philip N Garner, “Composition of deep and spiking neural networks for very low bit rate speech coding,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 24, no. 12, pp. 2301–2312, 2016.
+[9] J Jiang, “Image compression with neural networks–a survey,” Signal Processing: Image Communication, vol. 14, no. 9, pp. 737–760, 1999.
+[10] George Toderici, Damien Vincent, Nick Johnston, Sung Jin Hwang, David Minnen, Joel Shor, and Michele Covell, “Full resolution image compression with recurrent neural networks,” arXiv preprint arXiv:1608.05148, 2016.
+[11] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun, “Deep residual learning for image recognition,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2016, pp. 770–778.
+
+[12] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun, “Delving deep into rectiﬁers: Surpassing humanlevel performance on imagenet classiﬁcation,” in Proceedings of the IEEE international conference on computer vision, 2015, pp. 1026–1034.
+[13] Wenzhe Shi, Jose Caballero, Ferenc Husza´r, Johannes Totz, Andrew P Aitken, Rob Bishop, Daniel Rueckert, and Zehan Wang, “Real-time single image and video super-resolution using an efﬁcient sub-pixel convolutional neural network,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2016, pp. 1874–1883.
+[14] Eirikur Agustsson, Fabian Mentzer, Michael Tschannen, Lukas Cavigelli, Radu Timofte, Luca Benini, and Luc Van Gool, “Soft-to-hard vector quantization for end-to-end learned compression of images and neural networks,” arXiv preprint arXiv:1704.00648, 2017.
+[15] Michael Mathieu, Camille Couprie, and Yann LeCun, “Deep multi-scale video prediction beyond mean square error,” arXiv preprint arXiv:1511.05440, 2015.
+[16] Alexey Dosovitskiy and Thomas Brox, “Generating images with perceptual similarity metrics based on deep networks,” in Advances in Neural Information Processing Systems, 2016, pp. 658–666.
+[17] Lindasalwa Muda, Mumtaj Begam, and Irraivan Elamvazuthi, “Voice recognition algorithms using mel frequency cepstral coefﬁcient (mfcc) and dynamic time warping (dtw) techniques,” arXiv preprint arXiv:1003.4083, 2010.
+[18] John S Garofolo, Lori F Lamel, William M Fisher, Jonathan G Fiscus, David S Pallett, Nancy L Dahlgren, and Victor Zue, “Timit acoustic-phonetic continuous speech corpus,” Linguistic data consortium, vol. 10, no. 5, pp. 0, 1993.
+[19] Ilya Loshchilov and Frank Hutter, “Sgdr: stochastic gradient descent with restarts,” arXiv preprint arXiv:1608.03983, 2016.
+[20] Xavier Gastaldi, “Shake-shake regularization,” arXiv preprint arXiv:1705.07485, 2017.
+
+2525
+

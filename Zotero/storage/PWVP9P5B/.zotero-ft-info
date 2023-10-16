@@ -1,0 +1,16 @@
+Title:          IoT-Based Bee Swarm Activity Acoustic Classification Using Deep Neural Networks
+Subject:        Animal activity acoustic monitoring is becoming one of the necessary tools in agriculture, including beekeeping. It can assist in the control of beehives in remote locations. It is possible to classify bee swarm activity from audio signals using such approaches. A deep neural networks IoT-based acoustic swarm classification is proposed in this paper. Audio recordings were obtained from the Open Source Beehive project. Mel-frequency cepstral coefficients features were extracted from the audio signal. The lossless WAV and lossy MP3 audio formats were compared for IoT-based solutions. An analysis was made of the impact of the deep neural network parameters on the classification results. The best overall classification accuracy with uncompressed audio was 94.09%, but MP3 compression degraded the DNN accuracy by over 10%. The evaluation of the proposed deep neural networks IoT-based bee activity acoustic classification showed improved results if compared to the previous hidden Markov models system.
+Keywords:       bee acoustic analysis; deep neural networks; activity monitoring; acoustic classification; lossy audio compression
+Author:         Andrej Zgank
+Creator:        LaTeX with hyperref
+Producer:       pdfTeX-1.40.21
+CreationDate:   01/20/21 14:37:55
+ModDate:        01/20/21 15:00:30
+Tagged:         no
+Form:           none
+Pages:          14
+Encrypted:      no
+Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
+File size:      1635298 bytes
+Optimized:      no
+PDF version:    1.7

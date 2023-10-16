@@ -1,0 +1,2145 @@
+Signal Processing: Image Communication 14 (1999) 737}760
+
+Image compression with neural networks } A survey
+J. Jiang*
+School of Computing, University of Glamorgan, Pontypridd CF37 1DL, UK Received 24 April 1996
+Abstract Apart from the existing technology on image compression represented by series of JPEG, MPEG and H.26x standards,
+new technology such as neural networks and genetic algorithms are being developed to explore the future of image coding. Successful applications of neural networks to vector quantization have now become well established, and other aspects of neural network involvement in this area are stepping up to play signi"cant roles in assisting with those traditional technologies. This paper presents an extensive survey on the development of neural networks for image compression which covers three categories: direct image compression by neural networks; neural network implementation of existing techniques, and neural network based technology which provide improvement over traditional algorithms. 1999 Elsevier Science B.V. All rights reserved.
+Keywords: Neural network; Image compression and coding
+
+1. Introduction
+Image compression is a key technology in the development of various multimedia computer services and telecommunication applications such as teleconferencing, digital broadcast codec and video technology, etc. At present, the main core of image compression technology consists of three important processing stages: pixel transforms, quantization and entropy coding. In addition to these key techniques, new ideas are constantly appearing across di!erent disciplines and new research fronts. As a model to simulate the learning function of
+* Tel.: #44 1443 482271; fax: #44 1443 482715; e-mail: jjiang@glam.ac.uk
+
+human brains, neural networks have enjoyed widespread applications in telecommunication and computer science. Recent publications show a substantial increase in neural networks for image compression and coding. Together with the popular multimedia applications and related products, what role are the well-developed neural networks going to play in this special era where information processing and communication is in great demand? Although there is no sign of signi"cant work on neural networks that can take over the existing technology, research on neural networks of image compression are still making steady advances. This could have a tremendous impact upon the development of new technologies and algorithms in this subject area.
+
+0923-5965/99/$ - see front matter 1999 Elsevier Science B.V. All rights reserved. PII: S 0 9 2 3 - 5 9 6 5 ( 9 8 ) 0 0 0 4 1 - 1
+
+738
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+This paper comprises "ve sections. Section 2 discusses those neural networks which are directly developed for image compression. Section 3 contributes to neural network implementation of those conventional image compression algorithms. In Section 4, indirect neural network developments which are mainly designed to assist with those conventional algorithms and provide further improvement are discussed. Finally, Section 5 gives conclusions and summary for present research work and other possibilities of future research directions.
+2. Direct neural network development for image compression
+2.1. Back-propagation image compression
+2.1.1. Basic back-propagation neural network Back-propagation is one of the neural networks
+which are directly applied to image compression coding [9,17,47,48,57]. The neural network structure can be illustrated as in Fig. 1. Three layers, one input layer, one output layer and one hidden layer, are designed. The input layer and output layer are fully connected to the hidden layer. Compression is achieved by designing the value of K, the number of neurones at the hidden layer, less than that of neurones at both input and the output layers. The input image is split up into blocks or vectors of
+Fig. 1. Back propagation neural network.
+
+8;8, 4;4 or 16;16 pixels. When the input vector
+
+is referred to as N-dimensional which is equal to
+
+the number of pixels included in each block, all the
+
+coupling weights connected to each neurone at the
+
+hidden layer K and i"1,
+
+c2a,2 n b,eNre,p, rwehseicnhtecdabnya+lswoHGb, je"de1s,c2ri,2 bed,
+
+by a matrix of order K;N. From the hidden layer
+
+to the output layer, the connections can be repre-
+
+soetnhteerdwbeyig+hwtGHm: 1a) trixi)ofNo,r1d) er jN);KK,.
+
+which is anImage com-
+
+pression is achieved by training the network in such
+
+a way that input vector
+
+the coupling weights, of N-dimension into a
+
+n+awrHrG,o,wsccahlaentnheel
+
+of K-dimension (K(N) at the hidden layer and
+
+produce the optimum output value which makes
+
+the quadratic error between input and output min-
+
+imum. In accordance with the neural network
+
+structure shown in Fig. 1, the operation of a linear
+
+network can be described as follows:
+
+,
+
+hH" wHGxG, 1)j)K,
+
+(2.1)
+
+G
+
+for encoding and
+
+) xN G"
+
+wGHhH,
+
+1)i)N,
+
+(2.2)
+
+H
+
+for decoding where xG3[0, 1] denotes the normalized pixel values for grey scale images with grey
+
+levels [0, 255] [5,9,14,34,35,47]. The reason for us-
+
+ing normalized pixel values is due to the fact that
+
+neural networks can operate more e$ciently when both their inputs and outputs are limited to a range
+
+of [0, 1] [5]. Good discussions on a number of
+
+normalization functions and their e!ect on neural network performances can be found in [5,34,35].
+
+The above linear networks can also be trans-
+
+formed into non-linear ones if a transfer function
+
+such as sigmoid is added to the hidden layer and
+
+the output layer as shown in Fig. 1 to scale the
+
+summation down in the above equations. There is
+
+no proof, however, that the non-linear network can
+
+provide a better solution than its linear counterpart
+
+[14]. Experiments carried out on a number of im-
+
+age samples in [9] report that linear networks
+
+actually outperform the non-linear one in terms of
+
+both training speed and compression performance.
+
+Most of the back-propagation neural networks
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+739
+
+developed for image compression are, in fact, designed as linear [9,14,47]. Theoretical discussion on the roles of the sigmoid transfer function can be found in [5,6].
+With this basic back-propagation neural network, compression is conducted in two phases: training and encoding. In the "rst phase, a set of image samples is designed to train the network via the back-propagation learning rule which uses each input vector as the desired output. This is equivalent to compressing the input into the narrow channel represented by the hidden layer and then reconstructing the input from the hidden to the output layer.
+The second phase simply involves the entropy coding of the state vector hH at the hidden layer. In cases where adaptive training is conducted, the entropy coding of those coupling weights may also be required in order to catch up with some input characteristics that are not encountered at the training stage. The entropy coding is normally designed as the simple "xed length binary coding although many advanced variable length entropy coding algorithms are available [22,23,26,60]. One of the obvious reasons for this is perhaps that the research community is only concerned with the part played by neural networks rather than anything else. It is a straightforward thing to introduce better entropy coding methods after all. Therefore, the compression performance can be assessed either in terms of the compression ratio adopted by the computer science community or bit rate adopted by the telecommunication community. We use the bit rate throughout the paper to discuss all the neural network algorithms. For the back propagation narrow channel compression neural network, the bit rate can be de"ned as follows:
+
+nK¹#NKt
+
+bit rate"
+
+bits/pixel,
+
+(2.3)
+
+nN
+
+where input images are divided into n blocks of N pixels or n N-dimensional vectors; ¹ and t stand for the number of bits used to encode each hidden neurone output and each coupling weight from the hidden layer to the output layer. When the coupling weights are maintained the same throughout the compression process after training
+
+is completed, the term NKt can be ignored and the bit rate becomes K¹/N bits/pixel. Since the hidden neurone output is real valued, quantization is required for "xed length entropy coding which is normally designed as 32 level uniform quantization corresponding to 5 bit entropy coding [9,14].
+This neural network development, in fact, is in the direction of K}L transform technology [17,21,50] which actually provides the optimum solution for all linear narrow channel type of image compression neural networks [17]. When Eqs. (2.1) and (2.2) are represented in matrix form, we have
+
+[h]"[=]2[x],
+
+(2.4)
+
+[xN ]"[=][h]"[=][=]2[x]
+
+(2.5)
+
+for encoding and decoding.
+
+The K}L transform maps input images into
+
+a new vector space where all the coe$cients in the
+
+new space is de-correlated. This means that the
+
+covariance matrix of the new vectors is a diagonal
+
+matrix whose elements along the diagonal are eig-
+
+envalues of the covariance matrix of the original
+
+input vectors. Let eG and G, i"1, 2,2, n, be eigen-
+
+vectors and eigenvalues for input vector x, and
+
+tohfocsVe,
+
+the covariance matrix corresponding eigen-
+
+values are arranged in a descending order so that
+
+ciGp*al cGo>m,pfoornie" nts1, ,K2,2 eige, nnv!ec1to. Trsoceoxrtrreaspctotnhdeinpgritno-
+
+ctwIshnuohecnaihscKdthardluaiwatclrilatogryneotst,hwhtaeaesllitageKtrehiegn}eevfLo"narrvlmustetrecearstdonoiwnsrbfsoycoirVntfmha[[erAAeem))in]g]aoeitrsanrmritvxehea,ecollter[yoidAgruese)srn]eoe,vddf ectiicVonn-. tor corresponding to the largest eigenvalue, and the
+
+last row is the eigenvector corresponding to the
+
+smallest eigenvalue. Hence, the forward K}L trans-
+
+form or encoding can be de"ned as
+
+[y]"[A)]([x]![mV]),
+
+(2.6)
+
+and the inverse K}L transform or decoding can be de"ned as:
+
+[xN ]"[A)]2[y]#[mV],
+
+(2.7)
+
+wenhtesreth[emVr]ecisotnhsetrmucetaendvvaelucetoorfs[xo]r
+
+and [xN ] image
+
+represblocks.
+
+Thus the mean square error between x and xN is
+
+740
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+given by the following equation:
+
+e"E+(x!xN
+
+)," 1 M
+
++ )
+
+(x)!x)
+
+)
+
+L
+
+)
+
+L
+
+" H! H"
+
+H,
+
+(2.8)
+
+H H H)>
+
+where the statistical mean value E+ ) , is approximated by the average value over all the input vector samples which, in image coding, are all the nonoverlapping blocks of 4;4 or 8;8 pixels.
+Therefore, by selecting the K eigenvectors associated with the largest eigenvalues to run the K}L transform over input image pixels, the resulting errors between the reconstructed image and the original one can be minimized due to the fact that the values of 's decrease monotonically.
+From the comparison between the equation pair (2.4) and (2.5) and the equation pair (2.6) and (2.7), it can be concluded that the linear neural network reaches the optimum solution whenever the following condition is satis"ed:
+
+[=][=]2"[A)]2[A)].
+
+(2.9)
+
+Under this circumstance, the neurone weights from input to hidden and from hidden to output can be described respectively as follows:
+
+[=]"[A)][;]\, [=]2"[;][A)]2, (2.10)
+where [;] is an arbitrary K;K matrix and [;][;]\ gives an identity matrix of K;K. Hence, it can be seen that the linear neural network can achieve the same compression performance as that of K}L transform without necessarily obtaining its weight matrices being equal to [A)]2 and [A)].
+Variations of the image compression scheme implemented on the basic network can be designed by using overlapped blocks and di!erent error functions [47]. The use of overlapped blocks is justi"ed in the sense that some extent of correlation always exists between the coe$cients among the neighbouring blocks. The use of other error functions, in addition, may provide better interpretation of human visual perception for the quality of those reconstructed images.
+
+2.1.2. Hierarchical back-propagation neural network
+The basic back-propagation network is further extended to construct a hierarchical neural network by adding two more hidden layers into the existing network as proposed in [48]. The hierarchical neural network structure can be illustrated in Fig. 2 in which the three hidden layers are termed as the combiner layer, the compressor layer and the decombiner layer. The idea is to exploit correlation between pixels by inner hidden layer and to exploit correlation between blocks of pixels by outer hidden layers. From the input layer to the combiner layer and from the decombiner layer to the output layer, local connections are designed which have the same e!ect as M fully connected neural sub-networks. As seen in Fig. 2, all three hidden layers are fully connected. The basic idea is to divide an input image into M disjoint sub-scenes and each sub-scene is further partitioned into ¹ pixel blocks of size p;p.
+For a standard image of 512;512, as proposed [48], it can be divided into 8 sub-scenes and each sub-scene has 512 pixel blocks of size 8;8. Accordingly, the proposed neural network structure is designed to have the following parameters:
+Total number of neurones at the input layer"Mp"8;64"512. Total number of neurones at the combiner lTaoytearl"nMumNbFe"r 8o;f 8n" eur6o4n. es at the compressor layer"Q"8.
+Fig. 2. Hierarchical neural network structure.
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+741
+
+The total number of neurones for the decombiner layer and the output layer is the same as that of the combiner layer and the input layer, respectively.
+
+A so called nested training algorithm (NTA) is proposed to reduce the overall neural network training time which can be explained in the following three steps.
+
+Step 1. Outer loop neural network (O¸NN) training. By taking the input layer, the combiner layer and the output layer out of the network shown in Fig. 2, we can obtain M 64}8}64 outer loop neural networks where 64}8}64 represents the number of neurones for its input layer, hidden layer and output layer, respectively. As the image is divided into 8 sub-scenes and each sub-scene has 512 pixel blocks each of which has the same size as that of the input layer, we have 8 training sets to train the 8 outer-loop neural networks independently. Each training set contains 512 training patterns (or pixel blocks). In this training process, the standard back-propagation learning rule is directly applied in which the desired output is equal to the input.
+
+Step 2. Inner loop neural network (I¸NN) train-
+
+ing. By taking the three hidden layers in Fig. 2 into
+
+consideration, an inner loop neural network can be
+
+derived as shown in Fig. 3. As the related para-
+
+meters Q"8;
+
+are designed in M"8, the inner
+
+losuocphneaurwaal ynetthwaotrkNiFs"als8o;
+
+a 64}8}64 network. Corresponding to the 8 sub-
+
+scenes each of which has 512 training patterns (or
+
+pixel blocks), we also have 8 groups of hidden layer
+
+outputs from the operations of step 1, in which each
+
+hidden layer output is an 8-dimensional vector and
+
+each group contains 512 such vectors. Therefore,
+
+for the inner loop network, the training set contains
+
+512 training patterns each of them is a 64-dimen-
+
+Fig. 3. Inner loop neural network.
+
+sional vector when the outputs of all the 8 hidden layers inside the OLNN are directly used to train the ILNN. Again, the standard back-propagation learning rule is used in the training process. Throughout the two steps of training for both ILNN and OLNN, the linear transfer function (or activating function) is used.
+Step 3. Reconstruction of the overall neural networks. From the previous two steps of training, we have four sets of coupling weights, two out of step 1 and two out of step 2. Hence, the overall neural network coupling weights can be assigned in such a way that the two sets of weights from step 1 are given to the outer layers in Fig. 2 involving the input layer connected to the combiner layer, and the decombiner layer connected to the output layer. Similarly, the two sets of coupling weights obtained from step 2 can be given to the inner layers in Fig. 2 involving the combiner layer connected to the compressor layer and the compressor layer connected to the decombiner layer.
+After training is completed, the neural network is ready for image compression in which half of the network acts as an encoder and the other half as a decoder. The neurone weights are maintained the same throughout the image compression process.
+2.1.3. Adaptive back-propagation neural network Further to the basic narrow channel back-propa-
+gation image compression neural network, a number of adaptive schemes are proposed by Carrato [8,9] based on the principle that di!erent neural networks are used to compress image blocks with di!erent extent of complexity. The general structure for the adaptive schemes can be illustrated in Fig. 4 in which a group of neural networks with increasing number of hidden neurones, (h , h ), is designed. The basic idea is to classify the input image blocks into a few sub-sets with di!erent features according to their complexity measurement. A "ne tuned neural network then compresses each sub-set.
+Four schemes are proposed in [9] to train the neural networks which can be roughly classi"ed as parallel training, serial training, activity-based training and activity and direction based training schemes.
+
+742
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+The so called activity of the lth block is de"ned as
+
+Fig. 4. Adaptive neural network structure.
+
+The parallel training scheme applies the com-
+
+plete training set simultaneously to all neural
+
+networks and uses the S/N (signal-to-noise) ratio
+
+to roughly classify the image blocks into the
+
+same number of sub-sets as that of neural net-
+
+works. After this initial coarse classi"cation is com-
+
+pleted, each neural network is then further trained
+
+by its corresponding re"ned sub-set of training
+
+blocks.
+
+Serial training involves an adaptive searching
+
+process to build up the necessary number of neural
+
+networks to accommodate the di!erent patterns
+
+embedded inside the training images. Starting with
+
+a neural network with pre-de"ned minimum num-
+
+broeur gohflhyidtrdaeinnendeubryonalels,thhe im, tahgeenbeluorcaklsn. eTtwheorSk/Nis
+
+ratio is used again to classify all the blocks into two
+
+classes depending on whether their S/N is greater
+
+than a pre-set threshold or not. For those blocks
+
+with higher S/N ratios, further training is started
+
+to the next neural network with the number of
+
+hidden neurones increased and the corresponding
+
+threshold readjusted for further classi"cation. This
+
+process is repeated until the whole training set is
+
+classi"ed into a maximum number of sub-sets
+
+corresponding to the same number of neural net-
+
+works established.
+
+In the next two training schemes, extra two para-
+
+meters, activity "ned to classify
+
+Ath(Pe Jt)raainndinfgousertdriarethcteironthsa, naruesdineg-
+
+the neural networks. Hence the back propagation
+
+training of each neural network can be completed
+
+in one phase by its appropriate sub-set.
+
+A(PJ)"
+
+AN(PJ(i, j)),
+
+  GH
+
+(2.11)
+
+ AN(PJ(i, j))"
+
+ (PJ(i, j)!PJ(i#r, j#s)),
+
+P\ Q\
+
+(2.12)
+
+wcohnecreernAsN(iPtsJ(in, ej)i)ghisbtohueriancgtiv8itpyixoeflseaacshrpainxedl
+
+which s vary
+
+from !1 to #1 in Eq. (2.12).
+
+Prior to training, all image blocks are classi"ed
+
+into four classes according to their activity values
+
+which are identi"ed as very low, low, high and very
+
+high activities. Hence four neural networks are de-
+
+signed with increasing number of hidden neurones
+
+to compress the four di!erent sub-sets of input
+
+images after the training phase is completed.
+
+On top of the high activity parameter, a further
+
+feature extraction technique is applied by consider-
+
+ing four main directions presented in the image
+
+details, i.e., horizontal, vertical and the two diag-
+
+onal directions. These preferential direction fea-
+
+tures can be evaluated by calculating the values of
+
+mean squared di!erences among neighbouring
+
+pixels along the four directions [9].
+
+For those image patterns classi"ed as high activ-
+
+ity, further four neural networks corresponding to
+
+the above directions are added to re"ne their struc-
+
+tures and tune their learning processes to the pref-
+
+erential orientations of the input. Hence, the overall
+
+neural network system is designed to have six neu-
+
+ral networks among which two correspond to low
+
+activity and medium activity sub-sets and other
+
+four networks correspond to the high activity and
+
+four direction classi"cations [9]. Among all the
+
+adaptive schemes, linear back-propagation neural
+
+network is mainly used as the core of all the di!er-
+
+ent variations.
+
+2.1.4. Performance assessments Around the back-propagation neural network,
+we have described three representative schemes to achieve image data compression towards the direction of K}L transform. Their performances can normally be assessed by considering two measurements. One is the compression ratio or bit rate
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+743
+
+which is used to measure the compression performance, and the other is mainly used to measure the quality of reconstructed images with regards to a speci"c compression ratio or bit rate. The de"nition of this measurement, however, is a little ambiguous at present. In practice, there exists two acceptable measurements for the quality of reconstructed images which are PSNR (peak-signal-tonoise ratio) and NMSE (normalised mean-square error). For a grey level image with n blocks of size N, or n vectors with dimension N, their de"nitions can be given, respectively, as follows:
+
+PSNR"10 log 1 nN
+
+255 (dB),
+
+L G
+
+,H(PGH!PGH)
+
+(2.13)
+
+NMSE"
+
+LG
+
+,H(PGH!PGH) LG ,HPGH
+
+,
+
+(2.14)
+
+wrpeihcxoeerlnsesitnPruGtHchteiesdotrihimgeiangianeltsei;mnasnaigdtyePsvGwHathlhuiceehinoatfreenpssixpitelyiltsvuaipnluienthtooef n input vectors: xG"+PG, PG,2, PG,,.
+In order to bridge the di!erences between the two measurements, let us introduce an SNR (signal-to-noise ratio) measurement to interpret the NMSE values as an alternative indication of the quality of those reconstructed images in comparison with the PSNR "gures. The SNR is de"ned below:
+
+SNR"!10 log NMSE (dB).
+
+(2.15)
+
+Considering the di!erent settings for the experiments reported in various sources [9,14,47,48], it is di$cult to make a comparison among all the algorithms presented in this section. To make the best use of all the experimental results available, we take ¸ena as the standard image sample and summarise the related experiments for all the algorithms as illustrated in Tables 1}3 which are grouped into basic back propagation, hierarchical back propagation and adaptive back propagation.
+Experiments were also carried out to test the neural network schemes against the conventional image compression techniques such as DCT with SQ (scale quantization) and VQ (vector quantiz-
+
+Table 1 Basic back propagation on ¸ena (256;256)
+
+Dimension N
+
+Training schemes
+
+PSNR (dB)
+
+64
+
+Non-linear
+
+25.06
+
+64
+
+Linear
+
+26.17
+
+Bit rate (bits/pixel)
+0.75 0.75
+
+Table 2 Hierarchical back propagation on ¸ena (512;512)
+
+Dimension N
+
+Training schemes
+
+SNR (dB)
+
+Bit rate (bits/pixel)
+
+4
+
+Linear
+
+14.395
+
+1
+
+64
+
+Linear
+
+19.755
+
+1
+
+144
+
+Linear
+
+25.67
+
+1
+
+Table 3 Adaptive back propagation on ¸ena (256;256)
+
+Dimension Training schemes N
+
+PSNR Bit rate
+
+(dB)
+
+(bits/pixel)
+
+64
+
+Activity based linear 27.73 0.68
+
+64
+
+Activity and direction 27.93 0.66
+
+based linear
+
+ation), sub-band coding with VQ schemes [9]. The results reported reveal that the neural networks provide very competitive compression performance and even outperform the conventional techniques in some occasions [9].
+Back propagation based neural networks have provided good alternatives for image compression in the framework of the K}L transform. Although most of the networks developed so far use linear training schemes and experiments support this option, it is not clear why non-linear training leads to inferior performance and how non-linear transfer function can be further exploited to achieve further improvement. Theoretical research is required in this area to provide in-depth information and to prepare for further exploration in line with nonlinear signal processing using neural networks [12,19,53,61,63,74].
+Generally speaking, the coding scheme used by neural networks tends to maintain the same
+
+744
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+neurone weights, once being trained, throughout the whole process of image compression. This is because the bit rate will become K¹/N instead of that given by Eq. (2.3) in which maximisation of their compression performance can be implemented. From experiments [4,9], in addition, reconstructed image quality does not show any signi"cant di!erence for those images outside the training set due to the so-called generalization property [9] in neural networks. Circumstances where a drastic change of the input image statistics occurs might not be well covered by the training stage, however, adaptive training might prove worthwhile. Therefore, how to use the minimum number of bits to represent the adaptive training remains an interesting area to be further explored.
+
+2.2. Hebbian learning-based image compression
+
+While the back-propagation-based narrowchannel neural network aims at achieving a compression upper bounded by the K}L transform, a number of Hebbian learning rules have been developed to address the issue of how the principal components can be directly extracted from input image blocks to achieve image data compression [17,36,58,71]. The general neural network structure consists of one input layer and one output layer which is actually a half of the network shown in Fig. 1. Hebbian learning rule comes from Hebb's postulation that if two neurones were very active at the same time which is illustrated by the high values of both its output and one of its inputs, the strength of the connection between the two neurones will grow or increase. Hence, for the output values expressed as [h]"[w]2[x], the learning rule can be described as
+
+=(t)# =G(t#1)"#=G(t)#
+
+hG(t)X(t) hG(t)X(t)#
+
+,
+
+(2.16)
+
+cwohueprlein=g G(wt# eig1h)t"ve+cwtoGr,
+
+winG,2 the,
+
+wneG,x,t
+
+is the cycle
+
+ith new (t#1);
+
+1)i)M and M is the number of output neur-
+
+oXn(te)s.thethineplueat rvneicntgorr,atceo;rhreG(stp) othnediinthg
+
+output value; to each indi-
+
+vidual image block and # ) # the Euclidean norm
+
+used to normalize the updated weights and make the learning stable.
+From the above basic Hebbian learning, a socalled linearized Hebbian learning rule is developed by Oja [50,51] by expanding Eq. (2.16) into a series from which the updating of all coupling weights is constructed from below:
+=G(t#1)"=G(t)# [hG(t)X(t)!hG (t)=G(t)]. (2.17) To obtain the leading M principal components, Sanger [58] extends the above model to a learning rule which removes the previous principal components through Gram}Schmidt orthogonalization and made the coupling weights converge to the desired principal components. As each neurone at the output layer functions as a simple summation of all its inputs, the neural network is linear and forward connected. Experiments are reported [58] that at a bit rate of 0.36 bits/pixel, an SNR of 16.4 dB is achieved when the network is trained by images of 512;512 and the image compressed was outside the training set.
+Other learning rules developed include the adaptive principal component extraction (APEX) [36] and robust algorithms for the extraction estimation of the principal components [62,72]. All the variations are designed to improve the neural network performance in converging to the principal components and in tracking down the high order statistics from the input data stream.
+Similar to those back-propagation trained narrow channel neural networks, the compression performance of such neural networks are also dependent on the number of output neurones, i.e. the value of M. As explained in the above, the quality of the reconstructed images are determined by e"E+(x!xN )," ,H+> H for neural networks with N-dimensional input vectors and M output neurones. With the same characteristics as that of conventional image compression algorithms, high compression performance is always balanced by the quality of reconstructed images. Since conventional algorithms in computing the K}L transform involves lengthy operations in angle tuned trial and veri"cation iterations for each vector and there is no fast algorithm in existence so far, neural network development provides advantages in terms of computing e$ciency and speed in
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+745
+
+dealing with these matters. In addition, the iterative nature of these learning processes is also helpful in capturing those slowly varying statistics embedded inside the input stream. Hence the whole system can be made adaptive in compressing various image contents such as those described in the last section.
+
+2.3. Vector quantization neural networks
+
+Since neural networks are capable of learning
+
+from input information and optimizing itself to
+
+obtain the appropriate environment for a wide
+
+range of tasks [38], a family of learning algorithms
+
+has been developed for vector quantization. For all
+
+the learning algorithms, the basic structure is sim-
+
+ilar which can be illustrated in Fig. 5. The input
+
+vector is constructed from a K-dimensional space.
+
+M neurones are designed in Fig. 5 to compute the
+
+vector quantization code-book in which each neur-
+
+one relates to one code-word via its coupling
+
+weights. The coupling weight, the ith neurone is eventually
+
++twraGHi,n, eadsstoociraetpedrewseitnht
+
+tnheetwcoordke-iws obredincgG
+
+in the code-book. As the neural trained, all the coupling weights
+
+will be optimized to represent the best possible
+
+partition of all the input vectors. To train the net-
+
+work, a group of image samples known to both
+
+encoder and decoder is often designated as the
+
+training set, and the "rst M input vectors of the
+
+Fig. 5. Vector quantization neural network.
+
+training data set are normally used to initialize all
+
+the neurones. With this general structure, various
+
+learning algorithms have been designed and de-
+
+veloped such as Kohonen's self-organizing feature
+
+mapping [10,13,18,33,52,70], competitive learning
+
+[1,54,55,65], frequency sensitive competitive learn-
+
+ing [1,10], fuzzy competitive learning [11,31,32],
+
+general learning [25,49], and distortion equalized
+
+fuzzy competitive learning [7] and PVQ (predictive
+
+VQ) neural networks [46].
+
+at
+
+Let the
+
+WtthG(t)itbereatthioenw, ethigehbt avseicctocromofptehteitiivthe
+
+neurone learning
+
+algorithm can be summarized as follows:
+
+zG"
+
+1 0
+
+d(x, =G(t))" min d(x, =H(t)), otherwise, WHW+
+
+(2.18)
+
+=G(t#1)"=G(t)# (x!=G(t))zG,
+
+(2.19)
+
+wbehtewreeend(txh,e=inG(pt)u) tivs etchtoerdxisatanndcteheincotuhpeli¸ng
+
+metric weight
+
+vleeacArtnosiron= -gcaGr(altl)te" ed, au+nnwddGez,rGw-uiGst,ii2 ltiszao,twuiotG)np,up;tKr.o" blepm;[p1;,11i]s
+
+the oc-
+
+curs in competitive learning which means some of
+
+the neurones are left out of the learning process
+
+and never win the competition. Various schemes
+
+are developed to tackle this problem. Kohonen self-
+
+organizing neural network [10,13,18] overcomes
+
+the problem by updating the winning neurone as
+
+well as those neurones in its neighbourhood.
+
+Frequency sensitive competitive learning algo-
+
+rithm addresses the problem by keeping a record of
+
+how frequent each neurone is the winner to main-
+
+tain that all neurones in the network are updated
+
+an approximately equal number of times. To imple-
+
+ment this scheme, the distance is modi"ed to in-
+
+clude the total number of times that the neurone i is
+
+the winner. The modi"ed distance measurement is
+
+de"ned as
+
+d(x, =(t)G)"d(x, =G(t))uG(t),
+
+(2.20)
+
+wnehuerroenueG(ti)
+
+is the up to
+
+total number of the tth training
+
+winning times cycle. Hence,
+
+for the
+
+more the ith neurone wins the competition, the
+
+greater its distance from the next input vector.
+
+Thus, the chance of winning the competition dimin-
+
+ishes. This way of tackling the under-utilization
+
+746
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+problem does not provide interactive solutions in optimizing the code-book.
+For all competitive learning based VQ (vector quantization) neural networks, fast algorithms can be developed to speed up the training process by optimizing the search for the winner and reducing the relevant computing costs [29].
+By considering general optimizing methods [19], numerous variations of learning algorithms can be designed for the same neural network structure shown in Fig. 5. The general learning VQ [25,49] is one typical example. To model the optimization of centroids w3R+ for a "xed set of training vectors xx" , th+exin,2 pu,txv)e,c,taort,otaanldavWer,atgheemciosdmea-btcohokbertewpereensented by neurone weights, is de"ned as
+
+)+ (=)"
+G H
+
+gGP#xG!=P#" )
+
+K
+
+G
+
++ H
+
+¸V
+
+,
+
+(2.21)
+
+where gGP is given by
+
+1
+
+if r"i,
+
+gGP"
+
+1 +H#x!=H# otherwise,
+
+awnindn=inGgins eausrsounmee. d to be the weight vector of the
+
+To derive the optimum partition of x, the
+
+problem is reduced down to minimizing the
+
+total average mismatch (=), where ="
+
++w=ith,
+
+r=esp,2 ect,
+
+t=o +th,e
+
+is the code-book which varies partition of x. From the basic
+
+learning algorithm theory, the gradient of (=) can
+
+be obtained in an iterative, stepwise fashion by
+
+moving the learning algorithm in the direction of
+
+the gradient of rearranged as
+
+¸V
+
+in
+
+Eq.
+
+(2.21).
+
+Since
+
+¸V
+
+can
+
+be
+
++ ¸V"
+
+gGP#x!=P#
+
+P
+
+"#x!=G##
+
++P P$G#x!=P# +H#x!=H#
+
+"#x!=G##1!
+
+#x!=G# +H#x!=H#
+
+,
+
+(2.22)
+
+¸foVlloiswds:i!erentiated with respect to =G and =H as
+
+RR= ¸VG"!2(x!=G) D!D#D#x!=G#, (2.23)
+
+RR= ¸VH"2(x!=H)
+
+#x!=G# D
+
+,
+
+(2.24)
+
+where D" Hence, the
+
++Plea#rnxi! ng =ruP#le.can
+
+be
+
+designed
+
+as
+
+fol-
+
+lows:
+
+=G(t#1)"=G(t)# (t)(x!=G(t)) ;D!D#D#x !=G(t)#
+
+(2.25)
+
+for the winning neurone i, and
+
+=H(t#1)"=H(t)#
+
+(t)(x!=H(t))
+
+#x!=G(t)# D
+
+(2.26)
+
+for the other (M!1) neurones. This algorithm can
+
+also be classi"ed as a variation of Kohonen's self-
+
+organizing neural network [33].
+
+Around the competitive learning scheme, fuzzy
+
+membership functions are introduced to control
+
+the transition from soft to crisp decisions during the
+
+code-book design process [25,31]. The essential
+
+idea is that one input vector is assigned to a cluster
+
+only to a certain extent rather than either &in' or
+
+&out'. The fuzzy assignment is useful particularly at
+
+earlier training stages which guarantees that all
+
+input vectors are included in the formation of a new
+
+code-book represented by all the neurone coupling
+
+weights. Representative examples include direct
+
+fuzzy competitive learning [11], fuzzy algorithms
+
+for learning vector quantization [31,32] and distor-
+
+tion equalized fuzzy competitive learning algorithm
+
+[7], etc. The so-called distortion equalized fuzzy
+
+competitive learning algorithm modi"es the dis-
+
+tance measurement to update the neurone weights
+
+by taking fuzzy membership functions into con-
+
+sideration to optimize the learning process. Spe-
+
+ci"cally, each neurone is allocated a distortion
+
+represented itial values
+
+by VH
+
+(V0)H" (t),1j."Th1e, 2,d2ist,aMnc,ewbitehtwteheenir
+
+inthe
+
+input vector x and all the neurone weights =H is
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+747
+
+then modi"ed as follows:
+
+DIH"d(xI, =H(t))"
+
+<H(t) +J<J(t)
+
+#x!=H(t)#.
+
+(2.27)
+
+At each training cycle, a fuzzy membership func-
+
+tion, IH (t), for each neurone is constructed to up-
+
+date both distortion given below:
+
+VH
+
+and
+
+the
+
+neurone
+
+weights
+
+<H(t#1)"<H(t)#( IH)KDIH,
+
+=H(t#1)"=H(t)#( IH)K (xI!=H(t),
+
+where m*1 is a fuzzy index which controls the
+
+fuzziness of the whole partition, and membership function which speci"es
+
+thIHe
+
+is a fuzzy extent of
+
+the input vector being associated with a coupling
+
+weight. Throughout the learning process, the fuzzy
+
+idea is incorporated to control the partition of
+
+input vectors as well as avoid the under-utilization
+
+problem.
+
+Experiments are carried out to vector quantize
+
+image samples directly without any transform by
+
+a number of typical CLVQ neural networks [7].
+
+The results show that, in terms of PSNR, the fuzzy
+
+competitive learning neural network achieves
+
+26.99 dB for ¸ena when the compression ratio
+
+is maintained at 0.44 bits/pixel for all the neural
+
+networks. In addition, with bit rate being
+
+0.56 bits/pixel, the fuzzy algorithms presented in
+
+[32] achieve a PSNR "gure around 32.54 dB for
+
+the compression of ¸ena which is a signi"cant im-
+
+provement compared with the conventional LBG
+
+algorithm [32].
+
+In this section, we discussed three major develop-
+
+ments in neural networks for direct image compres-
+
+sion. The "rst two conform to the conventional
+
+route of pixel transforms in which principal compo-
+
+nents are extracted to reduce the redundancy
+
+embedded inside input images. The third type
+
+corresponds to the well developed quantization
+
+technique in which neural learning algorithms are
+
+called in to help producing the best possible code-
+
+book. While the basic structure for encoders are
+
+very similar which contain two layers of neurones,
+
+the working procedure is fundamentally di!erent.
+
+Apart from the fact that the pixel transform based
+
+narrow channel networks always have less number
+
+of hidden neurones than those of input ones, they also require a complete neural network to reconstruct those compressed images. Yet for those VQ neural networks, reconstruction stands the same as their conventional counterparts, which only involves a look-up table operation. These developments, in fact, cover two sides of image compression in the light of conventional route: pixel transform, quantization and entropy coding. Therefore, one natural alternative is to make these two developments work together which lead to a neural network designed to extract the desired principal components and then followed by another hidden layer of neurones to do the vector quantization. In that sense, the choice of leading principal components could be made more #exible. One simple example is to keep all the principal components instead of discarding those smaller ones and then represent them by a code-book which is re"ned according to their associated eigenvalues.
+3. Neural network development of existing technology
+In this section, we show that the existing conventional image compression technology can be developed right into various learning algorithms to build up neural networks for image compression. This will be a signi"cant development in the sense that various existing image compression algorithms can actually be implemented by simply one neural network architecture empowered with di!erent learning algorithms. Hence, the powerful parallel computing and learning capability with neural networks can be fully exploited to build up a universal test bed where various compression algorithms can be evaluated and assessed. Three conventional techniques are covered in this section which include wavelet transforms, fractals and predictive coding.
+3.1. Wavelet neural networks
+Based on wavelet transforms, a number of neural networks are designed for image processing and representation [16,24,41,66}68,75]. This direction of research is mainly to develop existing image
+
+748
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+coding techniques into various neural network structures and learning algorithms.
+When a signal s(t) is approximated by daughters of a mother wavelet h(t) as follows, for instance, a neural network structure can be established as shown in Fig. 6 [66}68].
+
+) s(t)" wIh
+I
+
+t!bI aI
+
+,
+
+(3.1)
+
+where the shifts and
+
+dwilIa,tiboInsanfodr
+
+eaaI cahredawugeihgthetr
+
+coe$cients, wavelet. To
+
+achieve the optimum approximation, the following
+
+least-mean-square energy function can be used to
+
+develop a learning algorithm for the neural net-
+
+work in Fig. 6.
+
+1 E"
+
+2
+
+(s(t)!s(t)).
+
+(3.2)
+
+2 R
+
+The value of E can be minimized by adaptively changing or learning the best possible values of the cuosee$a ccioennjtus,gwatIe, bgIraadnidenatI.mOentheotdyp[i1c9a,l6e7x]atmopalcehiisevtoe optimum approximation of the original signal s(t). Forming the column vectors [u(w)] and [w] from the gradient analysis and coe$cients wI, the ith iteration for minimising E with respect to [w] proceeds according to the following two steps:
+
+(i) if k is multiple of n then: [s(w)']"![g(w)'] else:
+
+[s(w)G]"![g(w)G]
+
+[g(w)G]2[g(w)G] #
+[g(w)G\]2[g(w)G\]
+
+[s
+
+(w)G\];
+
+(3.3)
+
+(ii)
+
+[wG>]"[wG]# G[s(w)G].
+
+(3.4)
+
+Step (i) computes a search direction [s] at iteration i. Step (ii) computes the new weight vector using a variable step-size . By simply choosing the step-size as the learning rate, the above two steps can be constructed as a learning algorithm for the wavelet neural network in Fig. 6.
+
+Fig. 6. Wavelet neural network.
+With the similar theory (energy function is changed into an error function), [41] suggested a back-propagation and convolution based neural network to search for the optimal wavelet decomposition of input images for e$cient image data compression. The neural network structure is designed to have one input layer and one output layer. Local connections of neurones are established to complete the training corresponding to four channels in wavelet decomposition [41,61], i.e. LL (low pass}low pass), LH (low pass}high pass), HL (high pass}low pass) and HH (high pass}high pass). From the well-known back-propagation learning rule, a convolution based training algorithm is used to optimize the neural network training in which quantization of neural network output is used as the desired output to allow back propagation learning. To modify the learning rule, minimization of both quantization error and entropy is taken into consideration by incorporating a socalled entropy reduction function, Z(Q¹(i, j)), hence the overall learning rule can be designed as follows:
+KA(u, v)[t#1]"KA(u, v)[t]# (i, j) GH
+;S(i!u, j!v)# KA(u, v)[t], (3.5)
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+749
+
+wlinhgerweeKigAh(uts,
+
+v)[t#1] is for channel
+
+the c at
+
+neural network (t#1)th cycle;
+
+coup, are
+
+the learning rate and momentum terms, respective-
+
+ly, in modi"ed back propagation to accelerate
+
+the learning process; S(i!u, j!v) is the original
+
+input image pixel; KA(uR,Evf)[t]"KA(u, v)[t]!
+
+KA(u, v)[t!1]; weight-update
+
+(i, j)" function RdKerA(iuv,edv)
+
+the from
+
+so-called the local
+
+gradient in the back propagation scheme.
+
+Ef is an error function which is de"ned below:
+
+Ef(i, j)"Z(QT(i, j)) (¹(i, j)!QT(i, j))/2,
+
+(3.6)
+
+where ¹(i, j) is the neural network output used to approximate wavelet coe$cients;
+
+QT(i, j) is the quantization of ¹(i, j);
+
+Z(QT(i, j))"
+
+0 1 F(n, q)
+
+for QT(i, j)"0, for "QT(i, j)""1, for "QT(i, j)""n.
+
+Z(QT(i, j)) is the above mentioned entropy reduction function; with F(n, q) being a ramp function, Z(QT(i, j)) can be illustrated in Fig. 7.
+While the neural network outputs converge to the optimal wavelet coe$cients, its coupling weights also converge to an optimal wavelet low pass "lter. To make this happen, extra theoretical work is required to re"ne the system design.
+Firstly, the standard wavelet transform comprises two orthonormal "lters, one low pass and the other high pass. To facilitate the neural network
+
+Fig. 7. Entropy reduction function.
+
+learning and its convergence to one optimal
+
+wavelet "lter, the entire wavelet decomposition
+
+needs to be represented by one type of "lter rather
+
+than two. This can be done by working on the
+
+relation between the two orthonormal "lters [2,41].
+
+Hence all the three channels, LH, HL and HH,
+
+can be represented by channel LL, and the whole
+
+wavelet decomposition can be implemented by
+
+training the neural network into one optimal low
+
+pass "lter. This type of redesign produces equiva-
+
+lently a pre-processing of input pixel for LH, HL
+
+and HH channels. Basically, the pre-processing in-
+
+volves a #ipping operation of the input matrix and
+
+an alternating operation of signs for the #ipped
+
+matrix [39].
+
+Secondly, each epoch of the neural network
+
+training is only a suggestion or approximation of
+
+the desired optimal wavelet low-pass "lter, which
+
+also gives us the smallest possible values of the
+
+error function Ef. To make it the best possible
+
+approximation, a post-processing is added to con-
+
+vert the neural network coupling weights into a re-
+
+quired wavelet "lter. Assuming that this desired
+
+wavelet "lter is neural network
+
+hsSu,gtgheestdiiosntasnccaenbbeteweeveanluhaSteadndasthe
+
+f (hS)" (hS hT!KA(u, v)).
+
+(3.7)
+
+ST
+
+To minimize the distance subject to constraint
+
+equations method is below:
+
+uCsNe(dhSt)o"ob0,tatihneaLseatnogrf ahnS,gwiahnicmh uisltgipivlieenr
+
+df (hS)# N dCN(hS)"0,
+
+(3.8)
+
+N
+
+where N is the di!erentiation of
+
+Lagrangian function f ( )
+
+multiplier, ) and CN(hS)
+
+df ( the
+
+) ) the equa-
+
+tions corresponding to the following constraints for
+
+wavelet low pass "lters [36]:
+
+[ ShS]!(2/2"0, [ hShS>L]! SS>L"0,
+GHEisxtpheeriDmiernatcsdreelptoarftuendc[t3io9n].on a number of image samples support the proposed neural network system by "nding out that Daubechie's wavelet
+
+750
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+produces a satisfactory compression with the smallest errors and Harr's wavelet produces the best results on sharp edges and low-noise smooth areas. The advantage of using such a neural network is that the searching process for the best possible wavelets can be incorporated directly into the wavelet decomposition to compress images [41,74]. Yet conventional wavelet based image compression technique has to run an independent evaluation stage to "nd out the most suitable wavelets for the multi-band decomposition [69]. In addition, the powerful learning capability of neural networks may provide adaptive solutions for problems involved in sub-band coding of those images which may require di!erent wavelets to achieve the best possible compression performance [4,71].
+
+3.2. Fractal neural networks
+
+Fractally con"gured neural networks [45,64,71]
+
+based on IFS (iterated function systems [3]) codes
+
+represent another example along the direction of
+
+developing existing image compression technology
+
+into neural networks. Its conventional counterpart
+
+involves representing images by fractals and each
+
+fractal is then represented by a so-called IFS which
+
+consists of a group of a$ne transformations. To
+
+generate images from IFS, random iteration algo-
+
+rithm is the most typical technique associated with
+
+fractal based image decompression [3]. Hence,
+
+fractal based image compression features higher
+
+speed in decompression and lower speed in com-
+
+pression.
+
+By establishing one neurone per pixel, two tradi-
+
+tional algorithms of generating images using IFSs
+
+are formulated into neural networks in which all
+
+the neurones are organized as a topology with two
+
+dimensions [64]. The network structure can be
+
+illustrated in Fig. 8 in weight between (ij)th
+
+nwehuircohnweGHtoGYHY(iisj)tthhe
+
+coupling one, and
+
+sTGHhies
+
+the state training
+
+output of the algorithm is
+
+neurone directly
+
+at position (i, j). obtained from
+
+the random iteration algorithm in which the coup-
+
+ling weights are used to interpret the self similarity
+
+between pixels [64]. Since not all the neurones in
+
+the network are fully connected, the topology can
+
+actually be described by a sparse matrix theoret-
+
+Fig. 8. IFS neural network.
+
+ically. In common with most neural networks, the
+
+majority of the work operated in the neural net-
+
+work is to compute and optimize the coupling
+
+wtheeigrhetqsu, iwreGHd GYiHmY. aOgnecceanthetysepihcaalvley
+
+been calculated, be generated in
+
+a small number of iterations. Hence, the neural
+
+network implementation of the IFS based image
+
+coding system could lead to massively parallel im-
+
+plementation on a dedicated hardware for generat-
+
+ing IFS fractals. Although the essential algorithm
+
+stays the same as its conventional algorithm, solu-
+
+tions could be provided by neural networks for the
+
+computing intensive problems which are currently
+
+under intensive investigation in the conventional
+
+fractal based image compression research area.
+
+The neural network proposed in the original
+
+reference [64] can only complete image generations
+
+from IFS codes. Research in fractal image compres-
+
+sion, however, focuses on developing fast encoding
+
+algorithms before real-time application can be im-
+
+proved. This involves extensive search for a$ne
+
+transformations to produce fractals for a given im-
+
+age and generating output entropy codes. The
+
+work described [64] actually covers the decom-
+
+pression side of the technology. In addition, the
+
+neural network requires a large number of
+
+neurones arranged in two dimensions which is
+
+the same as the number of pixels in any image.
+
+Yet large number of the neurones are not active
+
+according to the system design. Further work,
+
+therefore, is required to be done along this line of
+
+research.
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+751
+
+3.3. Predictive coding neural networks
+
+Predictive coding has been proved to be a powerful technique in de-correlating input data for speech compression and image compression where a high degree of correlation is embedded among neighbouring data samples. Although general predictive coding is classi"ed into various models such as AR and ARMA, etc., autoregressive model (AR) has been successfully applied to image compression. Hence, predictive coding in terms of applications in image compression can be further classi"ed into linear and non-linear AR models. Conventional technology provides a mature environment and well developed theory for predictive coding which is represented by LPC (linear predictive coding) PCM (pulse code modulation), DPCM (delta PCM) or their modi"ed variations. Non-linear predictive coding, however, is very limited due to the di$culties involved in optimizing the coe$cients extraction to obtain the best possible predictive values. Under this circumstance, a neural network provides a very promising approach in optimizing non-linear predictive coding [17,42].
+With a linear AR model, predictive coding can be described by the following equation:
+
+,
+
+XL" aGXL\G#vL"p#vL ,
+
+(3.9)
+
+G
+
+where p represents the predictive value for the pixel
+
+XnuesLeigdwhbbhyoicuthhrienislgintoepaibrxeemlseo,ndceXoldtLoe\dp,riXnoLd\tuhce,e2nthe,exXtpLr\set,ed,pic.taiIvrtees
+
+vpmaixoluedlee.llavenLddsbtayitnsadspserftoedroifcthtzievereeor-vrmoarelusaenb. einvtwLdeecepanenntdhaeenlstionapnbudet
+
+identically distributed random variables.
+
+Based on the above linear AR model, a multi-
+
+layer perceptron neural network can be construc-
+
+ted to achieve the design of its corresponding
+
+non-linear predictor as shown in Fig. 9. For the
+
+pinixgepl iXxeLlswohbicthaiinsetdo
+
+be predicted, its N from its predictive
+
+neighbourpattern are
+
+arranged into a one dimensional input vector
+
+Xwo"rk+. XALh\id,dXenL\lay,2 er i,sXdLe\si,g,nefodrtothcearrnyeuoruatl
+
+netback
+
+propagation learning for training the neural net-
+
+Fig. 9. Predictive neural network I.
+
+work. The output of each neurone, say the jth neurone, can be derived from the equation given below:
+
+,
+
+hH"f ( )"f
+
+wHGxL\G ,
+
+G
+
+(3.10)
+
+where f (v)"1/(1#e\T) is a sigmoid transfer func-
+
+tion.
+
+To predict those drastically changing features
+
+inside images such as edges, contours, etc., high-
+
+order terms are added to improve the predictive
+
+performance. This corresponds to a non-linear AR
+
+model expressed as follows:
+
+XL" aGXL\G# aGHXL\GXL\H
+
+G
+
+GH
+
+#
+
+aGHIXL\GXL\HXL\I#2#vL.
+
+GHI
+
+(3.11)
+
+Hence, another so-called functional link type neural network can be designed [42] to implement this type of a non-linear AR model with high-order terms. The structure of the network is illustrated in Fig. 10. It contains only two layers of neurones, one for input and the other for output. Coupling wpuetiglhaytse,r+awrGe,,trbaeitnweedentotwhaeridnspmutinlaimyeirzianngdththe ereosuidt-ual energy which is de"ned as
+
+RE" eL" (XL!XL),
+
+L
+
+L
+
+(3.12)
+
+where XL is the predictive value for the pixel XL. Predictive performance with these neural networks
+
+752
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+Fig. 11. Neural network adaptive image coding system.
+
+Fig. 10. Predictive neural network II.
+is claimed to outperform the conventional optimum linear predictors by about 4.17 and 3.74 dB for two test images [42]. Further research, especially for non-linear networks, is encouraged by the reported results to optimize their learning rules for prediction of those images whose contents are subject to abrupt statistical changes.
+4. Neural network based image compression
+In this section, we present two image compression systems which are developed "rmly based on neural networks. This illustrates how neural networks may play important roles in assisting with new technology development in the image compression area.
+4.1. Neural network based adaptive image coding
+The structure of a neural network-based adaptive image coding system [21] can be illustrated in Fig. 11.
+The system is developed based on a composite source model in which multiple sub-sources are involved. The principle is similar to those adaptive narrow-channel neural networks described in Section 2.1.3. The basic idea is that the input image
+
+can be classi"ed into a certain number of di!erent
+
+classes or sub-sources by features pre-de"ned for
+
+any input image data set. Features of an image are
+
+extracted through image texture analysis as shown
+
+in the "rst block in Fig. 11. After the sub-source or
+
+class to which the input image block belongs is
+
+identi"ed, a K}L neural network transform and
+
+a number of quantization code books speci"cally
+
+re"ned for each individual sub-source are then ac-
+
+tivated by the class label, ¸, to further process and
+
+achieve the best possible data compression.
+
+The LEP self-organization neural network in
+
+Fig. 11 consists of two layers, one input layer and
+
+one output layer. The input neurones are organized
+
+according to the feature sets. Accordingly, the input
+
+neurones can be
+
+MinpL,unt " da1ta,
+
+2,2, with
+
+rfNeeap,tr,uewrseehnestreeetdMnb. yLIt+is(cxtaKhnLe),bdmeim"seene1ns,i2ofr,n2 omof,
+
+this representation that there are N features in the
+
+input order
+
+data each of which consists to classify the input image
+
+odfaMtaLienlteomveanrtiso. Iuns
+
+sub-sources, the neurones at the output layer are
+
+represented by where p is the
+
++n(uumHI)b, ej" r o1f ,o2u,2 tpu,tp;sukb"-so1u, 2rc,2 es ,aqn,d,
+
+q the number of feature sets or perspectives as
+
+termed by the original paper [21]. The output
+
+neurone representation is also illustrated in Fig. 12
+
+where the neurones in each of the output sub-
+
+sources, for the convenience of understanding, are
+
+represented by di!erent symbols such as square,
+
+triangle, circles and rectangles. It can be seen from
+
+Fig. 12 that each individual sub-source of the input
+
+data is typi"ed by q features or perspectives at the
+
+output layer. Therefore, the overall learning classi-
+
+"cation system comprises q perspective neural net-
+
+works which can be summarized in Fig. 13.
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+753
+
+Fig. 12. Output neurons at LEP neural network.
+
+network, the overall winner will then be the sub-
+
+source represented by the column of triangles in
+
+Fig. 12. In case no match is found, a new sub-
+
+source has to be added to the system.
+
+An extended delta learning rule is designed to
+
+update the connection weights +w KL HI , m"
+
+1, 1,
+
+22,,2 2,,Mq,L;onlny"for1,t2h,o2se,wNin; nijn"g s1u,b2-,2 sou,rpc,es.kT" he
+
+weight, between
+
+wthKeL
+
+(HmI ,n)dthe"innepsutthneeucroonnneecatniodnthsetr(ejnkg)tthh
+
+output neurone. The modi"cation is
+
+s KL HI "d(sKL, w KL HI )cH (eG), k"1, 2,2, q, (4.1)
+
+Fig. 13. LEP overall neural network structure.
+To classify the input block pattern, each input feature is connected to a perspective array of output neurones which represent di!erent sub-sources or classes. Competitive learning is then run inside each perspective neural network in Fig. 13 to obtain a small proportion of winners in terms of the potential values computed at the output neurones. The potential value is calculated from a so-called activated function. The winners obtained from each neural network, in fact, are referred to as activated. That is because the real winner would be picked up by the overall neural network rather than each individual one, and the winner is a sub-source represented by a column in Fig. 12. Since those activated sub-units or neurones picked up by each individual neural network will not always belong to the same output sub-source, the overall winner will not be selected until all of its sub-units are activated. In Fig. 13, for example, if all triangle neurones are activated in each perspective neural
+
+where d(s KL , w KL HI ) is de"ned as similarity measures [21]; cH" IcHI is the so-called total con"dence factor of sub-source j with respect to the
+
+input pattern. To judge the reliability of learned
+
+information and to decide how far the learning
+
+process can modify the existing connection
+
+strengths, an experience source is de"ned by the
+
+record, number
+
+oeHf,
+
+for each times the
+
+subsub-
+
+source has won the competition. In order to be
+
+adaptive to the spatially and temporally variant
+
+environment, the learning process is also subject to
+
+a forgetting process where an experienced attenu-
+
+ation factor is considered.
+
+The K}L transform neural network implemented
+
+in Fig. 11 is another example of developing the
+
+existing technology into neural learning algorithms
+
+[21]. As explained in Section 2.1, the idea of the
+
+K}L transform is to de-correlate the input data and
+
+produce a set of orthonormal eigenvectors in de-
+
+scending order with respect to variance amplitude.
+
+Hence image compression can be achieved by
+
+choosing a number of largest principal components
+
+out of the whole eigenvector set to reconstruct the
+
+image. The neural network structure is the same as
+
+that of LEP. For the ith neurone at the output
+
+layer, the vector of weight regarding connections to
+
+all the input neurones j"1, 2,2, N,, where
+
+can N is
+
+be represented the dimension
+
+obfyin+pwuGHt,
+
+vectors. After a certain number of complete learn-
+
+ing N,,
+
+cycles, can be
+
+taalkl ethneaswtehieghetigveencvteocrtso, r+swfoGHr,
+
+j"1, 2,2, the particu-
+
+lar K}L transform. Therefore, each weight vector
+
+associated with the output neurone represents one
+
+754
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+axis of the new co-ordinate system. In other words, the training of the neural network is designed to converge all the axes in the output neurones to the new co-ordinate system described by the orthonormal eigenvectors.
+The function within the ith neurone at the output layer is de"ned as the squared projection of the input pattern on the ith co-ordinate in N!i#1 dimensional space:
+
+,
+
+
+
+uG" wGHsH ,
+
+(4.2)
+
+H
+
+wjthheirnepuwtGHniesutrhoeneweaingdhtthoef
+
+connection between the ith output neurone, and
+
+sH
+
+is the jth element of the input vector. The learning rule is designed on the
+
+basis
+
+of
+
+rotating each co-ordinate axis of the original N-
+
+dimensional Cartesian co-ordinate system to the
+
+main direction of the processed vectors. Speci"-
+
+cally, each time an input vector comes into the
+
+network, all the output neurones will be trained
+
+one by one, sequentially, for a maximum of N!1
+
+times until the angle of rotation is so small that the
+
+axis represented by the neurone concerned is al-
+
+most the same as the main direction of the input
+
+patterns. This algorithm is basically developed
+
+from the mathematical iterations for obtaining
+
+K}L transforms conventionally. As a matter of fact,
+
+the back-propagation learning discussed earlier can
+
+be adopted to achieve a good approximation of the
+
+K}L transform and an improvement over its pro-
+
+cessing speed.
+
+With this adaptive image coding system, a com-
+
+pression performance of 0.18 bit/pixel is reported
+
+for 8 bit grey level images [21].
+
+4.2. Lossless image compression
+Lossless image compression covers another important side of image coding where images can be reconstructed exactly the same as originals without losing any information. There are a number of key application areas, notably the compression of X-ray images, in which distortion or error cannot be tolerated.
+Theoretically, lossless image compression can be described as an inductive inference problem, in
+
+which a conditional probability distribution of fu-
+
+ture data is learned from the previously encoded
+
+d0) atams( et: Ci," , wh+xerKeL:
+
+n(j and the image
+
+0)m(N; n"j encoded is of the
+
+and size
+
+N;M, achieve
+
+athnedbxeGsHtips otshseibnleexctopmixperlestsoiobnepeenrcfoordmeda.nTceo,
+
+it is desired to make inferences on xGH such that the probability assigned to the entire two dimensional
+
+data set,
+
+P+xGH"i, j3(N, M),",\ +\ P(xGH"SGH), G H
+
+SGH-C, (4.3)
+
+is maximized, where tion the probability
+
+SaGsHsiisgtnheedc. ontext
+
+used
+
+to
+
+condi-
+
+Due to the fact that images are digitized from
+
+analogue signals, strong correlation exists among
+
+neighbouring pixels. In practice, therefore, various
+
+prediction techniques [22,27,35,43,44,71] are de-
+
+veloped to assist with the above inferences. The
+
+idea is to de-correlate the pixel data in such a way
+
+that the residue of the prediction becomes an inde-
+
+pendent random data set. Hence, better inferences
+
+can be made to maximize the probabilities allo-
+
+cated to all error entries, and the entropy of the
+
+error data set can also be minimized correspond-
+
+ingly. As a matter of fact, comparative studies
+
+[43,71] reveal that the main redundancy reduction
+
+is achieved through the inferences of the maximum
+
+probability assigned to each pixel encoded. The
+
+context based algorithm [71], for instance, gives
+
+the best performance according to the results re-
+
+ported in the literature.
+
+Normally, the criterion for prediction is to min-
+
+imize the values of errors in which a mean square
+
+error function (MSE) is used to measure the predic-
+
+tion performance. This notion leads to a number of
+
+linear adaptive prediction schemes which produce
+
+a good compression of images on a lossless basis
+
+[37,43]. Since prediction also reduces spatial re-
+
+dundancy in image pixels, another criterion of min-
+
+imizing the zero-order entropy of those errors
+
+proves working better than MSE based prediction
+
+[30] which often leads to non-linear prediction
+
+[44] or complicated linear prediction out of iter-
+
+ations [30]. This is put forward from the observa-
+
+tion that optimal MSE based prediction does not
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+755
+
+necessarily yield optimal entropy of the predicted errors. Experiments [30] show that around 10% di!erence exists between the MSE based prediction and the entropy based prediction in terms of the entropy of errors. Under such a context, one possibility of using neural networks for lossless image compression is to train the network such that minimum entropy of its hidden layer outputs can be obtained. The output values equivalent to the predicted errors is then further entropy coded by Hu!man or arithmetic coding algorithms.
+The work reported in [30] can be taken as an example close to the above scheme. In this work, lossless compression is achieved through both linear prediction and non-linear prediction in which linear prediction is used "rst to compress the smooth areas of the input image and the non-linear prediction implemented on the neural network is used for those non-smooth areas. Fig. 14 illustrates the linear predictive pattern (Fig. 14(a)) and the multi-layer perceptron neural network structure (Fig. 14(b)). The linear prediction is designed according to the criterion that minimum entropy of the predicted errors is achieved. This is carried out through a number of iterations to re"ne the coe$cients towards their optimal values. Hence, each image will have its own optimal coe$cients and these have to be transmitted as the overhead. After the "rst pass, each pixel will have a corresponding
+
+error produced from the optimal linear prediction represented as g(i, j). The pixel is further classi"ed as being inside the non-smooth area if the predicted errors of its neighbouring pixels 1, and 2 given in Fig. 14(a) satisfy the following equation:
+
+TH("g(i, j!1)#g(i!1, j)"(TH,
+
+(4.4)
+
+where TH and TH stand for the thresholds. Around the pixel to be encoded, four predicted
+
+eprorsoitriso, n+sgGa\reH,shgoG\wnH\in, FgiGgH.\15,
+
+agrG>e tHa\ke,n,
+
+whose as the
+
+input of the neural network and a supervised train-
+
+ing is applied to adjust the weights and thresholds
+
+to minimize the MSE between the desired output,
+
+g(i, j), and the real output. After the training is
+
+"nished, the values of weights and thresholds are
+
+transmitted as overheads to the decoding end and
+
+the neural network is ready to apply a further
+
+non-linear prediction to those pixels inside
+
+non-smooth areas. The overheads incurred in both
+
+optimal linear and neural network non-linear
+
+prediction can be viewed as an extra cost for statis-
+
+tics modelling [71]. In fact, the entropy-based cri-
+
+terion is to optimize the predictive coe$cients by
+
+taking probability assignment or statistical model-
+
+ling into consideration. No work has been re-
+
+ported, however, regarding how the coe$cients can
+
+be e$ciently and adaptively optimised under such
+
+a context without signi"cantly increasing the
+
+Fig. 14. (a) Predictive pattern for entropy optimal linear prediction; (b) multi-layer perceptron neural network structure.
+
+756
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+modelling cost (intensive computing, overheads etc.). This remains an interesting area for further research.
+Edge detection based prediction under development by the new JPEG-LS standard [40] produces a simple yet successful prediction scheme in terms of reducing the predicted error entropy. It takes the three neighbouring pixels, the north, the west and the north west location, into consideration to determine the predictive value depending on whether a vertical edge or a horizontal edge is detected or not. Detailed discussion of such a scheme, however, is outside the category of this paper since it is not directly relevant to any neural network application. Further details are referred to the JPEG-LS documents [40].
+With MSE based linear prediction, the main problem is that the predictive value for any pixel has to be optimized by its preceding pixel values rather than the pixel itself. Fig. 15 illustrates an example of predictive pattern in which the pixel xapxsGGrH\eissisdetHeod.nTbtaihes"upesdretdhbiecytperxdeG\bdyicitHt\isven, evixagGlhuHb\eoo,ufrxixnGG>gH cfoaHun\rbpeiaxenexlds-
+
+pGH"aGHxG\ H#aGHxG\ H\#aGHxG H\
+
+#aGHxG> H\.
+
+(4.5)
+
+To optimize the pixels as shown
+
+vianlsuiedeofthPeGH, daasghreoduplinoef
+
+encoded area in
+
+Fig. 15 which can also be represented by  can MbbeesSstEeplecocrstisetiedbrliieonnvpailsalucueesseoodff,tthahGeHe,papiGxrH,oealbGxlHeGamH ntodcodameGHt.eesWrmdhoienwnentthhtoee minimizing the following error function:
+
+e" 6GHZ
+
+(xGH!pGH).
+
+(4.6)
+
+The idea is based on the assumption that the coe$-
+
+cpireendtisc,taivGHe, avGaH,luaeGH in predicting all
+
+PaonGtHhdiefratGhpH,eixwyeicllsal nginikvseiedetephtethhbeeewstotitnpadoloseswrirboilner
+
+Fig. 15 to a minimum. The assumption is made on
+
+the ground that the image pixels are highly corre-
+
+lated. But when the window goes through those
+
+drastically changed image content areas like edges,
+
+lines, etc., the assumption would not be correct
+
+which causes serious distortion between the predic-
+
+tive value and the current pixel value encoded. One
+
+way of resolving this problem is to use a vector
+
+quantization neural network to quantize the pixels
+
+in  into a number of clusters [27]. The idea is to
+
+use the neural network to coarsely pre-classify all
+
+the pixels inside the window  and to exclude
+
+those pixels which are unlikely to be close to the
+
+pixel to be predicted. In other words, only those
+
+pixels which are classi"ed as being inside the same
+
+group by the vector quantization neural network
+
+are involved in the above MSE based optimal lin-
+
+ear prediction. The overall structure of the system
+
+can be illustrated in Fig. 16 in which the vector
+
+quantization neural network is adopted to produce
+
+an adaptive code-book for quantizing or pre-clas-
+
+sifying the part of image up to the pixel to be
+
+predicted. Since the vector quantization is only
+
+Fig. 15. Predictive pattern.
+
+Fig. 16. VQ neural network assisted prediction.
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+757
+
+used to pre-classify those previously encoded pixels, no loss of information is incurred during this pre-classi"cation process. To this end, such a neural network application can be viewed as an indirect application for lossless image compression. By considering each pixel as an individual symbol in a pre-de"ned scanned order, other general lossless data compression neural networks can also be applied for image compression [28,59].
+In fact, theoretical results are analysed [56] based on Kolmogorov's mapping neural network existence theorem [20] that a C grey level image of n;n can be completely described by a three-layer neural network with 2Ulog nV inputs, 4Ulog nV#2 hidden neurones and Ulog CV output neurones [56]. This leads to a storage of full connections represented by: 8 Ulog nV#(1#Ulog CV)4 log n #2Ulog CV. Compared with the original image which requires Ulog CVn bits, a theoretical lossless compression ratio can be expected. Further research, therefore, can be initiated under the guidance of this analysis to achieve the theoretical target for various classes of input images.
+5. Conclusions
+In this paper, we have discussed various up-todate image compression neural networks which are classi"ed into three di!erent categories according to the nature of their applications and design. These include direct development of neural learning algorithms for image compression, neural network implementation of traditional image compression algorithms, and indirect applications of neural networks to assist with those existing image compression techniques.
+With direct learning algorithm development, vector quantization neural networks and narrowchannel neural networks stand out to be the most promising technique which have shown competitive performances and even improvements over those traditional algorithms. While conventional image compression technology is developed along the route of compacting information (transforms within di!erent domains), then quantization and entropy coding, the principal components extraction based narrow-channel neural networks pro-
+
+duce better approximation of extracting principal components from the input images, and VQ neural networks make a good replacement for quantization. Since vector quantization is included in many image compression algorithms such as those wavelets based variations, etc., many practical applications can be initiated in image processing and image coding related area.
+Theoretically, all the existing state-of-the-art image compression algorithms can be possibly implemented by extended neural network structures, such as wavelets, fractals and predictive coding described in this paper. One of the advantages of doing so is that implementation of various techniques can be standardized on dedicated hardware and architectures. Extensive evaluation and assessment for a wide range of di!erent techniques and algorithms can be conveniently carried out on generalized neural network structures. From this point of view, image compression development can be made essentially as the design of learning algorithms for neural networks. People often get wrong impressions that neural networks are computing intensive and time consuming. The fact is the contrary. For most neural networks discussed in the paper, the main bottleneck is the training or convergence of coupling weights. This stage, however, is only a preparation for the neural network. This will not a!ect the actual processing speed. In the case of vector quantization, for example, a set of pre-de"ned image samples is often used to train the neural network. After the training is "nished, the converged code-book will be used to vector quantize all the input images throughout the whole process due to the generalization property in neural networks [4,9]. To this end, the neural network will at least perform as equally e$cient as that of conventional vector quantizers for software implementation. As a matter of fact, recent work carried out at Loughborough clearly shows that when LBG is implemented on a neural network structure, the software simulation is actually faster than the conventional LBG [4]. With dedicated hardware implementation, the massive parallel computing nature of neural networks is quite obvious due to the parallel structure and arrangement of all the neurones within each layer. In addition, neural networks can also be implemented on general
+
+758
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+purpose parallel processing architectures or arrays with programmable capability to change their structures and hence their functionality [18,73].
+Indirect neural network applications are developed to assist with traditional techniques and provide a very good potential for further improvement on conventional image coding and compression algorithms. This is typi"ed by signi"cant research work on image pattern recognition, feature extraction and classi"cations by neural networks. When traditional compression technology is applied to those pre-processed patterns and features, it can be expected to achieve improvement by using neural networks since their applications in these area are well established. Hence, image processing based compression technology could be one of the major research directions in the next stage of image compression development.
+At present, research in image compression neural networks is limited to the mode pioneered by conventional technology, namely, information compacting (transforms)#quantization#entropy coding. Neural networks are only developed to target individual problems inside this mode [9,15,36,47]. Typical examples are the narrow channel type for information compacting, and LVQ for quantization, etc. Although signi"cant work has been done towards neural network development for image compression, and strong competition can be forced on conventional techniques, it is premature to say that neural network technology standing alone can provide better solutions for practical image coding problems in comparison with those traditional techniques. Co-ordinated e!orts world-wide are required to assess the neural networks developed on practical applications in which the training set and image samples should be standardized. In this way, every algorithm proposed can go through the same assessment with the same test data set. Further research can also be targeted to design neural networks capable of both information compacting and quantizing. Hence the advantages of both techniques can be fully exploited. Therefore, future research work in image compression neural networks can be considered by designing more hidden layers to allow the neural networks go through more interactive training and sophisticated learning procedures. Accordingly, high performance compres-
+
+sion algorithms may be developed and implemented in those neural networks. Within the infrastructure, dynamic connections of various neurones and non-linear transfer functions can also be considered and explored to improve their learning performances for those image patterns with drastically changed statistics.
+References
+[1] S.C. Ahalt, A.K. Krishnamurthy et al., Competitive learning algorithms for vector quantization, Neural Networks 3 (1990) 277}290.
+[2] A. Averbuch, D. Lazar, M. Israeli, Image compression using wavelet transform and multiresolution decomposition, IEEE Trans. Image Process. 5 (1) (January 1996) 4}15.
+[3] M.F. Barnsley, L.P. Hurd, Fractal Image Compression, AK Peters Ltd, 1993, ISBN: 1-56881-000-8.
+[4] G. Basil, J. Jiang, Experiments on neural network implementation of LBG vector quantization, Research Report, Department of Computer Studies, Loughborough University, 1997.
+[5] Benbenisti et al., New simple three-layer neural network for image compression, Opt. Eng. 36 (1997) 1814}1817.
+[6] H. Bourlard, Y. Kamp, Autoassociation by multilayer perceptrons and singular values decomposition, Biol. Cybernet. 59 (1988) 291}294.
+[7] D. Butler, J. Jiang, Distortion equalised fuzzy competitive learning for image data vector quantization, in: IEEE Proc. ICASSP'96, Vol. 6, 1996, pp. 3390}3394, ISBN: 0-7803-3193-1.
+[8] G. Candotti, S. Carrato et al., Pyramidal multiresolution source coding for progressive sequences, IEEE Trans. Consumer Electronics 40 (4) (November 1994) 789}795.
+[9] S. Carrato, Neural networks for image compression, Neural Networks: Adv. and Appl. 2 ed., Gelenbe Pub, North-Holland, Amsterdam, 1992, pp. 177}198.
+[10] O.T.C. Chen et al., Image compression using self-organisation networks, IEEE Trans. Circuits Systems For Video Technol. 4 (5) (1994) 480}489.
+[11] F.L. Chung, T. Lee, Fuzzy competitive learning, Neural Networks 7 (3) (1994) 539}551.
+[12] P. Cicconi et al., New trends in image data compression, Comput. Med. Imaging Graphics 18 (2) (1994) 107}124, ISSN 0895-6111.
+[13] S. Conforto et al., High-quality compression of echographic images by neural networks and vector quantization, Med. Biol. Eng. Comput. 33 (5) (1995) 695}698, ISSN 0140-0118.
+[14] G.W. Cottrell, P. Munro, D. Zipser, Learning internal representations from grey-scale images: an example of extensional programming, in: Proc. 9th Annual Cognitive Science Society Conf., Seattle, WA, 1987, pp. 461}473.
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+759
+
+[15] J. Dangman, Complete discrete 2-D Gabor transforms by neural networks for image analysis and compression, IEEE Trans. ASSP 36 (1988) 1169}1179.
+[16] T.K. Denk, V. Parhi, Cherkasky, Combining neural networks and the wavelet transform for image compression, in: IEEE Proc. ASSP, Vol. I, 1993, pp. 637}640.
+[17] R.D. Dony, S. Haykin, Neural network approaches to image compression, Proc. IEEE 83 (2) (February 1995) 288}303.
+[18] W.C. Fang, B.J. Sheu, T.C. Chen, J. Choi, A VLSI neural processor for image data compression using self-organisation networks, IEEE Trans. Neural Networks 3 (3) (1992) 506}519.
+[19] R. Fletcher, Practical Methods of Optimisation, Wiley, ISBN: 0-471-91547-5, New York, 1987.
+[20] R. Hecht-Nielsen, Neurocomputing, Addison-Wesley, Reading, MA, 1990.
+[21] N. Heinrich, J.K. Wu, Neural network adaptive image coding, IEEE Trans. Neural Networks 4 (4) (1993) 605}627.
+[22] P.G. Howard, J.S. Vitter, New methods for lossless image compression using arithmetic coding, Inform. Process. Management 28 (6) (1992) 765}779.
+[23] C.H. Hsieh, J.C. Tsai, Lossless compression of VQ index with search-order coding, IEEE Trans. Image Process. 5 (11) (November 1996) 1579}1582.
+[24] K.M. Iftekharuddin et al., Feature-based neural wavelet optical character recognition system, Opt. Eng. 34 (11) (1995) 3193}3199.
+[25] J. Jiang, Algorithm design of an image compression neural network, in: Proc. World Congress on Neural Networks, Washington, DC, 17}21 July 1995, pp. I792}I798, ISBN: 0-8058-2125.
+[26] J. Jiang, A novel design of arithmetic coding for data compression, IEE Proc.-E: Computer and Digital Techniques 142 (6) (November 1995) 419}424, ISSN 13502387.
+[27] J. Jiang, A neural network based lossless image compression, in: Proc. Visual'96: Internat. Conf. on Visual Information Systems, 5}6 February 1996, Melbourne, Australia, pp. 192}201, ISBN: 1-875-33852-7.
+[28] J. Jiang, Design of neural networks for lossless data compression, Opt. Eng. 35 (7) (July 1996) 1837}1843.
+[29] J. Jiang, Fast competitive learning algorithm for image compression neural networks, Electronic Lett. 32 (15) (July 1996) 1380}1381.
+[30] W.W. Jiang et al., Lossless compression for medical imaging systems using linear/non-linear prediction and arithmetic coding, in: Proc. ISCAS'93: IEEE Internat. Symp. on Circuits and Systems, Chicago, 3}6 May 1993, ISBN 0-7803-1281-3.
+[31] N.B. Karayiannis, P.I. Pai, Fuzzy vector quantization algorithms and their application in image compression, IEEE Trans. Image Process. 4 (9) (1995) 1193}1201.
+[32] N.G. Karayiannis, P.I. Pai, Fuzzy algorithms for learning vector quantization, IEEE Trans. Neural Networks 7 (5) (1996) 1196}1211.
+
+[33] T. Kohonen, Self-Organisation and Associative Memory, Springer, Berlin, 1984.
+[34] D. Kornreich, Y. Benbenisti, H.B. Mitchell, P. Schaefer, Normalization schemes in a neural network image compression algorithm, Signal Processing: Image Communication 10 (1997) 269}278.
+[35] D. Kornreich, Y. Benbenisti, H.B. Mitchell, P. Schaefer, A high performance single-structure image compression neural network, IEEE Trans. Aerospace Electronic Systems 33 (1997) 1060}1063.
+[36] S.Y. Kung, K.I. Diamantaras, J.S. Taur, Adaptive principal component extraction (APEX) and applications, IEEE Trans. Signal Process. 42 (May 1994) 1202}1217.
+[37] N. Kuroki et al., Lossless image compression by twodimensional linear prediction with variable coe$cients, IEICE Trans. Fund. E75-A (7) (1992) 882}889.
+[38] R.P. Lippmann, An introduction to computing with neural nets, IEEE ASSP Mag. (April 1987) 4}21.
+[39] S.B. Lo, H. Li et al., On optimization of orthonormal wavelet decomposition: implication of data accuracy, feature preservation, and compression e!ects, SPIE Proc., Vol. 2707, 1996, pp. 201}214.
+[40] Lossless and near-lossless coding of continuous tone still images (JPEG-LS), ISO/IEC JTC 1/SC 29/WG 1 FCD 14495-public draft, 1997 (http://www.jpeg.org/public/jpeglinks.htm).
+[41] S.G. Mallat, A theory for multiresolution signal decomposition: The wavelet representation, IEEE Trans. Pattern Anal. Mach. Intell. 11 (7) (July 1989) 674}693.
+[42] C.N. Manikopoulos, Neural network approach to DPCM system design for image coding, IEE Proc.-I 139 (5) (October 1992) 501}507.
+[43] N.D. Memon, K. Sayood, Lossless image compression: A comparative study, in: Proc. SPIE Still Image Compression, Vol. 2418, 1995, pp. 8}27.
+[44] N. Memon et al., Di!erential lossless encoding of images using non-linear predictive techniques, in: Proc. ICIP-94, Internat. Conf. on Image Processing, Vol. III, 13}16 November, Austin, Texas, 1994, pp. 841}845, ISBN: 08186-6950-0.
+[45] W.L. Merrill John, R.F. Port, Fractally con"gured neural networks, Neural Networks 4 (1) (1991) 53}60.
+[46] N. Mohsenian, S.A. Rizvi, N.M. Nasrabadi, Predictive vector quantization using a neural network approach, Opt. Eng. 32 (7) (July 1993) 1503}1513.
+[47] M. Mougeot, R. Azencott, B. Angeniol, Image compression with back propagation: improvement of the visual restoration using di!erent cost functions, Neural Networks 4 (4) (1991) 467}476.
+[48] A. Namphol, S. Chin, M. Arozullah, Image compression with a hierarchical neural network IEEE Trans. Aerospace Electronic Systems 32 (1) (January 1996) 326}337.
+[49] R.P. Nikhil, C.J. Bezdek, E.C.K. Tsao, Generalized clustering networks and Kohonen's Self-organizing scheme, IEEE Trans. Neural Networks 4 (4) (1993) 549}557.
+[50] E. Oja, A simpli"ed neuron model as a principal component analyser, J. Math. Biol. 15 (1982) 267}273.
+
+760
+
+J. Jiang / Signal Processing: Image Communication 14 (1999) 737}760
+
+[51] E. Oja, Data compression, feature extraction, and autoassociation in feedforward neural networks, Arti"cial Neural Networks, Elsevier, Amsterdam, 1991.
+[52] I. Pitas et al., Robust and adaptive training algorithms in self-organising neural networks, Electronic Imaging SPIE 5 (2) (1997).
+[53] X.N. Ran, N. Farvardin, A perceptually motivated 3-component image model 2. applications to image compression, IEEE Trans. Image Process. 4 (4) (1995) 430}447.
+[54] S.A. Rizvi, N.M. Nasrabadi, Residual vector quantization using a multilayer competitive neural network, IEEE J. Selected Areas Commun. 12 (9) (December 1994) 1452}1459.
+[55] S.A. Rizvi, N.M. Nasrabadi, Finite-state residual vector quantization using a tree structured competitive neural network, IEEE Trans. Circuits Systems Video Technol. 7 (2) (1997) 377}390.
+[56] S.G. Romaniuk, Theoretical results for applying neural networks } To lossless image compression, Network-Comput. Neural Systems 5 (4) (1994) 583}597, ISSN 0954898X.
+[57] L.E. Russo, E.C. Real, Image compression using an outer product neural network, in: Proc. ICASSP, Vol. 2, San Francisco, CA, 1992, pp. 377}380.
+[58] T.D. Sanger, Optimal unsupervised learning in a singlelayer linear feed forward neural network, Neural Networks 2 (1989) 459}473.
+[59] J. Schmidhuber, S. Heil, Sequential neural text compression, IEEE Trans. Neural Networks 7 (1) (January 1996) 142}146.
+[60] J. Shanbehzadeh, P.O. Ogunbona, Index-compressed vector quantization based on index mapping, IEE Proc.-Vision Image Signal Process. 144 (1) (February 1997) 31}38.
+[61] J.M. Shapiro, Embedded image-coding using zerotrees of wavelet coe$cients, IEEE Trans. Signal Process. 41 (12) (1993) 3445}3462.
+[62] W. Skarbek, A. Cichocki, Robust image association by recurrent neural subnetworks, Neural Process. Lett. 3 (3) (1996) 131}138, ISSN 1370-4621.
+
+[63] H.H. Song, S.W. Lee, LVQ combined with simulated annealing for optimal design of large-set reference models, Neural Networks 9 (2) (1996) 329}336.
+[64] J. Stark, Iterated function systems as neural networks, Neural Networks 4 (5) (1992) 679}690.
+[65] A. Sto!els et al., On object-oriented video coding using the CNN universal machine, IEEE Trans. Circuits Systems I-Fund. Theory Appl. 43 (11) (1996) 948}952.
+[66] H. Szu, B. Telfer, J. Garcia, Wavelet transforms and neural networks for compression and recognition, Neural Networks 9 (4) (1996) 695}798.
+[67] H. Szu, B. Telfer, S. Kadambe, Neural network adaptive wavelets for signal representation and classi"cation, Opt. Eng. 31 (September 1992) 1907}1916.
+[68] C.P. Veronin, Priddy et al., Optical image segmentation using neural based wavelet "ltering techniques, Opt. Eng. 31 (February 1992) 287}294.
+[69] J.D. Villasenor, B. Belzer, J. Liao, Wavelet "lter evaluation for image compression, IEEE Trans. Image Process. 4 (8) (August 1995) 1053}1060.
+[70] N.P. Walker et al., Image compression using neural networks, GEC J. Res. 11 (2) (1994) 66}75, ISSN 0264-9187.
+[71] M.J. Weinberger, J.J. Rissanen, R.B. Arps, Applications of universal context modelling to lossless compression of grey-scale images, IEEE Trans. Image Process. 5 (4) (1996) 575}586.
+[72] L. Xu, A. Yuille, Robust principal component analysis by self-organising rules based on statistical physics approach, Tech. Report, 92-93, Harvard Robotics Lab, February 1992.
+[73] R.B. Yates et al., An array processor for general-purpose digital image compression, IEEE J. Solid-state Circuits 30 (3) (1995) 244}250.
+[74] Q. Zhang, A. Benveniste, Approximation by non-linear wavelet networks, in: Proc. IEEE Internat. Conf. ASSP, Vol. 5, May 1991, pp. 3417}3420.
+[75] L. Zhang et al., Generating and coding of fractal graphs by neural network and mathematical morphology methods, IEEE Trans. Neural Networks 7 (2) (1996) 400}407.
+

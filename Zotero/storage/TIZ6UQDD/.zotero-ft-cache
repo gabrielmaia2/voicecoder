@@ -1,0 +1,1189 @@
+arXiv:1712.08934v3 [cs.AR] 6 Dec 2018
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+KAIYUAN GUO, SHULIN ZENG, JINCHENG YU, YU WANG AND HUAZHONG YANG,
+Tsinghua University
+Recent researches on neural network have shown signi cant advantage in machine learning over traditional algorithms based on handcra ed features and models. Neural network is now widely adopted in regions like image, speech and video recognition. But the high computation and storage complexity of neural network inference poses great di culty on its application. CPU platforms are hard to o er enough computation
+11 capacity. GPU platforms are the rst choice for neural network process because of its high computation
+capacity and easy to use development frameworks. On the other hand, FPGA-based neural network inference accelerator is becoming a research topic. With
+speci cally designed hardware, FPGA is the next possible solution to surpass GPU in speed and energy e ciency. Various FPGA-based accelerator designs have been proposed with so ware and hardware optimization techniques to achieve high speed and energy e ciency. In this paper, we give an overview of previous work on neural network inference accelerators based on FPGA and summarize the main techniques used. An investigation from so ware to hardware, from circuit level to system level is carried out to complete analysis of FPGA-based neural network inference accelerator design and serves as a guide to future work. CCS Concepts: •General and reference → Surveys and overviews; •Computer systems organization → Parallel architectures;
+Additional Key Words and Phrases: FPGA architecture, Neural Network, Parallel Processing ACM Reference format: Kaiyuan Guo, Shulin Zeng, Jincheng Yu, Yu Wang Huazhong Yang. 2017. [DL] A Survey of FPGA-Based Neural Network Inference Accelerator. ACM Trans. Recon g. Technol. Syst. 9, 4, Article 11 (December 2017), 26 pages. DOI: 0000001.0000001
+1 INTRODUCTION Recent research on Neural Network (NN) is showing great improvement over traditional algorithms in machine learning. Various network models, like convolutional neural network (CNN), recurrent neural network (RNN), have been proposed for image, video, and speech process. CNN [28] improves the top-5 image classi cation accuracy on ImageNet [50] dataset from 73.8% to 84.7% in 2012 and further helps improve object detection [13] with its outstanding ability in feature extraction. RNN [21] achieves state-of-the-art word error rate on speech recognition. In general, NN features a high ing ability to a wide range of pa ern recognition problems. is ability makes NN a promising candidate for many arti cial intelligence applications.
+ACM acknowledges that this contribution was authored or co-authored by an employee, or contractor of the national government. As such, the Government retains a nonexclusive, royalty-free right to publish or reproduce this article, or to allow others to do so, for Government purposes only. Permission to make digital or hard copies for personal or classroom use is granted. Copies must bear this notice and the full citation on the rst page. Copyrights for components of this work owned by others than ACM must be honored. To copy otherwise, distribute, republish, or post, requires prior speci c permission and/or a fee. Request permissions from permissions@acm.org. © 2017 ACM. 1936-7406/2017/12-ART11 $15.00 DOI: 0000001.0000001
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:2
+
+K. Guo et al.
+
+Table 1. Performance and resource utilization of state-of-the-art neural network accelerator designs
+
+Year # Param # Operation Top-1 Accuracy
+
+AlexNet[28] 2012 60M 1.4G 61.0%
+
+VGG19[56] 2014 144M 39G 74.5%
+
+ResNet152[22] 2016 57M 22.6G 79.3%
+
+MobileNet[24] 2017 4.2M 1.1G 70.6%
+
+Shu eNet[79] 2017 2.36M 0.27G 67.6%
+
+But the computation and storage complexity of NN models are high. In Table 1, we list the number of operations, number of parameters (add or multiplication), and top-1 accuracy on ImageNet dataset [50] of state-of-the-art CNN models. Take CNN as an example. e largest CNN model for a 224 × 224 image classi cation requires up to 39 billion oating point operations (FLOP) and more than 500MB model parameters [56]. As the computation complexity is proportional to the input image size, processing images with higher resolutions may need more than 100 billion operations. Latest work like MobileNet [24] and Shu eNet [79] are trying to reduce the network size with advanced network structures, but with obvious accuracy loss. e balance between the size of NN models and accuracy is still an open question today. In some cases, the large model size hinders the application of NN, especially in power limited or latency critical scenarios.
+erefore, choosing a proper computation platform for neural-network-based applications is essential. A typical CPU can perform 10-100G FLOP per second, and the power e ciency is usually below 1GOP/J. So CPUs are hard to meet the high performance requirements in cloud applications nor the low power requirements in mobile applications. In contrast, GPUs o er up to 10TOP/s peak performance and are good choices for high performance neural network applications. Development frameworks like Ca e [26] and Tensor ow [4] also o er easy-to-use interfaces which makes GPU the rst choice of neural network acceleration.
+Besides CPUs and GPUs, FPGAs are becoming a platform candidate to achieve energy e cient neural network processing. With a neural network oriented hardware design, FPGAs can implement high parallelism and make use of the properties of neural network computation to remove additional logic. Algorithm researches also show that an NN model can be simpli ed in a hardware-friendly way while not hurting the model accuracy. erefore FPGAs are possible to achieve higher energy e ciency compared with CPU and GPU.
+FPGA-based accelerator designs are faced with two challenges in performance and exibility: • Current FPGAs usually support working frequency at 100-300MHz, which is much less than CPU and GPU. e FPGA’s logic overhead for recon gurability also reduces the overall system performance. A straightforward design on FPGA is hard to achieve high performance and high energy e ciency. • Implementation of neural networks on FPGAs is much harder than that on CPUs or GPUs. Development framework like Ca e and Tensor ow for CPU and GPU is absent for FPGA.
+Many designs addressing the above two problems have been carried out to implement energy e cient and exible FPGA-based neural network accelerators. In this paper, we summarize the techniques proposed in these work from the following aspects:
+• We rst give a simple model of FPGA-based neural network accelerator performance to analyze the methodology in energy e cient design.
+• We investigate current technologies for high performance and energy e cient neural network accelerator designs. We introduce the techniques in both so ware and hardware level and estimate the e ect of these techniques.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:3
+
+• We compare state-of-the-art neural network accelerator designs to evaluate the techniques introduced and estimate the achievable performance of FPGA-based accelerator design, which is at least 10× be er energy e cient than current GPUs.
+• We investigate state-of-the-art automatic design methods of FPGA-based neural network accelerators.
+e rest part of this paper is organized as follows: Section 2 introduces the basic operations of neural networks and the background of FPGA-based NN accelerator. In section 3, we analyze the design target of NN accelerators and corresponding methods. Section 4 and section 5 review the techniques in NN model compression and accelerator design respectively. Section 6 compares existing designs and evaluate the techniques. Section 8 introduces the methods for a exible accelerator design. Section 9 concludes this paper.
+2 PRELIMINARY Before discussing the system design for neural network acceleration, we rst introduce the basic concepts of neural networks and the typical structure of FPGA-based NN accelerator design.
+2.1 Neural Network
+
+output
+
+layer
+
+layer
+
+layer
+
+layer Network model
+
+input
+(a)
+
+𝑴𝑴−𝟏𝟏
+𝑭𝑭𝒐𝒐𝒐𝒐𝒐𝒐 𝒋𝒋 = � 𝒄𝒄𝒄𝒄𝒄𝒄𝒄𝒄𝒄𝒄𝒄𝒄 𝑭𝑭𝒊𝒊𝒊𝒊 𝒊𝒊 , 𝑲𝑲𝒊𝒊𝒊𝒊 + 𝒃𝒃𝒋𝒋
+𝒊𝒊=𝟏𝟏
+
+parameter of VGG-11
+CONV 6.9%
+
+𝑭𝑭𝒊𝒊𝒊𝒊
+
+𝑭𝑭𝒐𝒐𝒐𝒐𝒐𝒐
+
+x
+
+y 𝒚𝒚 = 𝑾𝑾𝑾𝑾 + 𝒃𝒃
+
+(b)
+
+FC 93.1%
+
+operations of VGG-11
+
+FC 1.6%
+
+POOL & ReLU 0.2%
+
+CONV 98.2%
+(c)
+
+Fig. 1. (a) Computation graph of a neural network model. (b) CONV and FC layers in NN model. (c) CONV and FC layers dominate the computation and parameter of a typical NN model: VGG11.
+
+In this section, we introduce the basic functions in a neural network. In this paper, we only focus on the inference of NN, which means using a trained model to predict or classify new data. e training process of NN is not discussed in this paper. A neural network model can be expressed as a directed graph shown in Figure 1(a). Each vertex of the graph denotes a layer which conducts operations on data from a previous layer or input and generates results to the next layer or output. We refer the parameter of each layer as weights and the input/output of each layer as activations through this paper.
+Convolution (CONV) layers and fully connected (FC) layers are two common types of layers in NN models. e functions of these two layers are shown in Figure 1(b). CONV layers conduct 2D convolutions on a set of input feature maps Fin and add the results to get output feature maps Fout . FC layers receive a feature vector as input and conduct matrix-vector multiplications.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:4
+
+K. Guo et al.
+
+Besides CONV and FC layers, NN layers also have pooling, ReLU [28], concat [58], elementwise [22] and other types of layers. But these layers contributes li le to the computation and storage requirement of a neural network model. Figure 1(c) shows the distribution of weights and operations in the VGG-11 model [56]. In this model, CONV and FC layers together contribute more than 99% of the network’s weights and operations, which is similar to most of the CNN models. Compared with CNN, RNN models [6, 21] usually have no CONV layers and only FC layers contributes to most of the computation and storage. So most of the neural network acceleration systems focus on these two types of layers.
+2.2 FPGA-based Accelerator In recent years, FPGA is becoming a promising solution for algorithm acceleration. Compared with CPU, GPU, and DSP platforms, for which the so ware and hardware are designed independently, FPGA enables the developers to implement only the necessary logic in hardware according to the target algorithm. By eliminating the redundancy in general hardware platforms, FPGAs can achieve higher e ciency. Application speci c integrated circuits (ASICs) based solutions achieve even higher e ciency but requires much longer development cycle and higher cost.
+
+On-chip storage unit size
+
+working at GHz
+Host (usually CPU)
+
+PCIe Ethernet AXI bus
+……
+
+working at 100-400 MHz
+FPGA
+
+1GB REG SRAM 1MB
+
+VGG-11 (531MB) ResNet-152 (229MB) ResNet-34 (86MB)
+SqueezeNet (5MB)
+
+Host Memory
+
+10-100Gbps bandwidth
+
+FPGA Memory
+
+GB level DDR SDRAM
+
+GB level DDR SDRAM
+
+(a)
+
+1KB
+XC7Z020 5CEA7
+
+ZU9EG 5SGXA7 10AX115
+(b)
+
+VU9P
+
+Fig. 2. (a) A typical structure of an FPGA-based NN accelerator. (b) Gap between NN model size and the storage unit size on FPGAs. The bar chart compares the register and SRAM sizes on FPGA chips in di erent scales. The do ed line denotes the parameter sizes of di erent NN models with 32-bit floating point parameters.
+
+For FPGA-based neural network accelerator, a typical architecture of the system is shown in Figure 2(a). e system usually consists of a CPU host and an FPGA part. A pure FPGA chip usually works with a host PC/server through PCIe connections. SoC platforms (like the Xilinx Zynq Series) and Intel HARPv2 [18] platform integrate the host and the FPGA in the same chip or package. Both the host and the FPGA can work with their own external memory and access each others’ memory through the connection. Most of the designs implement NN accelerator on the FPGA part and control the accelerator with the so ware on the host.
+Typical FPGA chips consist large on-chip storage units like registers and SRAM(Static RandomAccess Memory), but still too small compared with NN models as shown in Figure 2(b). Common models implement 100-1000MB parameters while the largest available FPGA chip implements ¡50MB on-chip SRAM. is gap requires that external memory like DDR SDRAM is needed. e bandwidth and power consumption of DDR limits the system performance.
+e computation capacity of FPGA is relatively higher. Common FPGAs implement hundreds to thousands of DSP units, each of which can compute 18 × 27 or 18 × 19, achieving up to 10TFLOP/s ( oating point operations per second) on the largest FPGAs. But for low-end FPGAs like Xilinx
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:5
+
+XC7Z020, this number is reduced to 20GFLOP/s, which is hard to support real-time video processing for applications on mobile platforms.
+Even faced with the above challenges, researchers have proposed a series of optimization methods from algorithm to architecture to design high performance NN accelerators on FPGA, which will be discussed in the following sections of this paper.
+3 DESIGN METHODOLOGY AND CRITERIA Before going into the details of the techniques used for neural network accelerators, we rst give an overview of the design methodology. In general, the design target of a neural network inference accelerator includes the following two aspects: high speed (high throughput and low latency), and high energy e ciency. e symbols used in this section are listed in Table 2.
+
+Table 2. List of Symbols
+
+Symbol IPS
+W
+OPSpeak
+OPSact
+η
+f P L C
+Ef f
+Etotal Es t at i c Eop Nx acc
+Ex acc
+
+Description
+
+Unit
+
+roughput of the system, measured by the number of in- s−1
+
+ference processed each second
+
+Workload for each inference, measured by the number of GOP operations∗ in the network, mainly addition and multiplica-
+
+tion for neural network.
+
+Peak performance of the accelerator, measured by the max- GOP/s
+
+imum number of operations can be processed each second.
+
+Run-time performance of the accelerator, measured by the GOP/s
+
+number of operations processed each second.
+
+Utilization ratio of the computation units, measured by -
+
+the average ratio of working computation units in all the
+
+computation units during each inference.
+
+Working frequency of the computation units.
+
+GHz
+
+Number of computation units in the hardware design. -
+
+Latency for processing each inference
+
+s
+
+Concurrency of the accelerator, measured by the number -
+
+of inference processed in parallel
+
+Energy e ciency of the system, measured by the number GOP/J
+
+of operations can be processed within unit energy.
+
+Total system energy cost for each inference.
+
+J
+
+Static energy cost of the system for each inference.
+
+J
+
+Average energy cost for each operation in each inference. J Number of bytes accessed from memory (x can be SRAM byte
+
+or DRAM). Energy for accessing each byte from memory(x can be J/byte
+
+SRAM or DRAM).
+
+* Each addition or multiplication is counted as 1 operation.
+
+Speed. e throughput of an NN accelerator can be expressed by equation 1. e on-chip resource for a certain FPGA chip is limited. We can increase the peak performance by: 1. increasing the number of computation units P by reducing the size of each computation unit and 2. increasing
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:6
+
+K. Guo et al.
+
+the working frequency f . Reducing the size of computation units can be achieved by sacri cing the data precision, which may hurt the model accuracy and requires hardware-so ware co-design. On the other hand, increasing working frequency is pure hardware design work. Corresponding techniques on so ware models and hardware are introduced in section 4 and 5 respectively. A high utilization ratio η is ensured by reasonable parallelism implementation and e cient memory system. e property of the target model, i.e. the data access pa ern or data-computation ratio also a ect if the hardware can be fully utilized at run-time. But most of the previous work targeting higher utilization ratio focus on the hardware side.
+
+IPS
+
+=
+
+OPSact W
+
+=
+
+OPSpeak × η W
+
+=
+
+fP ×η W
+
+(1)
+
+Most of the FPGA-based NN accelerators compute di erent inputs one by one. Some designs
+
+process di erent inputs in parallel. So the latency of the accelerator is expressed as equation 2.
+
+Common concurrent design includes layer pipeline and batch processing. is is usually considered
+
+together with loop unrolling and will be introduced in section 5.2. In this paper, we focus more on
+
+optimizing the throughput. As di erent accelerators may be evaluated on di erent NN models, a common criterion of speed is the OPSact , which eliminates the e ect of di erent network models to some extent.
+
+L
+
+=
+
+C IPS
+
+(2)
+
+Energy E ciency. Energy e ciency (E f f ) is another critical criteria to computing systems. For
+
+neural network inference accelerators, energy e ciency is de ned as equation 3. Like throughput,
+
+we count the number of operations rather than the number of inference to eliminates the di erence
+of workload W . If the workload for the target network is xed, increasing the energy e ciency of a neural network accelerator means to reduce the total energy cost, Etotal to process each input.
+
+Ef f
+
+=
+
+W Etotal
+
+(3)
+
+Etotal ≈ W × Eop + NSRAM acc × ESRAM acc + NDRAM acc × EDRAM acc + Estatic
+
+(4)
+
+e total energy cost mainly comes from 2 parts: computation and memory access, which is
+
+expressed in equation 4. e rst item in equation 4 is the dynamic energy cost for computation. Given a certain network, the workload W is xed. Researchers have been focusing on optimizing the NN models by quantization (narrowing the bit-width used for computation) to reduce Eop or sparsi cation (se ing more weights to zeros) to skip the multiplications with these zeros to reduce Nop , which follows similar rules as for throughput optimization.
+e second and third item in equation 4 is the dynamic energy cost for memory access. As shown
+
+in section 2.2, FPGA-based NN accelerator usually works with an external DRAM. We separate the memory access energy into DRAM part and SRAM part. Nx acc can be reduced by quantization, sparsi cation, e cient on-chip memory system, and scheduling method. us these methods help
+
+reduce dynamic memory energy. Corresponding methods will be introduced in section 5.3. e
+unit energy Ex acc can hardly be reduced given a certain FPGA platform. e fourth item Estatic denotes the static energy cost of the system. is energy cost can hardly
+be improved given the FPGA chip and the scale of the design.
+
+From the analysis of speed and energy, we see that neural network accelerator involves both
+
+optimizations on NN models and hardware. In the following sections, we will introduce previous
+
+work in these two aspects respectively.
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:7
+
+4 HARDWARE ORIENTED MODEL COMPRESSION As introduced in section 3, the design of energy e cient and fast neural network accelerator can bene t from the optimization of NN models. A larger NN model usually results in higher model accuracy. is means it is possible to trade the model accuracy for the hardware speed or energy cost. Neural network researchers are designing more e cient network models from AlexNet [28] to ResNet [22], SqueezeNet [25] and MobileNet [24]. Latest work tries to directly optimize the processing latency by searching a good network structure [59] or skip some layers at run-time to save computation [65]. Within these methods, the main di erences between the handcra ed/generated networks are the size of and the connections between each layer. e basic operations are the same and the di erences hardly a ect the hardware design. For this reason, we will not focus on these techniques in this paper. But designers should consider using these techniques to optimize the target network.
+Other methods try to achieve the tradeo by compressing existing NN models. ey try to reduce the number of weights or reduce the number of bits used for each activation or weight, which help lower down the computation and storage complexity. Corresponding hardware designs can bene t from these NN model compression methods. In this section, we investigate these hardware oriented network model compression methods.
+
+4.1 Data antization One of the most commonly used methods for model compression is the quantization of the weights and activations. e activations and weights of a neural network are usually represented by oating point data in common developing frameworks. Recent work tries to replace this representation with low-bit xed-point data or even a small set of trained values. On the one hand, using fewer bits for each activation or weight helps reduce the bandwidth and storage requirement of the neural network processing system. On the other hand, using a simpli ed representation reduce the hardware cost for each operation. e bene t of hardware will be discussed in detail in section 5. Two kinds of quantization methods are discussed in this section: linear quantization and non-linear quantization.
+4.1.1 Linear antization. Linear quantization nds the nearest xed-point representation of each weight and activation. e problem with this method is that the dynamic range of oatingpoint data greatly exceeds that for xed-point data. Most of the weights and activations will su er from over ow or under ow. Qiu et al. [49] nds that the dynamic range of the weights and activations in a single layer is much more limited and di ers across di erent layers. erefore they assign di erent fractional bit-widths to the weights and activations in di erent layers. To decide the fractional bit-width of a set of data, i.e. the activations or weights of a layer, the data distribution is
+rst analyzed. A set of possible fractional bit-widths are chosen as candidate solutions. en the solution with the best model performance on training data set is chosen. In [49], the optimized solution of a network is chosen layer by layer to avoid an exponential design space exploration. Wang et al. [64] try to use large bit-width for only the rst and last layer and quantize the middle layers to ternary or binary. e method needs to increase the network size to keep high accuracy but still brings hardware performance improvement. Guo et al. [17] choose to ne-tune the model a er the fractional bit-width of all the layers are xed.
+e method of choosing a fractional bit-width equals to scale the data with a scaling factor of 2k . Li et al. [29] scales the weights with trained parameter W l for each layer and quantize the weights with 2-bit data, representing W l , 0 and −W l . e activations in this work are not quantized. So the network still implements 32-bit oating point operations. Zhou et al. [82] further quantize the
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:8
+
+K. Guo et al.
+
+weights of a layer with only 1 bit to ±s, where s = E(|wl |) is the expectation of the absolute value of the weights of this layer. Linear quantization is also applied to the activations in this work.
+4.1.2 Non-linear antization. Compared with linear quantization, non-linear quantization independently assigns values to di erent binary codes. e translation from a non-linear quantized code to its corresponding value is thus a look-up table. is kind of methods helps further reduce the bit-width used for each activation or weight. Chen et al. [9] assign each of the weight to an item in the look-up table by a pre-de ned hash function and train the values in look-up tables. Han et al. [20] assign the values in look-up tables to the weights by clustering the weights of a trained model. Each look-up table value is set as the cluster centre and further ne-tuned with training data set. is method can compress the weights of state-of-the-art CNN models to 4-bit without accuracy loss. Zhu et al. [83] propose the ternary-quantized network where all the weights of a layer are quantized to three values: W n, 0, and W p . Both the quantized value and the correspondence between weights and look-up table are trained. is method sacri ces less than 2% accuracy loss on ImageNet dataset on state-of-the-art network models. e weight bit-width is reduced from 32-bit to 2-bit, which means about 16× model size compression.
+
+Accuracy Loss (%)
+
+25
+22.55
+20
+17.71
+
+top1 top5
+
+15
+
+13.62
+
+10
+
+5
+
+0.26
+
+0.88 1.06
+
+1.52 0.5
+
+0
+
+-0.09
+
+16x16
+
+8x8
+
+8x8
+
+-5 VGG16 CaffeNet VGG16
+
+0.38 0.04
+
+8x8 VGG16
+(FT)
+
+6x6 VGG16
+
+Linear
+
+10.3 9.24
+6.54
+4.22 3.2
+
+6x6 VGG16
+(FT)
+
+2xfp32 ResNet18
+
+1x4 AlexNet
+
+1x1 AlexNet
+
+0.01 0.03
+4x32 AlexNet
+
+0.57
+-0.28
+2x32 AlexNet
+
+Nonlinear
+
+Fig. 3. Comparison between di erent quantization methods from [17, 20, 29, 49, 82, 83]. The quantization configuration is expressed as (weight bit-width)×(activation bit-width). The ”(FT)” denotes that the network is fine-tuned a er a linear quantization.
+
+4.1.3 Comparison. We compare some typical quantization methods from [17, 20, 29, 49, 82, 83] in Figure 3. All the quantization results are tested on ImageNet data set and the absolute accuracy loss compared with corresponding baseline oating point models is recorded. Comparing di erent methods on di erent models is a li le bit unfair. But it still gives some insights. For linear quantization, 8-bit is a clear bound to ensure negligible accuracy loss. With 6 or fewer bits, using ne-tune or even training each weight from the beginning will cause noticeable accuracy degradation. If we require that 1% accuracy loss is within the acceptable range, linear quantization with at least 8 × 8 con guration and the listed non-linear quantization are available. We will further discuss the performance gain of quantization in section 5.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:9
+
+4.2 Weight Reduction Besides narrowing the bit-width of activations and weights, another method for model compression is to reduce the number of weights. One kind of method is to approximate the weight matrix with a low-rank representation. Qiu et al. [49] compress the weight matrix W of an FC layer with singular value decomposition. An m × n weight matrix W is replaced by the multiplication of two matrices Am×pBp×n. For a su ciently small p, the total number of weights is reduced. is work compresses the largest FC layer of VGG network to 36% of its original size with 0.04% classi cation accuracy degradation. Zhang et al. [80] use a similar method for convolution layers and takes the e ect of the following non-linear layer into the decomposition optimization process. e proposed method achieves 4× speed up on state-of-the-art CNN model targeting at ImageNet, with only 0.9% accuracy loss.
+Pruning is another kind of method to reduce the number of weights. is kind of methods directly remove the zeros in weights or remove those with small absolute values. e challenge in pruning is the tradeo between the ratio of zero weights and the model accuracy. One solution is the application of lasso method, which applies L1 normalization to the weights during training. Liu et al. [33] apply the sparse group-lasso method on the AlexNet [28] model. 90% weights are removed a er training with less than 1% accuracy loss. Another solution is to prune the zero weights during training. Han et al. [20] directly remove the weights of a network which are zero or have small absolute value. e le weights are then ne-tuned with the training dataset to recover accuracy. Experimental results on AlexNet show that 89% weights can be removed while keeping the model accuracy.
+e hardware gain from weight reduction is the reciprocal of the compression ratio. According to the above results, the potential speed improvement from weight reduction is up to 10×.
+5 HARDWARE DESIGN: EFFICIENT ARCHITECTURE In this section, we investigate the hardware level techniques used in state-of-the-art FPGA-based neural network accelerator design to achieve high performance and high energy e ciency. We classify the techniques into three levels: computation unit level, loop unrolling level, and system level.
+5.1 Computation Unit Designs Computation unit level design a ects the peak performance of the neural network accelerator. e available resource of an FPGA chip is limited. A smaller computation unit design means more computation units and higher peak performance. A carefully designed computation unit array can also increase the working frequency of the system and thus improve peak performance.
+5.1.1 Low Bit-width Computation Unit. Reduce the number of bit-width for computation is a direct way to reduce the size of computation units. e feasibility of using fewer bits comes from the quantization methods as introduced in section 4.1. Most of the state-of-the-art FPGA designs replace the 32-bit oating-point units with xed-point units. Podili et al. [47] implement 32-bit xed-point units for the proposed system. 16-bit xed-point units are widely adopted in [14, 30, 49, 70, 73]. ESE [19] adopts 12-bit xed-point weight and 16-bit xed-point neurons design. Guo et al. [17] use 8-bit units for their design on embedded FPGA. Recent work is also focusing on extremely narrow bit-width design. Prost-Boucle et al. [48] implements 2-bit multiplication with 1 LUT for ternary networks. Experiments in [46] show that FPGA implementation of Binarized Neural Network (BNN) outperforms that on CPU and GPU. ough BNN su ers from accuracy loss, many designs explore the bene t of using 1-bit data for computation [12, 27, 31, 41, 43, 44, 60, 71, 81].
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:10
+
+K. Guo et al.
+
+e designs mentioned above focus on computation units for linear quantization. For non-linear quantization, translating the data back to full precision for computation still costs many resources. Samragh et al. [51] propose the factorized coe cients based dot product implementation. As the possible values of weights are quite limited for non-linear quantization, the proposed computation unit accumulates the multipliers for each possible weight value and calculate the result as the weighted sum of the values in look-up tables. In this way, the multiplication needed for one output neuron equals to the number of values in look-up table. e multiplications are replaced by random-addressed accumulations.
+Most of the designs use one bit-width through the process of a neural network. Qiu et al. [49] nds that neurons and weights in FC layers can use fewer bits compared with CONV layers while the accuracy is maintained. Heterogeneous computation units are used in the designs of [16, 81].
+e size of computation units of di erent bit-widths is compared in Table 3. ree kinds of implementations are tested: separate multiplier and adder with logic resource on Xilinx FPGA, multiply-add function with DSP units on Xilinx FPGA, and multiply-add function with DSP units on Altera FPGA. e resource consumption is the synthesis result by Vivado 2018.1 targeting Xilinx XCKU060 FPGA and artus Prime 16.0 targeting Altera Arria 10 GX1150 FPGA. e pure logic modules and the oating-point multiply and add modules are generated with IP core. e
+xed-point multiply and add modules are implemented with A ∗ B + C in Verilog and automatically mapped to DSP by Vivado/ artus.
+We rst give an overview of the size of the computation units by logic-only implementations. By compressing the weights and activations from 32-bit oating-point number to 8-bit xed-point number, the multiplier and the adder are scaled down to about 1/10 and 1/50 respectively. Using 4-bit or smaller operators can bring further advantage but also incur signi cant accuracy loss as introduced in section 4.1.
+Recent FPGAs consist of a large number of DSP units, each of which implements hard multiplier, pre-adder and accumulator core. e basic pa ern of NN computation, multiplication and sum, also ts into this design. So we also test the multiply and add function implemented with DSP units. Because of the di erent DSP architectures, we test on both Xilinx and Altera platforms. Compared with the 32-bit oating-point function, xed-point functions with narrow bit-width still shows an advantage in resource consumption. But for Altera FPGA, this advantage is not obvious because the DSP units natively support oating-point operations.
+Fixed-point functions with 16-or-less-bit xed-point data are well t into 1 DSP unit on either Xilinx or Altera FPGA. is shows that quantization hardly bene ts the hardware if we use narrower bit-width like 8 or 4 in the aspect of computation. e problem is that the wide multipliers and adders in DSP units are underutilized in these cases. Nguyen et al. [45] propose the design to implement two narrow bit-width xed-point multiplication with a single wide bit-width xed-point multiplier. In this design, two multiplications, AB and AC, are executed in the form of A(B << k +C). If k is su ciently large, the bits for AB and AC does not overlap in the multiplication result and can be directly separated. e design in [45] implements two 8-bit multiplications with one 25 × 18 multiplier, where k is 9. Similar methods can be applied to other bit-width and DSPs.
+5.1.2 Fast Convolution Method. For CONV layers, the convolution operations can be accelerated by alternative algorithms. Discrete Fourier Transformation (DFT) based fast convolution is widely adopted in digital signal processing. Zhang et al. [75] propose a 2D DFT based hardware design for e cient CONV layer execution. For an F × F lter convolved with K × K lter, DFT converts the (F − K + 1)2K2 multiplications in the space domain to F 2 complex multiplications in the frequency domain. For a CONV layer with M input channel and N output channel, MN times of frequency domain multiplications and (M + N ) times DFT/IDFT are needed. e conversion of convolution
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:11
+
+Table 3. FPGA resource consumption comparison for multiplier and adder with di erent types of data.
+
+fp32 fp16
+xed32 xed16 xed8 xed4
+
+Xilinx Logic multiplier adder LUT FF LUT FF 708 858 430 749 221 303 211 337 1112 1143 32 32 289 301 16 16
+75 80 8 8 17 20 4 4
+
+Xilinx DSP multiply & add LUT FF DSP 800 1284 2 451 686 1 111 64 4
+0 01 0 01 0 01
+
+Altera DSP
+
+multiply & add
+
+ALM DSP
+
+1
+
+1
+
+213
+
+1
+
+64
+
+3
+
+0
+
+1
+
+0
+
+1
+
+0
+
+1
+
+kernels is once for all. So the domain conversion process is of low cost for CONV layers. is technique does not work for CONV layers with stride¿1 or 1 × 1 convolution. Ding et al. [11]
+
+suggest that a block-wise circular constraint can be applied to the weight matrix. In this way, the
+
+matrix-vector multiplication in FC layers are converted to a set of 1D convolutions and can be
+
+accelerated in the frequency domain. is method can also be applied to CONV layers by treating the K × K convolution kernels as K × K matrices and is not limited by K or stride.
+
+Frequency domain methods require complex number multiplication. Another kind of fast
+
+convolution involves only real number multiplication [68]. e convolution of a 2D feature map
+
+Fin with a kernel K using Winograd algorithm is expressed by equation 5.
+
+Fout = AT [(GFinGT ) (BFinBT )]A
+
+(5)
+
+G, B and A are transformation matrix which only related to the sizes of kernel and feature map. denotes an element-wise multiplication of two matrices. For a 4 × 4 feature map convolved with a 3 × 3 kernel, the transformation matrices are described as follows:
+
+1 0 0
+
+ 1 0 −1 0 
+
+1 0 
+
+1 1
+
+G
+
+=
+
+ 
+
+2 1
+
+
+
+2
+−1
+
+1 
+2
+1 
+
+
+
+B
+
+=
+
+ 
+
+0
+
+0
+
+1 −1
+
+1 1
+
+
+
+
+
+
+
+0
+ 0
+
+A=
+
+ 
+
+1
+
+1
+
+1
+
+−1
+
+ 
+
+2 22
+
+
+
+
+
+0 0 1
+
+ 0 1
+
+0
+
+−1
+
+ 
+
+ 0
+
+−1
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Multiplication with transformation matrices A, B and G induce only a small number of shi and
+
+addition because of the special matrix entries. In this case, the number of multiplication is reduced from 36 to 16. e most commonly used Winograd transformation is for 3 × 3 convolutions in
+
+[36, 70].
+
+e theoretical performance gain from fast convolution depends on the convolution size. Limited
+
+by the on-chip resource and the consideration of exibility, current designs are not choosing large convolution sizes. Existing work point out that up to 4× theoretical performance gain can be
+
+achieved by fast convolution with FFT [75] or Winograd [36] with reasonable kernel sizes. Zhuge
+
+et al. [84] even try to use both FFT and Winograd methods in their design to t di erent kernel
+
+sizes in di erent layers.
+
+5.1.3 Frequency Optimization Methods. All the above techniques introduced targets at increasing the number of computation units within a certain FPGA. Increasing the working frequency of the computation units also improves the peak performance.
+Latest FPGAs support 700-900MHz DSP theoretical peak working frequency. But existing designs usually work at 100-400MHz [17, 38, 49, 73, 77]. As claimed in [69], the working frequency is limited by the routing between on-chip SRAM and DSP units. e design in [69] uses di erent
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:12
+
+K. Guo et al.
+
+working frequencies for DSP units and surrounding logic. Neighbor slices to each DSP unit are used as local RAMs to separate the clock domain. e prototype design in [69] achieves the peak DSP working frequency at 741MHz and 891MHz on FPGA chips of di erent speed grades. Xilinx has also proposed the CHaiDNN-v2 [1] and xfDNN [2] with this technique and achieves up to 700MHz DSP working frequency. Compared with existing designs for which the frequency is within 300MHz, this technique brings at least 2× peak performance gain.
+5.2 Loop Unrolling Strategies CONV layers and FC layers contribute to most of the computations and storage requirement of a neural network as introduced in section 2. We express the CONV layer function in Figure 1(b) as nested loops in Algorithm 1. To make the code clear to read, we merge the loops along x and directions for feature maps and 2-D convolution kernels respectively. An FC layer can be expressed as a CONV layer with feature map and kernel both of size 1 × 1. Besides the loops in Algorithm 1, we also call the parallelism of the process of multiple inputs as a batch. As we treat FC layers and CONV layers all as nested loops, the loop unrolling strategy can be applied both in CNN accelerators and RNN accelerators. But as the case for FC layers are rather simple, we tend to use CNN as examples in this section.
+
+Algorithm 1 Convolution Layer
+
+Require: feature map Fin of size M × Y × X ; convolution kernel Ker of size N × M × K × K; bias vector b of size N
+
+Ensure: feature map Fout 1: function C L (Fin, Ker ) 2: Let Fout ← zero array of size N × (Y − K + 1) × (X − K + 1) 3: for n = 1; n < N ; n + + do
+
+Output channel loop
+
+4:
+
+for m = 1; m < M; m + + do
+
+Input channel loop
+
+5:
+
+for each ( , x) within (Y − K + 1, X − K + 1) do
+
+Feature map loop
+
+6:
+
+for each (k , kx) within (K, K) do
+
+Kernel loop
+
+7:
+
+Fout [n][ ][x]+ = Fin[m][ − k + 1][x − kx + 1] ∗ K[n][m][k ][kx]
+
+8:
+
+Fout [n]+ = b[n]
+
+9: return Fout
+
+5.2.1 Choosing Unroll Parameters. To parallelize the execution of the loops, we unroll the loops and parallelize the process of a certain number of iterations on hardware. e number of the parallelized iterations on hardware is called the unroll parameter. Inappropriate unroll parameter selection may lead to serious hardware underutilization. Take a single loop as an example. Suppose the trip count of the loop is M and the parallelism is m. e utilization ratio of the hardware is limited by m/M M/m . If M is not divisible by m, then the utilization ratio is less than 1. For processing an NN layer, the total utilization ratio will be the product of the utilization ratio on each of the loops.
+For a CNN model, the loop dimension varies greatly among di erent layers. For a typical network used on ImageNet classi cation like ResNet [22], the channel numbers vary from 3 to 2048; the feature map sizes vary from 224 × 224 to 7 × 7, the convolution kernel sizes vary from 7 × 7 to 1 × 1. Besides the underutilization problem, loop unrolling also a ect the datapath and on-chip memory design. us loop unrolling strategy is a key feature for a neural network accelerator design.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:13
+
+Various work are proposed focusing on how to choose the unroll parameters. Zhang et al. [74] propose the idea of unrolling the input channel and output channel loops and choose the optimized unroll parameter by design space exploration. Along these two loops, there is no input data crossdependency between neighboring iterations. So no multiplexer is needed to route data from the on-chip bu er to computation units. But the parallelism is limited as 7 × 64 = 448 multipliers. For larger parallelism, this solution is easy to su er from the underutilization problem. Ma et al. [38] further extends the design space by allowing parallelism on the feature map loop. e parallelism reaches 1 × 16 × 14 × 14 = 3136 multipliers. A shi register structure is used to route feature map pixels to the computation units.
+e kernel loop is not chosen in the above work because kernel sizes vary greatly. Motamedi et al [42] use kernel unrolling on AlexNet. Even with 3 × 3 unrolling for the 11 × 11 and 5 × 5 kernels, the overall system performance still reaches 97.4% of its peak performance for the convolution layers. For certain networks like VGG [56], only 3 × 3 convolution kernels are used. Another reason to unroll kernel loop is to achieve acceleration with fast convolution algorithms. Design in [75] implements fully parallelized frequency domain multiplication on 4 × 4 feature map and 3 × 3 kernel. Lu et al. [36] implement Winograd algorithm on FPGA with a dedicated pipeline for equation 5. e convolution of a 6 × 6 feature map with a 3 × 3 kernel is fully parallelized.
+e above solutions are only for a single layer. But there is hardly a one-size- ts-all solution for a whole network, especially when we need high parallelism. Designs in [30, 35, 78] propose fully pipelined structures with each layer a pipe stage. As each layer is executed with an independent part of the hardware and each part is small, loop unrolling method can be easily chosen. is method is memory consuming because ping-pong bu ers are needed between adjacent layers for the feature maps. Agressive design with binarized weights [71] can t into FPGA be er. Design in [76] is similar but implemented on FPGA clusters to resolve the scalability problem. Shen et al. [54] and Lin et al. [32] group the layers of a CNN by the loops’ trip count and map each group onto one hardware module. ese solutions can be treated as unrolling the batch loop because di erent inputs are processed in parallel on di erent layer pipeline stages. e design in [36] implements parallelized batch both within a layer and among di erent layers.
+Most of the current designs follow one of the above methods for loop unrolling. A special kind of design is for sparse neural networks. Han et al. [19] propose the ESE architecture for sparse LSTM network acceleration. Unlike processing a dense network, all the computation units will not work synchronously. is causes di culty in sharing data between di erent computation units. ESE implements only the output channel (the output neurons of the FC layers in LSTM) loop unrolling within a layer to simplify hardware design and parallelize batch process.
+
+5.2.2 Data Transfer and On-chip Memory Design. Besides the high parallelism, the on-chip memory system should e ciently o er the necessary data to each computation units every cycle. To implement high parallelism, neural network accelerators usually reuse data among a large number of computation units. Simply broadcasting data to di erent computation units leads to large fan-out and high routing cost and thus reduce the working frequency. Wei et al. [67] use the systolic array structure in their design. e shared data are transferred from one computation unit to the next in a chain mode. So the data is not broadcasted, and only local connections between di erent computation units are needed. e drawback is the increase in latency. e loop execution order is scheduled accordingly to cover the latency. Similar designs are adopted in [7, 38].
+For so ware implementation on GPU, the im2col function is commonly used to map 2D convolution as a matrix-vector multiplication. is method incurs considerable data redundancy and can hardly be applied to the limited on-chip memory of FPGAs. Qiu et al. [49] uses the line bu er
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:14
+
+CPU Host DDR
+
+FPGA logic
+Control
+
+On the fly logic
+
+Computation Units
+
+BRAM
+
+K. Guo et al.
+FPGA DDR
+
+Fig. 4. Block graph of a typical FPGA-based neural network accelerator system
+design to achieve the 3 × 3 sliding window function for 2-d convolution with only two lines of duplicated pixels.
+5.3 System Design A typical FPGA-based neural network accelerator system is shown in Figure 4. e logic part of the whole system is denoted by the blue boxes. e host CPU issues workload or commands to the FPGA logic part and monitors its working status. On the FPGA logic part, a controller is usually implemented to communicate with the host and generates control signals to all the other modules on FPGA. e controller can be an FSM or an instruction decoder. e on the y logic part is implemented for certain designs if the data loaded from external memory needs preprocess. is module can be data arrangement module, data shi er [49], FFT module [75], etc. e computation units are as discussed in section 5.1 and section 5.2. As introduced in section 2.2, on-chip SRAM of an FPGA chip is too limited compared with the large NN models. So for common designs, a two-level memory hierarchy is used with DDR and on-chip memory.
+5.3.1 Roofline Model. From the system level, the performance of a neural network accelerator is limited by two factors: the on-chip computation resource and the o -chip memory bandwidth. Various researches have been proposed to achieve the best performance within a certain o -chip memory bandwidth. Zhang et al. [74] introduce the roo ine model in their work to analyze whether a design is memory bounded or computation bounded. An example of a roo ine model is shown in Figure 5.
+e gure uses the computation to communication (CTC) ratio as the x-axis and hardware performance as the -axis. CTC is the number of operations that can be executed with a unit size of memory access. Each hardware design can be treated as a point in the gure. So /x equals to the bandwidth requirement of the design. e available bandwidth of a target platform is limited and can be described as the theoretical bandwidth roof in Figure 5. But the actual bandwidth roof is below the theoretical roof because the achievable bandwidth of DDR depends on the data access pa ern. Sequential DDR access achieves much higher bandwidth than random access. e other roof is the computation roof, which is limited by the available resource on FPGA.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+Actual Bandwidth roof Computation roof
+Computation Bounded Design
+
+11:15
+
+Hardware Performance
+
+Memory Bounded Design
+
+Bad Design
+
+Computation to Communication Ratio
+Fig. 5. An example of the roofline model. The shaded part denotes the valid design space given bandwidth and resource limitation.
+5.3.2 Loop Tiling and Interchange. A higher CTC ratio means the hardware is more likely to achieve the computation bound. Increasing the CTC ratio also reduce DDR access, which signi cantly saves energy according to [23]. In section 5.2, we have discussed the loop unrolling strategies to increase the parallelism while reducing the waste of computation for a certain network. When the loop unrolling strategy is decided, the scheduling of the rest part of the loops decides how the hardware can reuse data with on-chip bu er. is involves loop tiling and loop interchange strategy.
+Loop tiling is a higher level of loop unrolling. All the input data of a loop tile will be stored onchip, and the loop unrolling hardware kernel works on these data. A larger loop tile size means that each tile will be loaded from external memory to on-chip memory fewer times. Loop interchange strategy decides the processing order of the loop tiles. External memory access happens when the hardware is moving from one tile to the next. Neighboring tile may share a part of data. For example in a CONV layer, neighboring tile can share input feature map or the weights. is is decided by the execution order of the loops.
+In [38, 74], design space exploration is done on all the possible loop tiling sizes and loop orders. Many designs also explore the design space with some of the loop unrolling, tiling and loop order is already decided [42, 49]. Shen et al. [55] also discuss the e ect of batch parallelism over the CTC for di erent layers. is is a loop dimension not focused on in previous work.
+All the above work give one optimized loop unrolling strategy and loop order for a whole network. Guo et al. [17] implements exible unrolling and loop order con guration for di erent layers with an instruction interface. e data arrangement in on-chip bu ers is controlled through instructions to t with di erent feature map sizes. is means the hardware can always fully utilize the on-chip bu er to use the largest tiling size according to on-chip bu er size. is work also proposes the ”back and forth” loop execution order to avoid total on-chip data refresh when an innermost loop nishes.
+5.3.3 Cross-Layer Scheduling. Alwani et al. [5] address the external memory access problem by fusing two neighboring layers together to avoid the intermediate result transfer between the two layers. is strategy helps reduce 95% o -chip data transfer with extra 20% on-chip memory cost. Even so ware program gains 2× speedup with this scheduling strategy. Yu et al. [72] realize this
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:16
+
+K. Guo et al.
+
+idea on a single-layer accelerator design by modifying the order of execution through an instruction interface.
+5.3.4 Regularize Data Access Pa ern. Besides increasing CTC, increasing the actual bandwidth roof helps improve the achievable performance with a certain CTC ratio. is is achieved by regularizing the DDR access pa ern. e common feature map formats in the external memory include NCHW or CHW N , where N means the batch dimension, C means the channel dimension, H and W means the feature map and x dimension. Using any of these formats, a feature map tile may be cut into small data blocks stored in discontinuous addresses. Guan [14] suggest that a channel-major storage format should be used for their design. is format avoids data duplication while long DDR access burst is ensured. Qiu et al. [49] propose a feature map storage format that arranges the H × W feature map into (HW /rc) tile blocks of size r × c. So the write burst size can be increased from c/2 to rc/2.
+6 EVALUATION In this section, we compare the performance of state-of-the-art neural network accelerator designs and try to evaluate the techniques mentioned in section 4 and section 5. We mainly reviewed the FPGA-based designs published in the top FPGA conferences (FPGA, FCCM, FPL, FPT), EDA conferences (DAC, ASPDAC, DATE, ICCAD), architecture conferences (MICRO, HPCA, ISCA, ASPLOS) since 2015. Because of the diversity in the adopted techniques, target FPGA chips, and experiments, we need a trade-o between the fairness of comparison and the number of designs we can use. In this paper, we pick the designs with 1) whole system implementation; 2) experiments on real NN models with reported speed, power, and energy e ciency.
+e designs used for comparison are listed in Table 4. For data format, the ”INT A/B” means that activations are A-bit xed-point data and weights are B-bit xed-point data. We also investigate the resource utilization and draw advice to both accelerator designers and FPGA manufacturers.
+Each of the designs in Table 4 drawn as a point in Figure 6, using lo 10(power ) as x coordinate and lo 10(speed) as -axis. erefore, − x = lo 10(ener e f f icienc ). Besides the FPGA-based designs, we also plot the GPU experimental results used in [17, 19] as standards to measure the FPGA designs’ performance.
+Bit-width Reduction. Among all the designs, 1-2 bit based designs [27, 41, 43] show outstanding speed and energy e ciency. is shows that extremely low bit-width is a promising solution for high-performance design. As introduced in section 4.1, linear quantized 1-2 bit network models su er from great accuracy loss. Further developing related accelerator will be of li le use. More e orts should be put on the models. Even trading speed with accuracy can be acceptable considering the current hardware performance.
+Besides the 1/2bit designs, the rest of the designs adopts 32-bit oating-point data or linear quantization with 8 or more bits. According to the results in section 4.1, within 1% accuracy loss can be achieved. So we think the comparison between these designs is fair in accuracy. INT16/8 and INT16 are commonly adopted. But the di erence between these designs is not obvious. is is because the underutilization of DSPs discussed in section 5.1.1. e advantage of INT16 over FP32 is obvious except for [77], where the hard-core oating-point DSPs are utilized. To a certain extent, this shows the importance of fully utilizing the DSPs on-chip.
+Fast Convolution Algorithm. Among all the 16-bit designs, [36] achieves the best energy e ciency and the highest speed with the help of the 6 × 6 Winograd fast convolution, which is 1.7× faster and 2.6× energy e cient than the 16-bit design in [77]. e design in [75] achieves 2× speedup and 3× energy e ciency compared with [74] where both designs use 32-bit oating-point
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:17
+
+Table 4. Performance and resource utilization of state-of-the-art neural network accelerator designs
+
+Data Speed Power E .
+
+Resource(%)
+
+Format (GOP/s) (W) (GOP/J) DSP logic BRAM FPGA chip
+
+[43] 1bit 329.47 2.3 143.2 1 34 11 Zynq XC7Z020
+
+[41] 1bit 40770 48 849.38 - -
+
+-
+
+GX1155
+
+[27] 2bit 410.22 2.26 181.51 41 83 38 Zynq XC7Z020
+
+[17] INT8 84.3 3.5 24.1 87 84 89
+
+XC7Z020
+
+[57] INT16/8 117.8 19.1 6.2 13 22 65
+
+5SGSD8
+
+[35] INT16/8 222.1 24.8 8.96 40 27 40 XC7VX690T
+
+[38] INT16/8 645.25 21.2 30.43 100 38 70
+
+GX1150
+
+[19] INT16/12 2520 41 61.5 54 89 88
+
+XCKU060
+
+[61] INT16 12.73 1.75 7.27 95 67 6
+
+XC7Z020
+
+[49] INT16 136.97 9.63 14.22 89 84 87
+
+XC7Z045
+
+[70] INT16 229.5 9.4 24.42 92 71 83
+
+XC7Z045
+
+[73] INT16 354 26 13.6 78 81 42 XC7VX690T
+
+[14] INT16 364.4 25 14.6 65 25 46
+
+5SGSMD5
+
+[30] INT16 565.94 30.2 22.15 60 63 65 XC7VX690T
+
+431 25 17.1 42 56 52 XC7VX690T
+
+[53] INT16 785 26 30.2 53 8.3 30
+
+XCVU440
+
+XC7Z020+
+
+[76] INT16 1280.3 160
+
+8
+
+--
+
+- XC7VX690T×6
+
+[77] INT16 1790 37.46 47.8 91 43 53
+
+GX1150
+
+[36] INT16 2940.7 23.6 124.6 - -
+
+-
+
+ZCU102
+
+[7] FP16 1382 45 30.7 97 58 92
+
+GX1150
+
+[47] INT32 229 8.04 28.5 100 84 18
+
+Stratix V
+
+[15] FP32 7.26 19.63 0.37 42 65 52 XC7VX485T
+
+[74] FP32 61.62 18.61 3.3 80 61 50 XC7VX485T
+
+[75] FP32 123.5 13.18 9.37 88 85 64
+
+Stratix V
+
+[77] FP32
+
+866 41.73 20.75 87 -
+
+46
+
+GX1150
+
+data and FPGA with 28nm technology node. Compare with the theoretical 4× performance gain introduced in section 5.1.2, there is still 1.3 − 1.5× gap. Not all the layers can use the most optimized fast convolution method because of kernel size limitation.
+System Level Optimization. e overall system optimization is not well addressed in most of the work. As this is also related to the HDL design quality, we can roughly evaluate the e ect. Here we compare three designs[30, 35, 73] on the same XC7VX690T platform and try to evaluate the e ect. All the three designs implement 16-bit xed-point data format except that [35] uses 8-bit for weights. No fast convolution or sparsity is utilized in any of the work. Even though, [30] achieves 2.5× the energy e ciency of [35]. It shows that a system level optimization has a strong e ect even comparable to the use of fast convolution algorithm.
+We also investigate the resource utilization of the designs in Table 4. ree kinds of resources (DSP, BRAM, and logic) are considered. We plot the designs in Figure 7 using two of the utilization ratio as x and y coordinate. We draw the diagonal line of each gure to show the designs’ preference on hardware resource. e BRAM-DSP gure shows an obvious preference on DSP over BRAM. A similar preference appears on DSP over logic. is indicates that current FPGA designs are
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:18
+
+K. Guo et al.
+
+Log10(Speed/(GOP/s))
+
+5
+
+1bit
+
+2bit
+
+INT8
+
+INT16/8
+
+4.5 INT16/12 INT16
+
+FP16
+
+INT32
+
+4
+
+FP32
+
+GPU
+
+3.5
+
+3 [27]
+2.5 [43]
+2 [17]
+
+[47] [49]
+
+1.5
+
+[41]
+
+Nvidia TX1(batch-32)
+
+[36]
+
+Nvidia TX1(batch-1)
+
+[38] [14] [70]
+
+[19]
+
+[77] [7]
+
+[53]
+
+[77]
+
+[30]
+
+[53]
+
+[73] [13] [35]
+
+[76] Titan X(LSTM-dense)
+
+[57] [75]
+[74]
+
+Titan X(LSTM-sparse)
+
+[61] 1
+[15]
+
+0.5
+
+0
+
+0.5
+
+1
+
+1.5
+
+2
+
+2.5
+
+Log10(Power/W)
+
+Fig. 6. A comparison between di erent designs on a logarithm coordinate of power and performance.
+
+more likely computation bounded. FPGA manufacturers targeting neural network applications can adjust the resource allocation accordingly. Compared with that, the preference on logic and BRAM seems to be random. A possible explanation is that some of the designers use both logic and DSPs to implement high parallelism, while some prefers to use only DSPs to achieve high working frequency.
+Comparision with GPU. In general, FPGA-based designs have achieved comparable energy e ciency to GPU with 10-100GOP/J. But the speed of GPUs still surpasses FPGAs. Scaling up the
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:19
+
+BRAM Logic Logic
+
+100
+
+80
+
+60
+
+40
+
+20
+
+0
+
+0
+
+20 40 60 80 100
+
+DSP
+
+100
+
+80
+
+60
+
+40
+
+20
+
+0
+
+0
+
+20 40 60 80 100
+
+DSP
+
+100
+
+80
+
+60
+
+40
+
+20
+
+0
+
+0
+
+20 40 60 80 100
+
+BRAM
+
+Fig. 7. Resource utilization ratio of di erent accelerator designs.
+
+FPGA-based design is still a problem. Zhang et al. [76] propose the FPGA-cluster-based solution using 16-bit xed-point computation. But the energy e ciency is worse than the other 16-bit
+xed-point designs. Here we estimate the achievable speed of an ideal design. We use the 16-bit xed-point design in [36] as a baseline, which is the best 16-bit xed-point design with both the highest speed and energy e ciency. 8-bit linear quantization can be adopted according to the analysis in section 4.1, which achieves another 2× speedup and be er energy e ciency by utilizing 1 DSP as 2 multipliers. e double frequency optimization further improves the system speed by 2×. Consider a sparse model which is similar to the one in [19] with 10% non-zero values. We can estimate a similar 6× improvement as [19]. In general about 24× speedup and 12× be er energy e ciency can be achieved, which means 72TOP/s speed with about 50W. is shows that it is possible to achieve over 10× higher energy e ciency on FPGA over 32-bit oating-point process on GPU.
+e le problem is: does all the techniques: double MAC, sparsi cation, quantization, fast convolution, and the double frequency design work well together? Pruning a single element in a 2D convolution kernel is of no use for fast convolution because the 2D kernel is always processed as a whole. Directly pruning 2D kernels as a whole may help. But the reported accuracy of this method is lower [39] than a ne-grained pruning. e irregular data access pa ern for processing sparse network and the increase in parallelism also brings challenges to the design of memory system and scheduling strategy.
+7 TECHNIQUE DISCUSSION To give a be er overview of all the techniques introduced in section 4 and 5, we give a brief summary in this section to see how these techniques contribute to FPGA-based NN accelerator designs. Each technique is judged from two aspects: how it a ects hardware design and to which level it relates to NN models. Figure 8 shows the summary.
+A hardware design basically consists of three parts: datapath, memory, and scheduling. For the design target of high speed, datapath decides the OPCpeak while the memory system and scheduling strategy decides η. For the design target of energy e ciency, datapath decides Eop while the memory system decides NSRAMacc and NDRAMacc . We can see that existing researches are approaching the design target from every aspect by utilizing the neural network model features from single neuron level to the whole network level.
+What is the future of FPGA-based neural network inference accelerator? Currently, much of the techniques lie in the neuron level and the convolution level. ere are two reasons for this.
+e rst reason is that few feature can be utilized in layer level and network level. Most of the
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+5.2.1 Choose Loop Unrolling Parameter 5.3.2 Loop Tiling
+5.3.4 Regularize Data Access 5.2.1. Pipeline of layers
+5.3.3 Cross layer scheduling
+
+11:20
+
+Not NN related
+datapath
+
+Neuron &
+Weight
+
+Convolution &
+GEMM
+
+Layer
+
+K. Guo et al.
+Network
+
+5.1.2 Fast Convolution
+
+5.1.3 Frequency Optimization
+5.1.1 Double MAC 4.1 Data Quantization 4.2 Pruning
+
+5.2.2 Memory Design for
+Loop Unrolling
+
+memory
+
+scheduling
+
+4.2 Low Rank Approximation
+
+Fig. 8. A brief summary of both the so ware and hardware techniques in section 4 and 5.
+
+existing NN models introduce a simple structure with cascaded layers [28, 56] or simply adding a by-path [22]. New features like depth-wise convolution [24] and the complex branch in SSD [34] may brings more design opportunities. But few work focuses on these models. e second reason is that the scale of an FPGA chip is limited. An FPGA chip usually consists of hundreds to thousands of DSPs. is number is still too small compared with a single neural network layer with more than 100M operations.
+So further opportunities may come from two aspects. e rst is the evolution of network structure. e second is the scaling up of FPGA-based system, with larger chips or multiple chips. Existing designs using small models with binary weights are making their FPGAs relatively larger. ese designs already introduce some subversive ideas like mapping the whole networks spatially onto hardware [71]. Besides the opportunities, designers are also faced with the scaling up challenges, from the limitation of loop unrolling, bandwidth, etc.
+8 DESIGN AUTOMATION AND FLEXIBILITY Mapping a certain CNN model onto an FPGA accelerator still requires much heavier work than developing with existing deep learning frameworks. In some application scenarios, various NN models are to be supported with the FPGA accelerator. us the design automation of CNN accelerators is also important. Various researches have been focusing on CNN accelerator design tool ows. Venieris, et al. [63] give a detailed discussion on di erent tool ows in supported models, interface, hardware architecture, design space exploration and arithmetic precision. In this chapter, as we have been focusing on detailed techniques used in model optimization and hardware design, we only classify the tool ows into two categories: hardware design automation and so ware design automation. Hardware design automation generates di erent hardware designs according to di erent NN models. So ware design automation keeps the same accelerator and generates di erent inputs to the accelerator. e discussion in this section can serve as a supplementary to [63].
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:21
+
+8.1 Hardware Design Automation Hardware design automation is widely adopted in FPGA-based accelerators because of the recon-
+gurability of FPGAs [10, 37, 40, 52, 61, 62, 66]. ese proposed techniques focus on automatically generate the HDL design based on the network parameter. Di erence between these methods is the selection of an intermediate level description of the network to cover the gap between high-level network description and low-level hardware design.
+A straightforward way is no intermediate description. e design ow in [37] searches the optimized parameter for a handcra ed Verilog template with the input network description and platform constraint. is method is similar to the optimization methods mentioned in section 5. DiCecco et al. [10] use a similar idea based on OpenCL model. is enables that the development tool be integrated with Ca e and one network can be executed on di erent platforms.
+Venireis, et al. [62] describes the network model as a DFG in their design tool. en the network computaion process is translated to hardware design with DFG mapping method.
+DnnWeaver [52] use a virtual instruction set to describe a network. e network model is rst translated into an instruction sequence. en the sequence is mapped as hardware FSM states but not executed like traditional CPU instructions.
+Hardware design automation directly modi es the hardware design to support di erent networks. is means the hardware can always achieve the best performance on the target platform. is is suitable for FPGA because of its recon gurability. It works in situations where network switching is not frequent and the recon guration overhead does not care. For example, for a large-scale cloud service, the change in network models can be covered by switching between di erent FPGA chips. So the FPGAs do not need to be recon gured frequently.
+
+8.2 So ware Design Automation So ware design automation tries to run di erent networks on the same hardware accelerator by simply changing the input, in most cases, an instruction sequence. e di erence between these work is the granularity of instruction. At a lower level, Guo, et al. [17] propose the instruction set with only three kinds of instructions: LOAD, CALC, and SAVE. e granularity of the LOAD and SAVE instructions are the same as the data tiling size. Each CONV executes a set of 2-D convolutions given the feature map size encoded in the instruction. e channel number is xed as the hardware unrolling parameter. At this level, the so ware compiler can carry out static scheduling and dynamic data reuse strategy accordingly for each layer. DNNDK [3] uses similar ideas but with more functions in the instructions to support various networks.
+Zhang et al. [73] use a layer level instruction set. e control of a CNN layer is designed as a con gurable hardware FSM. Compared with [17], this reduces the memory access for instruction while increasing the hardware cost on the con gurable FSM.
+TVM [8] implements a uniform mapping optimization framework for di erent kinds of platforms including CPU, GPU, FPGA, and ASIC. e framework allows developers to de ne customized parallel primitive to support customized hardware, including FPGA accelerators. is means the scheduling granularity is more exible.
+Instruction based methods do not modify hardware and thus enables that the accelerator can switch between networks at run-time. An example of the application scenario is the real-time video processing system on a mobile platform. e process of a single frame can involve di erent networks if the task is complex enough. Recon gure the hardware causes unacceptable overhead while instruction based methods can solve the problem if all the instructions of all the networks are prepared in memory.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:22
+
+K. Guo et al.
+
+8.3 Mixed Method Wang, et al. [66] propose a design automation framework mixing the above two by both optimizing hardware design and compile so ware instructions. e hardware is rst assembled with prede ned HDL templates using the optimized hardware parameter. e data control ow of the computation process is controlled by so ware binaries, which is compiled according to the network description. It is possible that the hardware can be used for a new network by simply changing the so ware binaries.
+9 CONCLUSION In this paper, we review state-of-the-art neural network accelerator designs and summarize the techniques used. According to the evaluation result in section 6, with so ware hardware co-design, FPGA can achieve more than 10× be er speed and energy e ciency than state-of-the-art GPU.
+is shows that FPGA is a promising candidate for neural network acceleration. We also review the methods used for accelerator design automation, which shows that current development ow can achieve both high performance and run-time network switch.
+But there is still a gap between current designs and the estimation. On the one hand, quantization with extremely narrow bit-width is limited by the model accuracy, which needs further algorithm research. On the other hand, combining all the techniques needs more research in both so ware and hardware to make them work well together. Commercial tools including DNNDK [3] is taking a rst step but still has a lone way to go. Scaling up the design is also a problem. Future work should focus on solving these challenges.
+ACKNOWLEDGEMENT is work was supported by National Key R&D Program of China (2018YFB0105005, 2017YFA0207600),
+National Natural Science Foundation of China (No. 61622403, 61621091), DeePhi Technology and Xilinx.
+REFERENCES
+[1] [n. d.]. h ps://github.com/Xilinx/chaidnn. ([n. d.]). Accessed August 23, 2018. [2] [n. d.]. h ps://www.xilinx.com/support/documentation/white papers/wp504-accel-dnns.pdf. ([n. d.]). Accessed
+December 3, 2018. [3] [n. d.]. h p://www.deephi.com/technology/dnndk. ([n. d.]). Accessed December 3, 2018. [4] Mart´ın Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen, Craig Citro, Greg S Corrado, Andy Davis,
+Je rey Dean, Ma hieu Devin, et al. 2016. Tensor ow: Large-scale machine learning on heterogeneous distributed systems. arXiv preprint arXiv:1603.04467 (2016). [5] Manoj Alwani, Han Chen, Michael Ferdman, and Peter Milder. 2016. Fused-layer CNN accelerators. In Microarchitecture (MICRO), 2016 49th Annual IEEE/ACM International Symposium on. IEEE, 1–12. [6] Dario Amodei, Sundaram Ananthanarayanan, Rishita Anubhai, Jingliang Bai, Eric Ba enberg, Carl Case, Jared Casper, Bryan Catanzaro, Qiang Cheng, Guoliang Chen, et al. 2016. Deep speech 2: End-to-end speech recognition in english and mandarin. In International Conference on Machine Learning. 173–182. [7] Utku Aydonat, Shane O’Connell, Davor Capalija, Andrew C Ling, and Gordon R Chiu. 2017. An OpenCL (TM) Deep Learning Accelerator on Arria 10. arXiv preprint arXiv:1701.03534 (2017). [8] Tianqi Chen, ierry Moreau, Ziheng Jiang, Lianmin Zheng, Eddie Yan, Haichen Shen, Meghan Cowan, Leyuan Wang, Yuwei Hu, Luis Ceze, et al. 2018. {TVM}: An Automated End-to-End Optimizing Compiler for Deep Learning. In 13th {USENIX} Symposium on Operating Systems Design and Implementation ({OSDI} 18). 578–594. [9] Wenlin Chen, James Wilson, Stephen Tyree, Kilian Weinberger, and Yixin Chen. 2015. Compressing neural networks with the hashing trick. In International Conference on Machine Learning. 2285–2294. [10] Roberto DiCecco, Gri n Lacey, Jasmina Vasiljevic, Paul Chow, Graham Taylor, and Shawki Areibi. 2016. Ca einated FPGAs: FPGA Framework For Convolutional Neural Networks. In Field-Programmable Technology (FPT), 2016 International Conference on. IEEE, 265–268.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:23
+
+[11] Caiwen Ding, Siyu Liao, Yanzhi Wang, Zhe Li, Ning Liu, Youwei Zhuo, Chao Wang, Xuehai Qian, Yu Bai, Geng Yuan,
+et al. 2017. CirCNN: accelerating and compressing deep neural networks using block-circulant weight matrices. In Proceedings of the 50th Annual IEEE/ACM International Symposium on Microarchitecture. ACM, 395–408. [12] Mohammad Ghasemzadeh, Mohammad Samragh, and Farinaz Koushanfar. [n. d.]. ReBNet: Residual Binarized Neural
+Network. ([n. d.]).
+[13] Ross Girshick, Je Donahue, Trevor Darrell, and Jitendra Malik. 2014. Rich feature hierarchies for accurate object detection and semantic segmentation. In Proceedings of the IEEE conference on computer vision and pa ern recognition. 580–587.
+[14] Yijin Guan, Hao Liang, Ningyi Xu, Wenqiang Wang, Shaoshuai Shi, Xi Chen, Guangyu Sun, Wei Zhang, and Jason
+Cong. 2017. FP-DNN: An Automated Framework for Mapping Deep Neural Networks onto FPGAs with RTL-HLS Hybrid Templates. In Field-Programmable Custom Computing Machines (FCCM), 2017 IEEE 25th Annual International Symposium on. IEEE, 152–159. [15] Yijin Guan, Zhihang Yuan, Guangyu Sun, and Jason Cong. 2017. FPGA-based accelerator for long short-term memory recurrent neural networks. In Design Automation Conference (ASP-DAC), 2017 22nd Asia and South Paci c. IEEE, 629–634.
+[16] Jianxin Guo, Shouyi Yin, Peng Ouyang, Leibo Liu, and Shaojun Wei. 2017. Bit-Width Based Resource Partitioning for CNN Acceleration on FPGA. In Field-Programmable Custom Computing Machines (FCCM), 2017 IEEE 25th Annual International Symposium on. IEEE, 31–31.
+[17] Kaiyuan Guo, Lingzhi Sui, Jiantao Qiu, Jincheng Yu, Junbin Wang, Song Yao, Song Han, Yu Wang, and Huazhong Yang. 2017. Angel-Eye: A Complete Design Flow for Mapping CNN onto Embedded FPGA. IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems (2017).
+[18] PK Gupta. 2016. Accelerating datacenter workloads. In 26th International Conference on Field Programmable Logic and Applications (FPL).
+[19] Song Han, Junlong Kang, Huizi Mao, Yiming Hu, Xin Li, Yubin Li, Dongliang Xie, Hong Luo, Song Yao, Yu Wang, et al. 2017. ESE: E cient Speech Recognition Engine with Sparse LSTM on FPGA.. In FPGA. 75–84.
+[20] Song Han, Huizi Mao, and William J Dally. 2015. Deep compression: Compressing deep neural networks with pruning, trained quantization and hu man coding. arXiv preprint arXiv:1510.00149 (2015).
+[21] Awni Hannun, Carl Case, Jared Casper, Bryan Catanzaro, Greg Diamos, Erich Elsen, Ryan Prenger, Sanjeev Satheesh, Shubho Sengupta, Adam Coates, et al. 2014. Deep speech: Scaling up end-to-end speech recognition. arXiv preprint arXiv:1412.5567 (2014).
+[22] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pa ern recognition. 770–778.
+[23] M. Horowitz. [n. d.]. Energy table for 45nm process, Stanford VLSI wiki.[Online]. h ps://sites.google.com/site/
+seecproject. ([n. d.]).
+[24] Andrew G Howard, Menglong Zhu, Bo Chen, Dmitry Kalenichenko, Weijun Wang, Tobias Weyand, Marco Andree o,
+and Hartwig Adam. 2017. MobileNets: E cient Convolutional Neural Networks for Mobile Vision Applications.
+(2017).
+[25] Forrest N Iandola, Song Han, Ma hew W Moskewicz, Khalid Ashraf, William J Dally, and Kurt Keutzer. 2016. SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and¡ 0.5 MB model size. arXiv preprint arXiv:1602.07360 (2016).
+[26] Yangqing Jia, Evan Shelhamer, Je Donahue, Sergey Karayev, Jonathan Long, Ross Girshick, Sergio Guadarrama, and Trevor Darrell. 2014. Ca e: Convolutional Architecture for Fast Feature Embedding. arXiv preprint arXiv:1408.5093 (2014).
+[27] Li Jiao, Cheng Luo, Wei Cao, Xuegong Zhou, and Lingli Wang. 2017. Accelerating low bit-width convolutional neural networks with embedded FPGA. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–4.
+[28] Alex Krizhevsky, Ilya Sutskever, and Geo rey E Hinton. 2012. Imagenet classi cation with deep convolutional neural networks. In Advances in neural information processing systems. 1097–1105.
+[29] Fengfu Li, Bo Zhang, and Bin Liu. 2016. Ternary weight networks. arXiv preprint arXiv:1605.04711 (2016). [30] Huimin Li, Xitian Fan, Li Jiao, Wei Cao, Xuegong Zhou, and Lingli Wang. 2016. A high performance FPGA-based
+accelerator for large-scale convolutional neural networks. In Field Programmable Logic and Applications (FPL), 2016 26th International Conference on. IEEE, 1–9. [31] Yixing Li, Zichuan Liu, Kai Xu, Hao Yu, and Fengbo Ren. 2017. A 7.663-TOPS 8.2-W Energy-e cient FPGA Accelerator for Binary Convolutional Neural Networks. arXiv preprint arXiv:1702.06392 (2017). [32] Xinhan Lin, Shouyi Yin, Fengbin Tu, Leibo Liu, Xiangyu Li, and Shaojun Wei. 2018. LCP: a layer clusters paralleling mapping method for accelerating inception and residual networks on FPGA. In Proceedings of the 55th Annual Design Automation Conference. ACM, 16.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:24
+
+K. Guo et al.
+
+[33] Baoyuan Liu, Min Wang, Hassan Foroosh, Marshall Tappen, and Marianna Pensky. 2015. Sparse convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pa ern Recognition. 806–814.
+[34] Wei Liu, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Sco Reed, Cheng-Yang Fu, and Alexander C Berg. 2016. Ssd: Single shot multibox detector. In European conference on computer vision. Springer, 21–37.
+[35] Zhiqiang Liu, Yong Dou, Jingfei Jiang, and Jinwei Xu. 2016. Automatic code generation of convolutional neural networks in FPGA implementation. In Field-Programmable Technology (FPT), 2016 International Conference on. IEEE, 61–68.
+[36] Liqiang Lu, Yun Liang, Qingcheng Xiao, and Shengen Yan. 2017. Evaluating fast algorithms for convolutional neural networks on fpgas. In Field-Programmable Custom Computing Machines (FCCM), 2017 IEEE 25th Annual International Symposium on. IEEE, 101–108.
+[37] Yufei Ma, Yu Cao, Sarma Vrudhula, and Jae-sun Seo. 2017. An automatic RTL compiler for high-throughput FPGA implementation of diverse deep convolutional neural networks. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–8.
+[38] Yufei Ma, Yu Cao, Sarma Vrudhula, and Jae-sun Seo. 2017. Optimizing Loop Operation and Data ow in FPGA Acceleration of Deep Convolutional Neural Networks. In Proceedings of the 2017 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 45–54.
+[39] Huizi Mao, Song Han, Je Pool, Wenshuo Li, Xingyu Liu, Yu Wang, and William J. Dally. 2017. Exploring the Granularity of Sparsity in Convolutional Neural Networks. In Computer Vision and Pa ern Recognition Workshops. 1927–1934.
+[40] Raghid Morcel, Haitham Akkary, Hazem Hajj, Mazen Saghir, Anil Keshavamurthy, Rahul Khanna, and Hassan
+Artail. 2017. Minimalist Design for Accelerating Convolutional Neural Networks for Low-End FPGA Platforms. In Field-Programmable Custom Computing Machines (FCCM), 2017 IEEE 25th Annual International Symposium on. IEEE, 196–196.
+[41] Duncan JM Moss, Eriko Nurvitadhi, Jaewoong Sim, Asit Mishra, Debbie Marr, Suchit Subhaschandra, and Philip HW Leong. 2017. High performance binary neural networks on the Xeon+ FPGA platform. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–4.
+[42] Mohammad Motamedi, Philipp Gysel, Venkatesh Akella, and Soheil Ghiasi. 2016. Design space exploration of fpgabased deep convolutional neural networks. In Design Automation Conference (ASP-DAC), 2016 21st Asia and South Paci c. IEEE, 575–580.
+[43] Hiroki Nakahara, Tomoya Fujii, and Shimpei Sato. 2017. A fully connected layer elimination for a binarizec convolutional neural network on an FPGA. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–4.
+[44] Hiroki Nakahara, Haruyoshi Yonekawa, Hisashi Iwamoto, and Masato Motomura. 2017. A Batch Normalization Free Binarized Convolutional Deep Neural Network on an FPGA. In Proceedings of the 2017 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 290–290.
+[45] Dong Nguyen, Daewoo Kim, and Jongeun Lee. 2017. Double MAC: Doubling the performance of convolutional neural networks on modern FPGAs. In 2017 Design, Automation & Test in Europe Conference & Exhibition (DATE). IEEE, 890–893.
+[46] Eriko Nurvitadhi, David She eld, Jaewoong Sim, Asit Mishra, Ganesh Venkatesh, and Debbie Marr. 2016. Accelerating Binarized Neural Networks: Comparison of FPGA, CPU, GPU, and ASIC. In Field-Programmable Technology (FPT), 2016 International Conference on. IEEE, 77–84.
+[47] Abhinav Podili, Chi Zhang, and Viktor Prasanna. 2017. Fast and e cient implementation of Convolutional Neural Networks on FPGA. In Application-speci c Systems, Architectures and Processors (ASAP), 2017 IEEE 28th International Conference on. IEEE, 11–18.
+[48] Adrien Prost-Boucle, Alban Bourge, Fre´de´ric Pe´trot, Hande Alemdar, Nicholas Caldwell, and Vincent Leroy. 2017. Scalable high-performance architecture for convolutional ternary neural networks on FPGA. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–7.
+[49] Jiantao Qiu, Jie Wang, Song Yao, Kaiyuan Guo, Boxun Li, Erjin Zhou, Jincheng Yu, Tianqi Tang, Ningyi Xu, Sen Song, et al. 2016. Going deeper with embedded fpga platform for convolutional neural network. In Proceedings of the 2016 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 26–35.
+[50] Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev Satheesh, Sean Ma, Zhiheng Huang, Andrej
+Karpathy, Aditya Khosla, Michael Bernstein, Alexander C. Berg, and Li Fei-Fei. 2015. ImageNet Large Scale Visual Recognition Challenge. International Journal of Computer Vision (IJCV) 115, 3 (2015), 211–252. h ps: //doi.org/10.1007/s11263-015-0816-y
+[51] Mohammad Samragh, Mohammad Ghasemzadeh, and Farinaz Koushanfar. 2017. Customizing neural networks for e cient fpga implementation. In Field-Programmable Custom Computing Machines (FCCM), 2017 IEEE 25th Annual International Symposium on. IEEE, 85–92.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+[DL] A Survey of FPGA-Based Neural Network Inference Accelerator
+
+11:25
+
+[52] Hardik Sharma, Jongse Park, Divya Mahajan, Emmanuel Amaro, Joon Kyung Kim, Chenkai Shao, Asit Mishra, and Hadi Esmaeilzadeh. 2016. From high-level deep neural models to FPGAs. In Microarchitecture (MICRO), 2016 49th Annual IEEE/ACM International Symposium on. IEEE, 1–12.
+[53] Junzhong Shen, You Huang, Zelong Wang, Yuran Qiao, Mei Wen, and Chunyuan Zhang. 2018. Towards a Uniform Template-based Architecture for Accelerating 2D and 3D CNNs on FPGA. In Acm/sigda International Symposium. 97–106.
+[54] Yongming Shen, Michael Ferdman, and Peter Milder. 2016. Overcoming resource underutilization in spatial CNN accelerators. In Field Programmable Logic and Applications (FPL), 2016 26th International Conference on. IEEE, 1–4.
+[55] Yongming Shen, Michael Ferdman, and Peter Milder. 2017. Escher: A CNN Accelerator with Flexible Bu ering to Minimize O -Chip Transfer. In Proceedings of the 25th IEEE International Symposium on Field-Programmable Custom Computing Machines (FCCM 17). IEEE Computer Society, Los Alamitos, CA, USA.
+[56] Karen Simonyan and Andrew Zisserman. 2014. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 (2014).
+[57] Naveen Suda, Vikas Chandra, Ganesh Dasika, Abinash Mohanty, Yufei Ma, Sarma Vrudhula, Jae-sun Seo, and Yu
+Cao. 2016. roughput-optimized OpenCL-based FPGA accelerator for large-scale convolutional neural networks. In Proceedings of the 2016 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 16–25. [58] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Sco Reed, Dragomir Anguelov, Dumitru Erhan, Vincent
+Vanhoucke, Andrew Rabinovich, et al. 2015. Going deeper with convolutions. Cvpr.
+[59] Mingxing Tan, Bo Chen, Ruoming Pang, Vijay Vasudevan, and oc V Le. 2018. Mnasnet: Platform-aware neural architecture search for mobile. arXiv preprint arXiv:1807.11626 (2018).
+[60] Yaman Umuroglu, Nicholas J Fraser, Giulio Gambardella, Michaela Blo , Philip Leong, Magnus Jahre, and Kees Vissers. 2017. Finn: A framework for fast, scalable binarized neural network inference. In Proceedings of the 2017 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 65–74.
+[61] Stylianos I Venieris and Christos-Savvas Bouganis. 2017. fpgaConvNet: Automated Mapping of Convolutional Neural Networks on FPGAs. In Proceedings of the 2017 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 291–292.
+[62] Stylianos I Venieris and Christos-Savvas Bouganis. 2017. Latency-driven design for FPGA-based convolutional neural networks. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–8.
+[63] Stylianos I Venieris, Alexandros Kouris, and Christos-Savvas Bouganis. 2018. Tool ows for Mapping Convolutional Neural Networks on FPGAs: A Survey and Future Directions. ACM Computing Surveys (CSUR) 51, 3 (2018), 56.
+[64] Junsong Wang, Qiuwen Lou, Xiaofan Zhang, Chao Zhu, Yonghua Lin, and Deming Chen. 2018. Design Flow of Accelerating Hybrid Extremely Low Bit-width Neural Network in Embedded FPGA. arXiv preprint arXiv:1808.04311 (2018).
+[65] Xin Wang, Fisher Yu, Zi-Yi Dou, and Joseph E Gonzalez. 2017. Skipnet: Learning dynamic routing in convolutional networks. arXiv preprint arXiv:1711.09485 (2017).
+[66] Ying Wang, Jie Xu, Yinhe Han, Huawei Li, and Xiaowei Li. 2016. DeepBurning: automatic generation of FPGA-based learning accelerators for the neural network family. In Design Automation Conference (DAC), 2016 53nd ACM/EDAC/IEEE. IEEE, 1–6.
+[67] Xuechao Wei, Cody Hao Yu, Peng Zhang, Youxiang Chen, Yuxin Wang, Han Hu, Yun Liang, and Jason Cong. 2017. Automated Systolic Array Architecture Synthesis for High roughput CNN Inference on FPGAs. In Proceedings of the 54th Annual Design Automation Conference 2017. ACM, 29.
+[68] Shmuel Winograd. 1980. Arithmetic complexity of computations. Vol. 33. Siam. [69] Ephrem Wu, Xiaoqian Zhang, David Berman, and Inkeun Cho. 2017. A high-throughput recon gurable processing
+array for neural networks. In Field Programmable Logic and Applications (FPL), 2017 27th International Conference on. IEEE, 1–4.
+[70] Qingcheng Xiao, Yun Liang, Liqiang Lu, Shengen Yan, and Yu-Wing Tai. 2017. Exploring Heterogeneous Algorithms for Accelerating Deep Convolutional Neural Networks on FPGAs. In Proceedings of the 54th Annual Design Automation Conference 2017. ACM, 62.
+[71] Li Yang, Zhezhi He, and Deliang Fan. 2018. A Fully Onchip Binarized Convolutional Neural Network FPGA Impelmentation with Accurate Inference. In Proceedings of the International Symposium on Low Power Electronics and Design. ACM, 50.
+[72] Jincheng Yu, Yiming Hu, Xuefei Ning, Jiantao Qiu, Kaiyuan Guo, Yu Wang, and Huazhong Yang. 2017. Instruction driven cross-layer CNN accelerator with winograd transformation on FPGA. In International Conference on Field Programmable Technology. 227–230.
+[73] Chen Zhang, Zhenman Fang, Peipei Zhou, Peichen Pan, and Jason Cong. 2016. Ca eine: Towards uniformed representation and acceleration for deep convolutional neural networks. In Computer-Aided Design (ICCAD), 2016 IEEE/ACM International Conference on. IEEE, 1–8.
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+
+11:26
+
+K. Guo et al.
+
+[74] Chen Zhang, Peng Li, Guangyu Sun, Yijin Guan, Bingjun Xiao, and Jason Cong. 2015. Optimizing fpga-based accelerator design for deep convolutional neural networks. In Proceedings of the 2015 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 161–170.
+[75] Chi Zhang and Viktor Prasanna. 2017. Frequency domain acceleration of convolutional neural networks on CPU-FPGA shared memory system. In Proceedings of the 2017 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM, 35–44.
+[76] Chen Zhang, Di Wu, Jiayu Sun, Guangyu Sun, Guojie Luo, and Jason Cong. 2016. Energy-E cient CNN Implementation on a Deeply Pipelined FPGA Cluster. In Proceedings of the 2016 International Symposium on Low Power Electronics and Design. ACM, 326–331.
+[77] Jialiang Zhang and Jing Li. 2017. Improving the Performance of OpenCL-based FPGA Accelerator for Convolutional Neural Network.. In FPGA. 25–34.
+[78] Xiaofan Zhang, Junsong Wang, Chao Zhu, Yonghua Lin, Jinjun Xiong, Wen-mei Hwu, and Deming Chen. 2018. DNNBuilder: an automated tool for building high-performance DNN hardware accelerators for FPGAs. In Proceedings of the International Conference on Computer-Aided Design. ACM, 56.
+[79] Xiangyu Zhang, Xinyu Zhou, Mengxiao Lin, and Jian Sun. 2017. Shu eNet: An Extremely E cient Convolutional Neural Network for Mobile Devices. CoRR abs/1707.01083 (2017). arXiv:1707.01083 h p://arxiv.org/abs/1707.01083
+[80] Xiangyu Zhang, Jianhua Zou, Xiang Ming, Kaiming He, and Jian Sun. 2015. E cient and accurate approximations of nonlinear convolutional networks. In Proceedings of the IEEE Conference on Computer Vision and Pa ern Recognition. 1984–1992.
+[81] Ritchie Zhao, Weinan Song, Wentao Zhang, Tianwei Xing, Jeng-Hau Lin, Mani B Srivastava, Rajesh Gupta, and Zhiru Zhang. 2017. Accelerating Binarized Convolutional Neural Networks with So ware-Programmable FPGAs.. In FPGA. 15–24.
+[82] Shuchang Zhou, Yuxin Wu, Zekun Ni, Xinyu Zhou, He Wen, and Yuheng Zou. 2016. DoReFa-Net: Training low bitwidth convolutional neural networks with low bitwidth gradients. arXiv preprint arXiv:1606.06160 (2016).
+[83] Chenzhuo Zhu, Song Han, Huizi Mao, and William J Dally. 2016. Trained ternary quantization. arXiv preprint arXiv:1612.01064 (2016).
+[84] Chuanhao Zhuge, Xinheng Liu, Xiaofan Zhang, Sudeep Gummadi, Jinjun Xiong, and Deming Chen. 2018. Face Recognition with Hybrid E cient Convolution Algorithms on FPGAs. In Proceedings of the 2018 on Great Lakes Symposium on VLSI. ACM, 123–128.
+
+ACM Transactions on Recon gurable Technology and Systems, Vol. 9, No. 4, Article 11. Publication date: December 2017.
+

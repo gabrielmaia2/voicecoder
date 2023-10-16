@@ -1,0 +1,201 @@
+
+
+
+
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (248)
+    Cited by (121) 
+
+Elsevier
+Neurocomputing
+Volume 417 , 5 December 2020, Pages 302-321
+Neurocomputing
+Survey on Deep Neural Networks in Speech and Vision Systems
+Author links open overlay panel M. Alam a 1 , M.D. Samad b , L. Vidyaratne a , A. Glandon a , K.M. Iftekharuddin a
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.neucom.2020.07.053 Get rights and content
+Abstract
+
+This survey presents a review of state-of-the-art deep neural network architectures , algorithms, and systems in speech and vision applications. Recent advances in deep artificial neural network algorithms and architectures have spurred rapid innovation and development of intelligent speech and vision systems. With availability of vast amounts of sensor data and cloud computing for processing and training of deep neural networks, and with increased sophistication in mobile and embedded technology, the next-generation intelligent systems are poised to revolutionize personal and commercial computing. This survey begins by providing background and evolution of some of the most successful deep learning models for intelligent speech and vision systems to date. An overview of large-scale industrial research and development efforts is provided to emphasize future trends and prospects of intelligent speech and vision systems. Robust and efficient intelligent systems demand low-latency and high fidelity in resource-constrained hardware platforms such as mobile devices , robots, and automobiles. Therefore, this survey also provides a summary of key challenges and recent successes in running deep neural networks on hardware-restricted platforms, i.e. within limited memory, battery life, and processing capabilities. Finally, emerging applications of speech and vision across disciplines such as affective computing , intelligent transportation, and precision medicine are discussed. To our knowledge, this paper provides one of the most comprehensive surveys on the latest developments in intelligent speech and vision applications from the perspectives of both software and hardware systems. Many of these emerging technologies using deep neural networks show tremendous promise to revolutionize research and development for future speech and vision systems.
+Introduction
+
+There has been a massive accumulation of human-centric data to an unprecedented scale over the last two decades. This data explosion coupled with rapid growth in computing power has rejuvenated the field of neural networks and sophisticated intelligent systems (IS). In the past, neural networks have mostly been limited to the application of industrial control and robotics. However, recent advancements in neural networks have led to successful applications of IS in almost every aspect of human life with the introduction of intelligent transportation [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], intelligent diagnosis and health monitoring for precision medicine [11], [12], [13], [14], robotics and automation in home appliances [15], virtual online assistance [16], e-marketing [17], and weather forecasting and natural disasters monitoring [18] among others. The widespread success of IS technology has redefined and augmented human ability to communicate and comprehend the world by innovating ‘smart’ physical systems. A ‘smart’ physical system is designed to interpret, act, and collaborate with complex multimodal human senses such as vision, touch, speech, smell, gestures, or hearing. A large body of smart physical systems have been developed targeting two primary senses used in human communication: speech and vision.
+
+The advancement in speech and vision processing systems has enabled tremendous research and development in the areas of human–computer interactions [19], biometric applications [20], [21], security and surveillance [22], and most recently in computational behavioral analysis [23], [24], [25], [26], [27]. While traditional machine learning and evolutionary computations have enriched IS to solve complex pattern recognition problems over many decades, these techniques have limitations in their ability to process natural data or images in raw data formats. A number of computational steps are used to extract representative features from raw data or images prior to applying machine learning models. This intermediate representation of raw data, known as ‘hand-engineered’ features, requires domain expertise and human interpretation of physical patterns such as texture, shape, geometry, etc. There are three major problems with ‘hand-engineered’ features that impede major progress in IS. First, the choice of ‘hand-engineered’ features is application dependent and involves human interpretation and evaluation. Second, ‘hand-engineered’ features are extracted from each sample in a standalone manner without the knowledge of inevitable noise and variations in data. Third, ‘hand-engineered’ features may perform excellently with some inputs but may completely fail to extract quality features in other types of input data. This can lead to high variability in speech and vision recognition performance.
+
+A solution to the limitations of ‘hand-engineered’ features has emerged through mimicking functions of biological neurons in artificial neural networks (ANN). The potential of ANNs is recently exploited with access to large trainable datasets, efficient learning algorithms, and powerful computational resources. Advancements of ANN over the last decade have led to deep learning [28], [29] that has revolutionized several application domains, including computer vision, speech analysis, biomedical image processing, and online market analyses. The rapid success of deep learning over traditional machine learning may be attributed to three factors. First, deep learning offers end-to-end trainable architectures that integrate feature extraction, dimensionality reduction, and final classification. These steps are otherwise treated as standalone sub-systems in conventional machine learning, which may result in suboptimal pattern recognition performance. Second, target-specific and informative features may be learned from both input examples and classification targets without resorting to application-specific feature extractors. Third, deep learning models are highly flexible in capturing complex nonlinear relationships between inputs and output targets at a level that is far beyond the capacity of ‘hand-engineered’ features.
+
+The remainder of this article is organized as follows. Section 2 discusses deep learning architectures that have been recently introduced to solve contemporary challenges in speech and vision domain. Section 3 provides a comprehensive discussion of real-world and commercial application cases for the technology. Section 4 discusses state-of-the-art results in implementing these sophisticated algorithms in resource-constrained hardware environments. This section also highlights prospects of ‘smart’ applications in mobile devices. Section 5 discusses several successful and emerging applications of neural networks in state-of-the-art IS. Section 6 elaborates potential developments and challenges in the future for IS. Finally, Section 7 concludes with a summary of the key observations in this article.
+Section snippets
+Design and architecture of neural networks for deep learning
+
+An ANN consists of multiple levels of nonlinear modules arranged hierarchically in layers. This design is inspired by the hierarchical information processing observed in the primate visual system [30], [31]. Such hierarchical arrangements enable deep models to learn meaningful features at different levels of abstraction. Several successful hierarchical ANNs known as deep neural networks (DNNs) are proposed in the literature [32]. Few examples include convolutional neural networks [33], deep
+Deep learning in speech and vision processing
+
+This section discusses the impact of neural networks that are driving the state-of-the-art intelligent speech and vision systems.
+Speech and vision on resource restricted hardware platforms
+
+The success of future speech and vision systems depends on accessibility and adaptability to a variety of platforms that eventually drive the prospect of commercialization. While some platforms are intended for public and personal use, there are other commercial, industrial, and online-based platforms - all of which require seamless integration of IS. However, state-of-the-art deep learning models have challenges in adapting to embedded hardware due to large memory footprint, high computational
+Emerging applications of intelligent speech and vision Systems
+
+We identify three fields of research that are shifting paradigm through recent advances in speech and vision-related frameworks. First, the quantification of human behavior and expressions from visual image and speech offers great potentials in cybernetics, security and surveillance, forensics, quantitative behavioral science, and psychology research [208]. Second, the field of transportation research is rapidly incorporating intelligent vision systems for smart traffic management and
+Limitations of deep computational models
+
+Despite unprecedented successes of neural networks in recent years, we identify a few specific areas that may greatly impact the future progress of deep learning in intelligent systems. The first area is to develop a robust learning algorithm for deep models that requires a minimal amount of training samples.
+Summary of survey
+
+This paper systematically reviews the most recent progress and innovations of deep learning algorithms in speech and vision applications and limitations in implementating these models on popular mobile and embedded devices. The rapid evolution and success of deep learning algorithms is pioneering many new applications and commercial initiatives pertaining to intelligent speech and vision systems, which in turn is improving our daily lives. Despite tremendous success and performance gains of
+Declaration of Competing Interest
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Acknowledgments
+
+The authors would like to acknowledge partial funding of this work by the National Science Foundation (NSF), USA through a grant (Award# ECCS 1310353) and the National Institute of Health (NIH), USA through a grant (NIBIB/NIH grant# R01 EB020683). Note the views and findings reported in this work completely belong to the authors and not the NSF or NIH.
+
+Dr. Mahbubul Alam completed his Ph.D. from the Vision Lab of the Department of Electrical and Computer Engineering at the Old Dominion University (ODU), Norfolk, Virginia, USA in December 2018. His doctoral dissertation contributed to developing novel machine learning, more specifically deep learning algorithms for solving complex computer vision problems. After finishing his Ph.D., he started working as a Research Scientist at the Industrial AI Lab, Research and Development Division at Hitachi
+References (248)
+
+    X. Wang et al.
+    Capturing Car-Following Behaviors by Deep Learning
+    IEEE Trans. Intell. Transp. Syst.
+    (2017)
+    M. Havaei
+    Brain tumor segmentation with Deep Neural Networks
+    Med. Image Anal.
+    (2017)
+    E.W. Ngai et al.
+    Application of data mining techniques in customer relationship management: A literature review and classification
+    Expert Syst. Appl.
+    (2009)
+    M. El Ayadi et al.
+    Survey on speech emotion recognition: Features, classification schemes, and databases
+    Pattern Recogn.
+    (2011)
+    H.M. Fayek et al.
+    Evaluating deep learning architectures for Speech Emotion Recognition
+    Neural Networks
+    (2017)
+    G.E. Hinton
+    Learning multiple layers of representation
+    Trends Cognitive Sci.
+    (2007)
+    J. Schmidhuber
+    Deep learning in neural networks: an overview
+    Neural Networks
+    (2015)
+    C. Huang et al.
+    A research of speech emotion recognition based on deep belief network and SVM
+    Math. Problems Eng.
+    (2014)
+    Y. Dong et al.
+    Driver inattention monitoring system for intelligent vehicles: a review
+    IEEE Trans. Intell. Transport. Syst.
+    (2011)
+    J.C. McCall et al.
+    Video-based lane estimation and tracking for driver assistance: survey, system, and evaluation
+    IEEE Trans. Intell. Transport. Syst.
+    (2006)
+
+View more references
+Cited by (121)
+
+    Layer-wise regularized adversarial training using layers sustainability analysis framework
+    2023, Neurocomputing
+    Show abstract
+    Helium focused ion beam induced subsurface damage on Si and SiC substrates: experiments and generative deep neural network modeling via position-dependent input
+    2023, Journal of Materials Research and Technology
+    Show abstract
+    Deep learning based object detection for resource constrained devices: Systematic review, future trends and challenges ahead
+    2023, Neurocomputing
+    Show abstract
+    A Deep Fourier Residual method for solving PDEs using Neural Networks
+    2023, Computer Methods in Applied Mechanics and Engineering
+    Show abstract
+
+    When using Neural Networks as trial functions to numerically solve PDEs, a key choice to be made is the loss function to be minimised, which should ideally correspond to a norm of the error. In multiple problems, this error norm coincides with – or is equivalent to – the -norm of the residual; however, it is often difficult to accurately compute it. This work assumes rectangular domains and proposes the use of a Discrete Sine/Cosine Transform to accurately and efficiently compute the norm. The resulting Deep Fourier-based Residual (DFR) method efficiently and accurately approximate solutions to PDEs. This is particularly useful when solutions lack regularity and methods involving strong formulations of the PDE fail. We observe that the -error is highly correlated with the discretised loss during training, which permits accurate error estimation via the loss.
+    A new efficient algorithm based on feedforward neural network for solving differential equations of fractional order
+    2023, Communications in Nonlinear Science and Numerical Simulation
+    Show abstract
+    A comprehensive survey on image captioning: from handcrafted to deep learning-based techniques, a taxonomy and open research issues
+    2023, Artificial Intelligence Review
+
+View all citing articles on Scopus
+
+Dr. Mahbubul Alam completed his Ph.D. from the Vision Lab of the Department of Electrical and Computer Engineering at the Old Dominion University (ODU), Norfolk, Virginia, USA in December 2018. His doctoral dissertation contributed to developing novel machine learning, more specifically deep learning algorithms for solving complex computer vision problems. After finishing his Ph.D., he started working as a Research Scientist at the Industrial AI Lab, Research and Development Division at Hitachi America, Ltd., Santa Clara, California. Dr. Alam received his BS and MS degree in Computer Science and Engineering from Jahangirnagar University, Bangladesh in 2008 and 2011, respectively. He has secured highest grade in both BS and MS final examination. He was awarded “Gold Medal” for obtaining the highest Cumulative GPA in the whole University during his undergrad study. His research interests are machine learning, deep learning, computer vision, predictive maintenance, visual inspection and other interesting and challenging problems in the industrial domain. He has served as the reviewer for the following IEEE journals: IEEE Transactions on Neural Networks and Learning Systems, IEEE Transactions on Emerging Topics in Computational Intelligence, and IEEE Journal of Biomedical and Health Informatics.
+
+Dr. Manar D. Samad received the B.S. degree in Electrical and Electronic Engineering from the Bangladesh University of Engineering and Technology, Dhaka, Bangladesh, in 2007, the M.S. degree in Computer Engineering from the University of Calgary, Calgary, AB, Canada in 2011, and the Ph.D. degree from Old Dominion University, Norfolk, VA, USA in 2016. He worked as a post-doctoral research fellow at Geisinger, Danville, PA, USA with the Department of Imaging Science and Innovation. He is currently an Assistant Professor in the Department of Computer Science at Tennessee State University, Nashville, TN, USA. His research interests include machine learning, health informatics, computer vision, and human computer interactions.
+
+Dr. Lasitha S. Vidyaratne received the M.Eng. degree in Electronic and Communications Engineering from the University of Nottingham Malaysia Campus, Malaysia. He received the Ph.D. degree with the Vision Laboratory, Department of Electrical and Computer Engineering, Old Dominion University, Norfolk, VA, USA in 2019. His doctoral dissertation focuses on developing novel deep recurrent neural network architectures for complex computer vision and biomedical signal processing applications. His current research interests include deep learning, recurrent neural networks, unsupervised learning, reinforcement learning, brain-computer interfacing, and biomedical signal processing.
+
+Alexander M. Glandon is currently a research assistant at Old Dominion University Vision Lab, Norfolk VA, USA. He is pursuing a PhD in Electrical and Computer Engineering at ODU, where he also received his M.S. in Electrical and Computer Engineering and B.S. in Computer Engineering. His current research analyzes 3D lidar depth maps of humans for identification and activity recognition using image processing and novel algorithms. He is also interested in machine learning and statistics.
+
+Dr. Khan M. Iftekharuddin is a professor in the department of electrical and computer engineering and an Associate Dean for Research in the Batten College of Engineering at Old Dominion University (ODU). He is a Batten Endowed Chair in Machine Learning. He serves as the director of ODU Vision Lab. He is also a member of biomedical engineering program at ODU. Much of his research had focused on different aspects of computer vision, machine learning and signal/image processing problems. His research interests include machine learning and computational modeling, stochastic medical image analysis for tumor phenotype, intersection of bioinformatics and medical image analysis, automatic target recognition, biologically inspired human and machine centric learning, deep recurrent learning and networks, sensor signal acquisition and modeling, and optical computing and interconnection. He is the principal author of a book, several book chapters, and about 200 refereed journal and conference papers. His research has been funded by different agencies such as NSF, NIH, AFOSR, ARO, AFRL, ONR, DOT, DOE, Whitaker Foundation, Assisi Foundation, and Fed-EX-FIT. He obtained his B.Sc. degree from Bangladesh Institute of Technology in 1989. He received an M.S. and a Ph.D. both in electrical engineering from the University of Dayton in 1991 and 1995 respectively. He serves as a Senior Associate Editor for Optical Engineering journal and as an Associate Editor for multiple journals including IEEE Transaction in Image Processing, IEEE Transaction in Learning Systems, Cognitive Systems Research and Computer Methods in Biomechanics and Biomedical Engineering: Imaging & Visualization . He is a Fellow of SPIE, a Senior Member of IEEE, INNS and OSA.
+
+1
+
+    Current affiliation: Research and Development, Hitachi America Ltd.,Santa Clara, CA 95054, USA.
+
+View full text
+© 2020 Elsevier B.V. All rights reserved.
+Recommended articles
+
+    Video captioning with boundary-aware hierarchical language decoding and joint video prediction
+    Neurocomputing, Volume 417, 2020, pp. 347-356
+    Xiangxi Shi , …, Shafiq Joty
+    Speaker identification based on Radon transform and CNNs in the presence of different types of interference for Robotic Applications
+    Applied Acoustics, Volume 177, 2021, Article 107665
+    Amira Shafik , …, Abdullah M. Iliyasu
+    Reactive obstacle avoidance of monocular quadrotors with online adapted depth prediction network
+    Neurocomputing, Volume 325, 2019, pp. 142-158
+    Xin Yang , …, Kwang-Ting Cheng
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 98 
+
+Captures
+
+    Readers: 215 
+
+Social Media
+
+    Shares, Likes & Comments: 1 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

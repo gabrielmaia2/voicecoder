@@ -1,0 +1,529 @@
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+1
+
+A Survey of Model Compression and Acceleration for Deep Neural Networks
+Yu Cheng, Duo Wang, Pan Zhou, Member, IEEE, and Tao Zhang, Senior Member, IEEE
+
+arXiv:1710.09282v9 [cs.LG] 14 Jun 2020
+
+Abstract—Deep neural networks (DNNs) have recently achieved great success in many visual recognition tasks. However, existing deep neural network models are computationally expensive and memory intensive, hindering their deployment in devices with low memory resources or in applications with strict latency requirements. Therefore, a natural thought is to perform model compression and acceleration in deep networks without signiﬁcantly decreasing the model performance. During the past ﬁve years, tremendous progress has been made in this area. In this paper, we review the recent techniques for compacting and accelerating DNN models. In general, these techniques are divided into four categories: parameter pruning and quantization, low-rank factorization, transferred/compact convolutional ﬁlters, and knowledge distillation. Methods of parameter pruning and quantization are described ﬁrst, after that the other techniques are introduced. For each category, we also provide insightful analysis about the performance, related applications, advantages and drawbacks. Then we go through some very recent successful methods, for example, dynamic capacity networks and stochastic depths networks. After that, we survey the evaluation matrices, the main datasets used for evaluating the model performance and recent benchmark efforts. Finally, we conclude this paper, discuss remaining the challenges and possible directions for future work.
+Index Terms—Deep Learning, Convolutional Neural Networks, Model Compression and Acceleration,
+I. INTRODUCTION
+In recent years, deep neural networks have recently received lots of attention, been applied to different applications and achieved dramatic accuracy improvements in many tasks. These works rely on deep networks with millions or even billions of parameters, and the availability of GPUs with very high computation capability plays a key role in their success. For example, the work by Krizhevsky et al. [1] achieved breakthrough results in the 2012 ImageNet Challenge using a network containing 60 million parameters with ﬁve convolutional layers and three fully-connected layers. Usually, it takes two to three days to train the whole model on ImagetNet dataset with a NVIDIA K40 machine. Another example is the top face veriﬁcation results on the Labeled Faces in the Wild (LFW) dataset were obtained with networks containing hundreds of millions of parameters, using a mix of convolutional, locally-connected, and fully-connected layers [2], [3]. It is also very time-consuming to train such a model
+Yu Cheng is a Senior Researcher at Microsoft, One Microsoft Way, Redmond, WA 98052, USA.
+Duo Wang and Tao Zhang are with the Department of Automation, Tsinghua University, Beijing 100084, China.
+Pan Zhou is with the School of Electronic Information and Communications, Huazhong University of Science and Technology, Wuhan 430074, China.
+
+to get reasonable performance. In architectures that rely only on fully-connected layers, the number of parameters can grow to billions [4].
+As larger neural networks with more layers and nodes are considered, reducing their storage and computational cost becomes critical, especially for some real-time applications such as online learning and incremental learning. In addition, recent years witnessed signiﬁcant progress in virtual reality, augmented reality, and smart wearable devices, creating unprecedented opportunities for researchers to tackle fundamental challenges in deploying deep learning systems to portable devices with limited resources (e.g. memory, CPU, energy, bandwidth). Efﬁcient deep learning methods can have significant impacts on distributed systems, embedded devices, and FPGAs for Artiﬁcial Intelligence. For example, the ResNet-50 [5] with 50 convolutional layers needs over 95MB memory for storage and over 3.8 billion ﬂoating number multiplications when processing an image. After discarding some redundant weights, the network still works as usual but saves more than 75% of parameters and 50% computational time. For devices like cell phones and FPGAs with only several megabyte resources, how to compact the models used on them is also important.
+Achieving these goals calls for joint solutions from many disciplines, including but not limited to machine learning, optimization, computer architecture, signal processing, and hardware design. In this paper, we review recent works on compressing and accelerating deep neural networks, which attracts a lot of attention from the deep learning community and already achieved lots of progress in the past years.
+Based on their properties, we divide these approaches into four categories: parameter pruning and quantization, lowrank factorization, transferred/compact convolutional ﬁlters, and knowledge distillation. The parameter pruning and quantization based methods explore the redundancy in the model parameters and try to remove the redundant and uncritical ones. Low-rank factorization based techniques use matrix/tensor decomposition to estimate the informative parameters of the DNNs. The approaches based on transferred/compact convolutional ﬁlters design special structural convolutional ﬁlters to reduce the parameter space and save storage/computation. The knowledge distillation based methods learn a distilled model and train a more compact neural network to reproduce the output of a larger network.
+In Table I, we brieﬂy summarize these four types of approaches. The parameter pruning & quantization, low-rank factorization and knowledge distillation approaches can be deployed in DNN models with fully connected layers and
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+2
+
+TABLE I SUMMARIZATION OF DIFFERENT APPROACHES FOR MODEL COMPRESSION AND ACCELERATION.
+
+Category Name Parameter pruning and quantization
+Low-rank factorization
+Transferred/compact convolutional ﬁlters
+Knowledge distillation
+
+Description Reducing redundant parameters which are not sensitive to the performance
+Using matrix/tensor decomposition to estimate the informative parameters
+Designing special structural convolutional ﬁlters to save parameters
+Training a compact neural network with distilled knowledge of a large model
+
+Applications Convolutional layer and
+fully connected layer
+Convolutional layer and fully connected layer
+Convolutional layer only
+Convolutional layer and fully connected layer
+
+More details Robust to various settings, can achieve good performance, can support both train
+from scratch and pre-trained model Standardized pipeline, easily to be implemented, can support both train from scratch and pre-trained model Algorithms are dependent on applications, usually achieve good performance,
+only support train from scratch Model performances are sensitive to applications and network structure only support train from scratch
+
+convolutional layers, achieving comparable performances. On the other hand, methods using transferred/compact ﬁlters are designed for convolutional layers only. Low-rank factorization and transferred/compact ﬁlters based approaches provide an end-to-end pipeline and can be easily implemented in CPU/GPU environment. Parameter pruning & quantization use different strategies such as binary coding and sparse constraints to perform the task.
+Regarding the training protocols, models based on parameter pruning/quantization and low-rank factorization can be extracted from pre-trained models or trained from scratch. While the transferred/compact ﬁlter and knowledge distillation models can only support training from scratch. Most of these methods are independently designed and complementary to each other. For example, transferred layers and parameter pruning & quantization can be deployed together. Another example is that, model quantization & binarization can be used together with low-rank approximations to achieve further compression/speedup. We will describe the details of their properties, and analysis of strengths and drawbacks in the following sections separately.
+II. PARAMETER PRUNING AND QUANTIZATION
+Early works showed that network pruning and quantization are effective in reducing the network complexity and addressing the over-ﬁtting problem [6]. After found that pruning can bring regularization to neural networks and hence improve generalization, it has been widely studied to compress DNNs. These techniques can be further mapped into three subcategories: quantization and binarization, network pruning, and structural matrix.
+A. Quantization and Binarization
+Network quantization compresses the original network by reducing the number of bits required to represent each weight. Gong et al. [6] and Wu et al. [7] applied k-means scalar quantization to the parameter values. Vanhoucke et al. [8] showed that 8-bit quantization of the parameters can result in signiﬁcant speed-up with minimal loss of accuracy. The work in [9] used 16-bit ﬁxed-point representation in stochastic rounding based CNN training, which signiﬁcantly reduced memory usage and ﬂoat point operations with little loss in classiﬁcation accuracy.
+
+Fig. 1. The three-stage compression methods proposed in [10]: pruning, quantization and huffman encoding. The input is the original model and the output is the compressed model.
+The method proposed in [10] quantized the link weights using weight sharing and then applied Huffman coding to the quantized weights as well as the codebook to further reduce the rate. As shown in Figure 1, it started by learning the connectivity via normal network training, followed by pruning the small-weight connections. Finally, the network was retrained to learn the ﬁnal weights for the remaining sparse connections. This work achieved the state-of-art performance among all quantization based methods. In [11], it was shown that Hessian weight could be used to measure the importance of network parameters, and proposed to minimize Hessianweighted quantization errors in average to cluster parameters. Quantization is a very effective way for model compression and acceleration.
+In the extreme case of the 1-bit representation of each weight, that is binary weight neural networks. The main idea is to directly learn binary weights or activation during the model training. There are several works that directly train CNNs with binary weights, for instance, BinaryConnect [12], BinaryNet [13] and XNOR [14]. A systematic study in [15] showed networks trained with back propagation could be resilient to speciﬁc weight distortions, including binary weights.
+Discussion: the accuracy of the binary nets is signiﬁcantly lowered when dealing with large CNNs such as GoogleNet. Another drawback of such binary nets is that existing binarization schemes are based on simple matrix approximations and ignore the effect of binarization on the accuracy loss. To address this issue, the work in [16] proposed a proximal Newton algorithm with diagonal Hessian approximation that
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+3
+
+directly minimizes the loss with respect to the binary weights. The work in [17] reduced the time on ﬂoat point multiplication in the training stage by stochastically binarizing weights and converting multiplications in the hidden state computation to signiﬁcant changes. Zhao et al. [18] proposed half-wave Gaussian Quantization to learning low precision networks, achieving promissing results.
+B. Network Pruning
+An early approach to pruning was the Biased Weight Decay [19]. The Optimal Brain Damage [20] and the Optimal Brain Surgeon [21] methods reduced the number of connections based on the Hessian of the loss function. Their work suggested that such pruning gave higher accuracy than magnitudebased pruning, e.g., weight decay method.
+A following trend in this direction is to prune redundant, non-informative weights in a pre-trained DNN model. For example, Srinivas and Babu [22] explored the redundancy among neurons, and proposed a data-free pruning method to remove redundant neurons. Han et al. [23] proposed to reduce the total number of parameters and operations in the entire network. Chen et al. [24] proposed a HashedNets model that used a low-cost hash function to group weights into hash buckets for parameter sharing. The deep compression method in [10] removed the redundant connections and quantized the weights, and then used Huffman coding to encode the quantized weights. In [25], a simple regularization method based on soft weight-sharing was proposed, which included both quantization and pruning in one simple (re-)training procedure. The above pruning schemes typically produce connections pruning in DNNs.
+There is also growing interest in training compact DNNs with sparsity constraints. Those sparsity constraints are typically introduced in the optimization problem as l0 or l1norm regularizers. The work in [26] imposed group sparsity constraint on the convolutional ﬁlters to achieve structured brain Damage, i.e., pruning entries of the convolution kernels in a group-wise fashion. In [27], a group-sparse regularizer on neurons was introduced during the training stage to learn compact CNNs with reduced ﬁlters. Wen et al. [28] added a structured sparsity regularizer on each layer to reduce trivial ﬁlters, channels or even layers. In the ﬁlter-level pruning, all the above works used l1 or l2-norm regularizers. The work in [29] used l1-norm to select and prune unimportant ﬁlters.
+Discussion: there are some issues of using network pruning. First, pruning with l1 or l2 regularization requires more iterations to converge than general methods. In addition, all pruning criteria require manual setup of sensitivity for layers, which demands ﬁne-tuning of the parameters and could be cumbersome for some applications. Finally, network pruning usually is able to reduce model size but not improve the efﬁciency (training or inference time).
+C. Designing Structural Matrix
+In architectures that contain fully-connected layers, it is critical to explore this redundancy of parameters in fullyconnected layers, which is often the bottleneck in terms of
+
+memory consumption. These network layers use the nonlinear transforms f (x, M) = σ(Mx), where σ(·) is an element-wise nonlinear operator, x is the input vector, and M is the m × n matrix of parameters [30]. When M is a large general dense matrix, the cost of storing mn parameters and computing matrix-vector products in O(mn) time. Thus, an intuitive way to prune parameters is to impose x as a parameterized structural matrix. An m × n matrix that can be described using much fewer parameters than mn is called a structured
+matrix. Typically, the structure should not only reduce the
+memory cost, but also dramatically accelerate the inference
+and training stage via fast matrix-vector multiplication and
+gradient computations. Following this direction, the work in [31], [32] proposed a
+simple and efﬁcient approach based on circulant projections, while maintaining competitive error rates. Given a vector r = (r0, r1, · · · , rd−1), a circulant matrix R ∈ Rd×d is deﬁned as:
+
+ r0 rd−1 . . . r2 r1 
+
+ r1
+
+r0 rd−1
+
+r2 
+
+
+
+R
+
+=
+
+circ(r)
+
+:=
+
+ 
+
+...
+
+r1
+
+r0 . . .
+
+...
+
+
+
+ 
+
+.
+
+(1)
+
+
+ rd−2
+
+...
+
+...
+
+
+ rd−1
+
+rd−1 rd−2 . . . r1 r0
+
+thus the memory cost becomes O(d) instead of O(d2). This circulant structure also enables the use of Fast Fourier Transform (FFT) to speed up the computation. Given a ddimensional vector r, the above 1-layer circulant neural network in Eq. 1 has time complexity of O(d log d).
+In [33], a novel Adaptive Fastfood transform was introduced to reparameterize the matrix-vector multiplication of fully connected layers. The Adaptive Fastfood transform matrix R ∈ Rn×d was deﬁned as:
+
+R = SHGΠHB
+
+(2)
+
+where S, G and B are random diagonal matrices. Π ∈ {0, 1}d×d is a random permutation matrix, and H denotes the Walsh-Hadamard matrix. Reparameterizing a fully connected layer with d inputs and n outputs using the Adaptive Fastfood transform reduces the storage and the computational costs from O(nd) to O(n) and from O(nd) to O(n log d), respectively.
+The work in [30] showed the effectiveness of the new notion of parsimony in the theory of structured matrices. Their proposed method can be extended to various other structured matrix classes, including block and multi-level Toeplitz-like [34] matrices related to multi-dimensional convolution [35]. Following this idea, [36] proposed a general structured efﬁcient linear layer for CNNs.
+Drawbacks: one issue of this kind of approaches is that the structural constraint usually hurts the performance since the constraint might bring bias to the model. On the other hand, how to ﬁnd a proper structural matrix is hard. There is no theoretical way to derive it out.
+
+III. LOW-RANK APPROXIMATION AND SPARSITY
+Convolution operations contribute the bulk of most computations in deep DNNs, thus reducing the convolution layer
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+4
+
+TABLE II COMPARISONS BETWEEN DIFFERENT LOW-RANK MODELS AND THEIR
+BASELINES ON ILSVRC-2012.
+
+Fig. 2. A typical framework of the low-rank regularization method. The left is the original convolutional layer and the right is the low-rank constraint convolutional layer with rank-K.
+would improve the compression rate as well as the overall speedup. The convolution kernels can be viewed as a 3D tensor. Ideas based on tensor decomposition is derived by the intuition that there is a structure spacity in the 3D tensor. Regarding the fully-connected layer, it can be view as a 2D matrix (or 3D tensor) and the low-rankness can also help.
+It has been a long time for using low-rank ﬁlters to accelerate convolution, for example, high dimensional DCT (discrete cosine transform) and wavelet systems using tensor products to be constructed from 1D DCT transform and 1D wavelets respectively. Learning separable 1D ﬁlters was introduced by Rigamonti et al. [37] using a dictionary learning approach. For some simple DNN models, a few low-rank approximation and clustering schemes for the convolutional kernels were proposed in [38]. They achieved 2× speedup for a single convolutional layer with 1% drop in classiﬁcation accuracy. The work in [39] proposed to use different tensor decomposition schemes, reporting a 4.5× speedup with 1% drop in accuracy in text recognition.
+The low-rank approximation was done layer by layer. The parameters of one layer were ﬁxed after it was done, and the layers above were ﬁne-tuned based on a reconstruction error criterion. These are typical low-rank methods for compressing 3D convolutional layers, which is described in Figure 2. Following this direction, Canonical Polyadic (CP) decomposition of was proposed for the kernel tensors in [40]. Their work used nonlinear least squares to compute the CP decomposition. In [41], a new algorithm for computing the low-rank tensor decomposition for training low-rank constrained CNNs from scratch were proposed. It used Batch Normalization (BN) to transform the activation of the internal hidden units. In general, both the CP and the BN decomposition schemes in [41] (BN Low-rank) can be used to train CNNs from scratch. However, there are few differences between them. For example, ﬁnding the best low-rank approximation in CP decomposition is an illposed problem, and the best rank-K (K is the rank number) approximation may not exist sometimes. While for the BN scheme, the decomposition always exists. We perform a simple comparison of both methods shown in Table II. The actual speedup and the compression rates are used to measure their performances.
+As we mentioned before, the fully connected layers can be viewed as a 2D matrix and thus the above mentioned methods can also be applied there. There are several classical works on exploiting low-rankness in fully connected layers. For instance, Misha et al. [42] reduced the number of dynamic parameters in deep models using the low-rank method. [43]
+
+Model AlexNet BN Low-rank CP Low-rank VGG-16 BN Low-rank CP Low-rank GoogleNet BN Low-rank CP Low-rank
+
+TOP-5 Accuracy 80.03% 80.56% 79.66% 90.60% 90.47% 90.31% 92.21% 91.88% 91.79%
+
+Speed-up 1.
+1.09 1.82
+1. 1.53 2.05
+1. 1.08 1.20
+
+Compression Rate 1.
+4.94 5. 1. 2.72 2.75 1. 2.79 2.84
+
+explored a low-rank matrix factorization of the ﬁnal weight layer in a DNN for acoustic modeling. In [3], Lu et al. adopted truncated SVD (singular value decomposition) to decompose the fully connected layer for designing compact multi-task deep learning architectures.
+Discussion: low-rank approximation based approaches are straightforward for model compression and acceleration. However, the implementation is not that easy since it involves decomposition operation, which is computationally expensive. Another issue is that current methods perform low-rank approximation layer by layer, thus cannot perform global parameters compression, which is important as different layers hold different information. Finally, factorization requires extensive model retraining to achieve convergence when compared to the original model.
+
+IV. TRANSFERRED/COMPACT CONVOLUTIONAL FILTERS
+CNNs are parameter efﬁcient due to exploring the translation invariant property of the representations to the input image, which is the key to the success of training very deep models without severe over-ﬁtting. Although a strong theory is currently missing, a large number of empirical evidence support the notion that both the translation invariant property and the convolutional weight sharing are important for good predictive performance. The idea of using transferred convolutional ﬁlters to compress CNN models is motivated by recent works in [44], which introduced the equivariant group theory. Let x be an input, Φ(·) be a network or layer and T (·) be the transform matrix. The concept of equivalence is deﬁned as:
+
+T ‘Φ(x) = Φ(T x)
+
+(3)
+
+indicating that transforming the input x by the transform T (·) and then passing it through the network or layer Φ(·) should give the same result as ﬁrst mapping x through the network and then transforming the representation. Note that in Eq. (10), the transforms T (·) and T (·) are not necessarily the same as they operate on different objects. According to this theory, it is reasonable applying transform to layers or ﬁlters Φ(·) to compress the whole network models. From empirical observation, deep CNNs also beneﬁt from using a large set of convolutional ﬁlters by applying certain transform T (·) to a small set of base ﬁlters since it acts as a regularizer for the model.
+Following this direction, there are many recent reworks proposed to build a convolutional layer from a set of base
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+5
+
+ﬁlters [44]–[47]. What they have in common is that the transform T (·) lies in the family of functions that only operate in the spatial domain of the convolutional ﬁlters. For example, the work in [46] found that the lower convolution layers of CNNs learned redundant ﬁlters to extract both positive and negative phase information of an input signal, and deﬁned T (·) to be the simple negation function:
+
+T (Wx) = Wx−
+
+(4)
+
+where Wx is the basis convolutional ﬁlter and Wx− is the ﬁlter consisting of the shifts whose activation is opposite to that
+of Wx and selected after max-pooling operation. By doing this, the work in [46] can easily achieve 2× compression
+
+rate on all the convolutional layers. It is also shown that the
+
+negation transform acts as a strong regularizer to improve
+
+the classiﬁcation accuracy. The intuition is that the learning
+
+algorithm with pair-wise positive-negative constraint can lead
+
+to useful convolutional ﬁlters instead of redundant ones.
+
+In [47], it was observed that magnitudes of the responses
+
+from convolutional kernels had a wide diversity of pattern
+
+representations in the network, and it was not proper to discard
+
+weaker signals with a single threshold. Thus a multi-bias non-
+
+linearity activation function was proposed to generates more
+
+patterns in the feature space at low computational cost. The
+
+transform T (·) was deﬁne as:
+
+T ‘Φ(x) = Wx + δ
+
+(5)
+
+where δ were the multi-bias factors. The work in [48] considered a combination of rotation by a multiple of 90◦ and
+horizontal/vertical ﬂipping with:
+
+T ‘Φ(x) = WTθ
+
+(6)
+
+where WTθ was the transformation matrix which rotated the original ﬁlters with angle θ ∈ {90, 180, 270}. In [44], the transform was generalized to any angle learned from data, and θ was directly obtained from data. Both works [48] and [44] can achieve good classiﬁcation performance.
+The work in [45] deﬁned T (·) as the set of translation functions applied to 2D ﬁlters:
+
+T ‘Φ(x) = T (·, x, y)x,y∈{−k,...,k},(x,y)=(0,0)
+
+(7)
+
+where T (·, x, y) denoted the translation of the ﬁrst operand by (x, y) along its spatial dimensions, with proper zero padding at borders to maintain the shape. The proposed framework can be used to 1) improve the classiﬁcation accuracy as a regularized version of maxout networks, and 2) to achieve parameter efﬁciency by ﬂexibly varying their architectures to compress networks.
+Table III brieﬂy compares the performance of different methods with transferred convolutional ﬁlters, using VGGNet (16 layers) as the baseline model. The results are reported on CIFAR-10 and CIFAR-100 datasets with Top-5 error. It is observed that they can achieve reduction in parameters with little or no drop in classiﬁcation accuracy.
+Discussions: there are a few issues to be addressed for approaches that apply transform constraints to convolutional ﬁlters. First, these methods can achieve competitive performance for wide/ﬂat architectures (e.g., VGGNet, AlexNet)
+
+TABLE III A SIMPLE COMPARISON OF DIFFERENT APPROACHES ON CIFAR-10 AND
+CIFAR-100.
+
+Model VGG-16 MBA [47] CRELU [46] CIRC [44] DCNN [45]
+
+CIFAR-100 34.26% 33.66% 34.57% 35.15% 33.57%
+
+CIFAR-10 9.85% 9.76% 9.92% 10.23% 9.65%
+
+Compression Rate 1. 2. 2. 4. 1.62
+
+but not thin/deep ones (e.g., ResNet). Secondly, the transfer assumptions sometimes are too strong to guide the learning, making the results unstable in some situation.
+Using a compact ﬁlter for convolution can directly reduce the computation cost. The key idea is to replace the loose and over-parametric ﬁlters with compact blocks to improve the speed. Decomposing 3 × 3 convolution into two 1 × 1 convolutions was used in [49], which achieved signiﬁcant acceleration. SqueezeNet [50] was proposed to replace 3 × 3 convolution with 1 × 1 convolution, which created a compact neural network with about 50 fewer parameters. Similar technique has been adapted in MobileNets [51].
+V. KNOWLEDGE DISTILLATION
+To the best of our knowledge, exploiting knowledge transfer (KT) to compress model was ﬁrst proposed by Caruana et al. [52]. They trained a compressed/ensemble model of strong classiﬁers with pseudo-data labeled, and reproduced the output of the original larger network. But the work is limited to shallow models. The idea has been recently adopted in [53] as knowledge distillation (KD) to compress deep and wide networks into shallower ones, where the compressed model mimicked the function learned by the complex model. The main idea of KD based approaches is to shift knowledge from a large teacher model into a small one by learning the class distributions output via softmax.
+The work in [54] introduced a KD compression framework, which eased the training of deep networks by following a student-teacher paradigm, in which the student was penalized according to a softened version of the teacher’s output. The framework compressed an ensemble of teacher networks into a student network of similar depth. The student was trained to predict the output and the classiﬁcation labels. Despite its simplicity, KD demonstrates promising results in various image classiﬁcation tasks. The work in [55] aimed to address the network compression problem by taking advantage of depth neural networks. It proposed an approach to train thin but deep networks, called FitNets, to compress wide and shallower (but still deep) networks. The method was extended the idea to allow for thinner and deeper student models. In order to learn from the intermediate representations of teacher network, FitNet made the student mimic the full feature maps of the teacher. However, such assumptions are too strict since the capacities of teacher and student may differ greatly.
+All the above approaches are validated on MNIST, CIFAR10, CIFAR-100, SVHN and AFLW benchmark datasets, and experimental results show that these methods match or outper-
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+6
+
+form the teacher’s performance, while requiring notably fewer parameters and multiplications.
+There are several extension along this direction of distillation knowledge. The work in [56] trained a parametric student model to approximate a Monte Carlo teacher. The proposed framework used online training, and used deep neural networks for the student model. Different from previous works which represented the knowledge using the soften label probabilities, [57] represented the knowledge by using the neurons in the higher hidden layer, which preserved as much information as the label probabilities, but are more compact. The work in [58] accelerated the experimentation process by instantaneously transferring the knowledge from a previous network to each new deeper or wider network. The techniques are based on the concept of function-preserving transformations between neural network speciﬁcations. Zagoruyko et al. [59] proposed Attention Transfer (AT) to relax the assumption of FitNet. They transferred the attention maps that are summaries of the full activations.
+Discussions: KD-based approaches can make deeper models shallower and help signiﬁcantly reducing the computational cost. However, there are a few disadvantages. One of those is that KD can only be applied to tasks with softmax loss function, which hinders its usage. Another drawback is that KD-based approaches generally achieve less competitive performance compared with other type of approaches.
+VI. OTHER TYPES OF APPROACHES
+We ﬁrst summarize the works utilizing attention-like mechanism [60], which can reduce computations signiﬁcantly by learning to selectively focus or “attend” to a few, task-relevant input regions. In [61], dynamic deep neural networks (D2NN) were introduced, which were a type of feed-forward deep neural network that selected and executed a subset of D2NN neurons based on the input. The dynamic capacity network (DCN) [62] that combined the small sub-networks with low capacity, and the large ones with high capacity. The attention mechanism was used to direct the high-capacity sub-networks to focus on the task-relevant regions. By dong this, the size of the model has been signiﬁcantly reduced. Following this direction, the work in [63] introduced the conditional computation idea, which only computes the gradient for some important neurons via a sparsely-gated mixture-of-experts Layer (MoE).
+There have been other attempts to reduce the number of parameters of neural networks by replacing the fully connected layer with global average pooling [45], [64]. Network architecture such as GoogleNet or Network in Network, can achieve state-of-the-art results on several benchmarks by adopting this idea. However, these architectures have not been fully optimized the utilization of the computing resources inside the network. This problem was noted by Szegedy et al. [64] and motivated them to increase the depth and width of the network while keeping the computational budget constant.
+The work in [65] targeted the Residual Network based model with a spatially varying computation time, called stochastic depth, which enabled the seemingly contradictory setup to train short networks and used deep networks at test
+
+TABLE IV SUMMARIZATION OF BASELINE MODELS USED IN DIFFERENT
+REPRESENTATIVE WORKS OF NETWORK COMPRESSION.
+
+Baseline Models Alexnet [1]
+Network in network [76] VGG nets [77]
+Residual networks [78]
+All-CNN-nets [75] LeNets [74]
+
+Representative Works structural matrix [30], [31], [33]
+low-rank factorization [41] low-rank factorization [41]
+transferred ﬁlters [45] low-rank factorization [41] compact ﬁlters [50], stochastic depth [65]
+parameter sharing [25] transferred ﬁlters [46] parameter sharing [25] parameter pruning [21], [23]
+
+time. It started with very deep networks, while during training, for each mini-batch, randomly dropped a subset of layers and bypassed them with the identity function. Following this direction, thew work in [66] proposed a pyramidal residual networks with stochastic depth. In [67], Wu et al. proposed an approach that learns to dynamically choose which layers of a deep network to execute during inference so as to best reduce total computation. Veit et al. exploited convolutional networks with adaptive inference graphs to adaptively deﬁne their network topology conditioned on the input image [68].
+Other approaches to reduce the convolutional overheads include using FFT based convolutions [69] and fast convolution using the Winograd algorithm [70]. Zhai et al. [71] proposed a strategy call stochastic spatial sampling pooling, which speedup the pooling operations by a more general stochastic version. Saeedan et al. presented a novel pooling layer for convolutional neural networks termed detail-preserving pooling (DPP), based on the idea of inverse bilateral ﬁlters [72]. Those works only aim to speed up the computation but not reduce the memory storage. The MobileNetV2 [73] proposed the novel inverted residual structure.
+
+VII. BENCHMARKS, EVALUATION AND DATABASES
+
+In the past years the deep learning community had made
+
+great efforts in benchmark. One of the most well-known model
+
+used in compression and acceleration for CNNs is Alexnet
+
+[1], which has been occasionally used for assessing the perfor-
+
+mance of compression. Other popular standard models include
+
+LeNets [74], All-CNN-nets [75] and many others. LeNet-300-
+
+100 is a fully connected network with two hidden layers, with
+
+300 and 100 neurons each. LeNet-5 is a convolutional network
+
+that has two convolutional layers and two fully connected
+
+layers. Recently, more and more state-of-the-art architectures
+
+are used as baseline models in many works, including network
+
+in networks (NIN) [76], VGG nets [77] and residual networks
+
+(ResNet) [78]. Table IV summarizes the baseline models
+
+commonly used in several typical compression methods.
+
+The standard criteria to measure the quality of model
+
+compression and acceleration are the compression and the
+
+speedup rates. Assume that a is the number of the parameters in the original model M and a∗ is that of the compressed model M ∗, then the compression rate α(M, M ∗) of M ∗ over
+
+M is:
+
+α(M, M ∗)
+
+=
+
+a a∗ .
+
+(8)
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+7
+
+Another widely used measurement is the index space saving
+
+deﬁned in several papers [31], [36] as
+
+β(M, M ∗)
+
+=
+
+a − a∗ a∗ ,
+
+(9)
+
+where β(M, M ∗) is the deﬁned space saving rate. Similarly, given the running time s of M and s∗ of M ∗,
+the speedup rate δ(M, M ∗) is deﬁned as:
+
+δ(M, M ∗)
+
+=
+
+s s∗ .
+
+(10)
+
+Most work used the average training time per epoch to measure
+
+the running time, while in [31], [36], the average testing time
+
+was used. Generally, the compression rate and speedup rate
+
+are highly correlated, as smaller models often results in faster
+
+computation for both the training and the testing stages.
+
+A good compression method is expected to achieve almost
+
+the same performance as the original model with much smaller
+
+parameters and less computational time. However, for different
+
+applications with different CNN designs, the relation between
+
+parameter size and computational time might be different.
+
+For example, it is observed that for deep CNNs with fully
+
+connected layers, most of the parameters are in the fully
+
+connected layers; while for image classiﬁcation tasks, ﬂoat
+
+point operations are mainly in the ﬁrst few convolutional layers
+
+since each ﬁlter is convolved with the whole image, which is
+
+usually very large at the beginning. Thus compression and
+
+acceleration of the network should focus on different type of
+
+layers for different applications.
+
+VIII. CHALLENGES AND FUTURE WORK
+We summarized recent efforts on compressing and accelerating deep neural networks (DNNs). Here we discuss more details about how to choose different compression approaches, technique challenges and possible solutions for future work.
+
+A. General Suggestions
+There are no golden criteria to measure which approach is the best. How to choose a proper method really depends on the applications and requirements. Here are some general suggestions we can provide:
+• If the applications need compacted models from pretrained deep nets, you can choose either pruning & quantization or low rank factorization based methods. If you need end-to-end solutions for your problem, the low rank and transferred convolutional ﬁlters approaches should be considered.
+• For applications in particular domains (e.g., medical images), methods with human prior (like the transferred convolutional ﬁlters, structural matrix) sometimes have beneﬁts. For example, when doing medical images classiﬁcation, transferred convolutional ﬁlters could work well as medical images (like organ) do have the rotation transformation property.
+• The approaches of pruning & quantization generally give reasonable compression rate while not hurt the accuracy. Thus for applications which requires stable model performance, it is better to utilize pruning & quantization.
+
+• If your application involves small/medium size datasets or requires signiﬁcantly improving efﬁciency, you can try the knowledge distillation approaches. The compressed student model can take the beneﬁt of transferring knowledge from teacher model, achieving robust performance when datasets are not large.
+• As we mentioned before, these aforementioned techniques are orthogonal. It is reasonable to combine two or three of them to maximize the gain. For some speciﬁc applications, like object detection, which requires both convolutional and fully connected layers, you can compress the convolutional layers with a low rank based method and the fully connected layers with a pruning technique.
+B. Technique Challenges
+We also summarize the following challenges still need to be addressed.
+• Most of the current state-of-the-art approaches build on well-designed CNN models, which have limited freedom to change the conﬁguration (e.g., network architectures, hyper-parameters). To handle more complicated tasks, the furture work should provide more plausible ways to conﬁgure the compressed models.
+• Hardware constraints in various of small platforms (e.g., mobile, robotic, self-driving car) are still a major problem to hinder the extension of deep CNNs. How to make full use of the limited computational source and how to design special compression methods for such platforms are still challenges that need to be addressed.
+• Pruning is an effective way to compress and accelerate CNNs. The current pruning techniques are mostly designed to eliminate connections between neurons. On the other hand, pruning channel can directly reduce the feature map width and shrink the model into a thinner one. It is efﬁcient but also challenging because removing channels might dramatically change the input of the following layer.
+• As we mentioned before, methods of structural matrix and transferred convolutional ﬁlters impose prior human knowledge to the model, which could signiﬁcantly affect the performance and stability. It is critical to investigate how to control the impact of those prior knowledge.
+• The methods of knowledge distillation provide many beneﬁts such as directly accelerating model without special hardware or implementations. It is still worthy developing KD-based approaches and exploring how to improve their performances.
+• Despite the great achievements of these compression approaches, the black box mechanism is still the key barrier to the adoption. For example, why some neurons/connections are pruned is not clear. Exploring the knowledge interpret-ability is still an important challenge.
+C. Possible Future Directions
+To solve the hyper-parameters conﬁguration problem, we can rely on the recent neural architecture search strategies
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+8
+
+[79], [80]. This framework provides a mechanism allowing the algorithm to automatically learn how to exploit structure in the problem of interest. Leveraging reinforcement learning to efﬁciently sample the design space and improve the model compression has been tried in [81].
+Regarding the use of CNNs in different hardware platforms, proposing some hardware-aware approaches is one direction. Wang et al. [82] proposed the Hardware-Aware Automated Quantization (HAQ) to take the hardware accelerator‘s feedback in the design loop. Similar idea can be applied to make CNNs more applicable for different platforms. The work in [83] directly learn the architectures for large-scale target tasks and target hardware based performance.
+Channel pruning provides the efﬁciency beneﬁt on both CPU and GPU because no special implementation is required. But it is also challenging to handle the input conﬁguration. One possible solution is to use the training-based channel pruning methods [84], which focus on imposing sparse constraints on weights during training. In addition, training from scratch for such methods is costly for deep CNNs. In [85], the authors provided an iterative two-step algorithm to effectively prune channels in each layer. The work in [86] associated a scaling factor with each channel and imposed regularization on these scaling factors during training to automatically identify unimportant channels. Liu et al. [87] showed that pruned architecture itself is more crucial and pruning can be useful as an architecture search paradigm.
+Exploring new types of knowledge in the teacher models and transferring it to the student models is useful for the knowledge distillation (KD) approaches. Instead of directly reducing and transferring parameters, passing selectivity knowledge of neurons could be helpful. One option is deriving a way to select essential neurons related to the task [88], [89]. Very recently, the contrastive loss instead of KL divergence for distillation has been tried in [90].
+For methods with the convolutional ﬁlters and the structural matrix, we can conclude that the transformation lies in the family of functions that only operations on the spatial dimensions. Hence to address the imposed prior issue, one solution is to provide a generalization of the aforementioned approaches in two aspects: 1) instead of limiting the transformation to belong to a set of predeﬁned transformations, let it be the whole family of spatial transformations applied on 2D ﬁlters or matrix, and 2) learn the transformation jointly with all the model parameters.
+Despite the image classiﬁcation task, people are also adapting the compacted models in other tasks [73], [91], [92]. There is also some work about deep natural language models [93], [94]. We would like to see more work for applications with larger deep nets (e.g., video and image frames [95], [96], vision + language [97] and GANs [98], [99]).
+IX. ACKNOWLEDGMENTS
+The authors would like to thank the reviewers and broader community for their feedback on this survey. In particular, we would like to thank Hong Zhao from the Department of Automation of Tsinghua University for her help on modifying the paper.
+
+REFERENCES
+[1] A. Krizhevsky, I. Sutskever, and G. Hinton, “Imagenet classiﬁcation with deep convolutional neural networks,” in NIPS, 2012.
+[2] Y. Taigman, M. Yang, M. Ranzato, and L. Wolf, “Deepface: Closing the gap to human-level performance in face veriﬁcation,” in CVPR, 2014.
+[3] Y. Lu, A. Kumar, S. Zhai, Y. Cheng, T. Javidi, and R. S. Feris, “Fullyadaptive feature sharing in multi-task networks with applications in person attribute classiﬁcation,” CoRR, vol. abs/1611.05377, 2016.
+[4] J. Dean, G. Corrado, R. Monga, K. Chen, M. Devin, Q. Le, M. Mao, M. Ranzato, A. Senior, P. Tucker, K. Yang, and A. Ng, “Large scale distributed deep networks,” in NIPS, 2012.
+[5] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” CoRR, vol. abs/1512.03385, 2015.
+[6] Y. Gong, L. Liu, M. Yang, and L. D. Bourdev, “Compressing deep convolutional networks using vector quantization,” CoRR, vol. abs/1412.6115, 2014.
+[7] Y. W. Q. H. Jiaxiang Wu, Cong Leng and J. Cheng, “Quantized convolutional neural networks for mobile devices,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016.
+[8] V. Vanhoucke, A. Senior, and M. Z. Mao, “Improving the speed of neural networks on cpus,” in Deep Learning and Unsupervised Feature Learning Workshop, NIPS 2011, 2011.
+[9] S. Gupta, A. Agrawal, K. Gopalakrishnan, and P. Narayanan, “Deep learning with limited numerical precision,” in Proceedings of the 32Nd International Conference on International Conference on Machine Learning - Volume 37, ser. ICML’15, 2015, pp. 1737–1746.
+[10] S. Han, H. Mao, and W. J. Dally, “Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding,” International Conference on Learning Representations (ICLR), 2016.
+[11] Y. Choi, M. El-Khamy, and J. Lee, “Towards the limit of network quantization,” CoRR, vol. abs/1612.01543, 2016.
+[12] M. Courbariaux, Y. Bengio, and J. David, “Binaryconnect: Training deep neural networks with binary weights during propagations,” in Advances in Neural Information Processing Systems 28: Annual Conference on Neural Information Processing Systems 2015, December 7-12, 2015, Montreal, Quebec, Canada, 2015, pp. 3123–3131.
+[13] M. Courbariaux and Y. Bengio, “Binarynet: Training deep neural networks with weights and activations constrained to +1 or -1,” CoRR, vol. abs/1602.02830, 2016.
+[14] M. Rastegari, V. Ordonez, J. Redmon, and A. Farhadi, “Xnor-net: Imagenet classiﬁcation using binary convolutional neural networks,” in ECCV, 2016.
+[15] P. Merolla, R. Appuswamy, J. V. Arthur, S. K. Esser, and D. S. Modha, “Deep neural networks are robust to weight binarization and other nonlinear distortions,” CoRR, vol. abs/1606.01981, 2016.
+[16] L. Hou, Q. Yao, and J. T. Kwok, “Loss-aware binarization of deep networks,” CoRR, vol. abs/1611.01600, 2016.
+[17] Z. Lin, M. Courbariaux, R. Memisevic, and Y. Bengio, “Neural networks with few multiplications,” CoRR, vol. abs/1510.03009, 2015.
+[18] Z. Cai, X. He, J. Sun, and N. Vasconcelos, “Deep learning with low precision by half-wave gaussian quantization,” in CVPR. IEEE Computer Society, 2017, pp. 5406–5414.
+[19] S. J. Hanson and L. Y. Pratt, “Comparing biases for minimal network construction with back-propagation,” in Advances in Neural Information Processing Systems 1, D. S. Touretzky, Ed., 1989, pp. 177–185.
+[20] Y. L. Cun, J. S. Denker, and S. A. Solla, “Advances in neural information processing systems 2,” D. S. Touretzky, Ed., 1990, ch. Optimal Brain Damage, pp. 598–605.
+[21] B. Hassibi, D. G. Stork, and S. C. R. Com, “Second order derivatives for network pruning: Optimal brain surgeon,” in Advances in Neural Information Processing Systems 5. Morgan Kaufmann, 1993, pp. 164– 171.
+[22] S. Srinivas and R. V. Babu, “Data-free parameter pruning for deep neural networks,” in Proceedings of the British Machine Vision Conference 2015, BMVC 2015, Swansea, UK, September 7-10, 2015, 2015, pp. 31.1–31.12.
+[23] S. Han, J. Pool, J. Tran, and W. J. Dally, “Learning both weights and connections for efﬁcient neural networks,” in Proceedings of the 28th International Conference on Neural Information Processing Systems, ser. NIPS’15, 2015.
+[24] W. Chen, J. Wilson, S. Tyree, K. Q. Weinberger, and Y. Chen, “Compressing neural networks with the hashing trick.” JMLR Workshop and Conference Proceedings, 2015.
+[25] K. Ullrich, E. Meeds, and M. Welling, “Soft weight-sharing for neural network compression,” CoRR, vol. abs/1702.04008, 2017.
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+9
+
+[26] V. Lebedev and V. S. Lempitsky, “Fast convnets using group-wise brain damage,” in 2016 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2016, Las Vegas, NV, USA, June 27-30, 2016, 2016, pp. 2554–2564.
+[27] H. Zhou, J. M. Alvarez, and F. Porikli, “Less is more: Towards compact cnns,” in European Conference on Computer Vision, Amsterdam, the Netherlands, October 2016, pp. 662–677.
+[28] W. Wen, C. Wu, Y. Wang, Y. Chen, and H. Li, “Learning structured sparsity in deep neural networks,” in Advances in Neural Information Processing Systems 29, D. D. Lee, M. Sugiyama, U. V. Luxburg, I. Guyon, and R. Garnett, Eds., 2016, pp. 2074–2082.
+[29] H. Li, A. Kadav, I. Durdanovic, H. Samet, and H. P. Graf, “Pruning ﬁlters for efﬁcient convnets,” CoRR, vol. abs/1608.08710, 2016.
+[30] V. Sindhwani, T. Sainath, and S. Kumar, “Structured transforms for small-footprint deep learning,” in Advances in Neural Information Processing Systems 28, C. Cortes, N. D. Lawrence, D. D. Lee, M. Sugiyama, and R. Garnett, Eds., 2015, pp. 3088–3096.
+[31] Y. Cheng, F. X. Yu, R. Feris, S. Kumar, A. Choudhary, and S.-F. Chang, “An exploration of parameter redundancy in deep networks with circulant projections,” in International Conference on Computer Vision (ICCV), 2015.
+[32] Y. Cheng, F. X. Yu, R. S. Feris, S. Kumar, A. N. Choudhary, and S. Chang, “Fast neural networks with circulant projections,” CoRR, vol. abs/1502.03436, 2015.
+[33] Z. Yang, M. Moczulski, M. Denil, N. de Freitas, A. Smola, L. Song, and Z. Wang, “Deep fried convnets,” in International Conference on Computer Vision (ICCV), 2015.
+[34] J. Chun and T. Kailath, Generalized Displacement Structure for BlockToeplitz, Toeplitz-block, and Toeplitz-derived Matrices. Berlin, Heidelberg: Springer Berlin Heidelberg, 1991, pp. 215–236.
+[35] M. V. Rakhuba and I. V. Oseledets, “Fast multidimensional convolution in low-rank tensor formats via cross approximation,” SIAM J. Scientiﬁc Computing, vol. 37, no. 2, 2015.
+[36] M. Moczulski, M. Denil, J. Appleyard, and N. de Freitas, “Acdc: A structured efﬁcient linear layer,” in International Conference on Learning Representations (ICLR), 2016.
+[37] R. Rigamonti, A. Sironi, V. Lepetit, and P. Fua, “Learning separable ﬁlters,” in 2013 IEEE Conference on Computer Vision and Pattern Recognition, Portland, OR, USA, June 23-28, 2013, 2013, pp. 2754– 2761.
+[38] E. L. Denton, W. Zaremba, J. Bruna, Y. LeCun, and R. Fergus, “Exploiting linear structure within convolutional networks for efﬁcient evaluation,” in Advances in Neural Information Processing Systems 27, Z. Ghahramani, M. Welling, C. Cortes, N. D. Lawrence, and K. Q. Weinberger, Eds., 2014, pp. 1269–1277.
+[39] M. Jaderberg, A. Vedaldi, and A. Zisserman, “Speeding up convolutional neural networks with low rank expansions,” in Proceedings of the British Machine Vision Conference. BMVA Press, 2014.
+[40] V. Lebedev, Y. Ganin, M. Rakhuba, I. V. Oseledets, and V. S. Lempitsky, “Speeding-up convolutional neural networks using ﬁne-tuned cpdecomposition,” CoRR, vol. abs/1412.6553, 2014.
+[41] C. Tai, T. Xiao, X. Wang, and W. E, “Convolutional neural networks with low-rank regularization,” vol. abs/1511.06067, 2015.
+[42] M. Denil, B. Shakibi, L. Dinh, M. Ranzato, and N. D. Freitas, “Predicting parameters in deep learning,” in Advances in Neural Information Processing Systems 26, C. Burges, L. Bottou, M. Welling, Z. Ghahramani, and K. Weinberger, Eds., 2013, pp. 2148–2156. [Online]. Available: http://media.nips.cc/nipsbooks/nipspapers/paper ﬁles/nips26/1053.pdf
+[43] T. N. Sainath, B. Kingsbury, V. Sindhwani, E. Arisoy, and B. Ramabhadran, “Low-rank matrix factorization for deep neural network training with high-dimensional output targets,” in in Proc. IEEE Int. Conf. on Acoustics, Speech and Signal Processing, 2013.
+[44] T. S. Cohen and M. Welling, “Group equivariant convolutional networks,” arXiv preprint arXiv:1602.07576, 2016.
+[45] S. Zhai, Y. Cheng, and Z. M. Zhang, “Doubly convolutional neural networks,” in Advances In Neural Information Processing Systems, 2016, pp. 1082–1090.
+[46] W. Shang, K. Sohn, D. Almeida, and H. Lee, “Understanding and improving convolutional neural networks via concatenated rectiﬁed linear units,” arXiv preprint arXiv:1603.05201, 2016.
+[47] H. Li, W. Ouyang, and X. Wang, “Multi-bias non-linear activation in deep neural networks,” arXiv preprint arXiv:1604.00676, 2016.
+[48] S. Dieleman, J. De Fauw, and K. Kavukcuoglu, “Exploiting cyclic symmetry in convolutional neural networks,” in Proceedings of the 33rd International Conference on International Conference on Machine Learning - Volume 48, ser. ICML’16, 2016.
+
+[49] C. Szegedy, S. Ioffe, and V. Vanhoucke, “Inception-v4, inceptionresnet and the impact of residual connections on learning.” CoRR, vol. abs/1602.07261, 2016.
+[50] B. Wu, F. N. Iandola, P. H. Jin, and K. Keutzer, “Squeezedet: Uniﬁed, small, low power fully convolutional neural networks for real-time object detection for autonomous driving,” CoRR, vol. abs/1612.01051, 2016.
+[51] A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, “Mobilenets: Efﬁcient convolutional neural networks for mobile vision applications,” CoRR, vol. abs/1704.04861, 2017.
+[52] C. Buciluaˇ, R. Caruana, and A. Niculescu-Mizil, “Model compression,” in Proceedings of the 12th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, ser. KDD ’06, 2006, pp. 535– 541.
+[53] J. Ba and R. Caruana, “Do deep nets really need to be deep?” in Advances in Neural Information Processing Systems 27: Annual Conference on Neural Information Processing Systems 2014, December 8-13 2014, Montreal, Quebec, Canada, 2014, pp. 2654–2662.
+[54] G. E. Hinton, O. Vinyals, and J. Dean, “Distilling the knowledge in a neural network,” CoRR, vol. abs/1503.02531, 2015.
+[55] A. Romero, N. Ballas, S. E. Kahou, A. Chassang, C. Gatta, and Y. Bengio, “Fitnets: Hints for thin deep nets,” CoRR, vol. abs/1412.6550, 2014.
+[56] A. Korattikara Balan, V. Rathod, K. P. Murphy, and M. Welling, “Bayesian dark knowledge,” in Advances in Neural Information Processing Systems 28, C. Cortes, N. D. Lawrence, D. D. Lee, M. Sugiyama, and R. Garnett, Eds., 2015, pp. 3420–3428.
+[57] P. Luo, Z. Zhu, Z. Liu, X. Wang, and X. Tang, “Face model compression by distilling knowledge from neurons,” in Proceedings of the Thirtieth AAAI Conference on Artiﬁcial Intelligence, February 12-17, 2016, Phoenix, Arizona, USA., 2016, pp. 3560–3566.
+[58] T. Chen, I. J. Goodfellow, and J. Shlens, “Net2net: Accelerating learning via knowledge transfer,” CoRR, vol. abs/1511.05641, 2015.
+[59] S. Zagoruyko and N. Komodakis, “Paying more attention to attention: Improving the performance of convolutional neural networks via attention transfer,” CoRR, vol. abs/1612.03928, 2016.
+[60] D. Bahdanau, K. Cho, and Y. Bengio, “Neural machine translation by jointly learning to align and translate,” CoRR, vol. abs/1409.0473, 2014.
+[61] D. Wu, L. Pigou, P. Kindermans, N. D. Le, L. Shao, J. Dambre, and J. Odobez, “Deep dynamic neural networks for multimodal gesture segmentation and recognition,” IEEE Trans. Pattern Anal. Mach. Intell., vol. 38, no. 8, pp. 1583–1597, 2016.
+[62] A. Almahairi, N. Ballas, T. Cooijmans, Y. Zheng, H. Larochelle, and A. C. Courville, “Dynamic capacity networks,” in Proceedings of the 33nd International Conference on Machine Learning, ICML 2016, New York City, NY, USA, June 19-24, 2016, 2016, pp. 2549–2558.
+[63] N. Shazeer, A. Mirhoseini, K. Maziarz, A. Davis, Q. Le, G. Hinton, and J. Dean, “Outrageously large neural networks: The sparsely-gated mixture-of-experts layer,” 2017.
+[64] C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V. Vanhoucke, and A. Rabinovich, “Going deeper with convolutions,” in Computer Vision and Pattern Recognition (CVPR), 2015.
+[65] G. Huang, Y. Sun, Z. Liu, D. Sedra, and K. Q. Weinberger, Deep Networks with Stochastic Depth. Springer, 2016.
+[66] Y. Yamada, M. Iwamura, and K. Kise, “Deep pyramidal residual networks with separated stochastic depth,” CoRR, vol. abs/1612.01230, 2016.
+[67] Z. Wu, T. Nagarajan, A. Kumar, S. Rennie, L. S. Davis, K. Grauman, and R. Feris, “Blockdrop: Dynamic inference paths in residual networks,” in CVPR, 2018.
+[68] A. Veit and S. Belongie, “Convolutional networks with adaptive inference graphs,” 2018.
+[69] M. Mathieu, M. Henaff, and Y. Lecun, Fast training of convolutional networks through FFTs, 2014.
+[70] A. Lavin and S. Gray, “Fast algorithms for convolutional neural networks,” in 2016 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2016, Las Vegas, NV, USA, June 27-30, 2016, 2016, pp. 4013–4021.
+[71] S. Zhai, H. Wu, A. Kumar, Y. Cheng, Y. Lu, Z. Zhang, and R. S. Feris, “S3pool: Pooling with stochastic spatial sampling,” CoRR, vol. abs/1611.05138, 2016.
+[72] F. Saeedan, N. Weber, M. Goesele, and S. Roth, “Detail-preserving pooling in deep networks,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2018.
+[73] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, “Mobilenetv2: Inverted residuals and linear bottlenecks,” in The IEEE
+
+IEEE SIGNAL PROCESSING MAGAZINE, SPECIAL ISSUE ON DEEP LEARNING FOR IMAGE UNDERSTANDING
+
+10
+
+Conference on Computer Vision and Pattern Recognition (CVPR), June 2018. [74] Y. Lecun, L. Bottou, Y. Bengio, and P. Haffner, “Gradient-based learning applied to document recognition,” in Proceedings of the IEEE, 1998, pp. 2278–2324. [75] J. T. Springenberg, A. Dosovitskiy, T. Brox, and M. A. Riedmiller, “Striving for simplicity: The all convolutional net,” CoRR, vol. abs/1412.6806, 2014. [76] M. Lin, Q. Chen, and S. Yan, “Network in network,” in ICLR, 2014. [77] K. Simonyan and A. Zisserman, “Very deep convolutional networks for large-scale image recognition,” CoRR, vol. abs/1409.1556, 2014. [78] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” arXiv preprint arXiv:1512.03385, 2015. [79] B. Zoph and Q. V. Le, “Neural architecture search with reinforcement learning,” in ICLR, 2017. [Online]. Available: https://arxiv.org/abs/ 1611.01578 [80] H. Liu, K. Simonyan, and Y. Yang, “DARTS: Differentiable architecture search,” in International Conference on Learning Representations, 2019. [Online]. Available: https://openreview.net/forum?id=S1eYHoC5FX [81] Y. He, J. Lin, Z. Liu, H. Wang, L.-J. Li, and S. Han, “Amc: Automl for model compression and acceleration on mobile devices,” in The European Conference on Computer Vision (ECCV), September 2018. [82] K. Wang, Z. Liu, Y. Lin, J. Lin, and S. Han, “Haq: Hardware-aware automated quantization with mixed precision,” in IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2019. [83] H. Cai, L. Zhu, and S. Han, “ProxylessNAS: Direct neural architecture search on target task and hardware,” in International Conference on Learning Representations, 2019. [84] J. M. Alvarez and M. Salzmann, “Learning the number of neurons in deep networks,” pp. 2270–2278, 2016. [85] Y. He, X. Zhang, and J. Sun, “Channel pruning for accelerating very deep neural networks,” in The IEEE International Conference on Computer Vision (ICCV), Oct 2017. [86] Z. Liu, J. Li, Z. Shen, G. Huang, S. Yan, and C. Zhang, “Learning efﬁcient convolutional networks through network slimming,” in ICCV, 2017. [87] Z. Liu, M. Sun, T. Zhou, G. Huang, and T. Darrell, “Rethinking the value of network pruning,” in ICLR, 2019. [88] Z. Huang and N. Wang, “Data-driven sparse structure selection for deep neural networks,” ECCV, 2018. [89] Y. Chen, N. Wang, and Z. Zhang, “Darkrank: Accelerating deep metric learning via cross sample similarities transfer,” in Proceedings of the
+
+Thirty-Second AAAI Conference on Artiﬁcial Intelligence, (AAAI-18), New Orleans, Louisiana, USA, February 2-7, 2018, 2018, pp. 2852– 2859.
+[90] Y. Tian, D. Krishnan, and P. Isola, “Contrastive representation distillation,” in International Conference on Learning Representations, 2020. [Online]. Available: https://openreview.net/forum?id=SkgpBJrtvS
+[91] G. Chen, W. Choi, X. Yu, T. Han, and M. Chandraker, “Learning efﬁcient object detection models with knowledge distillation,” in Advances in Neural Information Processing Systems 30, I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, Eds., 2017, pp. 742–751.
+[92] J. Huang, V. Rathod, C. Sun, M. Zhu, A. Korattikara, A. Fathi, I. Fischer, Z. Wojna, Y. Song, S. Guadarrama, and K. Murphy, “Speed/accuracy trade-offs for modern convolutional object detectors,” in 2017 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2017, Honolulu, HI, USA, July 21-26, 2017, 2017, pp. 3296–3297.
+[93] S. Sun, Y. Cheng, Z. Gan, and J. Liu, “Patient knowledge distillation for BERT model compression,” in Empirical Methods in Natural Language Processing (EMNLP), 2019.
+[94] V. Sanh, L. Debut, J. Chaumond, and T. Wolf, “Distilbert, a distilled version of BERT: smaller, faster, cheaper and lighter,” CoRR, vol. abs/1910.01108, 2019.
+[95] Y. Cheng, Q. Fan, S. Pankanti, and A. Choudhary, “Temporal sequence modeling for video event detection,” in The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2014.
+[96] L. Cao, S.-F. Chang, N. Codella, C. V. Cotton, D. Ellis, L. Gong, M. Hill, G. Hua, J. Kender, M. Merler, Y. Mu, J. R. Smith, and F. X. Yu, “Ibm research and columbia university trecvid-2012 multimedia event detection (med), multimedia event recounting (mer), and semantic indexing (sin) systems,” 2012.
+[97] Y.-C. Chen, L. Li, L. Yu, A. E. Kholy, F. Ahmed, Z. Gan, Y. Cheng, and J. Liu, “Uniter: Learning universal image-text representations,” arXiv preprint arXiv:1909.11740, 2019.
+[98] Y. Mroueh, C.-L. Li, T. Sercu, A. Raj, and Y. Cheng, “Sobolev GAN,” in ICLR, 2018.
+[99] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, “Generative adversarial nets,” in NeurIPS, 2014.
+

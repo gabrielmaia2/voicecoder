@@ -1,0 +1,84 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1611.09405
+
+Help | Advanced Search
+Search
+Computer Science > Computation and Language
+(cs)
+[Submitted on 28 Nov 2016]
+Title: An End-to-End Architecture for Keyword Spotting and Voice Activity Detection
+Authors: Chris Lengerich , Awni Hannun
+Download a PDF of the paper titled An End-to-End Architecture for Keyword Spotting and Voice Activity Detection, by Chris Lengerich and 1 other authors
+Download PDF
+
+    Abstract: We propose a single neural network architecture for two tasks: on-line keyword spotting and voice activity detection. We develop novel inference algorithms for an end-to-end Recurrent Neural Network trained with the Connectionist Temporal Classification loss function which allow our model to achieve high accuracy on both keyword spotting and voice activity detection without retraining. In contrast to prior voice activity detection models, our architecture does not require aligned training data and uses the same parameters as the keyword spotting model. This allows us to deploy a high quality voice activity detector with no additional memory or maintenance requirements. 
+
+Comments: 	NIPS 2016 End-to-End Learning for Speech and Audio Processing Workshop
+Subjects: 	Computation and Language (cs.CL)
+Cite as: 	arXiv:1611.09405 [cs.CL]
+  	(or arXiv:1611.09405v1 [cs.CL] for this version)
+  	https://doi.org/10.48550/arXiv.1611.09405
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Christopher Lengerich [ view email ]
+[v1] Mon, 28 Nov 2016 22:03:22 UTC (42 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled An End-to-End Architecture for Keyword Spotting and Voice Activity Detection, by Chris Lengerich and 1 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.CL
+< prev   |   next >
+new | recent | 1611
+Change to browse by:
+cs
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+Christopher T. Lengerich
+Awni Y. Hannun
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

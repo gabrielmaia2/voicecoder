@@ -1,0 +1,1287 @@
+A Practical Guide to Video and Audio Compression
+
+This book is dedicated to my friend Bernard Fisk.
+
+A Practical Guide to Video and Audio Compression From Sprockets and Rasters to Macroblocks Cliff Wootton
+AMSTERDAM • BOSTON • HEIDELBERG • LONDON NEW YORK • OXFORD • PARIS • SAN DIEGO
+SAN FRANCISCO • SINGAPORE • SYDNEY • TOKYO Focal Press is an imprint of Elsevier
+
+Acquisition Editor: Joanne Tracy/Angelina Ward Project Manager: Brandy Lilly Editorial Assistant: Becky Golden-Harrell Marketing Manager: Christine Degon Cover Design: Eric DeCicco
+Focal Press is an imprint of Elsevier 30 Corporate Drive, Suite 400, Burlington, MA 01803, USA Linacre House, Jordan Hill, Oxford OX2 8DP, UK
+Copyright © 2005, Elsevier Inc. All rights reserved.
+No part of this publication may be reproduced, stored in a retrieval system, or transmitted in any form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the prior written permission of the publisher.
+Permissions may be sought directly from Elsevier’s Science & Technology Rights Department in Oxford, UK: phone: (+44) 1865 843830, fax: (+44) 1865 853333, e-mail: permissions@elsevier.com.uk. You may also complete your request on-line via the Elsevier homepage (http://elsevier.com), by selecting “Customer Support” and then “Obtaining Permissions.”
+Trademarks/Registered Trademarks: Computer hardware and software brand names mentioned in this book are protected by their respective trademarks.
+Recognizing the importance of preserving what has been written, Elsevier prints its books on acidfree paper whenever possible.
+Library of Congress Cataloging-in-Publication Data Application submitted.
+British Library Cataloguing-in-Publication Data A catalogue record for this book is available from the British Library.
+ISBN: 0-240-80630-1
+For information on all Focal Press publications visit our website at www.books.elsevier.com
+05 06 07 08 09 10 10 9 8 7 6 5 4 3 2 1 Printed in the United States of America
+
+Table of Contents
+Preface, ix Acknowledgments, xi
+Chapter 1. Introduction to Video Compression, 1 Chapter 2. Why Video Compression Is Needed, 15 Chapter 3. What Are We Trying to Compress? 35 Chapter 4. Film, 43 Chapter 5. Video, 77 Chapter 6. Digital Image Formats, 115 Chapter 7. Matters Concerning Audio, 147 Chapter 8. Choosing the Right Codec, 171 Chapter 9. How Encoders Work, 187 Chapter 10. The MPEG-1 Codec, 195 Chapter 11. The MPEG-2 Codec, 217 Chapter 12. The MPEG-4 Part 2 Codec, 227 Chapter 13. The H.264 Codec, 237 Chapter 14. Encoded Output Delivered as a Bit Stream, 251 Chapter 15. Live Encoding, 265 Chapter 16. Files and Storage Formats, 277
+v
+
+vi Contents
+Chapter 17. Tape Formats, 301 Chapter 18. Commercial Issues, Digital Rights Management, and Licensing, 307 Chapter 19. Network Delivery Mechanisms, 333 Chapter 20. Streaming, 345 Chapter 21. Players and Platforms, 363 Chapter 22. Windows Media, 373 Chapter 23. QuickTime, 383 Chapter 24. Real Networks, 397 Chapter 25. Other Player Alternatives, 407 Chapter 26. Putting Video on the Web, 415 Chapter 27. Digital Television, 427 Chapter 28. Digital Video on the Move, 439 Chapter 29. Building Your Encoding Hardware, 445 Chapter 30. Setting Up Your Encoding Software, 483 Chapter 31. Preparing to Encode Your Video, 521 Chapter 32. Ingesting Your Source Content, 529 Chapter 33. Temporal Preprocessing, 537 Chapter 34. Spatial Preprocessing, 549 Chapter 35. Color Correction, 567 Chapter 36. Cutting Out the Noise, 581 Chapter 37. Preparing the Audio for Encoding, 599 Chapter 38. Encoding—Go for It!, 611
+
+Contents vii
+Chapter 39. Where Shall We Go Next? 619 Appendix A Problem Solver, 639 Appendix B Hardware Suppliers, 645 Appendix C Software Suppliers, 651 Appendix D Film Stock Sizes, 657 Appendix E Video Raster Sizes, 659 Appendix F MPEG-2 Profiles and Levels, 661 Appendix G MPEG-4 Profiles and Levels, 665 Appendix H ISMA Profiles, 677 Appendix I File Types, 681 Appendix J Source-Video Formats, 693 Appendix K Source-Audio Formats, 695 Appendix L Formats Versus Players, 699 Appendix M Connectors, 703 Appendix N Important Standards and Professional Associations, 717 Glossary, 719 Bibliography, 743 Webliography, 745 Index, 765
+
+Preface
+The last few years have been an extraordinary time for the digital video industry. Not long before the turn of the millennium, digital video editing systems were expensive capital items of equipment that only major broadcasters and production companies could afford. To think that now the same capability is available in a laptop that you can buy off the shelf and it comes with the software for something in the region of $1200 is amazing. This is a capability we have dreamed about having on our desktops for 15 years. The price of the hardware and software needed to run an entire TV broadcast service is now within the reach of any organization or individual who cares to get involved.
+Recall the boom in publishing that happened when the Apple LaserWriter was launched with Adobe PostScript contained inside and those early page composition programs enhanced what we were able to do with Word version 1 or MacWrite. We are now at that place with digital media and while some people will create an unattractive mess with these powerful tools, they will also enjoy themselves immensely and learn a lot at the same time. Eventually, a few skilled people will emerge from the pack and this is where the next generation of new talent will come from to drive the TV and film industry forward over the next couple of decades.
+When Joanne Tracey asked me to prepare a proposal for this book I realized (as had most authors I have spoken to) that I didn’t know as much about the topic I was about to write on as I thought I did. So this book has been a journey of exploration and discovery for me, just as I hope it will be for you. And yet, we also don’t realize how much we do already know, and I hope you will find yourself nodding and making a mental comment to yourself saying “Yes—I knew that” as you read on.
+We excel through the efforts of those around us in our day-to-day interactions with them. I have been particularly lucky to enjoy a few truly inspirational years with a group of like-minded people at the BBC. We all shared the same inquisitive approach into how interactive TV news could work. Now that we have all gone our separate ways I miss those “water cooler moments” when we came up with amazingly ambitious ideas. Some of those ideas live on in the things we engineered and rolled out. Others are yet to develop into a tangible form. But they will, as we adopt and implement the new MPEG-4, 7, and 21 technologies.
+We are still at a very exciting time in the digital video industry. The H.264 codec is achieving enormous potential and there is much yet to do in order to make it as successful as it could be. Looking beyond that is the possibility of creating HDTV services and interactive multimedia experiences that we could only dream about until now.
+ix
+
+x Preface
+Video compression can be a heavy topic at the best of times and we cover a lot of ground here. I thought the idea of illustrating the concept with a cartoon (see the first illustration in Chapter 1) would be helpful, because this subject can be quite daunting and I have purposely tried not to take it all too seriously. The cartoon is in order to disarm the subject and make it as accessible as possible to readers who haven’t had the benefit of much experience with compression.
+In some chapters you’ll find a gray box with an icon on the left and a briefly encapsulated hot tip. These have been placed so that they are relevant to the topic areas being discussed but also to help you flick through the book and glean some useful knowledge very quickly. They have come out of some of those brainstorming times when I discussed digital video with colleagues in the various places I work and in online discussions. It’s a bit of homespun wisdom based on the experiences of many people and intended to lighten the tone of the book a little.
+If you are wondering about the face on the cover, it is my daughter Lydia. But if you look more closely at the cover, it tells a story. In fact, it is an attempt to show what the book is all about in one snapshot.
+On the left you’ll see the sprocket holes from film. Then in the background some faint raster lines should be evident. As you traverse to the right, the detail in the face becomes compressed. This illustrates how an image becomes degraded and finally degenerates into small macroblock particles that waft away in the breeze. Coming up with these illustrative ideas is one of the most enjoyable parts of writing a book.
+So there you have it. I’ve enjoyed working on this project more than any other book that I can recall being involved with. I hope you enjoy the book too and find it helpful, as you become a more experienced compressionist.
+In closing I’d like to say that the finer points of this publication are due to the extremely hard work by the team at Focal Press and any shortcomings you find are entirely my fault.
+Cliff Wootton Crowborough, South East England
+
+Acknowledgments
+When you write a book a book like this, it is the sum of so many people’s efforts and goodwill. I would like to especially thank “J and Lo” (Joanne Tracey and Lothlórien Homet) of Focal Press for guiding me through the process of writing this book. Thanks to Gina Marzilli, who guided us down the right path on the administrative side. The manuscript was skillfully progressed through the production process by Becky Golden-Harrell—thanks, Becky. Let’s do it again. Copyediting was ably managed by Cara Salvatore, Sheryl Avruch, and their team of experts. Thanks guys; you really turned this into a silk purse for me.
+Of course, without the products in the marketplace, we’d have very little success with our endeavors. I’d like to send warm thanks to the team at Popwire in Sweden. Anders Norström and Kay Johansson have been immensely helpful. Over the last couple of years I’ve enjoyed getting to know members of the QuickTime team at Apple Computer. Thanks to Dave Singer, Rhondda Stratton, Tim Schaaf, Vince Uttley, and Greg Wallace for their help and inspiration. Guys, you are doing wonderful stuff. Just keep on doing that thing that you do. Also at Apple, I’d like to thank Sal Soghoian for pointing out some really cool stuff that AppleScript does. Thanks go to Envivio for some very thoughtprovoking and inspiring conversations, especially the time I’ve spent with Rudi Polednik, Frank Patterson, and Sami Asfour. Greetings also to Diana Johnson, Dave Kizerian, and Matt Cupal of Sorenson and Annie Normandin of Discreet. Thanks for being there when I needed your help. In the latter stages of completeing the book, Janet Swift and Barbara Dehart at Telestream came through with some coolness that enabled me to make Windows Media files effortlessly on a Mac.
+To the people who work so hard at the MPEGIF (formerly known as the M4IF), Rob Koenen, Sebastian Möritz, and your team, I thank you for your time and patience explaining things to me. I hope this is a journey we can travel together for many years yet as we see the new MPEG standards being widely adopted.
+I have so many friends from my time at the BBC who unselfishly shared their expertise and knowledge. Foremost of these must be Russell Merryman, who produced the elephant cartoon and was also responsible—with Asha Oberoi, Robert Freeman, Saz Vora, and John Nicholas—for the MPEG-4 packaged multimedia concept studies way back in 2002. Thanks also to Julie Lamm, John Angeli, and everyone in the News Interactive department.
+Thanks are due also to those individuals, companies, and organizations who graciously permitted me to use their images in this project or spent time talking to me about
+xi
+
+xii Acknowledgments
+their work: Christopher Barnatt from the University of Nottingham; Simon Speight and Mark Sherwood from Gerry Anderson Productions; Guan at Etiumsoft; Jim Cooper at MOTU; David Carew-Jones, Anna Davidson, and Paul Dubery at Tektronix; Diogo Salari at DPI Productions; the folks at M-Audio; the Sales Web team at Apple Computer; Grant Petty and Simon Hollingworth at Black Magic Design; Julie Aguilar of ADC Telecommunications; Victoria Battison of AJA Video Systems; and Amanda Duffield of Pace Micro Technology.
+I’d also like to thank Ben Waggoner for his unselfish sharing of many Master Compressionist’s secrets at conferences. Ben, I’ve learned many new things from you whenever I’ve been at your presentations. Thank you so much for encouraging people the way you do.
+
+1
+Introduction to Video Compression
+1.1 Starting Our Journey
+We (that is, you and I) are going to explore video compression together. It is a journey of discovery and surprise. Compression might seem daunting at this point, but like the old Chinese proverb says, “Even the longest journey starts with a single step.” Let’s head into that unknown territory together, taking it carefully, one step at a time until we reach our destination.
+1.2 Video Compression Is Like . . .
+It really is like trying to get a grand piano through a mailbox slot or an elephant through the eye of a needle. In fact, we thought the elephant was such an appropriate description, my friend Russell Merryman created a cartoon to illustrate the concept:
+Video compression is all about trade-offs. Ask yourself what constitutes the best video experience for your customers. That is what determines where you are going to compromise. Which of these are the dominant factors for you?
+● Image quality ● Sound quality ● Frame rate ● Saving disk space ● Moving content around our network more quickly ● Saving bandwidth ● Reducing the playback overhead for older processors ● Portability across platforms ● Portability across players ● Open standards ● Licensing costs for the tools ● Licensing costs for use of content
+1
+
+2 A Practical Guide to Video and Audio Compression
+Figure 1-1 How hard can it be?
+● Revenue streams from customers to you ● Access control and rights management ● Reduced labor costs in production You will need to weigh these factors against each other. Some of them are mutually exclusive. You cannot deliver high quality from a cheap system that is fed with low-quality source material that was recorded on a secondhand VHS tape. Software algorithms are getting very sophisticated, but the old adage, “Garbage in, garbage out” was never truer than it is for video compression.
+1.3 It’s Not Just About Compressing the Video
+The practicalities of video compression are not just about how to set the switches in the encoder but also involve consideration of the context—the context in which the video is arriving as well as the context where it is going to be deployed once it has been processed.
+Together, we will explore a lot of background and supporting knowledge that you need to have in order to make the best decisions about how to compress the video. The actual compression process itself is almost trivial in comparison to the contextual setting and the preprocessing activity.
+
+Introduction to Video Compression 3
+1.4 What Is a Video Compressor?
+All video compressors share common characteristics. I will outline them here and by the end of the book you should understand what all of these terms mean. In fact, these terms describe the step-by-step process of compressing video:
+● Frame difference ● Motion estimation ● Discrete cosine transformation ● Entropy coding
+Wow! Right now you may be thinking that this is probably going to be too hard. Refrain from putting the book back on the shelf just yet though. Compression is less complicated than you think. If we take it apart piece by piece and work through it one item at a time, you will see how easy it is. Soon, you will be saying things like, “I am going to entropy code the rest of my day,” when what you actually mean is you are going home early because there is nothing to do this afternoon. You can have a secret guffaw at your colleagues’ expense because you know all about video compression and they don’t.
+1.5 The Informed Choice Is Yours
+Despite all the arguments about the best technology to use, in the end your decisions may be forced by your marketing department arguing about reaching larger audiences. Those decisions should be backed up by solid research and statistics. On the other hand, they might be based just on hearsay. The consequences of those decisions will restrict your choice of codecs to only those that your selected platform supports. However, you will still have some freedom to innovate in building the production system.
+Video compression is only a small part of the end-to-end process. That process starts with deciding what to shoot, continues through the editing and composition of the footage, and usually ends with delivery on some kind of removable media or broadcast system. In a domestic setting, the end-to-end process might be the capture of analogue video directly off the air followed by digitization and efficient storage inside a home video server. This is what a TiVo Personal Video Recorder (PVR) does, and compression is an essential part of how that product works.
+There is usually a lot of setting up involved before you ever compress anything. Preparing the content first so the compressor produces the best-quality output is very important. A rule of thumb is that about 90% of the work happens before the compression actually begins. The content of this book reflects that rule of thumb: about 90% of the coverage is about things you need to know in order to utilize that 10% of the time you will actually spend compressing video in the most effective way possible.
+
+4 A Practical Guide to Video and Audio Compression
+1.6 Parlez-Vous Compressionese?
+A few readers may be unfamiliar with the jargon we use. Words such as codec might not mean a lot to you at this stage. No need to worry—jargon will be explained as we go along. The important buzzwords are described in a glossary at the end of the book. Glossary entries are italicized the first time they are used.
+The word codec is derived from coder–decoder and is used to refer to both ends of the process—squeezing video down and expanding it to a viewable format again on playback. Compatible coders and decoders must be used, so they tend to be paired up when they are delivered in a system like QuickTime or Windows Media. Sometimes the coder is provided for no charge and is included with the decoder. Other times you will have to buy the coder separately. By the way, the terms coder and encoder in general refer to the same thing.
+1.7 Tied Up With Your Cabling?
+Because there are so many different kinds of connectors, where it is helpful, there are diagrams showing how things connect up. In Appendix M, there are pictures of the most common connectors you will encounter and what they are for. Even on a modest, semiprofessional system, there could be 10 different kinds of connectors, each requiring a special cable. FireWire and USB each have multiple kinds of connectors depending on the device being used. It is easy to get confused. The whole point of different types of connectors is to ensure that you only plug in compatible types of equipment. Most of the time it is safe to plug things in when the cable in your left hand fits into a socket in the piece of hardware in your right (okay, if you are left-handed it might be the other way around). Knowing whether these connections are “hot pluggable” is helpful, too.
+Hot-pluggable connections are those that are safe to connect while your equipment is turned on. This is, in general, true of a signal connection but not a power connection. Some hardware, such as SCSI drives, must never be connected or unconnected while powered on. On the other hand, Firewire interfaces for disk drives are designed to be hot pluggable.
+1.8 So You Already Know Some Stuff
+Chapters 2 to 7 may be covering territory you already know about. The later chapters discuss the more complex aspects of the encoding process and will assume that you already know what is in the earlier chapters or have read them.
+1.9 Video Compression Is Not Exactly New
+Video compression has been a specialist topic for many years. Broadband connections to the Internet are becoming commonplace, and consumers are acquiring digital video cameras. Those consumers all have a need for video compression software.
+
+Introduction to Video Compression 5
+The trick is to get the maximum possible compression with the minimum loss of quality. We will examine compression from a practical point of view, based on where your source material originated. You will need to know how film and TV recreate images and the fundamental differences between the two media. Then you will make optimal choices when you set up a compression job on your system.
+You don’t have to fully understand the mathematics of the encoding process. This knowledge is only vital if you are building video compression products for sale or if you are studying the theory of compression. Some background knowledge of how an encoder works is helpful though. In a few rare instances, some math formulas will be presented but only when it is unavoidable.
+Our main focus will be on the practical aspects of encoding video content. Once you’ve read this book, you should be able to buy off-the-shelf products and get them working together. However, this book is not a tutorial on how to use any particular product. We discuss compression in a generic way so you can apply the knowledge to whatever tools you like to use.
+1.10 This Is Not About Choosing a Particular Platform
+We will discuss a variety of codecs and tools, and it is important to get beyond the marketing hyperbole and see these products independently of any personal likes, dislikes, and platform preferences.
+My personal preference is for Apple-based technologies because they allow me to concentrate on my work instead of administering the system. I’ve used a lot of different systems, and something in the design of Apple products maps intuitively to the way I think when I’m doing creative work. You may prefer to work on Windows- or Linux-based systems, each of which may be appropriate for particular tasks. Compression tools are available for all of the popular operating systems.
+This book is about the philosophy and process of compression. The platform is irrelevant other than to facilitate your choosing a particular codec or workflow that is not supported elsewhere, although even that problem is becoming obsolete as we move forward with portability tools and wider use of open standards.
+Sometimes, lesser-known technology solutions are overlooked by the industry and are worth considering, and I’ve tried to include examples. But space is limited, so please don’t take offense if I have omitted a personal favorite of yours. Do contact us if you find a particularly useful new or existing tool that you think we should include in a later edition.
+1.11 Putting the Salesmen in a Corner
+You need to be armed with sufficient knowledge to cut through the sales pitch and ask penetrating questions about the products being offered to you. Always check the specifications thoroughly before buying. If you can, check out reference installations and read reviews before committing to a product. If this book helps you do that and saves you from
+
+6 A Practical Guide to Video and Audio Compression
+an expensive mistake, then it has accomplished an important goal: to arm you with enough knowledge to ask the right questions and understand the answers you get.
+1.12 Testing, Testing, Testing
+Test your own content on all the systems you are considering for purchase and prove to yourself which one is best. Demonstrations are often given to potential customers under idealized and well-rehearsed circumstances with footage that may have been optimally selected to highlight the strengths of a product. I’ve been present at demonstrations like this, and then when customer provided footage is tried, the system fails utterly to deliver the same performance. Of course, sometimes the products do perform to specification and well beyond, which is good for everyone concerned. There is no substitute for diligence during the selection process.
+1.13 Defining the Territory
+If you are presented with a large meal, it is a good idea to start with small bites. Video compression is a bit indigestible if you try and get it all in one go.
+We need to start with an understanding of moving image systems and how they originated. Early in the book, we look at film formats since they have been around the longest. It is also helpful to understand how analogue TV works. Much of the complexity in compression systems is necessary because we are compressing what started out as an analog TV signal.
+We will use the metaphor of going on a journey as we look at what is coming up in the various chapters of the book.
+1.14 Deciding to Travel
+In Chapter 2, we will examine the content we want to compress and why we want to compress it. This includes the platforms and systems you will use to view the compressed video when it is being played back. If you just want an overview of why compression is important, then Chapter 2 is a good place to start.
+1.15 Choosing Your Destination
+In Chapters 3, 4, 5, and 6, we look at the physical formats for storing moving images. We will examine frame rates, image sizes, and various aspects of film and the different ways that video is moved around and presented to our video compression system. It is important to know whether we are working with high-definition or standard-definition content. Moving images shot on film are quite different from TV pictures due to the way that TV
+
+Introduction to Video Compression 7
+transmission interlaces alternate lines of a picture. Don’t worry if the concept of interlacing is unfamiliar to you at this stage. It is fully explained in Chapter 5.
+Interlacing separates the odd and even lines and transmits them separately. It allows the overall frame rate to be half what it would need to be if the whole display were delivered progressively. Thus, it reduces the bandwidth required to 50% and is therefore a form of compression. Interlacing is actually a pretty harsh kind of compression given the artifacts that it introduces and the amount of processing complexity involved when trying to eliminate the unwanted effects. Harsh compression is a common result of squashing the video as much as possible, which often leads to some compromises on the viewing quality. The artifacts you can see are the visible signs of that compression.
+1.16 Got Your Ears On?
+It’s been a long time since audiences were prepared to put up with silent movies. Chapter 7 looks at how to encode the audio we are going to use with our video. Because the sampling and compression of audio and video are essentially the same, artifacts that affect one will affect the other. They just present themselves differently to your ears and eyes.
+1.17 Checking the Map
+In Chapters 8 to 14, we investigate how a video encoder actually works. If you drive a car, you may not know how the right fuel and air mixture is achieved by adjusting the carburetor. But everyone who drives a car will know that you press the accelerator pedal to go and the brake pedal to stop. Likewise, it is not necessary to use mathematical theory to understand compression. Pictures are helpful; trying it out for yourself is better still.
+1.18 Working Out the Best Route
+Chapter 15 is about live encoding. This is content that is delivered to you as a continuous series of pictures and your system has to keep up. There is little opportunity to pause or buffer things to be dealt with later. Your system has to process the video as it arrives. It is often a critical part of a much larger streaming service that is delivering the encoded video to many thousands or even millions of subscribers. It has to work reliably all the time, every time. That ability will be compromised if you make suboptimum choices early on. Changing your mind about foundational systems you have already deployed can be difficult or impossible.
+
+8 A Practical Guide to Video and Audio Compression
+1.19 Packing Your Bags for the Trip
+Chapter 16 looks at how we store video in files. Some applications require particular kinds of containers and will not work if you present your video in the wrong kind of file. It is a bit like taking a flight with a commercial airline. Your suitcase may be the wrong size or shape or may weigh too much. You have to do something about it before you will be allowed to take it on the plane. It is the same with video. You may need to run some conversions on the video files before presenting the contents for compression. Chapter 17 examines tape formats.
+1.20 Immigration, Visa, and Passport
+When you travel to another country, you must make sure your paperwork is all in order. In the context of video encoding, we have to make sure the right licenses are in place. We need rights control because the content we are encoding may not always be our own. Playback clients make decisions of their own based on the metadata in the content, or they can interact with the server to determine when, where, and how the content may be played.
+Your playback client is the hardware apparatus, software application, movie player, or web page plug-in that you use to view the content. Chapter 18 examines digital rights management (DRM) and commercial issues.
+1.21 Boarding Pass
+Where do you want to put your finished compressed video output? Are you doing this so you can archive some content? Is there a public-facing service that you are going to provide? This is often called deployment. It is a process of delivering your content to the right place and it is covered in Chapter 19.
+1.22 On the Taxiway
+Chapter 20 is about how your compressed video is streamed to your customers. Streaming comes in a variety of formats. Sometimes we are just delivering one program, but even then we are delivering several streams of content at the same time. Audio and video are processed and delivered to the viewer independently, even though they appear to be delivered together. That is actually an illusion because they are carefully synchronized. It is quite obvious when they are not in sync, however, and it could be your responsibility to fix the problem.
+1.23 Rotate and Wheels-Up
+In Chapters 21 to 25, we look at how those codec design principles have been applied in the real world. This is where we discuss the generally available tools and what they offer you as
+
+Introduction to Video Compression 9
+their individual specialty. Some of them are proprietary and others are based on open standards. All of these are important things to consider when selecting a codec for your project.
+1.24 Landing Safely
+In the context of your video arriving at some destination, Chapters 26 to 28 talk about the client players for which you are creating your content. Using open standards helps to reach a wider audience. Beware of situations where a specific player is mandated. This is either because you have chosen a proprietary codec or because the open standard is not supported correctly. That may be accidental or purposeful. Companies that manufacture encoders and players will sometimes advertise that they support an open standard but then deliver it inside a proprietary container. We will look at some of the pros and cons of the available players.
+1.25 Learning to Fly on Your Own
+By now, you may be eager to start experimenting with your own encoding. Maybe you just took a job that involves building a compression system and that seems a bit daunting. Or maybe you have some experience of using these systems and want to try out some alternatives. Either way, Chapter 29 will help you set up your own encoding system. Along the way, we examine the implications for small systems and how they scale up to commercial enterprises. This should be valuable whether you’re setting up large- or small-scale encoding systems.
+1.26 Circuits and Bumps
+We built the hardware in Chapter 29. In Chapter 30, we add the software to it. This is a lot easier to do, now that open standards provide applications with interoperability. Whilst you can still purchase all your support from a single manufacturer, it is wise to choose the best product for each part of the process, even if different manufacturers make them. Standards provide a compliance checkpoint that allows you to give evidence that some corrective work needs to be done to an application. If you have some problematic content, then standards-compliance tools can help you to isolate the problem so that you can feed some informative comments back to the codec manufacturer. An integration problem can be due to noncompliant export from a tool, or import mechanisms in the next workflow stage that are incorrectly implemented.
+1.27 Hitting Some Turbulence on the Way
+In Chapter 31, we begin to discuss how to cope with the difficult areas in video compression. You are likely to hit a few bumps along the way as you try your hand at video compression. These will manifest themselves in a particularly difficult-to-encode video
+
+10 A Practical Guide to Video and Audio Compression
+sequence. You will no doubt have a limited bit rate budget and the complexity of the content may require more data than you can afford to send. So you will have to trade off some complexity to reduce the bandwidth requirements. Degrading the picture quality is one option, or you can reduce the frame rate. The opportunities to improve your encoded video quality begin when you plan what to shoot.
+1.28 Going Solo
+In Chapters 32 to 38, you will have a chance to practice using the encoding system we just built. We will discuss all those complex little details such as scaling and cropping, frame rate reduction, and the effects of video noise on the encoding process. Don’t worry that there are a lot of factors to consider. If we are systematic in the way we experiment with them, we will not get into too much trouble.
+1.29 Planning Future Trips
+Chapter 39 draws some conclusions and looks at where you might go next. It also looks at what the future of video compression systems might be as the world adopts and adapts to a wholly digital video scenario. The appendices follow the final chapter, and they contain some useful reference material. The scope of the book allows for only a limited amount of this kind of reference material, but it should be sufficient to enable you to search for more information on the World Wide Web. Of particular note is the problem solver in Appendix A. It is designed to help you diagnose quality issues with your encoded video.
+Likewise, due to space constraints, we do not delve into the more esoteric aspects of audio and video. Many interesting technologies for surround sound and video production can only be mentioned here, so that we can remain focused on the compression process. You should spend some time looking for manufacturers’ Web sites and downloading technical documents from them. There is no substitute for the time you spend researching and learning more about this technology on your own.
+1.30 Conventions
+Film size is always specified in metric values measured in millimeters (mm). Sometimes scanning is described as dots per inch or lines per inch. TV screen sizes are always described in inches measured diagonally. Most of the time, this won’t matter to us, since we are describing digital imagery measured in pixels. The imaging area of film is measured in mm, and therefore a film-scanning resolution in dots per mm seems a sensible compromise.
+TV pictures generally scan with interlaced lines, and computers use a progressive scanning layout. The difference between them is the delivery order of the lines in the picture. Frame rates are also different.
+The convention for describing a scanning format is to indicate the number of physical lines, the scanning model, and the field rate. For interlaced displays, the field rate is
+
+Introduction to Video Compression 11
+
+Table 1-1 Units of Measure
+
+Quantity
+
+Unit of measure
+
+Data transfer
+Data storage
+Audio levels Frames Tape transport Screen resolution Film resolution
+
+Bits per second Thousands of bits per second (Kilo) Millions of bits per second (Mega) Thousands of millions of bits per second (Giga)
+Bytes Thousands of bytes (Kilo) Millions of bytes (Mega) Thousands of millions of bytes (Giga) Millions of millions of bytes (Tera) Thousands of Terabytes (Peta)
+Tenths of Bels (deci)
+Frames per second
+Inches per second
+Dots per inch
+Dots per mm
+
+Abbreviation
+bps Kbps Mbps Gbps
+B KB MB GB TB PB
+dB
+fps
+ips
+dpi
+dpmm
+
+twice the frame rate, while for progressive displays, they are the same. For example, 525i60 and 625i50 describe the American and European display formats, respectively.
+It is very easy to confuse bits and bytes when talking about video coding. Table 1-1 summarizes the basic quantities we will be using.
+In the abbreviations we use, note that uppercase B refers to bytes, and lowercase b is bits. So GB is gigabytes (not gazillions of bytes). When we multiply bits or bytes by each increment, the value 1000 is actually replaced by the nearest equivalent base-2 number. So we multiply memory size by 1024 instead of 1000 to get kilobytes. As you learn the numbers represented by powers of 2, you will start to see patterns appearing in computer science, and it will help you guess at the correct value to choose when setting parameters.
+Already this is becoming complex, and we have scarcely begun, but don’t worry, we will get to the bottom of it all in due course. Everything will become clear as we persevere and work our way steadily through the various topics chapter by chapter.
+1.31 What Did You Call That Codec?
+Video compression terminology is already confusing enough without having to worry about codecs having several names for the same thing. There are lots of unfamiliar terms and concepts to understand. It makes it even more difficult for the beginner when new codecs are launched with several names. The latest codecs are described elsewhere in the book, but one in particular leads to much confusion even amongst experienced professionals. The MPEG-4 part 10, otherwise known as H.264 codec, is part of a family of video encoders that is listed in Table 1-2.
+
+12 A Practical Guide to Video and Audio Compression
+
+Table 1-2 MPEG Codec Names
+
+Convention
+
+Description
+
+MPEG-1 MPEG-2 MPEG-4
+MPEG-4 part 2
+MPEG-4 part 10
+JVT AVC H.26L H.264
+
+The “grandfather” of the MPEG codecs. This is where it all began.
+Probably the most popular video codec to date when measured in numbers of shipped implementations.
+A large collection of audio/visual coding standards that describe video, audio, and multimedia content. This is a suite of approximately 20 separate component standards that are designed to interoperate with one another to build very rich, interactive, mixed-media experiences. You must be careful to specify a part of the MPEG-4 standard and not just refer to the whole. Beware of ambiguity when describing video as MPEG-4.
+Specifically, the video coding component originally standardized within MPEG-4. The compression algorithms in part 10 are improved but the way that part 2 can be alpha-channel coded is more flexible. If people refer to MPEG-4 video without specifying part 2 or part 10, they probably mean part 2, but that may change as part 10 becomes dominant by virtue of the H.264 codec being more widely adopted.
+A more recent and superior video coding scheme developed jointly by ISO MPEG and the ITU. This codec is a significant milestone in video-coding technology, and its importance to the delivery of video over the next few years will be profound. It is expected to have at least as much impact as MPEG-2 did when it was launched. It is likely that MPEG-4 part-2 video coding will become outmoded in time and people will use the term MPEG-4 when they really mean part10 video coding.
+The Joint Video Team that worked on the MPEG-4 part 10, H.264 standard. The standard is sometimes referred to as the JVT video codec.
+Advanced Video Coding is the name given to the MPEG-4 part-10 codec in the standard. Whilst the term AVC is popular amongst marketing departments, H.264 seems to be used more often by manufacturers in technical documents.
+An early trial version of the H.264 codec.
+The present champion of all codecs governed by the MPEG standards group. This is the most thoroughly scrutinized and carefully developed video-coding system to date.
+
+To be buzzword compliant, I will use the term H.264 to refer to the latest codec throughout this book unless I am talking specifically about the codec in the MPEG-4 or
+
+Introduction to Video Compression 13
+
+Table 1-3 SMPTE VC-1 Codec Names and Aliases
+
+Convention
+
+Description
+
+Windows Media Series 9 WM9
+WM8 WM7 WM6.5 VC-9
+VC-1 VC1
+WM10
+
+The original terminology used when Microsoft was the only party with “ownership” of the codec name.
+An often-used abbreviation. We will use this when specifically referring to Windows Media Series 9 and not the SMPTE standardized version.
+An older version of Windows Media.
+An even older version.
+The oldest version currently mentioned in product specs.
+One of the proposed names for the SMPTE standardized version of WM9 that emerged during 2004.
+Apparently, the codec will be officially known as VC-1.
+Note that this codec might also be shown in some literature as VC1 without the dash. This might be important when searching text-based archives.
+The newest version of the Windows Media series codecs. This is currently on beta release for the Windows operating system platform.
+
+AVC context. Having observed the usage amongst the video-compression community over some time, I have found that engineering people use the term H.264 and commercial or marketing people prefer AVC.
+Further confusion arises during discussion of the Windows Media codecs, since they have been lodged with SMPTE for ratification as an open standard. All of the naming conventions in Table 1-3 have been used in documents about video compression and codecs:
+Unless it is necessary to refer to the Windows Media codec by a different alias, the term VC-1 will be used in this book as far as possible.
+1.32 Where to Next?
+So, let’s go on a voyage of discovery together throughout the rest of this book. By the end of it, you should discover that although video compression is sometimes complex, the complexity comes from a large number of small subsystems. Individually, they are quite simple to understand, so don’t be frightened by the complexity. It is challenging at first, but after a little experimentation and a look at the practical encoding chapter, it should all fall into place. By the end of the book, you should have a good idea of how to build a small, medium, or large compression system from the available hardware components and software applications.
+
+14 A Practical Guide to Video and Audio Compression
+No doubt you will be tempted to start playing with your video-compression tools right away. If so, the early chapters of this book will be important because they describe why the results you are getting are not what you expected. If you are approaching compression for the first time, it is especially important that you read the early chapters in order to understand fundamental topics. I have tried to arrange the chapters in a logical way that introduces you to more complex ideas as we go along, and those early chapters lay the groundwork for the later ones.
+
+2
+Why Video Compression Is Needed
+2.1 Every Journey Begins with a Single Step
+So you are thinking about compressing some video. It might seem like a daunting subject, but it isn’t really. If you begin with small steps, soon you’ll be taking the whole thing in stride. In this chapter, we will examine the history and significance of video compression, along with its practical uses—some of the reasons you are on this journey today. There are quite a few products and services available today that just wouldn’t be possible without compression. Many more are being developed. Let’s see what’s out there.
+2.2 Compression Is Necessary Because . . .
+Delivering digital video and audio through the available networks is simply impossible without compressing the content first.
+To give you some history, there has been a desire to deliver TV services through telephone networks for many years. Trials were carried out during the 1980s. Ultimately, they were all unsuccessful because they couldn’t get the information down the wire quickly enough.
+Now we are on the threshold of being able to compress TV services enough that they can fit into the bandwidth being made available to broadband users. The crossing point of those two technologies is a very important threshold. Beyond it, even more sophisticated services become available as the broadcast on-air TV service comes to occupy a smaller percentage of the available bandwidth.
+So, as bandwidth increases and compressors get better, all kinds of new ways to enjoy TV and Internet services come online. For example, a weather forecasting service could be packaged as an interactive presentation and downloaded in the background. If this is cached on a local hard disk, it will always be available on demand, at an instant’s notice. An updated copy can be delivered in the background as often as needed. Similar services can be developed around airline flight details, traffic conditions, and sports results.
+15
+
+16 A Practical Guide to Video and Audio Compression
+2.3 Compression Is About Trade-Offs
+Compressing video is all about making the best compromises possible without giving up too much quality. To that end, anything that reduces the amount of video to be encoded will help reduce the overall size of the finished output file or stream.
+Compression is not only about keeping overall file size small. It also deals with optimizing data throughput—the amount of data that will steadily move through your playback pipeline and get onto the screen. If you don’t compress the video properly, it will not fit the pipe and therefore cannot be streamed in real time.
+Reducing the number of frames to be delivered helps reduce the capacity required, but the motion becomes jerky and unrealistic. Keeping the frame count up may mean you have to compromise on the amount of data per frame. That leads to loss of quality and a blocky appearance. Judging the right setting is difficult, because certain content compresses more easily, while other material creates a spike in the bit rate required. That spike can be allowed to momentarily absorb a higher bit rate, in which case the quality will stay the same. Alternatively, you can cap the bit rate that is available. If you cap the bit rate, the quality will momentarily decline and then recover after the spike has passed. A good example of this is a dissolve between two scenes when compressed using MPEG-2 for broadcast TV services operating within a fixed and capped bit rate.
+2.4 First We Have to Digitize
+Although some compression can take place while video is still in an analog form, we only get the large compression ratios by first converting the data to a digital representation and then reducing the redundancy. Converting from analog to digital form is popularly called digitizing. We now have techniques for digitally representing virtually every thing that we might consume. The whole world is being digitized, but we aren’t yet living in the world of The Matrix.
+Digitizing processes are normally only concerned with creating a representation of a view. Video structure allows us to isolate a view at a particular time, but unless we apply a lot more processing, we cannot easily isolate objects within a scene or reconstruct the 3D spatial model of a scene.
+Software exists that can do that kind of analysis, but it is very difficult. It does lead to very efficient compression, though. So standards like MPEG-4 allow for 3D models of real-world objects to be used. That content would have the necessary structure to exploit this kind of compression because it was preserved during the creation process.
+Movie special effects use 3D-model and 2D-view digitizing to combine artificially created scene components and characters with real-world pictures. Even so, many measurements must still be taken when the plates (footage) are shot.
+2.5 Spatial Compression
+Spatial compression squashes a single image. The encoder only considers that data, which is self-contained within a single picture and bears no relationship to other frames in a
+
+Why Video Compression Is Needed 17
+sequence. This process should already be familiar to you. We use it all the time when we take pictures with digital still cameras and upload them as a JPEG file. GIF and TIFF images are also examples of spatial compression. Simple video codecs just create a sequence of still frames that are coded in this way. Motion JPEG is an example in which every frame is discrete from the others.
+The process starts with uncompressed data that describes a color value at a Cartesian (or X–Y) point in the image. Figure 2-1 shows a basic image pixel map.
+The next stage is to apply some run-length encoding, which is a way of describing a range of pixels whose value is the same. Descriptions of the image, such as “pixels 0,0 to 100,100 are all black,” are recorded in the file. A much more compact description is shown in Figure 2-2.
+This coding mechanism assumes that the coding operates on scan lines. Otherwise it would just describe a diagonal line.
+The run-length encoding technique eliminates much redundant data without losing quality. A lossless compressor such as this reduces the data to about 50% of the original size, depending on the image complexity. This is particularly good for cell-animated footage.
+The TIFF image format uses this technique and is sometimes called LZW compression after its inventors, Lempel, Ziv, and Welch. Use of LZW coding is subject to some royalty fees if you want to implement it, because the concepts embodied in it are patented. This should be included in the purchase price of any tools you buy.
+The next level of spatial compression in terms of complexity is the JPEG technique, which breaks the image into macroblocks and applies the discrete cosine transform (DCT ). This kind of compression starts to become lossy. Minimal losses are undetectable by the human eye, but as the compression ratio increases, the image visibly degrades.
+Compression using the JPEG technique reduces the data to about 10% of the original size.
+Origin 0,0
+
+Figure 2-1 Uncompressed image pixel map.
+
+x,y Extent
+
+18 A Practical Guide to Video and Audio Compression
+0,0
+100,100
+Figure 2-2 Run-length encoding.
+2.6 Temporal Compression
+Video presentation is concerned with time and the presentation of the images at regular intervals. The time axis gives us extra opportunities to save space by looking for redundancy across multiple images.
+This kind of compression is always lossy. It is founded on the concept of looking for differences between successive images and describing those differences, without having to repeat the description of any part of the image that is unchanged.
+Spatial compression is used to define a starting point or key frame. After that, only the differences are described. Reasonably good quality is achieved at a data rate of one tenth of the original data size of the original uncompressed format.
+Research efforts are underway to investigate ever more complex ways to encode the video without requiring the decoder to work much harder. The innovation in encoders leads to significantly improved compression factors during the player deployment lifetime without needing to replace the player.
+A shortcut to temporal compression is to lose some frames, however it is not recommended. In any case, it is not a suitable option for TV transmission that must maintain the frame rate.
+2.7 Why Do I Need Video Compression?
+Service providers and content owners are constantly looking for new avenues of profit from the material they own the rights to. For this reason, technology that provides a means to facilitate the delivery of that content to new markets is very attractive to them. Content owners require an efficient way to deliver content to their centralized repositories. Cheap and effective ways to provide that content to end users are needed, too. Video compres-
+
+Why Video Compression Is Needed 19
+Figure 2-3 Removing frames for temporal compression.
+sion can be used at the point where video is imported into your workflow at the beginning of the content chain as well as at the delivery end. If you are using video compression at the input, you must be very careful not to introduce undesirable artifacts. For archival and transcoding reasons, you should store only uncompressed source video if you can afford sufficient storage capacity.
+2.8 Some Real-World Scenarios
+Let’s examine some of the possible scenarios where video compression can provide assistance. In some of these examples, video compression enables an entire commercial activity that simply would not be possible otherwise. We’ll take a look at some areas of business to see how compression helps them.
+2.8.1 Mobile Journalism News-gathering operations used to involve a team of people going out into the field to operate bulky and very expensive equipment. As technology has progressed, cameras have gotten smaller and easier to use. A film crew used to typically include a sound engineer, cameraperson, and producer, as well as the journalist being filmed. These days, the camera is very likely carried by the journalist and is set up to operate automatically. Broadcast news coverage is being originated on videophones, mini-cams, and videoenabled mobile-phone devices. The quality of these cameras is rapidly improving. To maintain a comfortable size and weight for portable use, the storage capacity in terms of hardware has very strict limits. Video compression increases the capacity and thus the recording time available by condensing the data before recording takes place.
+Current practice is to shoot on a small DV camera, edit the footage on a laptop, and then send it back to base via a videophone or satellite transceiver. The quality will clearly not be the same as that from a studio camera, but it is surprisingly good even though a high compression ratio is used.
+Trials are underway to determine whether useful results can be obtained with a PDA device fitted with a video camera and integral mobile phone to send the material back to
+
+20 A Practical Guide to Video and Audio Compression
+Figure 2-4 PDA video player prototype. Source: courtesy of Christopher Barnatt.
+a field headquarters. The problem is mainly one of picture size and available bandwidth for delivery. Figure 2-4 shows an example design provided by Christopher Barnatt.
+2.8.2 Online Interactive Multi-Player Games Multi-player online gaming systems have become very popular in recent years. The realism of the visuals increases all the time. So, too, does the requirement to hurl an evergrowing quantity of bits down a very narrow pipe. The difficulty increases as the games become more popular, with more streams having to be delivered simultaneously.
+Online games differ significantly from normal video, because for a game to be compelling, some aspects of what you see must be computed as a consequence of your actions. Otherwise, the experience is not interactive enough. There are some useful techniques to apply that will reduce the bit rate required. For example, portions of the image can be static. Static images don’t require any particular bit rate from one frame to the next since they are unchanged. Only pixels containing a moving object need to be delivered.
+More sophisticated games are evolving, and interactivity becomes more interesting if you cache the different visual components of the scene in the local player hardware and then composite them as needed. This allows some virtual-reality (VR) techniques to be employed to animate the backdrop from a large static image.
+Nevertheless, compression is still required in order to shrink these component assets down to a reasonable size, even if they are served from a local cache or CD-ROM.
+New standards-based codecs will facilitate much more sophisticated game play. Codecs such as H.264 are very efficient. Fully exploiting the capabilities of the MPEG-4
+
+Why Video Compression Is Needed 21
+standard will allow you to create non-rectangular, alpha-blended areas of moving video. You could map that video onto a 3D mesh that represents some terrain or even a face. The MPEG-4 standard also provides scene construction mechanisms so that video assets can be projected into a 3D environment at the player. This allows the user to control the point of view. It also reduces the bit rate required for delivery, because only the flat, 2D versions of the content need to be delivered as component objects. Figure 2-5 shows an example of a high-quality interactive snooker game developed by Etiumsoft. As the scene becomes more realistic, video compression helps keep games like this small enough to deploy online or on some kind of sell-through, removable-disk format.
+2.8.3 Online Betting Betting systems are sometimes grouped together with online gaming, and that may be appropriate in some cases. But online gaming is more about the interaction between groups of users and may involve the transfer of large amounts of data on a peer-to-peer basis.
+Betting systems can be an extension of the real-world betting shop where you place your wager and watch the outcome of the horse race or sports event on a wall of monitor screens. The transfer of that monitor wall to your domestic PC or TV screen is facilitated by efficient and cheap video compression. Real-time compression comes to the fore here because you cannot introduce more than fractions of a second of delay—the end users have wagered their own money and they expect the results to arrive in a timely manner.
+Another scenario could involve a virtual poker game. These are often based around VR simulations of a scene, but with suitable compression a live game could be streamed
+Figure 2-5 Live snooker? Source: courtesy of Etiumsoft.
+
+22 A Practical Guide to Video and Audio Compression
+Figure 2-6 Online casino example. Source: copyright © Diogo Salari.
+to anyone who wants to dial in and watch. Virtualizing a pack of cards is possible by simulating the cards on the screen, and a video-conferencing system could be used to enable observation of facial expressions of the other players in the game. 2.8.4 Sports and News coverage Of all the different genres of content that broadcasters provide to end users, news and sports have some particularly important criteria that directly affect the way that video is compressed for presentation. Figure 2-7 shows an example of the BBC News Online video console that presents news video clips for broadband use in the United Kingdom.
+News and sports are both very information-rich genres. Archiving systems tend to be large in both cases because there is a lot of material available. The metadata associated with the content assists the searching process and also facilitates the digital rights management (DRM) process. The content is easily accessible and widely available, but the playback can be controlled. Video may need to be encrypted as well as encoded. Other technologies such as watermarking are used, and these present additional technical problems. This is all addressed in more detail in Chapter 18, where DRM is covered extensively. In general, the rights protection techniques that are available impose further loads on an already hardworking compression system.
+The nature of news content is that the material must be encoded quickly and presented as soon after the event as possible. The same is true of sports coverage, and services
+BBC News Online: http://www.bbc.co.uk/news/
+
+Why Video Compression Is Needed 23
+Figure 2-7 BBC News’ broadband video console. Source: courtesy of BBC News Interactive.
+that present the highlights of a sporting event need to be able to select and encode fragments of content easily, quickly, and reliably.
+These demands lead to the implementation of very large infrastructure projects such as the BBC Colledia-based Jupiter system deployed in its news division. This facilitates the sharing of media assets as soon as they start to arrive. Editing by multiple teams at the same time is possible, and the finished packages are then routed to transmission servers in a form that is ready to deploy to the national TV broadcast service as well as to the Internet. 2.8.5 Advertising Advertising on the Internet is beginning use video to present more compelling content. The newer codecs such as H.264 allow the macroblocks to be presented in quite sophisticated geometrical arrangements. It is now feasible to fit video into the traditional banner advertising rectangles that have a very different aspect ratio from normal video. Creating the content may need to be done using video editing tools that allow non-standard raster sizes to be used.
+More information about these standard sizes is available at the Interactive Advertising Bureau Web site.
+Interactive Advertising Bureau (IAB): http://www.iab.com/standards/index.asp
+
+24 A Practical Guide to Video and Audio Compression
+2.8.6 Video Conferencing Large corporations have used video conferencing for many years. As far back as the 1980s, multinational corporations were prepared to permanently lease lines from the telecommunications companies in order to link headquarters offices in the United States with European offices. This generally required a dedicated room to be set aside and was sufficiently expensive that only one video-conferencing station would be built per site. Only one group of people could participate at a time, and the use of the technology was reserved for important meetings.
+Video conferencing can now be deployed to a desktop or mobile phone. This is only possible because video compression reduces the data-transfer rate to a trickle compared with the systems in use just a few years ago.
+Video conferencing applications currently lack the levels of interoperability between competing systems that telephone users enjoy for speech. That will come in time. For now, the systems being introduced are breaking new ground in making this available to the general public and establishing the fundamental principles of how the infrastructure should support it.
+Figure 2-8 shows an example of an advanced video-conferencing user interface that supports multiple simultaneous users. This is available in the MacOS X version 10.4 operating system and is called iChat AV.
+2.8.7 Remote Medicine The use of remote apparatus and VR techniques for medicine is starting to facilitate socalled “telemedicine,” where an expert in some aspect of the medical condition participates in a surgical operation being performed on the other side of the world. Clearly there are issues here regarding the need for force feedback when medical instruments are being oper-
+Figure 2-8 Apple iChat AV user interface.
+
+Why Video Compression Is Needed 25
+ated remotely. Otherwise, how can the operating surgeon “feel” what the instrument is doing on the remote servo-operated system? Game players have used force-feedback systems for some time. The challenge is to adapt this for other situations and maintain a totally synchronized remote experience. Video compression is a critical technology that allows multiple simultaneous camera views to be delivered over long distances. This will also work well for MRI, ultrasound, and X-ray-imaging systems that could all have their output fed in real time to a remote surgeon. The requirements here are for very high resolution. Xray images need to be digitized in grayscale to increased bit depths and at a much higher resolution than TV. This obviously increases the amount of data to be transferred.
+2.8.8 Remote Education
+Young people often have an immediate grasp of technology and readily participate in interactive games and educational uses of video and computing systems. The education community has fully embraced computer simulation, games, and interactive software. Some of the most advanced CD-ROM products were designed for educational purposes. With equal enthusiasm, the education community has embraced the Internet, mainly by way of Web sites. Video compression provides opportunities to deploy an even richer kind of media for use in educational systems. This enhances the enjoyment of consumers when they participate. Indeed, it may be the only way to enfranchise some special-needs children who already have learning difficulties.
+2.8.9 Online Support and Customer Services
+Online help systems may be implemented with video-led tuition. When designing and implementing such a system, it is important to avoid alienating the user. Presenting users with an experience that feels like talking to a machine would be counterproductive. Automated answering systems already bother some users due to the sterile nature of the interchange. An avatar-based help system might fare no better and present an unsatisfying experience unless it is backed up by well-designed artificial intelligence.
+2.8.10 Entertainment
+Online gaming and betting could be categorized as entertainment. Uses of video compression with other forms of entertainment are also possible. DVD sales have taken off faster than anyone could ever have predicted. They are cheap to manufacture and provide added-value features that can enhance the viewer’s enjoyment.
+The MPEG-4 standard offers packaging for interactive material in a way that the current DVD specification cannot match. Hybrid DVD disks with MPEG-4 interactive content and players with MPEG-4 support could herald a renaissance in content authoring similar to what took place in the mid-1990s with CD-ROMs.
+The more video can be compressed into smaller packages without losing quality, the better the experience for the viewer within the same delivery form factor (disk) or capacity (bit rate).
+
+26 A Practical Guide to Video and Audio Compression
+The H.264 codec is being adopted widely as the natural format for delivering highdefinition TV (HDTV) content on DVD and allows us to store even longer definition programs on the existing 5-GB and 9-GB disks.
+2.8.11 Religion
+All of the major religions have a presence on the Internet. There are Web sites that describe their philosophy, theology, and origins. Video compression provides a way to involve members of the community who may not be physically able to attend ceremonies. They may even be able to participate through a streamed-video broadcast. This may well be within the financial reach of medium to large churches, and as costs are reduced, even small communities may be able to deploy this kind of service. There are great social benefits to be gained from community-based use of video-compression systems. Such applications could be built around video-conferencing technologies quite inexpensively.
+2.8.12 Commerce
+Quite unexpectedly, the shopping channel has become one of the more popular television formats. This seems to provide an oddly compelling kind of viewing. Production values are very low cost, and yet people tune in regularly to watch. Broadcasting these channels at 4.5 megabits per second (Mbps) on a satellite link may ultimately prove to be too expensive. As broadband technology improves its reach to consumers, these channels could be delivered at much lower bit rates through a networked infrastructure.
+A variation of this that can be combined with a video-conferencing system is the business-to-business application. Sales pitches; demos; and all manner of commercial meetings, seminars, and presentations could take place courtesy of fast and efficient video compression.
+2.8.13 Security and Surveillance
+Modern society requires that a great deal of our travel and day-to-day activity take place under surveillance. A commuter traveling from home to a railway station by car, then by train, and then on an inner-city rapid-transit system may well be captured by as many as 200 cameras between home and the office desk. That is a lot of video, which until recently has been recorded on VHS tapes, sometimes at very low resolution, at reduced frame rates, and presented four at once in quarter-frame panes in order to save tape.
+Newer systems are being introduced that use video compression to preserve video quality, increase frame rates, and automate the storage of the video on centralized repositories. By using digital video, the searching and facial-recognition systems can be connected to the repository. Suspects can be followed from one camera to another by synchronizing the streams and playing them back together.
+This is a good thing if it helps to trace and then arrest a felon. Our legislators have to draw a very careful line between using this technology for the good of society as a whole and infringing on our rights to go about our daily lives without intervention by the state.
+
+Why Video Compression Is Needed 27
+You may disagree with or feel uncomfortable about this level of surveillance, but it will likely continue to take place.
+2.8.14 Compliance Recording
+Broadcasters are required to record their output and store it for 90 days, so that if someone wants to complain about something that was said or a rights issue needs to be resolved, the evidence is there to support or deny the claim. This is called compliance recording, and historically it was accomplished through a manually operated bank of VHS recorders running in LP mode and storing 8 hours of video per tape, requiring three cassettes per day per channel. The BBC outputs at least six full-frame TV services that need to be monitored in this way. The archive for 90 days of recording is some 1620 tapes. These all have to be labeled, cataloged, and stored for easy access in case of a retrieval request.
+The TX-2 compliance recorder was built on a Windows platform and was designed according to the requirements of the regulatory organizations so that UK broadcasters could store 90 days’ worth of content in an automated system. The compliance recorder is based on a master node with attached slaves, which can handle up to 16 channels in a flyconfigured system. Access to the archived footage is achieved via a Web-based interface, and the video is then streamed back to the requesting client.
+This recorder could not have been built without video compression, and it is a good example of the kind of product that can be built on top of a platform such as Windows Media running on a Windows operating system, or other manufacturer’s technology.
+Because this is a software-based system, the compression ratio and hence the capacity and quality of the video storage can be configured. Less video but at a higher quality can be stored, or maximal time at low quality. The choice is yours.
+2.8.15 Conference Proceedings
+Using large-screen displays at conferences is becoming very popular. These are being driven by a video feed shot by professional camerapeople, and the video is often captured and made available to delegates after the conference. Siggraph conference proceedings, for example, make significant use of compression to create the DVD proceedings disk, and the Apple developer conference proceedings have for some years been a showcase of Apple’s prowess with video workflow and production processes as well as its engineering work on codecs.
+2.8.16 Broadband Video on Demand
+During 2004, the BBC tested a system called the Internet Media Player (BBC iMP). This system presents an electronic program guide (EPG) over a 14-day window. The user browses the EPG listings and is able to call up something that was missed during the previous week. Alternatively, a recording can be scheduled during the next few days. In order to adequately protect the content, the BBC iMP trials are run on a Windows-based platform that supports the Windows Media DRM functionality. If the iMP player were used
+
+28 A Practical Guide to Video and Audio Compression
+on a laptop connected to a fixed broadband service, the downloaded material could be taken on the road and viewed remotely. This enables video to be as mobile as music carried around on Walkman and iPod devices.
+Future experiments in the area of broadband-delivered TV will explore some interesting peer-to-peer file techniques, which are designed to alleviate the bandwidth burden on service providers. For this to work, we must have reliable and robust DRM solutions, or the super-distribution model will fail to get acceptance from the content providers.
+2.8.17 Home Theatre Systems
+Hollywood movies are designed to be viewed on a large screen in a darkened room with a surround-sound system. There is now a growing market for equipment to be deployed at home to give you the same experience. The media is still mostly available in standard definition but some high-definition content is being broadcast already. More high-definition services will be launched during the next few years. Plasma, LCD, or LED flat screens are available in sizes up to 60 inches diagonal. If you want to go larger than that, you will need to consider a projection system.
+At large screen sizes, it helps to increase the resolution of the image that is being projected, and that may require some special hardware to scale it up and interpolate the additional pixels. At these increased screen sizes, any artifacts that result from the compression will be very obvious. Higher bit rates will be necessary to allow a lower compression ratio. Some DVD products are shipped in special editions that give up all the special features in order to increase the bit rate. The gradual advancement of codec technology works in your favor. New designs yield better performance for the same bit rate as technology improves.
+The bottom line is that compressing video to use on a standard-definition TV set may not be good enough for home-cinema purists.
+2.8.18 Digital Cinema
+Interestingly, the high-definition TV standards that are emerging seem to be appropriate for use in digital-cinema (D-cinema) situations. The same content will play in the domestic environment just as easily. As high-definition TV becomes more popular and more people install home theatre systems, commercial cinema complexes will need to develop their business in new ways. They will have to do this in order to differentiate their product and give people a reason to visit the cinema instead of watching the movie at home.
+2.9 Platforms
+With the increasing trends toward technological convergence, devices that were inconceivable as potential targets for video content are now becoming viable. Science fiction writers have been extolling the virtues of portable handheld video devices for years, and
+
+Why Video Compression Is Needed 29
+now the technology is here to realize that capability. In fact, modern third-generation mobile phones are more functional and more compact than science fiction writers had envisaged being available hundreds of years into the future. Handheld video, and touch-screen, flat-screen, and large-screen video, are all available here and now. They are being rolled out in a front room near you right this minute. What we take for granted and routinely use every day is already way beyond the futuristic technologies of the Star Trek crew.
+2.9.1 Portable Video Shoot and Edit
+Portable cameras have been around for a long time. Amateur film formats were made available to the consumer as 8-mm home movie products; they replaced earlier and more unwieldy film gauges. The 8-mm formats became increasingly popular in the 1950s and ‘60s. The major shortcomings of these were that they held only enough footage to shoot 4 minutes, and most models required that the film be turned over halfway through, so your maximum shot length was only 2 minutes. At the time, battery technology was less sophisticated than what we take for granted now, and many cameras were driven by clockwork mechanisms.
+These devices were displaced quite rapidly with the introduction of VHS homevideo systems in the late 1970s. Several formats were introduced to try and encourage mass appeal. But editing the content was cumbersome and required several expensive four-head video recorders.
+Just after the start of the new millennium, digital cameras reached a price point that was affordable for the home-movie enthusiast. Now that the cameras can be fitted with Firewire interfaces (also called iLink and IEEE 1394), their connection to a computer has revolutionized the video workflow. These cameras use the digital video (DV) format that is virtually identical to the DVCAM format used by professional videographers and TV companies. The DV format was originally conceived by Sony as digital 8-mm tape for use in Sony Handycam® recorders.
+Figure 2-9 illustrates the current state of the art that is represented by a system such as an Apple Macintosh G4 12-inch laptop with a FireWire connection to a Sony DCR PC 105 camera. The camera and laptop fit in a small briefcase. This combination is amazingly capable for a very reasonable total purchase price of less than $3000. The Apple laptop comes already installed with the iMovie video-editing software that is sufficient to edit and then burn a DVD (with the iDVD application). You can walk out of the store with it and start working on your movie project right away.
+Of course, there are alternative software offerings, and other manufacturers’ laptops support the same functionality. Sony VAIO computers are very video capable because they are designed to complement Sony’s range of cameras, and the Adobe Premier and Avid DV editing systems are comparable to the Apple Final Cut Pro software if you want to use Windows-based machines.
+This is all done more effectively on desktop machines with greater processing power. The laptop solution is part of an end-to-end process of workflow that allows a lot of work to be done in the field before content is shipped back to base.
+
+30 A Practical Guide to Video and Audio Compression
+Figure 2-9 Portable laptop and video camera.
+2.9.2 Video Playback on Handheld Devices Handheld video playback is becoming quite commonplace. There are several classes of device available depending on what you need. Obviously, the more sophisticated they are, the more expensive the hardware. There is a natural convergence here, so that ultimately all of these capabilities may be found in a single generic device. These fall into a family of mobile video devices that include
+● Portable TV sets supporting terrestrial digital-TV reception ● Portable DVD viewers ● Diskless portable movie players ● PDA viewers
+
+Why Video Compression Is Needed 31
+2.9.3 Video Phones
+The new generation of mobile-phone devices is converging with the role of the handheld personal digital assistant (PDA). These mobile phones are widely available and have cameras and video playback built in. They also have address books and other PDA-like applications, although these may be less sophisticated than those found in a genuine PDA. Some services were being developed for so-called 2.5G mobile phones, but now that the genuine 3G phones are shipping, they will likely replace the 2.5G offerings.
+2.9.4 H.264 on Mobile Devices
+H.264 is designed to be useful for mobile devices and consumer playback of video. Rolling this standard out for some applications must take account of the installed base of players, and that will take some time. So it is likely that, initially, H.264 will be used primarily as a mobile format.
+2.9.5 The Ultimate Handheld Device
+Taking the capabilities of a portable TV, DVD player, PDA, and mobile phone and integrating them into a single device gets very close to the ultimate handheld portable media device. Well it might, if the capabilities of a sub-notebook computer are included.
+A fair use policy is now required for consumer digital video that allows us to transfer our legitimately purchased DVD to a “memory card” or other local-storage medium. These memory cards are useful gadgets to take on a long journey to occupy us as we travel, but the content owners are not comfortable with us being able to make such copies.
+There are still issues with the form factor for a handheld device like this. To create a viewing experience that is convenient for long journeys, we might end up with a device that is a little bulkier than a phone should be. Maybe a hands-free kit addresses that issue or possibly a Bluetooth headset. Usable keypads increase the size of these devices. Currently, it is quite expensive to provide sufficient storage capacity without resorting to an embedded hard disk. That tends to reduce the battery life, so we might look to the new storage technologies that are being developed. Terabyte memory chips based on holographic techniques may yield the power–size–weight combination that is required. Newer display technologies such as organic LED devices may offer brighter images with less power consumed. Cameras are already reduced to a tiny charged cathode device (CCD) assembled on a chip, which is smaller than a cubic centimeter.
+The key to this will be standardization. Common screen sizes, players, video codecs, and connection protocols could enable an entire industry to be built around these devices. Open standards facilitate this sort of thing, and there are high hopes that H.264 (AVC) and the other parts of the MPEG-4 standard will play an important role here.
+3GPP home page: http://www.3gpp.org/
+
+32 A Practical Guide to Video and Audio Compression
+2.9.6 Personal Video Recorders
+Personal video recorders (PVRs) are often generically referred to as TiVo, although they are manufactured by a variety of different companies. Some of them do indeed license the TiVo software, but others do not. Another popular brand is DirecTV.
+2.9.7 Analog Off-Air PVR Devices
+A classic TiVo device works very hard to compress incoming analog video to store it effectively and provide trick-play features. The compression quality level can be set in the preferences. The compromise is space versus visible artifacts. At the lowest quality, the video is fairly noisy if the picture contains a lot of movement. This is okay if you are just recording a program that you don’t want to keep forever—for example, just a time shift to view the program at a different time. If you want to record a movie, you will probably choose a higher-quality recording format than you would for a news program.
+The functionality is broadly divided into trick-play capabilities and a mechanism to ensure that you record all the programs you want to, even if you do not know when they were going to be aired.
+In the longer term, these devices scale from a single-box solution up to a home media server with several connected clients. This would be attractive to schools for streaming TV services directly to the classroom. University campus TV, hospital TV services, and corporate video-distribution services are candidates. Standards-based solutions offer good economies of scale, low thresholds of lock-in to one supplier, and good commercial opportunities for independent content developers.
+2.9.8 Digital Off-Air PVR Devices
+When digital PVR devices are deployed, recording television programs off-air becomes far more efficient. In the digital domain, the incoming transport stream must be de-multiplexed, and packets belonging to the program stream we are interested in are stored on a hard disk. The broadcaster already optimally compresses these streams. Some storage benefits could be gained by transcoding them. Note that we certainly cannot add any data back to the video that has already been removed at source.
+Future development work on PVR devices will focus on storing and managing content that has been delivered digitally. This is within the reach of software-based product designs and does not require massive amounts of expensive hardware.
+There are complex rights issues attached to home digital-recording technology, and it is in constant evolution.
+TiVo: http://www.tivo.com/ DirecTV: http://www.directv.com/
+
+Why Video Compression Is Needed 33
+Figure 2-10 Pace PVR2GO. Source: courtesy of Pace Micro Technology. 2.9.9 Mobile PVR Solutions Another interesting product was demonstrated by Pace at the International Broadcasting Convention (IBC) in 2004. It was a handheld PVR designed to record material being broadcast using the DVB-H mobile-TV standard. Coupling this with the H.264 codec and a working DRM solution brings us very close to a system that could be rolled out very soon. Provided rights issues and the content-delivery technology can be developed at the front end, products such as the PVR2GO shown in Figure 2-10 could be very successful.
+2.10 The Future
+The technology that enables PVR devices is getting cheaper, and the coding techniques are pushing the storage capacity (measured in hours) ever upward. Nevertheless, not every household will want to own a PVR. In addition, the higher end of the functionality spectrum may only ever be available to users with a lot of disposable income. Some of the basic functionality may just be built into a TV set. As TV receivers are gradually replaced with the new technology, they ship with video compression and local storage already built in.
+
+34 A Practical Guide to Video and Audio Compression
+Pause and rewind of live video, for instance, is very likely to be built into TV sets, and for it to be manufactured cheaply enough, the functionality will be implemented in just a few integrated circuits and will then be as ubiquitous as the Teletext decoders found in European TV sets.
+Broadband connectivity is penetrating the marketplace very rapidly—perhaps not quite as fast as DVD players did, but in quite large numbers all the same.
+A critical threshold is reached when video codecs are good enough to deliver satisfactory video at a bit rate that is equal to or less than what is available on a Broadband connection. Indeed, H.264 encoding packed into MPEG-4 multimedia containers coupled with a PVR storage facility and a fast, low-contention broadband link is a potential fourth TV platform that offers solutions to many of the problems that cannot be easily solved on the satellite-, terrestrial- and cable-based digital-TV platforms. MPEG-4 interactive multimedia packages could be delivered alongside the existing digital-TV content in an MPEG-2 transport stream. Indeed, the standards body has made special provision to allow this delivery mechanism, and MPEG-4 itself does not need to standardize a transport stream because there is already one available.
+2.11 On with the Journey
+So we have some ideas now about the kind of platform the video we compress might be played on. This helps us to assess the best way to encode it. We also know something about the target size and the delivery mechanism. That will help us choose players and codecs.
+Now we can consider the scenario from the other end. The material we use will be sourced in a range of formats, and we need to know something about how each one works.
+
+3
+What Are We Trying to Compress?
+3.1 Where Do You Want to Go Today?
+That was a very good advertising line dreamed up by Microsoft. It is full of adventure and potential excitement and is based on you, the consumer, making a choice. So now we have to make a choice about what kind of moving-image content we are going to compress. Will it be film, video, or computer-generated digital imagery? They are all different. Let’s find out why in the next few chapters.
+3.2 What Is a Moving Image?
+Think about moving pictures. How are they captured? They are two-dimensional recordings of an array of pixels at an instant in time. Film and TV cameras both capture motion, but the resulting images have very little in common when they are examined from a technical standpoint.
+3.3 What Sort of Compression Do You Need?
+There are two basic kinds of compression. The first is utterly lossless, while the other sacrifices some fidelity in order to improve the compression ratio. Lossless compression is a format-conversion process that compresses the physical manifestation of the video. Lossy compression actually compresses the informational content of the video. This is a subtle and very important distinction. Lossy compression ranges from high quality with undetectable artifacts down to massively degraded viewing experiences. The developers of video-compression technology continually strive to improve the ratio of quality to bit rate or compression.
+3.4 What Sort of User Are You?
+Video compression is of interest to a variety of users. Professionals see it as a full-time occupation and may have significant funding to support building large and complex
+35
+
+36 A Practical Guide to Video and Audio Compression
+systems. At the other end of the scale is the enthusiastic amateur videographer who wants to create a DVD to record some family history. Compression systems are available for both extremes as well as for those whose needs are somewhere in between.
+We will consider the larger scale first. Then we will work our way down to something suitable for single users running a small operation.
+3.4.1 Broadcasters
+There are relatively few large broadcasters in the world compared with the number of small- to medium-sized potential compressionists. By large broadcasters, we mean organizations that are broadcasting multiple channels of content simultaneously. Examples might be the BBC; MTV; or News Corporation, which is the parent company of all the Sky brands and others such as Fox Television.
+The BBC broadcasts more than 26 hours of content for every hour of the day. This includes multiple national and international TV services and many audio services that are going out in the form of AM, FM, and digital radio. Some of this content is also streamed on the Internet to augment a large-scale Web site operation.
+The production processes for that content are now almost completely digital, from inputting the source material and passing it through the editing process, to putting it on the air. Some content still arrives in analog form, and the U.K. still has some analog broadcasting for the domestic user. That analog service is actually delivered using digital systems almost to the very last point in the chain before the transmitter.
+Video compression is fundamental to the broadcasting workflow. Storing everything in a totally uncompressed form is unrealistic for both technical and financial reasons. The compression chosen must allow the footage to be edited and reused without a generational loss being introduced. High-quality master copies of content might be preserved using a 50-Mbps storage format and routine content would use 25 Mbps. Other intermediate formats are used that have lower bit rates.
+Archives require a lossless or nearly lossless storage format. By the time the video reaches the TV set in your living room, it has been compressed by a factor of 10 to 1 and is no longer anything like archival quality.
+Long-term archival storage will almost certainly be in a variety of different formats. Some of them are lower quality than current production and broadcast standards allow because the older legacy systems could not achieve the quality levels that are now commonplace.
+You cannot put back what is not there. Repurposing old archival content presents some special problems, and finding ways to get the very best quality out of old material is an ongoing challenge. The BBC Research Centre develops technology solutions to this sort of problem from time to time. A recent innovation was a digital processing tool that samples the PAL recorded color sub-carrier more accurately in order to restore old PAL footage, eliminating a lot of analog noise and cross-color artifacts. This sort of research requires considerable resources and it benefits the entire industry.
+
+What Are We Trying to Compress? 37
+3.4.2 Production Company
+Independent production companies now produce a lot of their own programs. They don’t have the money available to invest in massive technical infrastructures that the broadcasters use, but they do use similar equipment to shoot and edit.
+Programs are typically delivered on Sony Digital betacam-based systems or on a format called DVCAM and its derivatives such as DVCPRO. These correspond to the 50Mbps and 25-Mbps formats that broadcasters prefer. HDTV variants of these are also beginning to be used. These formats are slightly compressed. All formats in use sacrifice some small portion of the picture information, even if it is just recording color data at a lower resolution than brightness.
+The original material might have been shot on film or on video. Today’s material is delivered to broadcasters in a digital format. New technologies such as Material eXchange Format (MXF) allow media to be delivered in files rather than on tapes, and this allows transfers to be networked through an information technology (IT) infrastructure.
+Any long-term storage of programs must be in a form that is ready to be reprocessed for new platforms and markets. A production company that has been in business for a while is likely to have some format-conversion and storage problems similar to those experienced by the broadcaster due to the continued change in video formats.
+3.4.3 Pro-Consumer
+This is a category of consumer that buys high-end equipment that is near professional quality and is almost good enough for production companies and broadcasters to use. The gap is narrowing, and the difference between pro-consumer and professional equipment is likely to be in the quality of the imaging optics and the storage capacity. Many of the physical components in the camera are common to consumer and professional equipment—especially in the case of DV-format cameras.
+The imaging chip in professional broadcast-standard equipment produces a higher resolution and has a greater dynamic range from black to white, resulting in high-quality images. Sometimes a professional system will use multiple CCD chips rather than a single chip to get even better quality.
+Broadcasters will require lenses with good depth-of-field control and little or no distortion of the image. The storage capacity of the videotape in a professional system will be higher than a consumer model in terms of bit rate. A professional format is also likely to record for less time because the amount of data recorded is larger. The consequence is that tape-based systems must transport the tape faster to record sufficient data. The same applies to solid-state storage because the bulk of the stored data is larger.
+3.4.4 Amateur
+The pricing of digital handycams is reducing to the point where this market is opening up now. Analog video recorders can still be purchased, but most manufacturers are also
+
+38 A Practical Guide to Video and Audio Compression
+shipping a range of digital camcorders. Sony, for instance, manufactures the DCR PC105E model, which will play back DVCAM tapes recorded in low-end studio digital VCRs such as the DSR 11. DVCAM is widely used in news-gathering operations, and the video is often manipulated using the 25-Mbps DV25 format. A range of video formats is discussed in Chapter 5 and tabulated in Appendix E.
+3.5 Problems You May Encounter
+If the video you are trying to compress is of particularly poor quality, you will find the results of compressing it to be disappointing. The encoder interprets any significant noise in the original as frame-to-frame changes. Even non-moving background content will compress badly if there is significant noise present. Either your compressor will be unable to reach the target bit rate, or if you cap the bit rate, quality of the video when played back will be very bad indeed.
+Motion artifacts are particularly hard to deal with when your source is interlaced video. Removing the interlacing is a significant challenge.
+Digitizing home movie film may be subject to unstable positioning of the film within the gate of the projector or telecine unit unless you are using a professional system. This is called gate weave, and it leads to tracking errors and unintended frame-to-frame differences that must be motion compensated. Since the camera introduced some gate weave as well, you have two film-weave artifacts to cope with.
+Tools that track the frames and stabilize the video before compression are worth investing in. Stabilization is not vital to the compression process, of course, but the output quality will be improved. The bit rate is consumed by compressing movement within the frame and not by the movement of the frame.
+This last point is very subtle, isn’t it? This is very typical of the sort of complexity you will encounter in the compression process.
+3.5.1 Dealing With Difficult Content
+Preprocessing your video through a noise filter will help the compression process. At the outset, you are unlikely to purchase products such as Final Cut Pro or Premier as a priority. Their superior color-correction and noise-reduction plug-ins will rescue footage that was unusable, and you can add them to your system when you can afford to.
+Tracking errors due to gate movement could be corrected by using the motion-tracking capabilities of Adobe After Effects to gently coerce the frames back to their optimum position with respect to one another. A slight loss of resolution will happen because you must frame a portion of the screen that always encloses a picture. If the film shifts significantly in the gate, you will lose some of the picture around the edges. A neatly cropped final output will remedy this, and as long as you only crop the over-scanned part of the picture, it is unlikely to seriously affect your viewing enjoyment. There is always the option to scale or composite into a frame of some kind if the movement is significant and the necessary cropping becomes extreme.
+
+What Are We Trying to Compress? 39
+3.5.2 Data Loss During Digital Transcoding Compression is simply a data-reduction process. No compression is genuinely lossless except perhaps for some of the production techniques used at the high end. In order to compress video to usable sizes for DVD or domestic-video archiving, some considerable data loss has to take place. This data simply cannot be put back once it has been discarded.
+Figure 3-1 shows the output of a video analyzer that is comparing the image before and after coding and then scaling the residual error so it is visible.
+More recent codecs provide additional compression tools to alleviate these effects, which will help a great deal. The H.264 codec, for example, offers some very sophisticated compression features, but the penalty is increased CPU power and time required to compress the content.
+You have to decide for yourself what the acceptable level of data loss is going to be. For film, there is no point in trying to preserve detail that is finer than the film grain, because all you are doing is preserving noise in the original photographed image. Mathematicians are bound to argue about this, and it is similar to the situation regarding audio sample rates. But that is a topic for later on. For now, note the name Harry Nyquist, who conceived the idea of digital sampling 60 years before the technology was available to realize his invention.
+Trading off horizontal resolution for video is preferable to losing vertical resolution due to the artifacts that vertical interpolations will introduce. If there is significant fine detail such as text, that will become illegible after severe compression.
+Figure 3-1 Residual differences after encoding (data loss).
+
+40 A Practical Guide to Video and Audio Compression
+Variable-bit-rate compression is much preferred for content that is not intended to be broadcast within a fixed-bit-rate budget. If the bit-rate budget is constrained in some way, a cooperative compression process on several channels will deliver some benefits. Two or more channels can make room for each other and be transmitted using less bandwidth than they would require if they were compressed independently of each other. This technique is called statistical multiplexing, and it is covered in some detail in Chapter 14.
+3.6 Downsides to Video Compression
+There are times when video compression causes more problems than it solves. Trying to deploy it in unsuitable circumstances leads to difficulty later in the production and consumption cycle.
+3.6.1 Origination Stage
+Video compression should be avoided at the origination stage. Some cameras compress the video as it is written to tape or disk inside the camera. These devices never yield an uncompressed output. The consequence is that any content you shoot with such a camera will probably turn out to be totally useless for anything other than home movies.
+For example, suppose you are shooting some training video and you want to color key the background. Regardless of whether you use blue or green screens or even the newer retro-reflective materials to get a good hard edge for your matte, any compression that loses detail will immediately compromise your ability to pull a matte off that video. The jaggies and edge-coded artifacts are so severe that your footage is rendered useless. The solution is to get a better camera and shoot the footage at the best-quality camera settings available, and then write it to tape with a high-bit-rate storage format with a nearlossless compression method.
+3.6.2 Not for Archiving Master-Quality Material
+For much the same reasons that you would a) shoot footage using the best available quality of equipment, film stock, or video recording format and b) use lossless compression techniques (the intent is to preserve the maximum information), the archives must be maintained at the highest possible quality. A completely lossless coding format is desirable but expensive in terms of storage space. Experience shows that if content is compressed with poorly chosen coding techniques, the archives become unusable very quickly. Putting the tracking systems in place and logging the rushes as soon as they arrive from the field must be seen as a benefit and not a cost. In the long term it will save money.
+I will describe a very painful episode based on a true story. Only the names and places have been changed to protect the innocent.
+
+What Are We Trying to Compress? 41
+Let’s say it is 2 years after you’ve launched a major multimedia-based Web site, and through cost-reduction exercises, you gave up logging the incoming material and just encoded it for delivery via modem, and then discarded the originals.
+When your marketing people strike the deal with a broadband portal to deliver your site as a major broadband experience, just how are you going to re-encode all that content? That is when you say, “If only we had kept the originals and built ourselves a media database to track and manage it all.” But the situation gets worse than that. Much worse.
+You have important and very complicated rights issues with media. Maybe your rights to use some of the clips have expired and they ought not to be visible on your site. Rights are sometimes granted only for modem delivery and either specifically exclude broadband or omit it. That gives the legal experts an opportunity to argue for additional payment. Some rights are clear and the media can be repurposed immediately. But how would you know which is which? In the words of the Ghostbusters, “Who you gonna call?”
+Effectively, the only archives you have are that rather scratchy looking, modem-quality, postage stamp-sized, frame-dropped, pixelated mess on your streaming server, and because your finance people talked you into saving money at the outset, you are going to reap the results of a very bad business decision.
+Maybe your business will recover from that. But in all likelihood it won’t, not without spending an awful lot of time and money reworking some content over again. And that assumes you are still able to find original master tapes—and get the rights to use them again.
+The moral of this story is to think ahead to what you might be doing in the future—not just next year but 5 and 10 years from now.
+3.7 Getting Out of the Mire
+The solution is to institute a media audit and try to trace where the originals of some of that footage are. The avoidance strategy in the first place would have been to build a media database even if it was manually operated. Keeping track of the location of every master copy of a clip and any compressed instances of it requires a reliable record-keeping system. Diligence is the only way to track the provenance of your media. Given that the originals are stored online somewhere, it is possible to set up some automation to load and transcode them one at a time without any human intervention. You have to plan way ahead, anticipate future needs of your content, and maintain archive-quality copies reliably. If they are compressed at all, they should be stored using a lossless compression format so that a transcoder is able to down sample to any format that is required. You cannot transcode up to a higher-quality format and not see some artifacts as a result. At best you can blur them to hide the worst effects.
+
+42 A Practical Guide to Video and Audio Compression
+3.8 Scoping the Problem
+To be able to compare the various picture sizes and frame rates, the size of the data sets we are operating on must be taken into consideration. Then the capacity planning for a new compression workflow system can take place. The calculations are fairly simple, although finding the initial values to use is not easy. Some helpful tables are provided in the appendices.
+Planning the capacity of a system to provide sufficient disk space for the projects being developed on it is vital. If the cost of storage is the limiting factor, then the equation is reversed. The decision then becomes how much video and at what picture size is going to be stored in the available disk space.
+3.9 Moving-Image Formats
+Now that we understand the basic requirements of a compression system, we can look at what kind of material is going to be processed. Film, TV, and computer data are all different. The next few chapters look at each of them in detail and close with an examination of audio, which is an important component of the viewing experience.
+
+4
+Film
+4.1 The Traditional Route
+On our journey through the complexities of video compression, we now look at movie film. Film has been around for a while. It was the first kind of moving image to be recorded, so we could think of film as a classic or traditional format.
+TV has been with us for many years, too, but film has been around much longer. Most major studios have been in existence for 80 years or more, and the technology existed for some time even before Hollywood became properly established.
+So for this part of our trip, we’ll look at how film technology creates those images flickering on the movie screen, which will help us understand the other formats better when we get to them.
+4.2 Back in the Old Days
+Film stock and camera manufacturers have made some significant improvements in what can be accomplished with movie film. The most problematic aspect of film is that because a chemical reaction imprinted the images, the film ages; that is, the images will degrade with time. They will lose contrast and the color will shift because each emulsion on the film substrate ages differently. This applies equally to films made by Hollywood movie companies and to those home movies shot in the 1950s and `60s on 8 mm film.
+Recovering and restoring some of our older footage and archiving it in a digital form are vitally important. If we neglect to do this over the next few years, it will be gone forever.
+In this chapter the important aspects of film are examined. Knowing about the nature of film will help you get the most out of the compression process if this is where your source material is coming from.
+4.3 How Film Projectors Work
+Projectors and cameras transport the film in the same way. The camera simply uses a slightly larger shutter aperture than the projector. Many alternative mechanisms were
+43
+
+44 A Practical Guide to Video and Audio Compression
+tried and discarded before the sprocket-driven serial frame design became dominant. A visit to the National Museum of Film and Television in Bradford, UK or the Science Museum in London will reward you with some insights into the way that film technology has evolved. Both of these are worth visiting if you have the time. There are similar museums in the United States (such as the California Museum of Photography) and in other countries where there is any history of filmmaking. Some URLs for Web sites of other museums are listed at the bottom of the page. Museums featuring scientific or engineering subjects may also have sections devoted to filmmaking.
+4.3.1 Gate and Film Transport Mechanism The film is pulled through the gate of the camera and projector by a claw mechanism that is driven by a cam or eccentric motion of some kind. This is easier to understand if it is shown visually. Figure 4-1 demonstrates how this mechanism works.
+As the motor drives the eccentric cam around, the claw is moved up and down and in and out. This is a vastly simplified example and the actual mechanism is a bit more complicated than this, but the principle is the same. The claw moves up, the teeth come out through an aperture in the gate, and they penetrate the film via the sprocket holes and
+Eccentric motion
+Claw motion
+Figure 4-1 Film gate claw mechanism.
+National Museum of Film & Photography: http://www.nmpft.org.uk/ George Eastman House: http://www.eastmanhouse.org/ American Widescreen Museum: http://www.widescreenmuseum.com/ California Museum of Photography: http://www.cmp.ucr.edu/ American Museum of Photography: http://www.photographymuseum.com/guide.html International Centre of Photography: http://www.icp.org/ The Big Camera: http://www.thebigcamera.com.au/
+
+Film 45
+pull the film down through the gate. This movement has to be very precise. The film must be moved by exactly one frame distance. The sprockets must be aligned perfectly each time or the film will be torn by the claw mechanism.
+4.3.2 The Shutter The shutter allows the light through in order to expose the film in the camera or project it onto a screen when viewing. The shutter is mounted on a spindle and rotates once per frame. The projector contrives to flash the image on the screen twice. This effectively presents the image at 48 fps (frames per second), although the film is only moving at 24 fps through the gate. Figure 4-2 shows shutter designs for a camera and projector.
+Some projectors allow the shutter timing synchronization to be adjusted so as to open or close the aperture with respect to the gate movement. Even more sophisticated projectors allow adjustments to how much time the aperture stays open.
+4.4 Picture Formats and Sizes
+Probably the most important parameters that you have to know are the physical characteristics of your source material.
+These include the following:
+● Width in pixels ● Height in pixels ● Color depth ● Frames per second ● Scanning method (interlaced or progressive)
+Exposure time
+
+Camera
+Figure 4-2 Camera and projector shutter designs.
+
+Projector
+
+46 A Practical Guide to Video and Audio Compression
+The width, height, and color depth dictate how much information you have to deal with per frame. Some of your pre-compression processing, such as cropping and scaling, is going to be based on what you know about these values.
+The frames per second (fps) value tells you whether any time-based correction or pulldown is necessary to introduce additional frames for your target output platform.
+The scanning method indicates the complexity of any motion-based processing. Raw film can be converted to interlaced or progressive scanning quite easily. Video originates in an interlaced format, and that does not conveniently convert to progressive scanning without some complex interpolation. This interpolation is difficult because it takes place in space (X and Y) and on the time axis (between successive fields). The interpolation is much easier if the video was created from a film format with a telecine process. This will become apparent after the discussion of how pulldown works.
+Film formats have picture information at the highest resolution. Frame rates are generally stable across all sizes at 24 fps. Some older home-movie footage may have been shot at 18 fps to economize on film stock. This text will work down from the highest quality to the lowest, making some simple calculations about potential digitized image sizes on the way.
+4.5 Film Grain and Scanning Resolution
+During the research for this book, a number of conflicting dimensions for film formats were discovered. Film grain is such a variable attribute that scanning resolutions will vary widely.
+You may choose to scan at a higher or lower resolution in your own projects. Simply recalculate the storage density equations, which are straightforward. Here is an example:
+Given: W = Imaged area width in mm. H = Imaged area height in mm. D = Dots-per-millimeter (dpmm) resolution selected. F = Frame rate in fps. T = Duration of the movie in minutes. Z = Bytes per pixel (RGB 8 bit = 3). GigaBytes per movie: Disk space required = W * H * Z * F * T * 60 * D 2 / 230
+Having decided on a scanning resolution, the frame size in pixels is then computed. The storage sizes for our capacity planning are derived from those values.
+A resolution of approximately 115 dots per millimeter (dpmm) is considered a reasonable compromise for a maximum scanning density for the purposes of calculating image sizes. This is why:
+An IMAX movie was produced by the Massachusetts Institute of Technology in 1996 and worked on at a resolution of 4K in the horizontal axis. This was considered to be an
+
+Film 47
+
+adequate resolution for IMAX at the time. It would result in a raster size of approximately 4096 × 2854. Taking film grain size into account, the theoretical maximum for this format is approximately 8192 × 5944. The picture size of the image on the 70 mm film stock is approximately 69.6 mm by 48.5 mm. Taking that size and the pixel dimensions into account, a scanning resolution of 115 pixels per mm or 2920 pixels per inch is derived. At an 8K resolution, each pixel would be about 25 mm square on the screen surface of a 215-meter wide screen.
+Scanner manufacturers have standardized some popular resolutions regardless of the technology they use. They are based on the number of pixels scanned across the image area, regardless of its size, and they tend not to discuss dots per millimeter.
+● 2K (2048 pixels across) ● 3K (3072 pixels across) ● 4K (4096 pixels across) ● 6K (6144 pixels across)
+The normal working resolution for digital film projects is 2048 × 1536. It’s commonly referred to as “2K,” but of course that doesn’t describe any aspect ratio or anamorphic scaling. It is an industry standard, however. At 2K, the results look a little soft and fine detail gets lost. To compensate for this, some companies work at 4K resolution, with its attendant increase in storage and file sizes. The 6K resolution is considered to be as high as the industry is prepared to go for normal projects; due to the massive increase in data sizes, it’s only used for the largest projects.
+At a 2K working resolution, fine detail in hair is resolved quite poorly. The 4K resolution solves this, and even if the final output is reduced to 2K, the difference is still apparent. This high-resolution scanning and subsequent “down-rezzing” was developed by Cinesite as part of the digital intermediate process and is known as Super 2K.
+The 6K scanning resolution is sometimes used to pull a single still frame image off of the film so that it can be used in book projects. These tend to be photoset at very high resolutions, and they therefore can benefit from the denser scanning.
+Table 4-1 suggests some alternative scanning densities based on conversations with manufacturers of telecine systems and film scanners.
+Choosing the right scanning density is crucial to achieving the best possible quality. The resolution depends on the grain size of the stock and the image size being scanned.
+
+Table 4-1 Some Examples of Scanning Resolutions
+Description
+IMAX on a 4K scanner IMAX on a 8K scanner VistaVision on 4K scanner 16 mm frame on 2K scanner 16 mm film full width including sound track on 2K scanner
+
+Resolution
+58 dpmm 115 dpmm 109 dpmm 212 dpmm 128 dpmm
+
+48 A Practical Guide to Video and Audio Compression
+Film stocks all exhibit different grain sizes, and the processing of the stock to force exposures will also affect grain size because it’s a chemical reaction based on crystals. One way this could happen would be if the chemical reaction were caused to happen more slowly by use of a more diluted solution. Some care is necessary with the formulation of chemicals for film processing, because you only get one chance at it. It is best left to a competent laboratory.
+4.5.1 Real-World Scanning Resolutions
+Examining some manufacturer literature provided by FilmLight Ltd. reveals some recommended scanning resolutions for different film sizes on their Northlight scanner. Bear in mind that film stock, age, and desired output resolution all affect the final choice of scanning resolution. Table 4-2 summarizes some alternatives.
+The quoted resolutions are approximate and based on nominal film sizes divided into the maximum scanning resolution. This assumes the entire camera gate area is being imaged and that may not necessarily be the case.
+Scanning times are quoted as 4.7 seconds per frame when scanning 4 perf 35mm film at 4K resolution. This needs to be taken into account when calculating how long a job will take to complete. A roll of film that is 2000 feet long might contain 28,000 frames, and this could take a couple of days to scan completely at the higher resolutions. Scanning is much slower than simply projecting the film by a factor of more than 100:1. A similar roll of 16mm film might take even longer, although the scanning time per frame would be shorter so the duration might be compensated accordingly.
+Cintel uses flying spot CRT technology that seems to offer a slight increase in scanning speed, but the output quality may be somewhat compromised in return.
+
+Table 4-2 Northlight Scanner Resolutions Versus Film Sizes
+
+Imaging size
+
+Stock
+
+Width
+
+Height
+
+16 mm
+
+3.0k
+
+1.5k
+
+4 perf 35mm
+
+6.0k
+
+4.5k
+
+Super 16mm
+
+3.0k
+
+1.5k
+
+4 perf 35mm (4.7 seconds per frame scan)
+
+4.0k
+
+3.0k
+
+16 mm
+
+2.0k
+
+1.0k
+
+Super 16mm
+
+2.0k
+
+1.0k
+
+4 perf 35mm
+
+3.0k
+
+2.0k
+
+4 perf 35mm (2.6 seconds per frame scan)
+
+2.0k
+
+5.0k
+
+Filmlight Ltd.: http://www.filmlight.ltd.uk/ Cintel International Ltd.: http://www.cintel.co.uk/
+
+Resolution
+290 dpmm 280 dpmm 240 dpmm 190 dpmm 180 dpmm 140 dpmm 140 dpmm
+96 dpmm
+
+Film 49
+4.5.2 Nyquist and Grain Size
+The concepts developed by Harry Nyquist regarding sample rates needing to be twice the resolvable detail in order to preserve information apply to film as much as they do to sound and video. In this case the sampling needs to be twice the grain size or better. To arrive at a suitable scanning resolution for your footage, you need to know the film stock characteristics and how the processing will affect the grain. Then, given the picture size, you can work out how big the grain particles are. Double that and you have the target resolution that you need to scan with. Figure 4-3 shows the relationship between the grain size and the scanning grid.
+The vertical pixel dimension is governed by the aspect ratio of the frame and is set up to deliver square pixels.
+4.6 Cinema Formats
+These formats have been around for a very long time. Most footage exists on 35mm, although there are variants such as Todd AO, 70mm, Vista Vision, Cinerama, CinemaScope, TechniScope, and others.
+Hollywood movies shown in cinemas are usually presented on 35mm film projected with an 1.85:1 aspect ratio or stretched to 2.39:1 with an anamorphic lens (CinemaScope). Most cinemas will use those two formats, but a few will also support 1.37:1 Academy Aperture 35mm format as well.
+Note that for some formats, the negative master films have sprocket holes that are a different shape or size. You must be careful to ensure that they are not conveyed through a film transport designed for a different sprocket format. Mismatching the transport and film formats will permanently damage the film the first time it is used. If this is the master negative, the damage may not be repairable.
+
+Grain particles Figure 4-3 Film grain and nyquist scanning limits.
+
+scanning grid
+
+50 A Practical Guide to Video and Audio Compression
+4.6.1 Aspect ratios Original material could have been shot on larger stock and then reduction-printed down to 35mm for distribution. Aspect ratios broadly fall into three categories:
+● Normal aspect ratio that roughly corresponds to 4:3 on a TV set ● Wide screen, which is somewhat equivalent to 16:9 on TV ● Ultra-wide screen, which has to be cropped or letterboxed to fit a TV Figure 4-4 shows the difference between these aspect ratios. A lot more of the scenery is visible with the wider aspect ratios. In fact, on extremely wide screen presentations, the human peripheral vision is included within the viewing angle. This creates an impression of being immersed in the movie. TV does not adequately convey this impression, and it is one reason why we still enjoy going to the cinema to see those big blockbuster movies.
+Normal
+Widescreen
+Ultra wide screen
+Figure 4-4 Cinema aspect ratios.
+
+Film 51
+The physical imaging area of 35mm is conveniently mapped to 2048 × 1536 for production work. Anamorphic compression (squeeze prints) allows a wider aspect ratio to be worked on. The final raster is computed digitally or squeezed optically during printing.
+The normal aspect ratio fits reasonably well on a TV monitor and many TV programs are shot on 35mm or 16mm normal aspect-ratio film stock.
+Wide screen is accomplished either by shooting on wider film stock and maintaining roughly the same height, or by applying an optical distortion to squeeze a wider image in the horizontal axis into normal aspect-ratio film stock. This is called anamorphic distortion, and the same effect happens electronically when normal aspect-ratio video is stretched from 4:3 to fit a 16:9 wide-screen monitor.
+4.6.2 Anamorphic Printing
+Anamorphic lenses were available in the 1960s as a retrofit accessory so that you could attach them to a 16mm movie camera. The same anamorphic lens is designed be attached to the projector. This leads to some distortion if the axis of the lens is not precisely perpendicular, and the image will appear skewed if it is not fitted correctly. The effect is shown in Figure 4-5. Professional anamorphic lenses are integral to the camera optics and are factory aligned.
+4.6.3 IMAX
+The largest cinema format in current use is the IMAX theatre presentation. This is projected onto a screen that is 215 meters wide by 156 meters high. The audience sits abnormally close to this screen, therefore artifacts in the rendering process will be more visible than usual. For this reason the film must be rendered at quite a high resolution.
+The film is presented on 70mm stock with the picture oriented sideways, and it passes horizontally through the projector. The frames occupy an area that is roughly three times the size of a normal 70mm frame, with a corresponding increase in resolution.
+Figure 4-6 illustrates a single frame of IMAX film. Note the placement of the small circular holes. This ensures that the operator loads the film the correct side up.
+
+Correctly adjusted
+Figure 4-5 Incorrect anamorphic stretch.
+
+Off axis by 15 degrees
+
+70 mm
+
+52 A Practical Guide to Video and Audio Compression
+IMAX 70 mm format Imaging area 69.6 mm x 48.5 mm
+Figure 4-6 IMAX film dimensions.
+IMAX programs tend to be quite short. Due to the nature of the projection equipment and the way the film is spooled, older installations were limited to a maximum time of 120 minutes. Upgrades to the projector extend this to 150 minutes. IMAX movies are also projected at 48 frames per second. This will reduce the available run time to 75 minutes.
+Some IMAX programs are shot in 3D, giving a separate image to the left and right eye. Compression work to display this content on normal TV sets begins with a 50% reduction right off the bat, simply by choosing one or the other image. The 48 fps frame rate is used in IMAX presentations to produce a pair of images for 3D, interleaved, with left and right on alternate frames, effectively presenting a 24 fps frame rate.
+4.6.4 VistaVision One format of note is VistaVision. This is shot on 70mm film stock running horizontally, which is the same way IMAX film travels through the projector gate. In this case the format is an ultra-wide aspect ratio. In fact, VistaVision uses one of the largest possible imaging areas of any film format (the Todd-AO format is a similar size). While it was used by production companies in the 1960s, all the available cameras were later acquired by Lucasfilm during the production of the early Star Wars movies because they found it to be ideal for use in special effects work. They adapted and modified the format throughout their work on these films. Figure 4-7 shows an example of the VistaVision film format.
+Working digitally makes most of these formats obsolete, so optical film is usually just 35 or 70mm for projection.
+The imaging area on 70mm film stock is approximately 48.5mm by 22.1mm. If this were scanned at the maximum 115 pixels per mm, resolution would yield a picture that is 5577 × 2541.
+The corresponding imaging area on 35mm film is of course much smaller at 21.0 × 15.2mm (2415 × 1748).
+
+35 mm
+
+Film 53
+VistaVision 35 mm format Imaging area 37.72 mm x 20.4 mm Note action safe area
+Figure 4-7 VistaVision film dimensions.
+Refer to Appendix D for a summary of the image sizes and nominal bit rates for uncompressed digitized footage.
+4.7 Semi-Professional and News-gathering Formats
+Before portable video cameras were available at a size, cost, and performance that was suitable for news-gathering, reportage took place with 16mm cameras and the film stock had to be physically taken to a lab and then converted with a telecine system. This introduced enormous delays in getting the content to air.
+A lot of this original footage has probably been lost over the years, but with more restoration work being done and the gradual opening of archives, some of this material may still come to light and require processing through a video-compression system.
+All the issues covered already with cinematic film apply here with the additional consideration that the imaging rectangle of 16mm film is smaller. The consequence is that the pixel size of the images is smaller and the relative grain size is effectively twice that of 35mm film. The results you get from 35mm will therefore be much better than 16mm.
+Figure 4-8 shows the 16mm film format. Note the optical audio track. There is a variety of audio formats for 16- and 35mm film, and extracting the audio is quite a different challenge from dealing with the image frames. This audio track is run continuously through the projector while the images are pulled through the gate one frame at a time.
+The audio is offset by some distance from the frame to which it should be synchronized. This is necessary because the sound pickup cannot be mounted adjacent to the film gate. If it were, the sound would suffer from the non-linear way that the film is pulled through the gate. The solution is to offset the audio and allow a loop of film in the projector
+
+54 A Practical Guide to Video and Audio Compression
+16 mm
+16 mm format
+Imaging area 9.65 mm x 7.21 mm
+Figure 4-8 16mm film dimensions.
+mechanism to smooth out the motion so that the film can be passed over the sound pickup at a constant speed. The audio bandwidth is limited by the speed of the film and the grain size of the emulsion.
+The image size for standard 16mm film is 9.65mm × 7.21mm, and using the reference point of 115 pixels per mm as the highest resolvable scanning quality, a maximum image size of 1110 × 829 is possible. This is coincidentally similar to emerging HDTV standards, making the 16mm material suitable for transfer to HDTV. The perceived viewing quality will be slightly less than video that is shot at HDTV resolution due to the grain size.
+4.8 Home Movie Formats
+There were mainly three movie film formats used by amateur photographers before the introduction of portable VHS equipment in the 1970s:
+● Pathé baby 9.5mm, used until around 1950 ● Standard 8mm, popular during the 1950s and 60s ● Super 8mm, popular during the 1970s until video replaced it in the 1980s
+4.8.1 Pathé Baby 9.5mm During the early to middle part of the 20th century, the 9.5mm format was widely used. The archives are likely to contain quite a lot of interesting material shot by enthusiastic amateurs in this format. The 9.5mm format was unusual in that it had a single centerlocated sprocket, where all the other formats either have sprocket holes at both sides of the film for professional use or down one side only for amateur/semi-professional use. This is shown clearly in Figure 4-9.
+
+9.5 mm
+9.5 mm format Imaging area 9.65 mm x 7.21 mm
+
+Film 55
+
+Figure 4-9 9.5mm film dimensions.
+The imaging rectangle for this format would be approximately 978 × 736, which is quite good for an amateur film format. The only material I have ever seen in this format is black and white, and any color footage would be very rare indeed. Very little of this material has a sound track associated with it, although it was possible to add a magnetic stripe to the edge of the film and use the projector with an auxiliary sound unit.
+Scanning this material is somewhat problematic because 9.5mm telecine units are quite rare. There are specialists who will scan this material for you, or you could build a telecine unit of your own. The center sprocket hole is also the source of a lot of film damage and ghosting artifacts when watching this format. If the shutter and film movement are not perfectly synchronized in the projector, you will see the sprocket hole projected on the screen. Figure 4-10 illustrates the effect.
+Most formats place the sprocket holes so they are offset from the horizontal position of the picture.
+A 2K scanner has more than sufficient resolving power for film sizes of 16mm and below. For example, scanning 8mm film with a 4K scanner just wastes time because the detail isn’t there to begin with.
+4.8.2 Standard 8mm
+In the 1950s, home movie enthusiasts embraced the standard 8mm format and it became very popular. The image rectangle on this film stock is the smallest of all the commonly used formats. Scanning the projected area at 115 pixels per millimeter will yield an image size of approximately 529 × 391. This is somewhat smaller than TV resolution even at standard definition. Grain size is going to be a significant problem with scanned material from this format. Figure 4-11 shows the layout of standard 8mm film.
+
+56 A Practical Guide to Video and Audio Compression
+Figure 4-10 9.5mm Sprocket hole ghosting.
+Note that the sprocket holes interfere with the picture. The cameras would often overscan the image area, and the aperture in the projector gate was made somewhat smaller than the camera gate aperture so as to crop the projected image. This also helped to hide the gate weave in the camera. The actual size of images on 8mm film is quite variable, and a casual search of the Web reveals a variety of different sizes and specifications. The values quoted here are approximate. The make and model of the camera the film was exposed in will determine the actual image dimensions on the emulsion.
+If you are digitally scanning the film, it is a good idea to extract a slightly larger image area than if you project the movie and film the result with a video camera. You will also get a better-quality image that will be more stable.
+4.8.3 Super 8mm Super 8mm superseded the standard 8mm format in the 1970s and provided a larger image size. It also had the advantage that the unexposed film was delivered in a single 50foot reel of 8mm stock and was mounted inside a cartridge. This made loading the camera much easier and less prone to fogging the already exposed film.
+Figure 4-12 illustrates how this format is different from the standard 8mm layout. Note, for example, that the sprocket holes are oriented so the long axis is aligned with the film. This allows a little extra room for an enlarged picture area. The frame sizes are bigger and the film would run to a slightly shorter playback time when projected.
+Digitally scanned image sizes for this format would yield a raster that is almost the same as a standard-definition TV picture in the USA at 633 × 460 pixels. Grain size is still
+
+8 mm
+
+Film 57
+
+Standard 8 mm format
+Imaging area 4.9 mm x 3.55 mm
+Safe shooting area 4.4 mm x 3.25 mm
+
+Figure 4-11 Standard 8mm film dimensions.
+8 mm
+
+Super 8 mm format
+Imaging area 5.79 mm x 4.12 mm
+Safe shooting area 5.31 mm x 4.01 mm
+
+Figure 4-12 Super 8mm film dimensions.
+
+58 A Practical Guide to Video and Audio Compression
+an issue with this format, but slightly less so than for standard 8mm. This is somewhat smaller than European TV picture sizes, though.
+The camera gate is still larger than the projector gate, so there is some variability of image size according to how you scan it in.
+4.9 Audio Synchronization
+Be aware that the audio track is running at the same speed as the film being transported through the projector but is not placed adjacent to the frame to which it should be synchronized. The 8mm home movie film format has a de-facto standard 56-frame offset. This distance is different for all formats, and there is no guarantee that the films you are converting have the same offset even though they are shot on the same size stock.
+Digitizing the picture and sound separately is a good idea. Modern nonlinear editing systems allow the audio and video to be processed independently of each other and then merged back together on the desktop. The timing of the audio may need to be adjusted so it is the same as the video. The start and end of both media must coincide, and any lip sync might need to be fixed. Resampling the audio within your editing system will correct the sample rate, although you may want to perform that in an external audio-processing application to achieve the best-possible quality.
+If you are doing a lot of this work, investing in some good audio-processing tools would be worthwhile. Final Cut Pro on the Macintosh is supplemented by adding a copy of the Apple/E-Magic Logic application.
+Apart from Logic, MacOS supports other tools such as Bias Deck, Peak or Cubase, and Pro Tools. PC-based systems can deploy tools that work well with Avid editors or Adobe Premier. Pro Tools is a good example. There are many other alternatives for Windows users and far fewer for Linux.
+Bear in mind that for some formats, the speed of the film through the projector will seriously affect the available audio bandwidth. For 8mm movie film, the frequency range is between 35 Hz and 9 KHz, which results in a lot of top-end loss, and audio resolution is therefore somewhat limited. This plays into your hands, though, when compressing the audio, as the reduced detail yields some slight bit-rate benefits.
+Projector gate
+Sound head
+Figure 4-13 Audio track offset on film.
+
+Film 59
+When working with 16mm film, the audio bandwidth will be higher. The audio bandwidth of 35mm film should go well beyond the audible range of a human ear, depending on whether it uses a magnetic stripe or an optical track on the edge of the film.
+4.10 Magnetic Stripe for Sound Recording
+There is certain to be some interesting archival material in people’s attics, and during the 1960s a small UK-based company called SuperSound developed a method of adding a stripe of magnetic tape down the sprocketed edge of the film so that a sound track could be added. Figure 4-14 shows where the stripe was placed.
+Wider-gauge film required a balancing stripe so that the film could be spooled evenly. Adding the stripe reduced the amount of film that could be carried on the spools because it was thicker and couldn’t therefore wind as tightly. Note also that the stripe is on the emulsion side. Be aware of this when scanning because it offsets the emulsion away from the focal plane of the scanner, and this might slightly blur the scanned image.
+The development of this striping technology spawned a successful business that either added the stripe to customers’ films or sold them the equipment and materials to do it themselves. Figure 4-15 shows a photograph of the striper unit that you could buy and use at home. These were marketed all over the world during the 1960s, which means there may be significant quantities of archival 8mm material out there that also has an interesting sound track.
+Film stock was available in monochrome and color and was based on a 16mm stock that was turned over after the first pass through the camera. The film was then slit down the middle during processing and spliced together before sending back to the photographer. Typical film roll sizes were 25, 50, 100, and 200 feet long. A roll of 16mm stock was supplied on 25-foot spools and played for about 4 minutes when slit and returned from processing as a 50-foot reel. The exact time depended on the shooting frame rate, which could be between 18 and 24 fps. This short duration somewhat limited the creative possibilities, although some enthusiasts edited together programs of several hours at what must have been an extraordinarily high cost.
+
+Optional balancing stripe
+
+Emulsion
+
+Stripe
+
+Substrate
+Figure 4-14 Placement of the magnetic sound stripe on the film.
+
+60 A Practical Guide to Video and Audio Compression
+Figure 4-15 Supersound super stripe unit. The same technique for adding sound stripe down the sprocketed edge of the film
+was provided by Supersound for all the major film gauges that were in common use at the time.
+4.11 Telecine
+Film is scanned using a telecine unit when converting to video, or a film scanner when making a digital version for computer manipulation. Professional systems are very expensive and way beyond the means of the amateur user with a collection of home movies to process. 4.11.1 How Telecine Works Film-to-TV transfer has been around for some time. There are fundamentally two technical solutions. One is to present a moving point source of light that scans the film surface using the same technique as a TV set; the other is to use a charge coupled device (CCD) sensor. The older technique is to place a cathode ray tube (CRT) at one end of the machine and fly a spot across it. The film is then positioned between that flying spot and
+
+Film 61
+the light sensor. Optical components collimate (or make parallel) the light transmitted through the film, and the analog waveform is recorded. This design works well because it mimics exactly the way a TV picture is produced but in reverse. Figure 4-16 shows how this works.
+The resolution of the output of a flying spot scanner is fixed at 2K or 4K or whatever the manufacturer provides. The film is positioned and optical components introduced so that the scanning area completely covers the frame. Resolution is inferred from the fixed 2K/4K sizes and the physical size of the film substrate.
+Flatbed scanners that have backlight hoods for scanning film have a fixed resolution and yield a varying-sized pixel image according to the area of the film being scanned. A flying spot telecine always yields the same-sized image. This is another subtle point that you need to understand to ensure you get what you want out of the scanner.
+Modern scanners are more precise and have a CCD device lit by a projected image of the film, and the electronics are very similar to those of a digital camera. This design is technically superior since the imaging component creates a much better-quality result. The recorded image is crisper and less prone to analog noise artifacts. This arrangement is shown in figure 4-17.
+The downside of the flying spot scanner is that the beam intensity is not 100% stable all the time. The linearity and convergence of the telecine must be carefully adjusted and
+
+Filtered light converted to an electrical signal by a detector.
+Figure 4-16 Flying spot scanner.
+
+Illumination created by a scanning beam on a CRT.
+
+62 A Practical Guide to Video and Audio Compression
+Illumination created by a diffuse light source.
+Filtered light converted to an electrical signal by a CCD imaging detector.
+Figure 4-17 Modern CCD scanner.
+calibrated regularly. The beam has a halo that reduces the focus and some blurring is evident if this is not correctly calibrated. This defocusing effect or softening of the beam edges is an artifact of CRT tubes and is called the Kell effect. Spot shape is adjustable in some TV receivers, and making the beam oval prevents some twittering artifacts when the beam shape is vertically oriented in an interlaced system. This allows the beam edges to overlap slightly on successive lines. Flattening the beam horizontally sacrifices resolution across the screen.
+4.11.2 Pulldown—60 Hz Frame Rate In the United States, the frame rate of the film must be altered from 24 to 30 fps. Running the film at a faster frame rate is not a viable solution. The change in motion is too extreme and everything will appear to be over-cranked.
+The trick is to introduce an extra frame every now and then. By keeping an occasional frame in the gate slightly longer, the time base is stretched.
+To attain a smooth pulldown and an integer relationship between the frame rate of the film and video, the film is run a little slower than normal (at 23.97 fps instead of 24 fps). The first frame is transferred to the first 2 fields and the second frame to the next 3 fields. At this point, the film is out of synchronization with the interlaced field structure of
+
+Film 63
+the video. If this is repeated for the next 2 frames as well, the fields and frames will come back into sync. Over the course of 4 frames of film, 5 frames of video are created (or 10 fields of video). Figure 4-18 shows how these frames are mapped between the two kinds of media.
+This is called 3-2 pulldown but is more accurately described as 2-3 pulldown because it better describes the input-to-output transformation.
+The QuickTime software developed by Apple has tools built in to remove or add this pulldown conversion. In fact, most compression tools on all platforms provide support for this as well. Uniquely, the QuickTime platform provides it in a way that you can exploit from within your own applications.
+Because the pulldown is distributed evenly throughout the time base, the effect is imperceptible until you push the pause button on a video recorder and you often see frames on the TV screen that appear to contain a double image. This is only obvious when there is some movement.
+You also occasionally see this artifact when running video input cards in preview mode or when you monitor an incoming DV stream via FireWire. That is just an artifact of the monitoring stream, and when you play the ingested video back it looks fine.
+Because the movie is running a little slower, the overall run time is a little longer. Since the change is only 3%, it makes hardly any difference.
+
+Frames
+A B C D A
+Figure 4-18 Film-to-video pulldown.
+
+1 cadence cycle
+
+Fields Odd Even Odd Even Odd Even Odd Even Odd Even
+
+64 A Practical Guide to Video and Audio Compression
+Editing of the video must be sensitive to these transfers. For example, editing anywhere other than at 5-frame intervals changes the cadence of the starting frame of a 5-frame sequence. The viewer may not notice the change in cadence, but it does make subsequent processing of that footage very difficult. If you are editing interlaced video, then after an inverse telecine process the field dominance could be compromised and fields after the edit may exhibit a twittering effect. As long as the edit point is an integer multiple of 5 frames, then this problem will not occur. That constraint is a very large burden to place on a film editor. It is much better to compress from the unedited original material.
+4.11.3 Pulldown—50 Hz Frame Rate
+The techniques that work for transferring film to 30 fps video will not work for transfer to 25 fps video in Europe. The European TV frame rate is much closer to the correct frame rate for film. To use a pulldown effect requires that we introduce just one additional frame per second. This produces a noticeable flicker in the movement, so it is not used as a solution.
+Transfers to 30 fps video run the film a little slower, and that does not materially alter the sound quality. Running 24 fps film at 25 fps looks okay visually because the motion is only slightly faster. The pitch of the sound is increased noticeably and must be corrected. Pitch correction is tricky because you must preserve synchronization or the lip sync gets off track.
+You are also freed from the cadence and field dominance issues because there are no pulldown frame cadences to consider.
+4.11.4 Line-Based Telecine Transfer
+A more sophisticated approach is to index the film at 24 fps and scan the appropriate lines of the raster. This results in a frame of video containing portions of two frames of film. There is no obvious pulldown happening. Determining which part of a composite frame belongs to one or the other of the original 24 FPS source is very hard indeed unless there are some obvious clues. This would require some sophisticated image processing software to compare one frame of video with another and see which lines have changed between successive frames or corresponding odd or even fields.
+4.12 Building Your Own Telecine System
+It might be feasible (and fun, perhaps) to construct your own film scanner using some components that are cannibalized from other sources.
+4.12.1 Choosing a Film Scanner
+The most expensive part of building your own system will be the film scanner. You will require one that has a straight path through the unit, and you will also have to manufac-
+
+Note relief under image area to avoid damage
+
+Film 65
+
+Figure 4-19 Film guide cross-section.
+
+ture a gate to hold the film steady as it passes through. This need not be anything more complex than a film guide, but you must be careful to protect the imaging area of the film to avoid scratching it, as you see in Figure 4-19.
+Rather than use a slide scanner, consider carefully dismantling a video camera and using the imaging system in that. Some high-end Telecine manufacturers such as CTM Debrie Cinematography use Sony HDCAM components on an OEM basis to build their systems.
+
+4.12.2 Film Transport
+Next you have to construct a framework to create a film path through the scanner. You will need a couple of film pulleys. Most important for driving the film through, you will require a suitable sprocket for the film gauge you are using. But there is no need to manufacture a proper film gate with a claw mechanism. Dismantling a broken film projector will yield the parts you need.
+If you place a friction pulley on one side of the gate and a motorized sprocket to pull it through the gate from the other side, this will provide sufficient control. The film must remain taut. There are other tensioning devices available, and perhaps the cannibalized projector will yield up a sprung double-pulley tensioner.
+A projector synchronizes the movements of the film and the shutter by a complex mechanism of gears and cams as discussed at the beginning of this chapter. That is
+
+Tension pulleys
+
+Slide scanner
+
+Sprocket driven by stepper motor
+
+Figure 4-20 Film path through scanner. CTM Debrie Cinematography: http://www.ctmsolutions.com/
+
+66 A Practical Guide to Video and Audio Compression
+unnecessary here because our exposure time happens under software control. The film must be moved through the gate, advancing by one frame’s worth of distance each time.
+Attach a stepper motor to the sprocket drive to provide the motive force. Stepper motors are obtained by dismantling old floppy-disk drives to remove the head-positioning motor. An interface is required to contrive some kind of electrical connection to the computer, and one of the servo control interfaces used by amateur robotics enthusiasts would do. Some of these I/O controllers are now available as USB connected devices. Controlling this machinery should not involve any particularly complex driver writing.
+4.12.3 Software Support
+Once the whole machine is assembled, two sets of utility code must be provided. The first one will control the stepper motor. This must be moved one step forward at
+a time. The code is called a number of times depending on the distance from one frame to the next, measured in steps. Hopefully the step distance will be small enough that there is an integer relationship between the two.
+The second part of the utility software is designed to drive the film scanner in order to capture a frame. Scanning the whole 35mm film surface area is not necessary, as the device was likely a 35mm slide scanner to start with. The API support in the TWAIN interface will provide the support necessary to frame the scanning area so it just covers the imaged part of the film. This is known to be feasible here because it is done all the time with paper scanners during a preview and crop. They use the same TWAIN driver code.
+4.12.4 Running the Process
+Scanning the full 8mm width will include the sprocket holes. That provides a reference that will reduce the software-process tracking errors later on.
+An application uses these utilities to drive the stepper motor and take a snapshot. That application could just capture the frames as a series of still images or make a movie file one frame at a time.
+After a successful run, the application will have created a file containing a digitized version of the film at probably as good a resolution as it is possible to achieve (depending on the quality of the film scanner you start with). Some remedial work to stabilize any camera gate weave and crop the output will be necessary.
+Some variants on this theme are possible if the scanner is driven one line of pixels at a time. In that case alternating steps of the film transport and the scanning head will yield a continuous series of scan lines that will then need to be sliced into frames. This will deliver a slightly more stable scanned result. The quality of the whole project is dependent on your mechanical skills and how well you conceive the software to process the results. This design will eliminate the gate weave you normally get with a projector because the film is being moved far more gently through the gate. None of the scanners can eliminate the gate weave from the camera because that is an integral part of the film once it has been exposed. We stabilize the footage in software to remove that problem.
+
+Film 67
+4.13 Ingest and Restoration
+Any currently existing movie film from the 8mm era is likely to have faded. After scanning this material in, at least some color correction is going to be necessary to get the best result. Modern compression software provides this. Software like Final Cut Pro or Premier will work from the raw, uncorrected footage if necessary. Their built-in color-correction capabilities can be used during the editing session. Of course, this color correction is unnecessary for black and white film. However, contrast enhancement will be required to eliminate over- or underexposure.
+4.13.1 Spliced Joints There will be significant problems with spliced joints in this old material. The older stock was spliced with acetone glue that welded the two parts together. The same is true for any Supersound stripe that was attached to the film. Later materials were based on a polyester substrate, and during the 1970s various alternatives using short pieces of transparent tape were tried because there were no readily available solvents for polyester at the time. Significant cleanup and restorative attention will be necessary. When handling archive material, the telecine process must be very kind to the film and not cause it to be twisted or bent around tight pulleys and sprockets more than necessary. Modern transports carry the film gently and steadily through the scanning area with a smooth and flowing motion. This avoids damage due to the stop/start jerking movement that a projector has to deploy.
+Figures 4-21 to 4-23 show a cross-sectional view of the film to illustrate some of the splicing techniques you will encounter when digitizing old film stock. The beveled-edge splice is quite weak and will break when the glue deteriorates. If this splice is done carefully at the frame boundaries, it is hard to detect in the projected image.
+The undercut splice is stronger but damages a larger area of the film. In fact, it tends to completely ruin a frame of 8mm film. It is less likely to break due to the glue, but the film is quite weak at the ends of the joint.
+Figure 4-21 Bevel edge butted and glued splice.
+Figure 4-22 Undercut overlap glued splice.
+Figure 4-23 Adhesive taped splice.
+
+68 A Practical Guide to Video and Audio Compression
+The adhesive tape splice was introduced so that the polyester film could be edited. This was necessary because there wasn’t a usable solvent available. Quite a large area of the film is obscured, but the tape is transparent enough that it is actually harder to detect than the glued undercut joint.
+All of the splices will cause some gate weave and disruption to the smooth motion of the film through a gate. Specially designed gates or stepper-based movements will allow splices to go through without impeding the film movement. If you are building a telecine system, you must consider this issue, because otherwise the film will be displaced as it passes through the gate.
+4.13.2 Fogging
+Many amateur filmmakers were caught out when turning over the 8mm film to shoot the other side. The film occasionally slipped out of the roll, and unless you used a black bag to change the film, there was a risk of spoiling your movie. This caused many films to be exposed to some light as the film was exchanged. The result is a yellowish fogging effect down the first few feet of film. If this fogging is not too severe, some careful restorative image processing could clean it up once the film has been scanned in. Figure 4-24 shows what this looks like. It is usually fogged down the sprocketed edge of the film.
+4.13.3 Surface Damage
+When dealing with film as a source, you must consider the implications of dust and scratches. There used to be proprietary formulations that you could apply to films to clean them. They involved mixing all manner of carcinogenic chemicals (carbon tetrachloride—carpet cleaner—and paraffin wax for example) and applying them to the film. The wax dissolved in the carpet cleaner and as that evaporated, it left a waxy deposit on the film. It is sufficient to make sure the film is scanned in a dust-free environment rather than risk damaging your film with chemicals. Passing it between a pair of lightly sprung felt pads would remove any accretions. Any remaining particulate matter will become an integral part of the scan. This has to be removed using some image-processing code.
+4.13.4 Physical Structure of Film
+Before we consider how dust and scratches affect the film, we need to examine how film is physically structured. Up to now we’ve been looking through the film and discussing the imaging area in its normal viewing aspect. If we turn the film sideways and examine it from the edge, we can see that it is made up a series of layers sandwiched together. Figure 4-25 illustrates the structure.
+Various depredations have been perpetrated on this piece of film, each one resulting in some reduction in image quality. The shortcut solution when restoring is just to isolate the area of damage and fill in the missing fragments by interpolation. A more scientific approach requires that each kind of damage be identified and treated accordingly.
+
+Film 69
+Figure 4-24 Severely fogged 8mm film. Table 4-3 describes the different kinds of damage shown in Figure 4-25. The item
+numbers in the table correspond to the numbers in the figure. 4.13.5 Dust and Scratches A better-quality transfer will be achieved if the dust is cleaned off to start with. Figure 4-26 shows an example with some dust and scratches.
+Because film is often passed through various positive and negative stages, dust will appear as white or black dots. Any dust on the negative will cause a white dot on the final output, and this is far more annoying than a dust particle on the positive film. Hairs in the gate of the telecine unit are also very annoying. 4.13.6 Severe Damage Damage in the form of bad splices, tears, broken sprocket holes, and peeled emulsion require manual restoration to be applied. Once the film has been captured into the
+
+70 A Practical Guide to Video and Audio Compression
+computer, much of this becomes quite easy to do. The process is sometimes arduous and time consuming, but a painstaking approach could yield a true gem of a movie from something that was simply unwatchable as projected film. Figure 4-27 shows a couple of examples. Both happen to be near the edge of the frame.
+Being very gentle in the handling and scanning of film is of prime importance, and reducing the number of times the film is despooled and passed through a film transport
+
+Table 4-3 Repairing the Damage
+
+Item
+
+Solution
+
+1
+
+Minor scratch to the film base substrate material on the side away from the
+
+emulsion. This will cause some light scattering and depending on whether the
+
+film is lit from the back or front, that will cause a spread of the illumination
+
+when the film is scanned. Lit from the back, a larger area of emulsion will be
+
+illuminated. Lit from the front, a few pixels will be scattered over a wider area
+
+due to the refractive effect. The result is a slight blurring over a localized area.
+
+De-blurring algorithms can usually correct this problem. Localizing them is
+
+somewhat tricky.
+
+2
+
+This is a minor scratch to the protective layer over the emulsion. Similar
+
+refractive problems occur. Because this scratch is nearer the emulsion, the
+
+blurring effect will be less. Use the same fix as for Item 1.
+
+3
+
+This is a very deep scratch through the protective layer and in this example,
+
+it has actually removed the yellow emulsion layer and partly damaged the
+
+magenta layer. Added to the refractive effects are actual color changes and loss
+
+of information. Blurring effects don’t lose information, they just move it
+
+around, but this has effectively obliterated part of the picture. The only kind of
+
+repair you can do for this is reconstruction of the missing area.
+
+4
+
+This is a large piece of dust that prevents the light from getting through. Dust
+
+on the intermediate negative prints will show up as white spots.
+
+Reconstructing the missing pixels is the solution.
+
+5
+
+Fingerprints show as a distinctive pattern of light and shade. The oil in the
+
+fingerprint causes a refractive effect, but removing it is hard because the edges
+
+are complex and there is a large and odd-shaped area to correct. Blurring the
+
+edges might hide the effects, but you should make sure there isn’t a noticeable
+
+difference between the frame with the fingerprint and the ones on either side.
+
+A temporal interpolation may fix this.
+
+6
+
+Films or smears of oily material or the results of getting the emulsion wet may
+
+show up as an area that is slightly discolored. You may only have to deal with
+
+the edges if the deposit has no color-changing effects. Temporal interpolation
+
+or manual rotoscoping the area to correct might be necessary.
+
+Film 71
+is obviously a wise thing. Projectors that are badly adjusted will seriously damage a film. Lacing a projector incorrectly and turning it on will rip the sprockets. Not allowing the film to loop sufficiently on either side of the gate causes the claw mechanism to fight the drive sprockets and do terrible damage to the film as it is projected. All it requires is a little care and attention when projecting your film. Once your film is damaged like this, it is very hard to repair. Thankfully, as long as the imaging area is intact, film restoration can now take place in the computer.
+Assembling a toolkit of software for this kind of restoration is likely to take some time and will be quite expensive unless you write the programs yourself. Some tools may be available as shareware or open source. Having Photoshop, After Effects, Final Cut, Commotion, Shake, Ultimatte, and various other graphics tools on hand will speed up the process. These tools range from a few hundred dollars to several thousand. Whether you should purchase them is partly dependent on your ability to use them to generate revenue from your film restoration work. You don’t need to buy them all, but they can help you solve problems. Chapter 30 discusses some alternatives to add to your shopping list when planning your system. Appendix C describes a few more.
+4.13.7 The RACINE-S project The collaborative RACINE-S project is exploring how to restore historical footage with large sections of missing frames or audio. The project’s goal is to be able to replace the missing material in real time. A variety of companies and academic institutions are involved and are publishing useful material about the project.
+4 6
+2 3
+Protective layer
+Yellow emulsion Magenta emulsion
+Cyan emulsion
+Film base
+1 5
+Figure 4-25 Film structure and damage.
+
+72 A Practical Guide to Video and Audio Compression
+
+Dust laden image
+
+Dust particle detail
+
+Figure 4-26 Dust and scratches.
+
+Scratch detail
+
+Tears and punctures after scanning damaged film
+
+Figure 4-27 Examples of film damage.
+4.13.8 Hardware Solutions The Cintel company that makes Telecine units has a product called Oliver that is designed to cope with damaged film as it is scanned. It fixes the effects of a scratch by looking for areas where the refractive damage has occurred and recombining the scattered light with a clever algorithm to restore the image.
+Snell and Wilcox offer similar restorative equipment (Alchemist.PhC) for video content. This may be useful for restoring film as well.
+4.14 Digital Intermediate Processes
+The traditional way of making movies was purely mechanical. Splices were done manually and the color grading was done with filters and timed exposures. Although they are automated now, the processes have been fundamentally the same for many years.
+Cintel International Ltd.: http://www.cintel.com/ Snell & Wilcox: http://www.snellwilcox.com/
+
+Film 73
+
+Table 4-4 RACINE-S Project Participants
+
+Company
+
+Expertise
+
+Arri Pandora International FSSG
+Cineca University of Glasgow Androme
+Limberg Univeritair Centrum (LUC) Cinecitta
+
+Developing a portable scanner for all available formats. Developing the processing hardware required to run the restoration processes. Software to regenerate speech. They call this virtual dubbing. They are also looking at the acoustical enhancement of audio recording and reproduction systems. User interface being developed using VR techniques. Interpolation software to replace or repair damaged and missing imagery. Collaborating with the University of Glasgow on joint research projects to develop multimedia software and restoration techniques. Collaborating with the University of Glasgow on joint software tool development projects.
+Integration and bench testing to establish whether the restoration algorithms work satisfactorily, and feeding back to the researchers.
+
+If the film is digitized and the color correction is done digitally, it can then be printed back onto film for distribution. This digital intermediate (DI) introduces an opportunity to improve the workflow and provide additional tools to the filmmaker.
+Scanning the film in at the earliest possible point enables the editing to be done electronically. This is very beneficial. The integration of special effects or corrective “surgery” other than just grading the film can then be used to easily add or remove elements, or perform sky replacement or compositional adjustment to frame the content more attractively.
+Shooting on HDCAM equipment eliminates the scanning process altogether at the expense of losing the organic quality of film grain. That quality can be reintroduced during the finishing phase. The process of shooting and editing a movie is shown in Figure 4-28. The top row of boxes is the traditional mechanical process and the bottom is
+RACINE-S: http://www.racine.eu.com/Arri: http://www.arri.com/ Pandora International: http://pogle.pandora-int.com/ FSSG: http://www.cini.ve.cnr.it/ Cineca: http://www.cineca.it/ University of Glasgow: http://www.gla.ac.uk/ Androme: http://www.androme.be/ LUC: http://www.luc.ac.be/ Cinecitta: http://wwwcinecittastudios.it/
+
+74 A Practical Guide to Video and Audio Compression
+
+Traditional Film Camera
+
+Manual editing process
+
+Grading
+
+Optical printing
+
+Scanning
+
+Film
+
+HDCAM Digital Movie
+Camera
+
+NLE editing
+
+Digital grading
+
+Figure 4-28 Digital intermediate workflow.
+
+Laser exposed
+film output
+
+the all-digital workflow. You can see there are opportunities to move from the traditional workflow to the digital intermediate form whenever you need to.
+The digital revolution is pervading and affecting every aspect of film and TV production, and video compression is critical to the success of the industry from one end to the other.
+A significant advantage of the digital intermediate process is that an archival copy of the film is retained in a digital form. Since this was scanned from the original pristine footage, there is very little likelihood of damage, dust, scratches, or other artifacts being introduced. The colors in the picture will not fade over time the way the film emulsion would. Archiving becomes easier and repurposing to other formats such as DVD is a much simpler process. This also facilitates the migration to D-cinema and the electronic delivery of movies.
+Archiving over hundreds of years is becoming an issue with digital content, and some current studies are examining the aging of storage media and the most reliable file formats to interface with systems that won’t even exist for several hundred years. This might seem an odd subject to be talking about in a book on video compression, but it is quite important that future generations be able to decode the material that we store today. You should bear that in mind when choosing a codec for archival purposes.
+
+4.15 Summary
+This chapter has touched on a lot of different aspects of how filmed images work. There are, however, many film formats that have not been covered here. Studying this topic on the Internet reveals a large number and variety of Web sites that describe some very odd film formats. In addition, you will find some information in the appendices about frame sizes and formats.
+
+Film 75
+As you work with archival film sources, keep in mind that the exact size and resolution of film stock varies considerably and that the values quoted here for picture sizes are nominal guidelines only. The chapter on digital imaging revisits the commonly used 2K, 4K, and 6K resolutions for digital film work.
+The caveat stated at the beginning of this chapter applies here too: The resolution chosen for calculating image sizes is based on quoted values from a variety of sources. However, you may scan at a higher or lower resolution than the 115 pixels per mm used here. You will need to make adjustments to take that into account if you are doing any capacity planning. Your mileage may vary.
+In the next two chapters, video and digital imaging are studied. A few minor issues having to do with film will come up again later on in the discussion of some of the more esoteric aspects of video compression.
+
+5
+Video
+5.1 On the Matter of Video
+During this segment of our journey we will examine the video source material that you might want to compress. We will start with the frame size and layout, and then move on to analog-to-digital conversion and synchronization of the video, all of which is related to the content of a line of picture information. The chapter is rounded out by considering color information and how it is converted from RGB to luma and chroma.
+5.2 Video Is Not Film
+Television is much more complicated than film. It involves several interlocking concepts that interact with one another. The way the picture is represented electronically and the techniques for color encoding influence how it is converted from an analog form into a digital form. This also has implications for how the compression works. The technicality of how video works is a book-length topic in itself. In order to cover it in just a chapter, a lot of the fine detail has to be put to one side.
+The imaging mechanisms for film and TV are different. The technology requires that certain processing be done to deliver a satisfactory broadcast within the available bandwidth.
+Television pictures are composed of a series of horizontal lines arranged in a sequence that scans down the entire screen from top to bottom. This is called a raster. The number of lines and how they are ordered in the scanning sequence depend on the kind of display being driven and where in the world the TV signal is being broadcast.
+European TV is closer to movie film projection than the American system because the display frame rates are similar, but it is still different.
+If only it were possible to go back in time and reinvent some of these things. Just changing the frame rate of projected film or adjusting the way that pictures are displayed to use progressive scanning instead of interlacing on TV sets would make the world a much simpler place for video compressionists. The following factors are all
+77
+
+78 A Practical Guide to Video and Audio Compression
+relevant to understanding how TV works and by implication how compression has to work:
+● Picture sizes on different TV systems ● Frame rates in the United States, Europe, and elsewhere ● Aspect ratios and conversion between them ● Analog waveforms and how to code a digital image from them ● Coding of luma and chroma
+5.3 Television Standards
+There are a variety of standards that describe how TV is delivered. These have evolved over the years. New work is underway to accommodate high-definition formats and digital television delivery. The convergence between TV systems and computer imaging technology is also significantly affecting this. There are two principal standards for analog TV: NTSC and PAL. Some derivative standards are based on variants of these. In France, the SECAM system is used, but this is broadly similar to PAL.
+5.4 Frame Rates
+One of the things that you will encounter when compressing video is the capability to change the frame rate of the compressed output. You must be aware of the various source frame rates. If you are creating video to be played back on a variety of platforms, and they include TV systems, then choosing the wrong frame rate will detrimentally affect the quality of the playback experience.
+
+Table 5-1 Analog TV Standards
+
+Standard
+
+Description
+
+NTSC PAL
+SECAM
+
+NTSC is the way that analog TV is broadcast in the United States, although this does not actually describe a picture size, resolution, or frame rate.
+The broadcasting TV standard in the UK is PAL. It is a coding and modulation scheme for transmitting video in the most economic bandwidth over analog broadcast systems. Therefore, it is an analog compression scheme and does not describe a physical presentation format.
+This is a transmission modulation technique used in some parts of Europe.
+
+Video 79
+
+5.4.1 Comparing NTSC with PAL (60 Hz Versus 50 Hz)
+To convert between NTSC and PAL services, the change in scan lines and the horizontal resolution is usually dealt with by simple interpolation in the X- and Y-axes. The frame rate is much harder to process because simply removing frames when going from 30 to 25 Hz leads to a somewhat jerky experience. Going the other way, from 25 to 30 Hz, requires the introduction of extra frames. Working with fields rather than frames does not solve the problem. Pulldown techniques that work for film do not work very well for video because the interlace scanning fields are not photographed at an identical moment in time. Therefore they cannot be averaged or repeated without some strange combing effects being introduced. Duplicating a single field is unsatisfactory because it has a spatial and temporal relationship to the adjacent fields before and after. Figure 5-1 shows these field-timing differences.
+Digital systems with multiple frame stores provide the means to carry out the necessary temporal interpolation. Very good time-base conversion is possible with desktop tools such as Adobe After Effects and Apple Final Cut Pro. There are of course other alternatives to these, depending on the platform you use and the budget you have available.
+
+5.4.2 Temporal Resampling
+American TV transmissions run at approximately 30 frames per second—the actual frame rate is 29.97 frames per second. Because interlacing is used, this is really 60 fields per second. In the UK, Europe, and some other parts of the world, the values of 25 frames and 50 fields per second are applicable. Mixing content from both systems, or playing American content back in the UK and vice versa, causes problems.
+Resampling the 2D raster image is simply a case of averaging or interpolating adjacent pixel values according to whether you are scaling down or up. Changing the frame rate is much more complicated because you must interpolate movement from one frame to the next and it is not happening uniformly across the picture.
+Interlaced content is even more complex because pixels only correspond to one another in alternate fields, and adjacent fields are offset by the field time (one fiftieth or sixtieth of a second).
+Thankfully you don’t have to worry about this too much as there is now some very good software that makes changes to the frame rate. Products such as Final Cut Pro and
+
+Time
+
+60 Hz fields
+
+O EO EO EO EO EO EO EO EO EO EO EO EO EO EO E
+
+O EO EO EO EO EO EO EO EO EO EO EO EO 50 Hz fields
+Figure 5-1 Frame rate relationships.
+
+80 A Practical Guide to Video and Audio Compression
+Adobe After Effects help with this problem. At the high end, professional users deploy tools such as Discreet Combustion and Pinnacle Commotion. All of these tools offer other useful capabilities as well.
+5.4.3 Comparing Video with Film as a Source Input
+When Hollywood movie films are broadcast on TV, the frame rates have to be adjusted so that the picture is played at a different frame rate. Film runs at 24 frames per second and opening the shutter twice for each frame reduces the flickering.
+This is close to the frame rate of European broadcast systems, but it is a long way from the right frame rate for TV systems in the United States.
+To change the frame rate without using the digital interpolation techniques is quite tricky, so a mechanical means of accomplishing this was developed that is called 2-3 or 3-2 pulldown. It is done differently for 60 Hz and 50 Hz field rates. (Chapter 4 discussed film formats and examined pulldown and telecine systems.)
+5.4.4 Up-Rated Scanning
+Some TV sets have a built-in frame store that is loaded with new pictures at a rate of 25 or 30 times per second. The output delivers the video to the screen at a 100 Hz frame rate. This significantly improves the viewing experience. The frame store also provides scaling and aspect-ratio correction. The digital scaling sometimes introduces subtle artifacts into the picture that are similar to those caused by over-compressing the source material.
+5.5 Scanning Modes
+In the descriptions of the different image sizes, terminology such as 1080i or 1080p is used to describe two alternative line-scanning patterns for HDTV. Standard definition (SDTV) generally has just an “i.” This indicates whether the line scanning is interlaced or progressive.
+The future of video everywhere is progressive, not interlaced. –Ben Waggoner, 2004
+This is certainly true, and the European Broadcasting Union (EBU) predicts that between 2009 and 2015, progressive HD-compatible displays will probably outnumber interlaced SDTV receivers.
+Tests with H.264 and WM9 encoders prove that they both encode progressively scanned video with a better efficiency (compression ratio) than they do interlaced video.
+The delivery of progressively scanned content is preferable because it is easy to create interlaced material from it but much harder to go the other way. In any case, it is convincingly argued by the EBU that putting expensive and very-high-quality interlacedto-progressive conversion equipment at the broadcaster’s head-end installation is far
+
+Video 81
+better than deploying millions of less-capable, low-quality interlace-to-progressive converters embedded inside receivers in the home.
+5.6 Interlaced Field Rasters
+Interlaced scanning was introduced in the 1930s as a way to reduce the number of lines that must be transmitted to half of what was required for progressive scanning. This kind of presentation requires that the odd- and even-numbered lines be presented independently of one another. The presentation of interlaced lines is shown in Figure 5-2.
+As the lines scan down the screen, the electron beam on a CRT display moves across the tube face, painting horizontal lines as it goes. When the beam reaches the bottom of the screen, it must go back to the top as quickly as possible to start the next downward pass. This fly back accounts for about 8% of the scanning time, so you end up losing some of the lines.
+Note how a half line is necessary on each pass in order to properly interleave the lines in the odd and even fields. It is tempting to just crop those two lines when compressing the video. Very often the choices you make with a video processing operation will have consequences (or knock-on effects) later in the workflow. In this case, removing just a single line has a knock-on effect that potentially compromises the field dominance. Lines must be removed in adjacent pairs. So those half lines are actually going to cost 4 lines of image data. An alternative is to keep them, and work out how to fill the other half of each line. A simple copy from an adjacent line would probably be the best solution.
+So the picture area is traversed twice, with one field being painted first and then on the second pass, the other field is painted with the lines filling in the gaps. Figure 5-3 shows how an object is painted on the screen.
+
+Odd field Even field
+Figure 5-2 Interlaced scanning pattern.
+
+Visible lines Horizontal flyback lines Vertical flyback
+
+82 A Practical Guide to Video and Audio Compression
+
+Interlace
+
+Figure 5-3 Interlaced field rasters.
+
+Reconstruction
+Odd Even Odd Even Odd Even Odd Even
+Odd
+
+Whether the odd or even field is painted first depends on what is called the field dominance. It is very important that this is maintained identically to how the footage was filmed because if it is not, a strange “twittering” effect is observed and all the motion seems very jerky. That is because every 25th of a second, the time base goes back by a 50th of a second—a “two steps forward and one step back” scenario—and it is not pleasant to watch. Figure 5-4 plots the time base for a correctly clocked field presentation and one that has its field dominance reversed.
+5.6.1 Persistence of Vision
+The time base of the picture movement is in a 50th of a second increment, based on the field times and not the frame times. The field rate is twice the frame rate, but none of the lines in the odd field are displaying a part of the image that exists in the even field. It is as if there are two separate but simultaneous and totally synchronized movies playing as far as any motion is concerned.
+Because the tube phosphor glows for a little while after the electron beam has passed over it and our eyes have a “persistence of vision,” you don’t see this as two alternate scans. Instead your eyes aggregate it into a single image.
+
+Video 83
+
+Video time
+
+Orderly time line Playback time
+
+Video time
+
+Figure 5-4 Time base twitter.
+
+Twittering time line Playback time
+
+5.6.2 Horizontal Fine Detail
+Interlaced video demands that certain fine horizontal detail gets special treatment. If you draw a 1 pixel-wide line across the screen, it will appear to flicker because for half the time it is not being displayed. If you increase the thickness to 2 pixels, it appears to bounce up and down because it is present in alternate fields at different times. This is called twittering. You must defocus the line in the vertical axis so it covers a slightly larger area, and the flickering effect is then reduced. See Figure 5-5.
+The top line will flicker at 25 Hz because it only appears in one field. The second line will appear to bounce 25 times a second because it appears in a different place in each field. The third line will appear stable because either a full-intensity line is visible or two half-intensity lines are visible, but the average position is always the center line. Hence the eye is fooled into thinking it is stationary.
+5.6.3 Object Motion Between Fields
+Another downside to interlaced video is that motion carries on between fields. A ball bouncing past the camera will be in different positions on the odd and even fields. Figure 5-6 shows the distribution of the object as it moves.
+If the original footage was shot on film and the telecine was transferred using a linebased algorithm rather than a pulldown, the effect is even grosser as shown in Figure 5-7.
+
+84 A Practical Guide to Video and Audio Compression
+1 pixel line 2 pixel line Defocussed line
+Figure 5-5 Horizontal detail.
+Position in first field
+Position in second field shown in dashed outline
+
+Odd field
+Figure 5-6 Interlaced object movement.
+
+Even field
+
+Pausing the video so that both fields are displayed presents a very disturbed image with some detail twittering about all over the place while the background remains still.
+Some of these effects are alleviated by only displaying one field when the video is paused, but this sacrifices vertical resolution. Averaging between the two fields is another possibility that works some of the time, but it is a compromise as well. Chapter 33 revisits that topic in the discussion about de-interlacing. This is an important part of the practical encoding process.
+
+Video Film
+
+Video 85
+
+Figure 5-7 Line-based telecine object movement.
+5.7 Progressive Scanning
+Many of the problems with interlaced video go away completely when you use progressive scanning. You must progressively scan at twice the normal film frame rate (or at the field rate) to provide smooth motion. High-definition TV systems and computer displays are designed around a progressive-scanning model. Figure 5-8 illustrates the progressivescanning line layout.
+5.8 Picture Sizes and Formats
+Television services transmit images of a markedly lower resolution than professional film formats. The frame rates are higher and the delivery process is often more complex. This is designed to reduce the transmission bandwidth.
+
+Figure 5-8 Progressive scanning pattern.
+
+Visible lines Horizontal flyback lines Vertical flyback
+
+86 A Practical Guide to Video and Audio Compression
+5.8.1 Physical Raster Area The physical raster is often described as if the image filled all the available lines. When a 525or 625-line system is mentioned, this is a reference to the physical raster. You will not actually see 525 or even 625 lines on your TV receiver. The vertical blanking time required for the CRT electron beam to fly back to the top of the screen and the horizontal fly-back time accounts for about 8% of the raster. The raster is reduced from 525 to 480 in USA broadcasts and from 625 to 576 lines of usable picture area in Europe. The value of 480 has been argued about and is considered to be a nominal value. Other values are quoted in some literature. Anything bigger than 482 lines of visible picture may be cropped somewhere in the distribution process even when operating in Europe. This is because video equipment and processing software may be operated with settings that allow for worldwide distribution of the content.
+In fact you lose some of the horizontal time because the imaging is only scanned from left to right, and about 15% of the horizontal time is lost to blanking while the beam goes back to start another line.
+This is wholly an analog TV issue; digital TV systems don’t require fly back or blanking time. However, they must make sure the image areas they work in are usable on analog systems.
+This is probably best represented by drawing the physical raster and indicating where to place the blanking to see how much usable raster area remains.
+5.8.2 Visible Raster Area Within the usable raster area is a somewhat smaller picture area. The viewer normally sees an even smaller area than that. This is because TV sets are designed to stretch the image past the edges of the screen. This is called over-scanning. Studio TV monitors allow for this to be switched in and out so that you can see the entire raster. Computer monitors do not over-scan, and you should expect to see the whole addressable picture area on the screen.
+Vertical blanking period
+Visible raster area
+Figure 5-9 Physical and visible raster areas.
+
+525 lines (NTSC) 480 visible
+Horizontal blanking period 625 lines (PAL) 576 visible
+
+Video 87
+Visible area on a normal TV set
+Overscanned region
+Figure 5-10 Over-scanned area on a normal TV set.
+Over-scanning is used to avoid seeing noise and ragged synchronization down either side of the picture. It also hides the half line at the top and bottom of the picture. In addition, there is some hidden digital data that is not part of the picture intended for the viewer. Because of this over-scanning, television programs are designed so that everything happens within a safe area.
+The human eye is amazingly forgiving of nonlinearity and curvature of perpendicular lines. Note that two safe areas are shown in Figure 5-11. One is the action safe area and the other is the text safe area. The text safe area is even smaller in order to cope with TV sets that are grossly misconfigured. The safe area ensures that text remains within the part of the picture that is most likely to be geometrically stable and linear. The safe area is the part of the picture that is least likely to be cropped or damaged by aspect-ratio conversion.
+5.8.3 Legacy 405 Line Transmission This format is no longer being broadcast, but it is important because some archival material was recorded off-air when this was the UK standard-definition service. The material will be monochrome because no color service was broadcast in this resolution. The BBC has publicly committed to making some of the archives accessible to UK citizens over the next few years, and very likely some valuable historical footage in this format will come to light. Any restorative processes will be performed digitally, so the first step is to convert the material from an analog form. The equivalent resolution for this service is 400 nonsquare pixels across 380 visible lines within a 405-line interlaced raster.
+5.8.4 Standard-Definition TV Standard-definition TV (SDTV) continues to be delivered differently in Europe and the United States. In fact there are many different variations to the size and scan rate of TV services all over the world.
+

@@ -1,0 +1,200 @@
+353
+
+Compression Of Wideband Sound For Multimedia
+Application
+Adrian Rominski, Zygmunt Ciota'
+
+Absfrocr - Two methods of sound compression: MPEG and Ogg-
+
+Vorbis have been discussed and compared. The objective eritcria
+
+has been uscd during test procedure. Mired hardwarc-software
+
+approach can improve the speed and also the quality of the
+
+compression. Audible noise cancellation in high quality speceh
+
+processing has been also pmcnted. Furthermore, speech coding
+
+system has to have real-time capabilities, so the hsrdwarr-
+
+software co-design permits to achicve low cost and high-speed
+
+performances.
+
+Keywords - Multimedia, GPL,compression, audio, ASIC, FIR,
+
+DSP
+
+I.
+
+INTRODUCTTON
+
+GPL (General Public License) made up by Richard Stallman is completely new idea of soflware and intellectual property distribution. GPL guarantees free of charge possibility of coping, using and access to the source code of the program. Idea of free software witten by a little more experienced users and given to whole community had been ignored long time until Linux started up as the professional and competitive product to the most powerful operational systems which cost a lot of work and money and are created by the most powerful firms ofthe world.
+W e can observe two strategies of big firms being active in this new reality: combating against this new trend with all means, while the second strategy is a trial of cooperation and using this new experience in own products, vide Sun corporation.
+The second part of the article deals with the hardware implementation of algorithms for sound processing. The earlier mentioned GPL licensed solution are also very attractive in this context.
+11. ORBIS-OGG AS THE NEW GPL COMPRESSlON
+FORMAT
+
+An oppressive license policy in time of CD-writers, printers, Internet and other technical possibilities ofcoping and spreading any kind of media but also in time of huge resources of created programs, multimedia contents, seems to be a little bit out of date.
+An equivalent of Linux system in audio compression formats is vorbis-ogg format [l]. It is based on GPL and is available absolutely for free. Now state of the project could be described as Release Candidate 3, it means that offered codecs, also in source code version, for the most popular operational systems, machines and programs (LinuxAJNIX, Windows, Macintosh, BeOS, Winamp and other players plug-ins) are
+'Technical University of Lodz Depamnent of Microelectronics and Computer ScienceAl. Poiitechniki I I, 90-924 Lo4 Poland
+
+fully functional and ready to use, moreover there is no discovered errors in the program operation.
+Users tests proved that quality of sound at the same bitrate is better than for MPEG audio layer 3 (famous MP3) and comparable to lately created MP3pr0, but without any fees also for coders, coding and using in hardware players at any bitrate [2]. Of course, the popularity of 0% is still less than widely spread MP3, but Internet query showed up, that it is the second most used format for compression after MP3, but more often used than strongly promoted Microsoft Windows Media Audio 8.
+Not only music is a place for audio compression. Sound tracks in films are very promiscuous; tandem DivX - Ogg seems to work now only in 2 channels, but multi-channel surround sound is coming and it will be strong alternative for Dolby Digital, DTS and MPEG. Also other branches of electronic entertainment started to use the new format. Many computer games were released with sound in Vorbis-Ogg, one of them Schinn were awarded with Seal Of Excellence Adrenaline Vault. Ogg format was not created in the vain and utilizes experiences of yet created formats. Some main features, characterized good, modem audio codec were established:
+Effective compression based on MDCT, but with opportunity of using other methods
+Variable Bitrate (VBR), which accommodates bitrate to signal characteristics, but with possibility to obtain restricted bitrate in order to utilize transmission channels with fixed
+bitrate for a signal.
+Multi-channel (2 and much more than 2 channels) feature with possibility of using correlation between channels in compression process
+GPL license Ogg is predefined for using in streamable digital media as Internet radio, Voice Over IF' telephony, communication between players in computer games, etc. Tags system useful for description of files with predefined
+tags and user definable tags
+111. SOME OTHER FEATURES WHlCH WILL BE
+USEFUL IN THE FUTURE
+Today we stand in front of a big problem, growing rapidly in multimedia, but also other information and contents. These problems, mostly derives from extraordinary amount of multimedia information. One ofthe Peer-To-Peer file exchange client offers hundreds of terabytes compressed music, it equivalent of human life duration. In that situation is obvious,
+
+CADSM'ZOO3, FEBRUARY 18-22,2003. LVIV-SLASKO, UKRAINE
+
+354
+
+that one man cannot listen all these files, so it is necessary to index and describe all pieces of the information.. Contemporary tag system works now, but one day may not be enough, even set o f headers will overcome limits of lmmun perception. One of the solutions could be splitting data base between users using different contents and then let them interchsngc information. Maybe, some inforniation should be also incrementally deleted to make room for new things (how to decide which?). Another challenge are new methods of coding which will allow algorithmic coding of sound, like sound synthesis with type of voice choosing, coding of niusic with vocal with newer equivalent of MIDI fomiat. Xiphomorphous intend to create also moving picture coding (Tarkin project), it could be very interesting, specially with new restrictive licensing policy of MPEG 4, when many firms tries to find an alternative.
+Iv. COMPARISON TEST
+We have made some test based on objective (not the best in case of subjective lossless formats, but always objective) criteria. Because Vorbis codec is VRR (Variable Bitrate), the same option was used in MPEG layer-3 codec. The coding was made with Vorbis RC3 encoder and LAME MPEG layer-3 encoder considered as one with the best quality, mp3 encoder. The codecs were set up to obtain the same average bitrate of about 128 kbit's, coding was made from source file of CDaudio quality (44100Az,16 bitlsample, stereo). Tne set of parameters for tnp3 coding is shown in Figure 1, whilc the parameter for Vorbis codec is shown in Figure 2. Because Vorbis is made as VRR from the beginning, the average bitrate is derived from the quality factor, but there is a method to set lower and upper limit for the bitrate. The first criteria (very often used) is bandwidth of encoded sound, 3 seconds o f white noise was used to examine the codecs, as it was sliown in Figure 3. Vorbis encoder performs all the bandwidths, while mp3 encoder (see Figure 4) has a threshold at about 12 kHz. It is worth to say that subjectively high frequency sound are weakly audible.
+
+Fig. 2: I'wamcter s t for Vorbis c~tlec
+Fig. 3: Bandwidth ofencadcd soilnil - Varbis encoder
+Channel separation was very good in both cases, so this test is not worth of publishing. The third test has been performed as pre- and post-echo test. Encoders often doesn't work properly leavingladding some artifacts before and after original sound. We used a sound consisted of 1 sec. of silence, 3 seconds ofwhite noise and then again 1 second o f silence. As it is shown in Figure 5 the sound has delay, because the noise should finished at 4th second, and then there is a long period ofpost-echo fading. about lOms in comparison with 2ms of Ogg's post-echo (Figure 6 ) .
+
+Fig. 4: Bandwidth of encoded sound ~ M1'3 encoder CADSM'2003, FEBRUARY 18-22,2003, LVIV-SI.ASK0, UKRAINE
+
+355
+
+Fig. 4: MP3 codcc: pre- and post-ccho test
+
+..
+Additionally, each sample is also corrclated with neiehborina SaInDIeS. For unvoiced soeech simal the
+
+Fig. 5 : Vorbis codec: pre- and post-echo test " We can also observe that there is no sound delay in the
+
+case of Ogg Vorhis. Pie-echo is similar as post-echo for both
+
+codecs.
+
+This 3 tests revealed an advantage in the objective
+
+criteria, but it should he mentioned that it is not a "full tnitli"
+
+about codecs. The most important i a people opinion based on
+
+subjective criteria but sometimes also connected with customs,
+
+prejudices and economic criteria. One of the important criteria
+
+ihat could be taken into consideration is encoder speed.
+
+Because Vorbis is rather fresh and under development, so there
+
+was no possibility to optimize it, like LAME, which uses
+
+MMX and has strongly optimized code. One of the way of
+
+optimization could he through the hardware acceleration. For
+
+example, such oflen repeated operations, like MDCT transform
+
+o r suhband synthesis based on the hank of digital FIR filters,
+
+are predisposed to realize them in hardware form (see Figure 7
+
+and 8).
+
+V.
+
+HIGH QUAIITY VOICE PROCESSING
+
+The latest development of multimedia systems demands new methods of speech processing like effective coding, recognition and synthesis [3,4,5].The vocal communication between computer and man has nowadays a lot of gaps, because language is very essential evidence of humanity. As a consequence, it is necessary to improve the transformation methods of speech signal for obtaining more efficient transmission procedures and also for an enhancement of intelligibility. New digital signal processing permits to apply a lot of effcient algorithms (using dctcrministic and probabilistic approaches) for speech processing.
+
+The sampling technique permits to obtain high quality speech under the condition, that noise spectrum has to bc located under the three first formants (resonances) of the synthesized voice, according to Figure 6 . The proper shape o f noise spectrum can be achieved by using adaptive filters.
+
+d
+
+h/
+
+Fig. 6 :The spectral representation ofa vowel sound (solid line) and quantizingnoise (dashed line): a). audible noise, h). uudihlc disrortions haw been canccled aRer optimization Adaptive filters are very important and responsible
+components in today's telecommunication systems. They are
+widely tipplied in different applications like full-duplex transmissions of telephone lines for acoustic echo cancellation, blind source separation, channel equalizers and noise cancellation. Since modem adaptive filters have to be suitable for real time applications, it is necessary to build appropriate fast algorithms. Such adaptive algorithms should be a compromise between high convergence, low steady-state error
+and fast tracking properties. The FIR filters are the most frequently used in adaptive
+systems. The application of the least-mean-square (LMS) algorithms and its modification to the control of FIR filter
+
+CADSM'2003, FEBRUARY 18-22,2003, LVIV-SLASKO, UKRAINE
+
+356
+
+gives the approximation of the Wiener solution [3]. The concerning current-mode CMOS components (see Fig. 7 and 8)
+
+simplicity of such approach is used very often in many ~ 3 ~ 4 1 .
+
+practical implementations. Sometimes, LMS algorithm may be
+
+also applied in a non-stationary (but slowly varying only)
+
+VI. CONCLUSION
+
+environment. Designing a speech processing system is inherently a
+complex task involving human expertise as well as aids intended to accelerate the process. Furthermore, such efficient system has to have real-time capabilities, so the hardwaresoftware co-design permits to achieve low cost and high-speed performances. While microcontrollers and microprocessors are
+
+Combining GPL licensed algorithms with effective hardware realization c& be new way of audio signals processing. High efficiency of free software solutions like Ogg-Vorbis and their hardware realizations could be a base of new digital radio broadcasting, music distribution and the solution for modern audio signal processing at all.
+
+inherently digital components, some functions can be executed in analog or digital form.
+
+VII. ACKNOWLEDGEMENTS
+
+Application of mixed digital-analog realization to the design process of adaptive structures may be better in comparison with purely digital solution and very often we can achieve better results (decreasing of the chip surface and
+
+This work was supported by the EU programme Research
+and Training Action for System on Chip Design REASON IST-200030 193.
+
+increasing of the speed parameter of the circuit). Different analog approaches of the programming of such systems have
+
+VIII. REFERENCES
+
+been presented [3,5], including time-sharing method. [I] w . v o r b i s . c o m
+
+Advanced adaptive systems can work efficiently thanks to the additional control system, built as digital circuit, which applies
+
+[2] www.m~3-tech.org
+
+the time-sharing principle.
+
+[3] Z. Ciota, Efficient algorithm of adaptive filtering for real-
+
+time applications, Proc. Adaptive Systems for Signal ._
+Processing, Communicationsand Control (AS-SPPC?OOO),
+
+Lake Louise, Canada, October 1-4,2000, pp.299-303
+
+[4] M. Szermer, M. Jankowski. Z. Ciota , A. Napieralski, M. Daniel, K. Slusarczyk, Efficient measurements of current
+mode circuits using LABVIEW environment, . 8'*
+Internutionul Conference MIXDES'2OOI,June 21-23,2001,
+Zakopane, Poland
+
+Fig. 7: Microphotograph of current mode CMOS wmpnenls (A/D converter and transwnducmce amplifiers)
+
+[ 5 ] Z. Goh, K.-C. Tan, B.T.G.Tan, Estimating time-varying noise introduced by CVSD for speech enhancement, IEE Proc.-Vis. Image Signal Process., vol. 145, February 1998,
+pp. 23-29
+
+n I
+
+r I l l.l 1 ' 1 1 1 1 1 1 . ,,,, ., t .e
+
+:> 1.
+
+.I 87 //
+
+Fi-e. 8: The bank of switched current filters (CMOS
+technology)
+
+We expect that hardware realization of some components (e.g. filters, neural network units) can be useful for smart realtime applicable .We have performed some preliminary works
+
+CADSM'2003, FEBRUARY 18-22.2003, LVIV-SLASKO, UKRAINE
+

@@ -1,0 +1,130 @@
+See discussions, stats, and author profiles for this publication at: https://www.researchgate.net/publication/265214872
+
+An Optimal Compressive Approach for the Analysis of Electroencephalogram using Artiﬁcial Neural Network
+
+Article · April 2011
+CITATION
+1
+2 authors:
+B.K. Tripathy VIT University 749 PUBLICATIONS 4,517 CITATIONS
+SEE PROFILE
+
+READS
+85
+Sasikumar Gurumurthy 101 PUBLICATIONS 197 CITATIONS
+SEE PROFILE
+
+All content following this page was uploaded by Sasikumar Gurumurthy on 13 October 2014. The user has requested enhancement of the downloaded file.
+
+ISSN No. 0976-5697
+
+!
+
+"!" # $ $"
+
+%&
+
+''' (
+
+An Optimal Compressive Approach for the Analysis of Electroencephalogram using Artificial neural network
+
+Sasikumar Gurumurthy*, Dr.B.K.Tripathy
+School of Computing Science and Engineering VIT University Vellor, India
+g.sasikumar@vit.ac.in
+
+Abstract: Electroencephalogram is an important tool for diagnosing, Monitoring and Managing neurological disorders related to brain diseases such as epilepsy, tumor, encephalitis, and sleep disorders; using hardware like Electroencephalogram (EEG) wherein the strokes are directly detected and the brain signals is recognized. The Proposed work is an algorithm to perform digital data retrieval in a denoised signal and to design a vector quantizer for digital signal compression using clustering and subvector technique. A challenge of brain signal denoising is how to preserve the edges of brain signal when reducing noise. The paper presents an approach for signal denoising based on wavelets Thresholding. The presence of brain activity in the Electroencephalogram (EEG) confirms the diagnosis of diseases. The purpose of the work describes the automated detection of brain diseases based on wavelet analysis of electroencephalogram. Three layer feed forward back-propagation artificial neural network (ANN) is designed to classify the brain signals among different age group of people. The algorithm is developed based on the lossless digital data retrieval concept.
+Keywords: Electroencephalogram (EEG), Artificial Neural Networks (ANN), watermarking, wavelet Thresholding, Vector quantization.
+
+I. INTRODUCTION
+Digital Data retrieval plays an important role in this era. The growth of high speed computer networks and that of Internet, in particular, has explored means of new business, scientific, entertainment, and social opportunities. Digital Data retrieval is referred to as a process to embed useful data (representing some information) into a cover media. Data retrieval is a generalization of signal wherein perceptually invisible changes are made to the digital signal for embedding additional information in the data. Data retrieval could be used to embed control or reference information in digital media for applications such as tracking the use of a particular disease for different age group or to diagnosis for the particular age group of people.
+Digital Denoising has remained a fundamental problem in the field of signal processing. Wavelets give a superior performance in digital signal denoising due to properties such as sparsity and multiresolution structure. With Wavelet Transform gaining popularity in the last two decades, various algorithms for denoising in wavelet domain were introduced. The focus was shifted from the Spatial and Fourier domain to the Wavelet transform domain.
+Digital signal compression addresses the problem of reducing the amount of data required to represent a digital image. The basis for reduction is removal of redundant data. Various algorithms have been proposed regarding the lossy compression which removes the psycho visual redundant data. Later on, the compressed digital signal is decomposed to reconstruct the original signal or an approximation of it.
+.
+II. PROPOSED METHOD
+Proposed method performs digital signal denoising, authenticated digital data as well as image compression using vector quantization. Denoising is done to reduce the noise present in the image, here gaussian noise is removed because
+
+removal of gaussian noise is not easier like that of other noises present in the images.
+The proposed method has various phases such as Signal Transformation and denoising, authenticated Data Embedding Digital Data extraction. The resultant signal will be a compressive digital data with less noise when compared to that of original digital signal and the hidden data is successfully retrieved.
+A. Digital Signal Transformation and Denoising
+A Digital signal is basically formed as a result of the projection of a 3D scene into 2D. Brain signals are basically coordinated in 2D. Every discrete point will have an associated gray level or brightness. One of the useful ways of decomposing signal is with the help of wavelet transforms. Apart from this, a number of other methods of decomposing digital brain signal are also available like Fourier transforms and Karhunen - Loeve transforms.
+
+© 2010, IJARCS All Rights Reserved
+
+485
+
+Sasikumar Gurumurthy, International Journal of Advanced Research in Computer Science, 2 (2), Mar-Apr, 2011, 485-487
+
+Start Input Image Add Gaussian Noise
+
+Data
+
+Original Image
+
+Key
+
+Wavelet Transformation
+
+Perform over complete wavelet transform
+
+Data are to be embedded inside the least bit plane of wavelet coefficients
+
+Horizontal/Vertical/Diagonal details
+Calculate Variance of Each subband
+Assume the Variance of noise
+
+Encryption of data is done using key Marked Image
+
+Calculate linear minimum mean square error
+Reconstruct image and calculate PSNR for denoised image
+End
+Figure 1. Wavelet Thresholding based denoising flow diagram
+De-noising algorithms attempt to recover the original signal corrupted by additive white noise. The ability of wavelets to concentrate the signal in a few relatively large wavelet coefficients makes it a very attractive tool for noise signal processing (fig 1). Thus we go in for the technique of wavelet transforms to de-noise our brain signals.
+B. Data hiding and retrieval
+Digital Data hiding is referred to as a process to embed useful data (representing some information) into a cover media. In most of application where authentication is needed, invisibility of data becomes the major requirement. In most cases, the cover media will experience some distortion due to data hiding and cannot be inverted back to the original media. That is, some permanent distortion exists even after the hidden data have been extracted. In some applications, such as medical diagnosis and law enforcement, it is desired to reverse the marked media back to the original cover media after the hidden data are retrieved. The marking techniques satisfying this requirement are referred to as reversible or lossless data hiding techniques.
+The secret key is used to make the hidden data remaining in secret even after the algorithm is known to the public. This is used for the authentication, to prevent others misusing the data hidden in the original Image.
+The block diagram of the proposed authenticated data embedding is shown in Figure 2. Data extraction is an inverse process of the data embedding.
+
+Figure 2. Authenticated Data hiding using key
+C. Image Compression
+In recent years, the image compression has gained immense importance. Digital Signal compression addresses the problem of reducing the amount of data required to represent a digital image. The basis is removal of redundant data.
+The digital signals can be slightly modified during compression/expansion cycle without affecting the perceived quality on the part of the user. Minor changes in the exact shade of the signal here and there can easily go completely unnoticed if the modifications are done carefully.
+The transformation is applied prior to transmission or storage of the signals. Later, the compressed digital signal is decompressed to reconstruct the original signal which is the approximation of it.
+If the inputs and outputs of a quantizer are vectors, they are called as Vector quantizes. Vector Quantization has been seen as an extension to scalar Quantization. By Shannon’s distortion theory Vector quantization has proven to be better than scalar quantization. Vector quantization is used in many applications such as digital signal and voice compression, voice recognition (in general statistical pattern recognition).
+Vector quantization is a generalization of scalar quantization techniques where the number of possible (signal) values is reduced. Here the input data consists of Mdimensional vectors (M blocks) instead of scalars (single signal values). These vectors however, do not evenly occupy the input space. Some input vectors are very common while others hardly ever appear in real images.
+Vector Quantization partitions the input space is into Knon overlapping regions so that the input space completely covered .A representative (code vector) is then assigned to each cluster. Vector Quantization maps each input vector to this code vector, which is the representative vector of the partition. A vector quantizer Q maps k-dimensional vectors in the vector space Rk into a finite set of vectors Y = {yi: i = 1, 2, ..., N}. Each vector yi is called a code vector or a codeword. And the set of all the codewords is called a codebook (Fig 3).
+Q: Rk ---- Y Digital Signal compression based on vector quantization: 1. Design of code book to encode the digital signal. 2. Design the encoder to encode each frame of the signal using the code book and transmit the index of the code book. 3. Design of decoder which decodes the index transmitted to look up the code book to reconstruct the encoded digital signals.
+
+© 2010, IJARCS All Rights Reserved
+
+486
+
+Sasikumar Gurumurthy, International Journal of Advanced Research in Computer Science, 2 (2), Mar-Apr, 2011, 485-487
+
+III. CONCLUSION
+
+Obtained result is the original digital signal with less noise compared to that Input signal and the successful retrieval of embedded digital data from an image without loss of data. Experiments were carried out using the test signal such as brain signal, for the different age group the proposed algorithm works well. This paper provides a fast encoding algorithm for Vector Quantization, reduced the computational time. The blocking effects in the reconstructed image have been removed. And also the time complexity has been reduced.
+The time complexity has been reduced, the noise present in the signal has been reduced and data hiding concept is done successfully and the peak signal to ratio has been increased. So, work can be extended for color digital signals .
+
+IV. REFERENCES
+
+Figure 3. Code book initialization by the vectors
+The procedure for Optimal Clustering is as follows: 1. Get the input digital signal from the user. 2. Convert the input signals into blocks. 3. Calculate the norm for each vector. 4. Divide the vectors into two sub vectors. 5. Sort the input vectors based on their distance. 6. Find the difference between the sorted value of first pass. 7. To find the Variance of the difference ( Var ( Diff ) )
+a. var(X) returns the variance of X for vectors. For matrices, var(X)is a row vector containing the variance of each column of X. var(X) normalizes by N-1 where N is the sequence length. This makes var(X) the best unbiased estimate of the variance if X is a sample from a normal distribution. var(X,1) normalizes by N and produces the second moment of the sample about its mean.
+8. Based on the variance calculate sum and divid by variance.
+9. Divide the vector into subvector(ie 64/8=8) 10. Again calculate the Norm. 11. Find the difference between the sorted value of first pass. 12. According to the sorted value calculate the sum , divide
+by variance and codebook is generated
+
+[1] Mehmet Uktu Celik, Gaurav Sharma and A. Murat Tekalp, “Lossless Watermarking for Image Authentication: A New Framework and an Implementation” IEEE Transactions On Image Processing, Vol. 15, No. 4, April 2006.
+[2] Jeng-Shyang Pan, Zhe-Ming Lu, and Sheng-He Su, “An Efficient Encoding Algorithm for Vector Quantization Based on Subvector Technique” IEEE Transactions On Image Processing, Vol. 12, No. 3, March 2006.
+[3] Q.Pan, L.Zhang et al, Dec. 1999, “Two denoising methods by wavelet transform,” IEEE Trans. Image Processing, vol.3, pp3401-3406.
+[4] Ryun Q. Shi, Z. Ni, Dekun Zou, Changyin Liang and Guorong Xuan “Lossless Data Hiding: Fundamentals, Algorithms and Applications” IEEE.(2004).
+[5] C. W. Honsinger, P. Jones, M. Rabbani, and J. C. Stoffel, “ Lossless recovery of an original image containing embedded data,” US Patent application, Docket No: 77102/E−D (1999).
+[6] Nan-I Wu and Min-Shiang Hwang, “Data Hiding: Current Status and Key Issues”, Internationational Journal of Network Security, Vol.4, No.1, PP.1-9, Jan. 2007.
+[7] Fabien A.P. Petitcolas, Ross J. Anderson and Markus G, Kuhn, “Information Hiding – A Survey,” Proceedings of the IEEE, Special issue on protection of multimedia content, 87(7):1062-1078, July 1999.\
+
+© 2010, IJARCS All Rights Reserved
+
+487
+
+View publication stats
+

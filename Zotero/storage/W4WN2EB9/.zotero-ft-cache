@@ -1,0 +1,153 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (75)
+    Cited by (160) 
+
+Elsevier
+Signal Processing: Image Communication
+Volume 14, Issue 9 , July 1999, Pages 737-760
+Signal Processing: Image Communication
+Image compression with neural networks – A survey
+Author links open overlay panel J. Jiang
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/S0923-5965(98)00041-1 Get rights and content
+Abstract
+
+Apart from the existing technology on image compression represented by series of JPEG, MPEG and H.26x standards, new technology such as neural networks and genetic algorithms are being developed to explore the future of image coding. Successful applications of neural networks to vector quantization have now become well established, and other aspects of neural network involvement in this area are stepping up to play significant roles in assisting with those traditional technologies. This paper presents an extensive survey on the development of neural networks for image compression which covers three categories: direct image compression by neural networks; neural network implementation of existing techniques, and neural network based technology which provide improvement over traditional algorithms.
+Introduction
+
+Image compression is a key technology in the development of various multimedia computer services and telecommunication applications such as teleconferencing, digital broadcast codec and video technology, etc. At present, the main core of image compression technology consists of three important processing stages: pixel transforms, quantization and entropy coding. In addition to these key techniques, new ideas are constantly appearing across different disciplines and new research fronts. As a model to simulate the learning function of human brains, neural networks have enjoyed widespread applications in telecommunication and computer science. Recent publications show a substantial increase in neural networks for image compression and coding. Together with the popular multimedia applications and related products, what role are the well-developed neural networks going to play in this special era where information processing and communication is in great demand? Although there is no sign of significant work on neural networks that can take over the existing technology, research on neural networks of image compression are still making steady advances. This could have a tremendous impact upon the development of new technologies and algorithms in this subject area.
+
+This paper comprises five sections. Section 2discusses those neural networks which are directly developed for image compression. Section 3contributes to neural network implementation of those conventional image compression algorithms. In Section 4, indirect neural network developments which are mainly designed to assist with those conventional algorithms and provide further improvement are discussed. Finally, Section 5gives conclusions and summary for present research work and other possibilities of future research directions.
+Section snippets
+Basic back-propagation neural network
+
+Back-propagation is one of the neural networks which are directly applied to image compression coding 9, 17, 47, 48, 57. The neural network structure can be illustrated as in Fig. 1. Three layers, one input layer, one output layer and one hidden layer, are designed. The input layer and output layer are fully connected to the hidden layer. Compression is achieved by designing the value of K , the number of neurones at the hidden layer, less than that of neurones at both input and the output
+Neural network development of existing technology
+
+In this section, we show that the existing conventional image compression technology can be developed right into various learning algorithms to build up neural networks for image compression. This will be a significant development in the sense that various existing image compression algorithms can actually be implemented by simply one neural network architecture empowered with different learning algorithms. Hence, the powerful parallel computing and learning capability with neural networks can
+Neural network based image compression
+
+In this section, we present two image compression systems which are developed firmly based on neural networks. This illustrates how neural networks may play important roles in assisting with new technology development in the image compression area.
+Conclusions
+
+In this paper, we have discussed various up-to-date image compression neural networks which are classified into three different categories according to the nature of their applications and design. These include direct development of neural learning algorithms for image compression, neural network implementation of traditional image compression algorithms, and indirect applications of neural networks to assist with those existing image compression techniques.
+
+With direct learning algorithm
+References (75)
+
+    S.C. Ahalt et al.
+    Competitive learning algorithms for vector quantization
+    Neural Networks
+    (1990)
+    P.G. Howard et al.
+    New methods for lossless image compression using arithmetic coding
+    Inform. Process. Management
+    (1992)
+    D. Kornreich et al.
+    Normalization schemes in a neural network image compression algorithm
+    Signal ProcessingImage Communication
+    (1997)
+    M. Mougeot et al.
+    Image compression with back propagation: improvement of the visual restoration using different cost functions
+    Neural Networks
+    (1991)
+    T.D. Sanger
+    Optimal unsupervised learning in a single-layer linear feed forward neural network
+    Neural Networks
+    (1989)
+    H.H. Song et al.
+    LVQ combined with simulated annealing for optimal design of large-set reference models
+    Neural Networks
+    (1996)
+    A. Averbuch, D. Lazar, M. Israeli, Image compression using wavelet transform and multiresolution decomposition, IEEE...
+    M.F. Barnsley, L.P. Hurd, Fractal Image Compression, AK Peters Ltd, 1993, ISBN:...
+    G. Basil, J. Jiang, Experiments on neural network implementation of LBG vector quantization, Research Report,...
+    Benbenisti
+    New simple three-layer neural network for image compression
+    Opt. Eng.
+    (1997)
+
+View more references
+Cited by (160)
+
+    Learning-driven lossy image compression: A comprehensive survey
+    2023, Engineering Applications of Artificial Intelligence
+    Show abstract
+    Convolution Neural Network based lossy compression of hyperspectral images
+    2021, Signal Processing: Image Communication
+    Citation Excerpt :
+
+    Another domain deals with multitemporal HSI compression [11], and its implementation on cloud [12]. It is one of the most popular methods as it involves neural network [13], machine learning and deep learning in compression. It is widely known due to the learning capacity of features and automatic updating of parameters.
+    Show abstract
+    LeCA: In-Sensor Learned Compressive Acquisition for Efficient Machine Vision on the Edge
+    2023, Proceedings - International Symposium on Computer Architecture
+    A survey of Image Compression Algorithms based on Deep Learning
+    2023, Research Square
+    An Introduction to Neural Data Compression
+    2023, Foundations and Trends in Computer Graphics and Vision
+    A natural representation of colors with textures
+    2022, Visual Computer
+
+View all citing articles on Scopus
+View full text
+Copyright © 1999 Elsevier Science B.V. All rights reserved.
+Recommended articles
+
+    Hybrid Neural Network Predictive-Wavelet Image Compression System
+    Neurocomputing, Volume 151, Part 3, 2015, pp. 975-984
+    Abir Jaafar Hussain , …, Paulo Lisboa
+    Improved hybrid layered image compression using deep learning and traditional codecs
+    Signal Processing: Image Communication, Volume 82, 2020, Article 115774
+    Haisheng Fu , …, Chengjie Tu
+    Research on image compression technology based on Huffman coding
+    Journal of Visual Communication and Image Representation, Volume 59, 2019, pp. 33-38
+    Shuyun Yuan , Jianbo Hu
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 138
+    Patent Family Citations: 1 
+
+Captures
+
+    Exports-Saves: 4
+    Readers: 107 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

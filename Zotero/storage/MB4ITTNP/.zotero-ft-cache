@@ -1,0 +1,466 @@
+Survey of Dropout Methods for Deep Neural Networks
+
+arXiv:1904.13310v2 [cs.NE] 25 Oct 2019
+
+Alex Labach University of Toronto alex.labach@mail.utoronto.ca
+
+Hojjat Salehinejad University of Toronto hojjat.salehinejad@mail.utoronto.ca
+
+Shahrokh Valaee University of Toronto valaee@ece.utoronto.ca
+
+Abstract
+Dropout methods are a family of stochastic techniques used in neural network training or inference that have generated signiﬁcant research interest and are widely used in practice. They have been successfully applied in various applications, including neural network regularization, model compression, and in measuring the uncertainty of neural network outputs. While originally formulated for dense neural network layers, recent advances have made dropout methods also applicable to convolutional and recurrent neural network layers. This paper summarizes the history of dropout methods, their various applications, and current areas of research interest. Important proposed methods are described in additional detail.
+1 Introduction
+Deep neural networks are a topic of widespread interest in contemporary artiﬁcial intelligence and signal processing. Their high number of parameters make them particularly prone to overﬁtting, requiring regularization methods in practice. Dropout was introduced in 2012 as a technique to avoid overﬁtting [1] and was subsequently applied in the 2012 winning submission for the Large Scale Visual Recognition Challenge that revitalized deep neural network research [2]. The original method omitted each neuron in a neural network with probability 0.5 during each training iteration, with all neurons being included during testing. This technique was shown to signiﬁcantly improve results on a variety of tasks [1].
+In the years since, a wide range of stochastic techniques inspired by the original dropout method have been proposed for use with deep learning models. We use the term dropout methods to refer to them in general. They include dropconnect [3], standout [4], fast dropout [5], variational dropout [6], Monte Carlo dropout [7] and many others. Generally speaking, dropout methods involve randomly modifying neural network parameters or activations during training or inference, or approximating this process. Figure 1 illustrates research into dropout methods over time.
+While originally used to avoid overﬁtting, dropout methods have since expanded to a variety of applications. The two additional applications discussed in this paper are the use of dropout to compress deep neural networks [8–11] and Monte Carlo dropout [7], which measures the uncertainty of deep learning models during inference.
+Another direction of research into dropout methods has been applying them to a wider range of neural network topologies. This includes methods for applying dropout to convolutional neural network layers [12–19] as well as to recurrent neural networks (RNNs) [20–24]. RNN dropout
+
+Standard dropout 5Hinton et alVR
+
+Empirical analysis of dropout 5WardeTFarley et alVR
+Annealed dropout 5Rennie et alVR
+Multiplicative Gaussian noise 5Srivastava et alVR
+
+Stochastic depth 5Huang et alVR
+Evolutionary dropout 5Li et alVR
+Variational RNN dropout 5Gal et alVR
+Hidden state update dropout 5Semeniuta et alVR
+Monte Carlo dropout 5Gal et alVR
+Selective CNN dropout 5Park et alVR Swapout 5Singh et alVR
+
+Adversarial dropout methods 5Park et alVb
+Saito et alVR
+Fraternal dropout 5Żołna et alVR
+Information dropout 5Achille et alVR
+Targeted dropout 5Gomez et alVR
+
+Publication Year
+
+76C7
+
+76Ch
+
+76Ck
+
+76C8
+
+76Cz
+
+76C9
+
+76CI
+
+76Cj
+
+Analysis of dropout as averaging 5Baldi et alVR
+Standout 5Ba et alVR
+Fast dropout 5Wang et alVR
+Dropconnect 5Wan et alVR
+Maxout 5Goodfellow et alVR Dropout as weight regularization 5Wager et alVb
+Helmbold et alVR
+
+Variational dropout 5Kingma et alVR
+RNNdrop 5Moon et alVR
+MaxTpooling dropout 5Wu et alVR
+Spatial dropout 5Tompson et alVR
+Dropout for RNNs 5Zaremba et alVR
+Dropout as data augmentation 5Bouthillier et alVR
+
+Cutout 5DeVries et alVR
+Dropout for model compression 5Neklyudov et alVR
+Variational dropout for sparsification 5Molchanov et alVR
+Concrete dropout 5Gal et alVR
+Curriculum dropout 5Morerio et alVR
+AlphaTdivergence dropout in Bayesian NNs 5Li et alVR
+WeightTdropped LSTMs 5Merity et alVR
+
+Spectral dropout 5Khan et alVR
+Ising dropout 5Salehinejad et alVR
+Adversarial dropout for RNNs 5Park et alVR
+Effective dropout for CNNs 5Cai et alVR
+Weighted Channel Dropout 5Hou et alVR
+
+Figure 1: Some proposed methods and theoretical advances in dropout methods from 2012 to 2019.
+
+methods in particular have become commonly used, and have been recently applied in improving state-of-the-art results in natural language processing [24–26].
+This paper provides an overview of past and current research into dropout methods. Although not exhaustive, certain dropout methods that are particularly inﬂuential or representative of particular areas of research are described in detail. The rest of the paper is structured as follows. Section 2 describes the original dropout method proposed by Hinton et al. [1] and introduces basic concepts common to dropout methods. Section 3 summarizes approaches for theoretically explaining the function of dropout methods. Section 4 describes dropout methods for general neural network training. Section 5 describes dropout methods specialized for training convolutional neural network layers and Section 6 describes methods specialized for recurrent neural network layers. Section 7 summarizes dropout methods for compressing neural networks. Section 8 describes Monte Carlo dropout and related work. Finally, Section 9 discusses current and future research directions.
+1.1 Notation
+We follow a number of common conventions when providing formulas describing neural network cells or layers. Bold lower-case letters represent vectors and bold upper-case letters represent matrices. Most of the time, when multiplying an input vector by a weight matrix, a vector of learned biases may also be added, for example producing Wx + b from an input vector x. To simplify notation, we generally treat the biases as elements of the weight matrix, with an element with value 1 implicitly appended to the vector x. So, the previous operation would be written as Wx. The operator ◦ represents element-wise (or Hadamard) multiplication.
+2 Standard dropout
+The original proposed dropout method, introduced by Hinton et al. [1] in 2012, provides a simple technique for avoiding overﬁtting in feedforward neural networks. During each training iteration, each neuron is omitted from the network with probability p. Once trained, the full network is used, although neuron outputs are multiplied by the probability p that the neuron was omitted. This com-
+2
+
+Figure 2: An example of standard dropout. The left network is fully connected, and the right has had neurons dropped with probability 0.5. Dropout is not applied to the output layer.
+
+pensates for the larger size of the network now that no neurons are dropped, and can be interpreted as averaging over the possible networks during training. The probability can vary for each layer, with the original paper recommending p = 0.2 for the input layer and p = 0.5 for hidden layers. Neurons in the output layer are not dropped. This technique is usually simply known as dropout, but for the purposes of this article we will call it standard dropout, to distinguish it from other dropout methods. This method is illustrated in Figure 2.
+
+Mathematically, the behaviour of standard dropout during training for a neural network layer is given
+
+by:
+
+y = f (Wx) ◦ m, mi ∼ Bernoulli(1 − p)
+
+(1)
+
+where y is the layer output, f (·) is the activation function, W is the layer weight matrix, x is the
+
+layer input, and m is the layer dropout mask, with each element mi being 0 with probability p. Once
+
+trained, the layer output is given by
+
+y = (1 − p)f (Wx).
+
+(2)
+
+Standard dropout is equivalent to adding an additional layer after a layer of neurons that simply sets values to zero with some probability during training, and multiplies them by 1 − p during testing. Other formulations of standard dropout may scale weights rather than outputs during testing, or scale outputs by 1/(1 − p) during training rather than scaling them during testing, but both of these approaches have the same effect as the formulation given here.
+This method proved effective for regularizing neural networks, enabling them to be trained for longer periods without overﬁtting and resulting in improved test accuracy [1, 27]. Standard dropout has since become widely used in practice.
+
+3 Theoretical understandings of dropout
+Substantial theoretical work has been done to understand why standard dropout works, how it affects neural network training, and to establish links with other concepts and techniques in deep learning. Two important directions in this area have been interpreting dropout as implicitly averaging over an ensemble of neural networks, and linking neural networks with dropout to Bayesian machine learning models.
+In the original dropout paper, Hinton et al. [1] observe that there is a large number of possible neural network structures that result from randomly dropping neurons, and suggest that dropout implicitly performs averaging over this ensemble of possible networks. For instance, using a network with a single hidden layer of N units and softmax activation is equivalent to taking the geometric mean of the outputs of the 2N possible networks under dropout [1]. This is similar to bagging, a machine learning technique where multiple instances of a model are trained separately and the arithmetic average of their output is used in inference. Standard dropout training varies from bagging in that only one model is trained, and an approximation to the geometric mean of the dropout ensemble’s outputs is used rather than an arithmetic mean [28]. Later work has built a ﬁrmer foundation for this interpretation by analysing the suitability of the geometric mean and the quality of the approximation, both mathematically and empirically [28, 29].
+Another theoretical approach links dropout methods to Bayesian machine learning. An ideal Bayesian model places a prior distribution over the model parameters, then determines the posterior
+
+3
+
+distribution of parameters given a training set, and marginalizes over this distribution to perform inference on an input. In practice, this is computationally expensive, and so approximations are used to simplify this process. Various authors have argued that training with dropout methods can be interpreted as using a Bayesian model with certain approximations [4, 5, 7]. This provides a justiﬁcation for using dropout methods grounded in probability theory. The Bayesian interpretation of dropout presented by Gal and Ghahramani [7] has been particularly inﬂuential. The authors show that training a neural network with standard dropout is equivalent to optimizing a variational objective between an approximate distribution and the posterior of a deep Gaussian process, which is a Bayesian machine learning model. This insight led to the development of Monte Carlo dropout, described in Section 8.
+Although the two approaches described above have been widely applied, neither has completely dominated research into dropout methods, and various alternative approaches that seek to link dropout to established machine learning techniques or concepts have been explored. These include analyzing dropout as a weight regularization method [30, 31], as a data augmentation method [32], and in terms of information theory [33].
+Research into standard dropout has also shown empirical properties that have proven useful in understanding dropout and in developing new dropout methods. Hinton et al. [1] showed that standard dropout reduces feature co-adaptation, where the outputs of individual neurons only provide useful information in combination with other neuron outputs. They argue that reducing co-adaptation leads to improved generalization. Srivastava et al. [27] showed that standard dropout also promotes sparsity in the weights of neural networks, causing more weights to be near zero. This has led to research interest in using dropout to sparsify and ultimately compress neural networks, which is described in Section 7.
+
+4 Dropout methods for training
+
+This section describes signiﬁcant dropout methods that, like standard dropout, regularize dense feedforward neural network layers during training. Most of these methods were directly inspired by standard dropout, and seek to improve on its speed or regularization effectiveness. Dropout methods for other kinds of neural network layers or for applications other than regularization are described in later sections.
+
+One of the ﬁrst proposed variations on standard dropout was dropconnect, introduced in 2013 by Wan et al. [3]. This method is a generalization of dropout where individual weights and biases rather than neuron outputs are set to zero with some probability. So, in training, the output of a network layer is given by:
+
+y = f ((W ◦ M)x), mij ∼ Bernoulli(1 − p),
+
+(3)
+
+where terms are deﬁned as in 1, but with a dropout mask matrix rather than a vector. Dropconnect is illustrated in Figure 3.
+
+Dropconnect takes a different approach than standard dropout during test time. Rather than setting weights to their average value, the authors propose a Gaussian approximation of dropconnect at each neuron [3]. A sample is then taken from this Gaussian and passed to the neuron activation function. This makes dropconnect a stochastic method at test time as well as during training. The authors show that dropconnect can regularize some networks more effectively than standard dropout, at the expense of requiring larger dropout masks. Dropout methods that drop weights rather than neurons are also sometimes called weight dropout.
+
+Another area of improvement over standard dropout that has been explored is speeding up training convergence when using dropout. Fast dropout [5], also proposed in 2013, provides a faster way to do dropout-like regularization, by interpreting dropout methods from a Bayesian perspective. The authors show that the outputs of layers with dropout can be seen as sampling from an underlying distribution, which can be approximated by a Gaussian. This distribution can then either be sampled from directly or its parameters can be used to propagate information about the entire dropout ensemble. This technique can lead to faster training procedures than standard dropout, where only one element of the ensemble of possible networks is sampled at once. One reason for this is that in standard dropout, for a given training sample, the fraction of neurons trained on the sample is p. To effectively use an entire training dataset to train all neurons requires passing each sample through
+
+4
+
+Figure 3: An example of dropconnect. The right network has had weights dropped with probability 0.5.
+
+the network multiple times. Fast dropout exposes all neurons to each training sample, which avoids this slowdown. Fast dropout can also be directly applied at test time, as opposed to the approximate averaging employed in standard dropout.
+Several proposed dropout methods seek to improve regularization or speed up convergence by making dropout adaptive, that is tuning dropout probabilities during training based on neuron weights or activations. A major example is Standout [4], again proposed in 2013. This method overlays a binary belief network onto a neural network which controls the dropout properties of individual neurons. The authors intepret the belief network as tuning the architecture of the neural network. For each weight in the original neural network, Standout adds a corresponding weight parameter in the binary belief network. A layer’s output during training is given by:
+
+y = f (Wx) ◦ m, mi ∼ Bernoulli(g(Wsx)),
+
+(4)
+
+where terms are deﬁned as in (1), but with Ws representing the belief network’s weights for that layer and g(·) representing the belief network’s activation function.
+
+While a separate learning algorithm can be applied to learn the belief network weights, in practice, the authors found that this resulted in the belief network weights becoming approximately equal to an afﬁne function of the corresponding neural network weights [4]. So, an effective approach to determine belief network weights is setting them as
+
+Ws = αW + β
+
+(5)
+
+at each training iteration for some constants α and β. The output of each layer during testing is
+
+given by:
+
+y = f (Wx) ◦ g(Wsx).
+
+(6)
+
+Another adaptive dropout method, inspired by a Bayesian understanding of dropout, is variational dropout, as proposed by Kingma et al. [6] in 2015. The authors show that a variant of dropout that uses Gaussian multiplicative noise (proposed by Srivastava et al. [27]) can be interpreted as a variational method given a particular prior over the network weights and a particular variational objective. They then derive an adaptive dropout scheme that can automatically determine an effective dropout probability for an entire network, or for individual layers or neurons. Variational dropout has also been applied to sparsify networks as a step in model compression. This application is described in section 7.
+Other signiﬁcant adaptive dropout methods include evolutionary dropout [34], which uses secondorder statistics of neuron activations across a minibatch to set dropout probabilities, and concrete dropout [35], which applies a variational interpretation of dropout to set dropout probabilities in a principled way.
+A simple modiﬁcation to standard dropout that some researchers have explored is changing the dropout probability according to a schedule during training. Annealed dropout [36] is a method in which the dropout probability is gradually reduced during training, with the goal of taking advantage of a larger effective network during later training iterations. It uses a schedule of the form
+
+t
+
+pt = max
+
+0, 1 − N
+
+p0,
+
+(7)
+
+5
+
+where pt is the dropout probability used at training iteration t, p0 is the initial dropout probability, and N is a constant. On the other hand, Morerio et al. [37] argue that increasing dropout probability during training is preferable, reasoning that stronger regularization is needed more later in training to avoid overﬁtting. They propose curriculum dropout, which uses a schedule of the form
+
+pt = p∞(1 − e−γt),
+
+(8)
+
+where p∞ is the upper limit that pt approaches as t → ∞ and γ is a constant.
+
+5 Convolutional layers
+
+Convolutional neural network layers require different regularization methods than standard dropout in order to generalize well [13, 38]. This is because the pixels in feature maps produced by a convolutional layer are highly correlated, and so randomly dropping some has little effect [13]. However, many promising alternative approaches to using dropout as a regularization method for training CNNs have been proposed. These include applying dropout to larger regions than individual neurons, applying dropout at different places in the network topology, and designing dropout methods for deep residual networks.
+Batch normalization [39] is another regularization technique commonly used with convolutional neural networks. Some authors have found that using batch normalization reduces or eliminates the beneﬁts of using dropout for regularization [38, 39]. However, recently proposed dropout methods have often shown that when using a dropout method adapted speciﬁcally for convolutional layers, better results are achieved compared to batch normalization alone [14–17, 40].
+One approach for achieving strong regularization given highly correlated activations is to drop larger regions than individual pixels. Spatial dropout, proposed in 2015, takes this approach [13] [13]. When using spatial dropout, instead of dropping individual pixels, entire feature maps are dropped with probability p. This prevents the network from using nearby pixels to recover information when dropout is applied. The authors showed that this method improved performance on object localization [13]. Park and Kwak [14] propose an improvement to this where the spatial location or the feature map with the highest activation is dropped with some probability poff. This encourages the model to rely on a wider range of information when making classiﬁcation decisions. They also propose to increase the robustness of the network to dropped neurons by sampling the dropout probability itself from some probability distribution at each iteration. The authors suggest either a normal distribution p ∼ N (µ, σ) or a uniform distribution p ∼ U (a, b). Their results show that these two modiﬁcations can improve results on image classiﬁcation datasets [14].
+Another CNN dropout method that works by dropping out larger regions is cutout [15], which applies a random square mask over a region of each input image. Unlike other common methods which apply dropout at the feature map level, this method directly applies to the input image. The main motivation behind cutout is removing visual features with high activation values in later layers of a CNN. However, the authors argue that this masking approach on input images has equivalent performance and is cheaper to conduct [15].
+Another approach some authors have explored for improving dropout-based regularization in CNNs is to apply dropout at alternate points in the network topology. Max-pooling dropout [12] is one such method, where dropout is integrated into a max-pooling layer. Max-pooling is a common operation in CNN topologies which selects the maximum activation value from non-overlapping areas of an input feature map. This simpliﬁes following layers at the cost of potentially losing useful information. Max-pooling dropout retains the behaviour of max-pooling layers while probabilistically allowing other feature values to affect the output of a pooling layer. This operator masks a subset of feature values before performing the max-pooling operation. As Figure 4 shows, the max-pooling operator always pools the largest value in a given pooling window, while the max-pooling dropout method provides an opportunity for smaller feature values to affect activations in later layers. This technique can help the network to avoid overﬁtting as saturated activation values have less contribution in the network loss. At test time, the pooling operation becomes a linear sum over activations, where each activation is weighted by the probability that it would be selected as the output during training according to this dropout method.
+Cai et al. [17] argue that the observed lack of additional regularization when using dropout along with batch normalization is simply due to incorrectly ordering those two operations. They examine
+
+6
+
+0.3 0.6 1.1 0.9
+
+max-pooling
+
+1.1
+
+dropout
+
+0.3 0.9
+
+max-pooling
+
+0.9
+
+Figure 4: Max-pooling dropout in convolutional neural networks [12].
+
+using dropout alongside batch normalization in CNNs at neuron, channel, path, and layer levels. In their proposed method, dropout and batch normalization are reordered in convolutional building blocks to address the increase of variance from random deactivation of basic components such as neurons [17]. The authors claim that the failure of standard dropout, resulting in training instability, is due to the incorrect placement of dropout and batch normalization operations in the the convolutional layer. The conducted experiments on various datasets show that reordering them improves performance [17].
+The development of very deep convolutional neural networks using residual layers [38] has inspired new dropout methods for such networks. Stochastic depth is a dropout method proposed by Huang et al. [16] where entire layers are dropped randomly during training, and values are instead passed through unchanged. This allows for extremely deep networks to be effectively trained. Another method based on residual networks is swapout [40]. This method operates on individual neurons by randomly selecting between the neuron output, the corresponding input, the sum of the input and output (a residual connection), and the value zero.
+
+6 Recurrent layers
+
+In general, feedforward dropout methods as described in section 4 can be applied to the feedforward connections of a network containing recurrent layers. Research has therefore focused on applying dropout methods to recurrent connections. Applying standard dropout to these connections results in poor performance [41], since the noise caused by dropout at each time step prevents the network from retaining long-term memory. However, methods that are specialized for recurrent layers have proved successful, and are commonly used in practice. Generally speaking, they apply dropout to recurrent connections in a way that can still preserve long-term memory.
+
+Research into dropout in recurrent neural networks (RNNs) has focused on long short-term memory (LSTM) networks, although some proposed methods can be applied to RNNs in general. The following is a typical deﬁnition of an LSTM cell, although variations exist. For an input xt at time t, input, forget, and output, gate signals are deﬁned as:
+
+it = σ (Wixt + Uiht−1) ,
+
+(9)
+
+ft = σ (Wf xt + Uf ht−1) ,
+
+(10)
+
+and
+
+ot = σ (Woxt + Uoht−1) ,
+
+(11)
+
+respectively. The cell state is deﬁned as:
+
+ct = ft ◦ ct−1 + it ◦ gt,
+
+(12)
+
+where
+
+gt = tanh (Wgxt + Ught−1) .
+
+(13)
+
+The hidden state, which is the layer’s output, is deﬁned as:
+
+ht = ot ◦ tanh(ct).
+
+(14)
+
+W and U matrices represent learned weights, σ(·) represents a sigmoid activation function, and σ(·) and tanh(·) are applied element-wise. For more information on LSTM networks, see [42].
+
+RNNdrop [20], proposed in 2015, provides a simple solution to better preserve memory when applying dropout. The key change is to generate a dropout mask for each input sequence, and keep it
+
+7
+
+y0
+
+y1
+
+y2
+
+y0
+
+y1
+
+y2
+
+...
+
+...
+
+x0
+
+x1
+
+x2
+
+x0
+
+x1
+
+x2
+
+Figure 5: Comparison of per-step (left) versus per-sequence (right) sampling of dropout masks on an unrolled RNN. Horizontal connections are recurrent while vertical connections are feedforward. Different colours represent different dropout masks applied to the corresponding connection.
+
+the same at every time step. This varies from the naive way of applying dropout to RNNs, which would generate new dropout masks for each input sample, regardless of which time sequence it was from. Generating masks on a per-sequence basis means that the elements in the network hidden state that are not dropped will persist throughout the entire sequence without ever being affected by dropout, which allows the network to maintain long-term memory. The difference between per-step and per-sequence masks on an unrolled RNN is illustrated in Figure 5.
+In particular, the authors propose applying dropout to the hidden cell state. So, the only change from the original LSTM deﬁnition is the equation for ct, which becomes
+ct = m ◦ (ft ◦ ct−1 + it ◦ gt), mi ∼ Bernoulli(1 − p).
+
+Various other proposed methods also use per-sequence dropout mask sampling on recurrent connections to help preserve long-term memory. Variational RNN dropout [21], proposed in 2016, is one such method, but it operates in a way that is theoretically justiﬁed in terms of a Bayesian interpretation of RNN dropout. The authors show that if dropout is seen as a variational Monte Carlo approximation to a Bayesian posterior, then the natural way to apply it to recurrent layers is to generate a dropout mask that zeroes out both feedforward and recurrent connections for each training sequence, but to keep the same mask for each time step in the sequence. This is similar to RNNdrop in that masks are generated on a per-sequence basis, but the derivation leads to dropout being applied at a different point in the LSTM cell. Formally, the equations for it, ft, ot, and gt become:
+
+it = σ (Wi(xt ◦ mx) + Ui(ht−1 ◦ mh))
+
+(15)
+
+ft = σ (Wf (xt ◦ mx) + Uf (ht−1 ◦ mh))
+
+(16)
+
+ot = σ (Wo(xt ◦ mx) + Uo(ht−1 ◦ mh))
+
+(17)
+
+gt = tanh (Wg(xt ◦ mx) + Ug(ht−1 ◦ mh))
+
+(18)
+
+mx,i, mh,i ∼ Bernoulli(1 − p)
+
+(19)
+
+with the equations for ct and h remaining the same as in the original LSTM. This dropout method has become one of the most widespread techniques for regularizing RNNs.
+
+One other proposed method using per-sequence mask sampling is weight-dropped LSTMs, proposed in 2017 [24]. This method takes inspiration from dropconnect, rather than standard dropout, also dropping out weights rather than activations. In training, these LSTM cells use the following equations for it, ft, ot, and gt, otherwise following the basic LSTM formulation given above.
+
+it = σ (Wixt + (Ui ◦ M)ht−1)
+
+(20)
+
+ft = σ (Wf xt + (Uf ◦ M)ht−1)
+
+(21)
+
+ot = σ (Woxt + (Uo ◦ M)ht−1)
+
+(22)
+
+gt = tanh (Wgxt + (Ug ◦ M)ht−1)
+
+(23)
+
+Mij ∼ Bernoulli(1 − p)
+
+(24)
+
+This approached allows the authors to achieve results on language modelling benchmarks that were state-of-the-art at the time [24].
+
+Recurrent dropout [22] is an alternative approach that can preserve memory in an LSTM while still generating different dropout masks for each input sample, as in standard dropout. This is done by
+
+8
+
+only applying dropout to the part of the RNN that updates the hidden state and not the state itself. So, if an element is dropped, then it simply does not contribute to network memory, rather than erasing the hidden state. For an LSTM, the equations are the same as in the original LSTM except that the equation for ct becomes
+
+ct = ft ◦ ct−1 + it ◦ gt ◦ mt, mt,i ∼ Bernoulli(1 − p).
+
+(25)
+
+Another proposed dropout method that can help to preserve memory in RNNs is Zoneout [23]. This method randomly replaces neuron activations with the corresponding activations from the previous time-step. The authors interpret this method as being related to stochastic depth and swapout, as discussed in Section 5, but with information being stochastically passed through from previous timesteps as opposed to previous layers.
+
+7 Dropout methods for model compression
+Standard dropout promotes sparsity in neural network weights [27]. This property means that dropout methods can be applied in compressing neural network models by reducing the number of parameters needed to perform effectively. Since 2017, several dropout-based approaches have been proposed for practical model compression.
+In 2017, Molchanov et al. [8] proposed using variational dropout [6] (described in Section 4) to sparsify both fully connected and convolutional layers. This approach was shown to achieve large reductions in the number of parameters in standard convolutional networks while minimally affecting performance. This sparse representation can then be passed into existing methods that convert sparse networks into compressed models, as in [43]. A similar method was proposed by Neklyudov et al. [9], which uses a modiﬁed variational dropout scheme that promotes sparsity, but the resulting network is speciﬁcally structured in such a way that is easy to compress.
+Developing further dropout methods for model compression has been an area of signiﬁcant activity recently. Recently proposed approaches include targeted dropout [11], in which neurons are chosen adaptively to be dropped out in such a way that the network adapts to neural pruning, allowing it to be shrunk considerably without much loss in accuracy. Another recent proposal is Ising-dropout [10], which overlays a graphical Ising model on top of a neural network in order to identify less useful neurons, and drop them out in both training and inference. We expect to continue to see advances in applying dropout methods for model compression.
+
+8 Monte Carlo dropout
+In many machine learning tasks, it is useful to know how certain a model’s output is. For instance, a classiﬁcation output is more likely to be correct when an input is very similar to elements of the training set than when its input is dissimilar to all training data. Most neural network models do not provide this information. Bayesian machine learning models, on the other hand, often produce outputs that are probability distributions, giving more information about model certainty [44]. Monte Carlo dropout is a dropout method that can produce model uncertainty estimates in an analogous way [7].
+In 2016, Gal and Ghahramani [7] proposed a Bayesian theoretical understanding of dropout that has since become widely accepted. They interpret dropout as a sampling method that is equivalent to a variational approximation of a deep Gaussian process. A deep Gaussian process is a Bayesian machine learning model that would normally produce a probability distribution as its output, and applying standard dropout at test time (rather than scaling weights and using all neurons as described in Section 2) can be used to estimate characteristics of this underlying distribution. The estimated variance of the distribution is taken to indicate the uncertainty of the model for a particular input. This method of estimating uncertainty is called Monte Carlo dropout.
+To implement Monte Carlo dropout, a neural network is ﬁrst trained normally using standard dropout. To perform inference on an input sample, the network is run T times with standard dropout, all with the same input but with different randomly generated dropout masks each time. Estimators
+9
+
+for the mean and variance of the implicit Bayesian model output are given by [44]:
+
+1T
+
+E[y] ≈ T
+
+yˆt(x)
+
+t=1
+
+Var(y)
+
+≈
+
+τ −1ID
+
++
+
+1 T
+
+T
+
+yˆt(x)T yˆt(x) − E[y]T E[y],
+
+t=1
+
+where yˆt(x) is the output of the network given inputs x and the tth set of dropout masks and τ is a constant determined by the model structure. These are respectively taken to be the model output and an indication of the model uncertainty.
+Monte Carlo dropout has found many applications in practice, including in time-series prediction [45] and medical imaging [46]. Other approaches proposed to measure model uncertainty include Bayesian neural networks [44] and ensemble-based approaches[47]. Monte Carlo dropout has an advantage over these methods in that changes are not needed to the model training procedure, whereas both of these approaches incur a large increase in training complexity.
+
+9 Discussion
+We have described a wide range of advances in dropout methods above. This section discusses ongoing research trends in broader terms.
+The most common research direction in dropout methods has been improving dropout for regularization. It is generally accepted that standard dropout can regularize a wide range of neural network models, but there is room to achieve either faster training convergence or better ﬁnal performance. The former concern is important since dropout reduces the exposure of neurons to each training sample, which can slow down training [5]. With neural networks becoming larger and more computationally intensive to train, techniques such as fast dropout [5] that reduce this effect are valuable. Improving how dropout affects the performance of trained networks is also an ongoing concern. Trying to drop neurons in a more intelligent or theoretically justiﬁed way than standard dropout has shown promise. Also, the growth of convolutional and recurrent neural networks in practice has prompted the development of specialized methods that perform better than standard dropout on speciﬁc kinds of neural networks. As new kinds of neural networks and neural network layers continue to be developed, there continue to be opportunities to design or improve on specialized dropout methods.
+Other research into dropout methods looks to widen their applications beyond regularization. As discussed above, this includes the use of dropout for model compression, either on its own or in concert with existing model compression techniques. As with regularization, there are opportunities to develop improved methods that are specialized for particular kinds of networks or that use more advanced approaches for selecting neurons to drop. Monte Carlo dropout is another application of dropout methods: using them to measure model uncertainty. There is potential for further applications, given the broad ability of dropout methods to stochastically guide network training and operation.
+A promising line of research has emerged into adversarial dropout methods [48–50]. These techniques either incorporate dropout methods into adversarial learning schemes, or apply ideas from adversarial learning to guide dropout procedures in a more effective way.
+Finally, a substantial amount of theoretical analysis has been done to rigorously justify existing dropout methods. The growth of Bayesian interpretations of dropout methods over the last few years points to new opportunities in theoretical justiﬁcations of dropout and similar stochastic methods, which corresponds to a broader trend of Bayesian and variational techniques advancing research into deep neural networks.
+In general, dropout methods have continually shown their utility and potential throughout deep learning, and we expect this trend to continue as deep neural networks continue to become more advanced and widely used.
+10
+
+References
+[1] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” arXiv preprint arXiv:1207.0580, 2012.
+[2] A. Krizhevsky, I. Sutskever, and G. E. Hinton, “Imagenet classiﬁcation with deep convolutional neural networks,” in Advances in Neural Information Processing Systems 25, 2012, pp. 1097– 1105.
+[3] L. Wan, M. Zeiler, S. Zhang, Y. LeCun, and R. Fergus, “Regularization of neural networks using dropconnect,” in Proceedings of the 30th International Conference on Machine Learning. PLMR, 2013.
+[4] L. J. Ba and B. Frey, “Adaptive dropout for training deep neural networks,” in Proceedings of the 26th International Conference on Neural Information Processing Systems. NIPS, 2013.
+[5] S. Wang and C. Manning, “Fast dropout training,” in Proceedings of the 30th International Conference on Machine Learning. PLMR, 2013.
+[6] D. P. Kingma, T. Salimans, and M. Welling, “Variational dropout and the local reparameterization trick,” in Advances in Neural Information Processing Systems 28, 2015, pp. 2575–2583.
+[7] Y. Gal and Z. Ghahramani, “Dropout as a bayesian approximation: Representing model uncertainty in deep learning,” in Proceedings of the 33rd International Conference on Machine Learning. PLMR, 2016.
+[8] D. Molchanov, A. Ashukha, and D. Vetrov, “Variational dropout sparsiﬁes deep neural networks,” in Proceedings of the 34th International Conference on Machine Learning-Volume 70. JMLR. org, 2017, pp. 2498–2507.
+[9] K. Neklyudov, D. Molchanov, A. Ashukha, and D. P. Vetrov, “Structured bayesian pruning via log-normal multiplicative noise,” in Advances in Neural Information Processing Systems 30, 2017, pp. 6775–6784.
+[10] H. Salehinejad and S. Valaee, “Ising-dropout: A regularization method for training and compression of deep neural networks,” arXiv preprint arXiv:1902.08673, 2019.
+[11] A. N. Gomez, I. Zhang, K. Swersky, Y. Gal, and G. E. Hinton, “Targeted dropout,” in 2018 CDNNRIA Workshop at the 32nd Conference on Neural Information Processing Systems. NeurIPS, 2018.
+[12] H. Wu and X. Gu, “Towards dropout training for convolutional neural networks,” Neural Networks, vol. 71, no. C, pp. 1–10, 2015.
+[13] J. Tompson, R. Goroshin, A. Jain, Y. LeCun, and C. Bregler, “Efﬁcient object localization using convolutional networks.” in IEEE CVPR. IEEE, 2015, pp. 648–656.
+[14] S. Park and N. Kwak, “Analysis on the dropout effect in convolutional neural networks,” in Asian Conference on Computer Vision. Springer, 2016, pp. 189–204.
+[15] T. DeVries and G. W. Taylor, “Improved regularization of convolutional neural networks with cutout,” arXiv preprint arXiv:1708.04552, 2017.
+[16] G. Huang, Y. Sun, Z. Liu, D. Sedra, and K. Weinberger, “Deep networks with stochastic depth,” arXiv preprint arXiv:1603.09382, 2016.
+[17] S. Cai, J. Gao, M. Zhang, W. Wang, G. Chen, and B. C. Ooi, “Effective and efﬁcient dropout for deep convolutional neural networks,” arXiv preprint arXiv:1904.03392, 2019.
+[18] S. H. Khan, M. Hayat, and F. Porikli, “Regularization of deep neural networks with spectral dropout,” Neural Networks, vol. 110, pp. 82–90, 2019.
+[19] S. Hou and Z. Wang, “Weighted channel dropout for regularization of deep convolutional neural network,” in Proceedings of the AAAI Conference on Artiﬁcial Intelligence, 2019.
+11
+
+[20] T. Moon, H. Choi, H. Lee, and I. Song, “Rnndrop: A novel dropout for RNNs in ASR,” in 2015 IEEE Workshop on Automatic Speech Recognition and Understanding (ASRU). IEEE, 2015.
+[21] Y. Gal and Z. Ghahramani, “A theoretically grounded application of dropout in recurrent neural networks,” in Proceedings of the 30th International Conference on Neural Information Processing Systems. NIPS, 2016.
+[22] S. Semeniuta, A. Severyn, and E. Barth, “Recurrent dropout without memory loss,” in Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics, 2016.
+[23] D. Krueger, T. Maharaj, J. Krama´r, M. Pezeshki, N. Ballas, N. R. Ke, A. Goyal, Y. Bengio, H. Larochelle, A. C. Courville, and C. Pal, “Zoneout: Regularizing RNNs by randomly preserving hidden activations,” arXiv preprint arXiv:1606.01305, 2016.
+[24] S. Merity, N. S. Keskar, and R. Socher, “Regularizing and optimizing LSTM language models,” arXiv preprint arXiv:1708.02182, 2017.
+[25] G. Melis, C. Dyer, and P. Blunsom, “On the state of the art of evaluation in neural language models,” arXiv preprint arXiv:1707.05589, 2017.
+[26] K. Z˙ ołna, D. Arpit, D. Suhubdy, and Y. Bengio, “Fraternal dropout,” arXiv preprint arXiv:1711.00066, 2018.
+[27] N. Srivastava, G. E. Hinton, A. Krizhevsky, I. Sutskever, and R. Salakhutdinov, “Dropout: a simple way to prevent neural networks from overﬁtting.” Journal of Machine Learning Research, vol. 15, no. 1, pp. 1929–1958, 2014.
+[28] D. Warde-Farley, I. J. Goodfellow, A. Courville, and Y. Bengio, “An empirical analysis of dropout in piecewise linear networks,” in Proceedings of the International Conference on Learning Representations (ICLR), 2014.
+[29] P. Baldi and P. J. Sadowski, “Understanding dropout,” in Advances in Neural Information Processing Systems 26, 2013, pp. 2814–2822.
+[30] S. Wager, S. Wang, and P. S. Liang, “Dropout training as adaptive regularization,” in Advances in neural information processing systems, 2013, pp. 351–359.
+[31] D. P. Helmbold and P. M. Long, “On the inductive bias of dropout,” Journal of Machine Learning Research, vol. 16, no. 1, pp. 3403–3454, 2015.
+[32] X. Bouthillier, K. Konda, P. Vincent, and R. Memisevic, “Dropout as data augmentation,” arXiv preprint arXiv:1506.08700, 2015.
+[33] A. Achille and S. Soatto, “Information dropout,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 40, no. 12, pp. 2897–2905, 2018.
+[34] Z. Li, B. Gong, and T. Yang, “Improved dropout for shallow and deep learning,” in Proceedings of the 30th International Conference on Neural Information Processing Systems. NIPS, 2016.
+[35] Y. Gal, J. Hron, and A. Kendall, “Concrete dropout,” in Advances in Neural Information Processing Systems 30, 2017, pp. 3581–3590.
+[36] S. J. Rennie, V. Goel, and S. Thomas, “Annealed dropout training of deep networks,” in IEEE Spoken Language Technology Workshop (SLT), 2014.
+[37] P. Morerio, J. Cavazza, R. Volpi, R. Vidal, and V. Murino, “Curriculum dropout,” arXiv preprint arXiv:1703.06229, 2017.
+[38] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in IEEE CVPR, 2016, pp. 770–778.
+12
+
+[39] S. Ioffe and C. Szegedy, “Batch normalization: Accelerating deep network training by reducing internal covariate shift,” in Proceedings of the 32nd International Conference on Machine Learning, ser. Proceedings of Machine Learning Research, F. Bach and D. Blei, Eds., vol. 37. Lille, France: PMLR, 07–09 Jul 2015, pp. 448–456.
+[40] S. Singh, D. Hoiem, and D. Forsyth, “Swapout: Learning an ensemble of deep architectures,” in Proceedings of the 30th International Conference on Neural Information Processing Systems. NIPS, 2016.
+[41] W. Zaremba, I. Sutskever, and O. Vinyals, “Recurrent neural network regularization,” arXiv preprint arXiv:1409.2329, 2015.
+[42] H. Salehinejad, J. Baarbe, S. Sankar, J. Barfett, E. Colak, and S. Valaee, “Recent advances in recurrent neural networks,” arXiv preprint arXiv:1801.01078, 2017.
+[43] S. Han, H. Mao, and W. J. Dally, “Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding,” in Proceedings of the International Conference on Learning Representations (ICLR), 2016.
+[44] Y. Gal, “Uncertainty in deep learning,” Ph.D. dissertation, University of Cambridge, 2016. [45] L. Zhu and N. Laptev, “Deep and conﬁdent prediction for time series at Uber,” arXiv preprint
+arXiv:1709.01907, 2017. [46] A. Jungo, R. McKinley, R. Meier, U. Knecht, L. Vera, J. Pe´rez-Beteta, D. Molina-Garc´ıa, V. M.
+Pe´rez-Garc´ıa, R. Wiest, and M. Reyes, “Towards uncertainty-assisted brain tumor segmentation and survival prediction,” in Brainlesion: Glioma, Multiple Sclerosis, Stroke and Traumatic Brain Injuries, A. Crimi, S. Bakas, H. Kuijf, B. Menze, and M. Reyes, Eds. Cham: Springer International Publishing, 2018, pp. 474–485. [47] B. Lakshminarayanan, A. Pritzel, and C. Blundel, “Simple and scalable predictive uncertainty estimation using deep ensembles,” in Proceedings of the 31th International Conference on Neural Information Processing Systems. NIPS, 2017. [48] S. Park, J. Park, S.-J. Shin, and I.-C. Moon, “Adversarial dropout for supervised and semisupervised learning,” in Proceedings of the AAAI Conference on Artiﬁcial Intelligence, 2018. [49] K. Saito, Y. Ushiku, T. Harada, and K. Saenko, “Adversarial dropout regularization,” arXiv preprint arXiv:1711.01575, 2018. [50] S. Park, K. Song, M. Ji, W. Lee, and I.-C. Moon, “Adversarial dropout for recurrent neural networks,” arXiv preprint arXiv:1904.09816, 2019. [51] I. J. Goodfellow, D. Warde-Farley, M. Mirza, A. Courville, and Y. Bengio, “Maxout networks,” arXiv preprint arXiv:1302.4389, 2013. [52] Y. Li and Y. Gal, “Dropout inference in Bayesian neural networks with alpha-divergences,” in Proceedings of the 34th international conference on machine learning (ICML’17), 2017, pp. 2052–2061.
+13
+

@@ -1,0 +1,285 @@
+2000 6mIEEE International Workshop on Cellular Neural Networks and Their Applications Roceedings
+
+A Compact and Universal Cellular Neural Network Cell Based on Resonant Tunneling Diodes: Circuit, Model, and Functional Capabilities
+R A Dogaru, Martin Hiinggi and Leon 0.Chua
+Electronics Research Laboratory Department of Electrical Engineering and Computer Sciences
+University of California at Berkeley Berkeley, CA 94720, USA Email: radu-d@ieee.org
+
+ABSTRACT: A novel Cellular Neural Network (CNN) cell and its circuit realization are proposed. The theory of the multi-nested universal cell [ l ] is applied, and the nonmonotonic current-voltage characteristic of resonant tunneling diodes (RTD) is eqloited to achieve a highfunctionality. Theproposed cell has the potential of implementing arbitrary
+local Boolean functions with n inputs. The cell has a complexity of only O(n) in the number
+of devices and template elements. For comparison, the digital n-to-1 multiplexor, a functionally equivalent system has a complexity of O(2"). A simple, piecewise-linear mathematical model is derived and used to evaluate the functional capabilities of the RTD-
+CNN cell. The model was proved to be accurate enough, and, as shown in [2], only minor tuning of some of the parameters is necessary to achieve the same functionality using a Spice simulntion of the same circuit, which is based on more refined physical device
+models.
+
+1. Introduction
+
+The demand for high speed in signal processing parallels the increasing requirements for more memory and computing power embedded in a single chip. In the near future, a plateau is expected to be reached in Moore's law, which has accurately predicted the constant increase in density of components per chip over the last 3 decades. To overcome this problem, several new devices and technologies (often referred to as nanctechnologies) were proposed in the last decade to reduce the size of the active components and achieve greater functionality. While some of them are, at present, described theoretically (e.g. the "quantum dots"), and others require special operating conditions, we focused 'on a relatively mature technology; namely the vertical integration of resonant tunneling diodes (RTD) with FETs in high speed III-V semiconductors [3]. This technology provides an increase in functionality while operating at room temperature. Our goal is to exploit the particularitiesof this technology to build a new generation of cellular neural networks (CNN) [4] with increased
+
+functional capability, a switching speed in the order of picoseconds, and a larger number of cells on a single CNN chip. Such intelligent chips with increased computational power and processing speed are essential to many high-tech applications, including microrobotics and integrated vision.
+The CNN cell described in this paper exploits the non-monotone current-voltage (I-V) characteristicof the resonant tunneling diode (RTD) [ 5 ] to build a compact programmable system capable of representing any
+Boolean function with n inputs. Upto-date RTD-based technologies were developed and tested for applications such as RTD-based logic gates [6,7] and memny cells 181. However, the most advanced RTD-based logic gates families reported in the literature are neither programmable nor universal. They are usually circuits designed to
+implement a set of basic two-inputs gates (e.g. AND, NOT,OR, XOR) which are the building blocks of more
+sophisticated digital systems. Our solution is radically different and leads to a tremendous increase in
+
+functionality. Indeed, while most of the RTD-based system reported in the literatureexploit only the switching
+
+propeh.es resulting from the region with negative differentialresistancein the RTD ch&teristic, we exploit the
+
+fRm(v) entire non-monotonic I-v characteristic I =
+
+applying the results of a theory on "multi-nested"
+
+universal CNN cells [ 1). The an&g and recurent nonlinear nature of computation in the proposed cell leads to a dramatic decrease in complexity. and, at the same time, an increase in functionality. Compared to the standard CNN cell [4], our design has several advantages: (a) It uses a simple synapse made of only two n-FET transistors, where the synaptic weights (or CNN templates) are always positive; (b) It expands the domain of realizable Boolean functions beyond the small class of linearly separable Boolean functions, while it uses exactly the same number of parameters ( n + l ) to code the template; (c) It targets a promising nanotechnology, from which very high processing speeds and densitiesare expected.
+The proposed RTD-CNN cell circuit and its piecewise-linear model are introduced in Section 2. After briefly reviewing the "nesting" theory in [I], we show how it can be implemented using RTD-based devices and what is
+
+0-7803-6344-U00/$10.00 02000IEB
+
+183
+
+the role of each sub-circuit composing the RTD-CNN cell. The functional capabilities of the RTD-c" cell are discussedin Section 3. Conclusionsand topics of further research are given in Section 4.
+2. The genericRTD-CNN cell circuit
+The schematic of the generic RTD-CNN cell circuit is presented in Fig. 1. The circuit, its model and design principles apply to any RTD-based technology. The numerical values considered herein apply for a particular
+RTD-FETtechnology [3], which has been implemented and tested and for which measurements of the devices
+were made available. Consequently, the RTD and E T device parameters used herein correspond to the same technology. Due to limitations of space we provide here only the basic concepts. More details about the design rules and modeling techniquescan be found in [9].
+A piecewise-linear model is used for the RTDs and the simple generic heterojunction FET model in [10,p.330] is used for the FET transistors. The parameters of both models were determined to achieve the best
+v, match with the measured characteristics given in (31. The threshold voltages for all FET transistors are = 0 .
+
+"saturaied resistor': which is defied as an active load acting as a current stabilizer or constant current source [12].
+
+As shown in Fig.1, all signals used for inputs (U,).output ( y ) and control ( g , ) , are voltages. However,
+
+intemally, the circuit is divided into three functionally distinct sub-circuits, where currents are used as coupling signals.
+Our goal is to define a circuit modeled by the nonlinear function F so that Y = F ( U , ,g,,go) implements
+
+programmable Boolean functions of the inputs U , . Here, a binary code was assigned to the input and output
+
+signals. The
+
+binary
+
+variable
+
+U,
+
+is
+
+used to
+
+code the binary inputs, where
+
+U, =
+
+0, if U, < V,
+, and
+
+1, if U, >V,
+
+U,,i = 1,...,n , are the efJective input voltage signals. The output binary variable Y is defined similarly with
+
+respect to the output y . The n + l control or gene inputs, are labeled go and g , , i = 1,...,n,(correspondingto
+
+the bias z, and the B template parameters b,, in the standard CNN cell). A set of parameters defining a
+
+particular Boolean realization is called a gene [4]. The design problem consists in finding the whole set of
+(robust) genes associated with the entire set of Boolean functions (identified by an integer ID number) admitting
+
+RTD-CNN cell realizations. The cell is said to be universal if a gene exists for all arbitraryBoolean functions. In defining our RTD-CNN circuit, we apply the theory of universal CNN cells [ 11. This theory shows that a
+
+cell is universal in the sense mentioned above if F is of the fomx
+
+2 Y = F ( U , ,b,,bo) = sgn(w(a)), a = bo+ b,U,
+
+(1)
+
+,=l
+In the RTD-CNN circuit, the evaluation of CTis performed by the synaptic sub-circuit, and the evaluation of
+
+the sign function in the output or "axon" sub-circuit. The discriminant function ~ ( 0is )a onedimensional,
+
+multiple-folded function which plays a fundamental role in achieving the universality [I]. This function is
+
+184
+
+implemented in our cell circuit by exploiting the non-monotone I-V characteristic of the RTDs when arranged in
+a cascade of similar nesting sub-circuits. If the discriminant function has only one m t w(C) = 0 (e.g., in the
+
+linear case of a standard CNN cell), only a very small fraction of the Boolean functions (the linearly separable
+
+ones) admit realizations, therefore the standard CNN cell is not universal. In what follows we define the folding
+
+40) degree f, of a &criminmffunction w as the maximum number of roots of the equation
+
+= z ,where z is
+
+any real number. It is conjectured that iff, 2 2"-', then there exists a set of parameters b, (gene) for any of the
+
+2' Boolean functions so that (1) is a realization of that Boolean function. This conjecture was proved for f l I 4 in [ l ] by enumerating all Boolean functions and their associate genes. For compact realizations it is
+essential to find an efficient way of implementing a function with a folding degree of 2"-', while minimizing
+the number of nonlinear devices. A solution to this problem was given in the framework of the "multi-nested universal CNN cell theory in [11. In the next subsection we generalize this idea and apply it to the case of RTD devices, exploiting their non-monotone characteristic.
+
+2.1 The "nesting"principle and its RTD realization
+
+For a properly chosen set of parameters zo,zl,..,~,, the discriminant function w"(x) defined by the
+
+iterative mapping
+
+w 0 ( u ) = z 0+0,w ' ( 0 ) = z l +g(wO(0)),..w," ( C ) = z k+g(w"'(a))
+
+(2)
+
+has a folding degree equal to p m , where p is the folding degree of the seed function g(.) which is non-
+
+monotonic (e.g., a polynomial of degree p . or a canonical piecewise linear representation [111 with p - l absolute value term%). In [ l ] we called each iteration in (2) a "nesting". We do not give here the proof due to space
+limitations;however one may easily see it thinking of g(x) as polynomials of degree p .
+
+The I-V characteristic of the RTD (Fig. 2) can be modeled by the following seed function with p = 3
+
+(where x plays the role of the voltage):
+
+(3) where
+
+Figure 2: The currenf-voltagecharacteristic of the RTD (a canonical piecewise linear model)
+Observe that the RTD alone cannot implement the "nesting principle". The reason is that in the case of the RTD, the output in (3) is a current, while the input variable x is a voltage. Therefore a "nesting" sub-circuit (Eg.1) is designed, having a similar input-output characteristic as in Fig 2, but now both the input and the output
+are current signals. Cascading m such circuits is functionally equivalent to implementing Eq.(2). where w m is
+185
+
+substituted by I,,, in our circuit diagram. This will lead to the realization of a discriminant function with a folding degree of 3". In addition, the m parameters I,, ,...,I,, corresponding to Zl,...,Z, in (2) should be
+optimized globally (for the whole chain of "nesting" units) so that the degree of folding reaches its maximum of
+3" and the roots of I,,,, ( I m l ) are as uniformlydistributed as possible.
+
+22. Circuitdescriptionand model
+
+The synaptic arcuit (Fig.1) has the advantage of being very simple in the sense that it requires only positive synapses. This advantage comes from the use of a non-monotone discriminant and leads to a significant reduction in the number of components, compared with the standard CNN cells where the circuitry should be
+designed to accommodate both negative and positive synapses. The positive synaptic parameters bi in the
+
+n
+mathematical model = z-bo - c b i u i correspond to the currents Ii flowing through the synaptic
+i-I
+transistors Fsi . The magnitude of these currents is controlled by the gate voltages g i , which correspond to the
+
+cloning template (or gene) parameters. The synaptic currents are turned ON or OFF by the serially connected switch transistors F w i , depending on the binary input signal applied to their control gates. The mathematical
+
+model of the synaptic circuit is given by
+"
+
+I,, = I , , -10 - x I i u i
+
+(5)
+
+i=1
+
+The purpose of a "nesting" unit is to implement one step of the iteration (2). while both the input and the
+
+output are coded as currents. Therefore, a cascade of m nesting units will implement the entire iteration (2). In
+
+what follows we will discuss the fust nesting unit in Fig.1. The other units are similar. The nonlinear
+
+discriminantWO (0)in (2) corresponds to the input currentl,, in our nesting sub-circuit, and the output current
+
+I,,+, of the whole cascade of m nesting circuits corresponds to W , (0)in (2).
+
+The resistors R l ,R,,..R, play an important role, and they are subject to a design trade-off. A larger value of
+the resistance leads to lower power consumption but it increases the risk of unstable behavior due to the negative differential resistance of the RTD. If the value is too small, all other components should drive larger currents
+and therefore the compactness of the cell depreciates. The functional role of these resistors is to convert the input current flowing within a nesting unit into a voltage, so that the nonlinear voltagecurrent characteristic of
+the RTDs can be efficiently exploited. The current through the RTD is then sensed and mirrored (with a certain amplification factor k ) using the current mirror fonned by the two FET transistors in each "nesting" unit. The
+input-output current characteristic of each "nesting" unit is similar to the voltage-current characteristic of the
+RTD F t now, since both the input and the output signals are of the same type. the nesting operation can be
+effec vely implemented. Je simplified piecewise-linear
+
+(6)
+
++ where k is the current mirror gain (in our example k=IO) and the function reCt(X) = (X I4)/2 models the
+rectification property of the current mirror (i.e., only positive currentsI,,, entering the current mirror are
+reflected and amplified). The function gh, (X) describes the current I,,, through the RTD when x is the voltage on the input node of the "nesting" sub-circuit and of an equivalent RTD. Its expression is similar to (3) and its parameters can be readily determined [91 knowing the value of the linear resistor R, and the specific parameters of the RTD model in (2). Equations similar to (6)and (7) should be considered for any additional
+nesting circuit. The output or "axon" circuit is implementing the sign function, being inspired by the MOBILE circuit
+reported elsewhere [13]. The output sub-circuit acts like a neural axon: when the input current exceeds a certain
+threshold value I , , the output will switch to an "ON" state otherwise, it remains "OFF". It is assumed that before each new operating cycle the output state is reset to the "OFF"state, by turning the power supply off
+
+186
+
+(v,,, v-Rm =
+
+; The power supply is acting as a clock signal to avoid hysteresis). The model derived in 191 is
+
+described b y
+
+Y =0.5+0.5sgn(l,+, - I m )
+
+(8)
+
+The value of the threshold current is influenced by the specific parameters of the RTDs and by the voltage
+
+v,, v-Rm. difference
+
+-
+
+For our example, 1, = 0.04br.d. Two independent power supplies are used for
+
+the output circuit to ensure an output voltage y which can be interpreted as a binary code by the inputs of
+neighboring RTD-CNN cell. By using high quality FET transistors it was shown in [2]that the "axon" unit can
+be simplified, by eliminating the two RTDs and the clocked voltage supply.
+
+3. Functional capabilities of the RTD-CNNcell
+
+The piecewiselinear model of the generic RTD-CNNcell circuit represented by the equations (5)-(8) was
+found to be accurate enough to capture the essential characteristic of our RTDCNN cell; namely, its capability
+
+to provide a discriminant function with 3" folds while using onlyO(m) devices. As the theory of the universal
+
+CNN cell predicts, the use of such a discriminant function greatly enhances the number of realizable Boolean functions. Spice simulations described in [2]show that the same characteristic is obtained when our simplified model is replaced by a more accurate physical model of the devices. However, the piecewise-linear model has the advantage of shortening the computation time needed to evaluate the functional capabilities of the RTD-CNN cell. By functional capabilities here we mean the number of realizable Boolean functions for a cell with a given
+
+number of inputs and nests. Thefunction selection problem is defined as an analytical or algorithmic procedure
+
+to find all Boolean function realizations, and give for each one at least one (if possible the most robust)
+
+lis,"), associated parameter point (Ii
+
+or gene. The algorithm is applied only once for a given cell model and
+
+the result is stored in a list (or a table) which then allows to select a specified Boolean function realization using the predetermined gene. The geometrical complexity of the partitioning induced by the piecewise-linear model in
+the parameter space impedes analytical approaches. Another possibility is to treat it as a nonlinear optimization problem and solve it with specific methods, e.g. using evolutionary algorithm or algorithm from the Simulated Annealing family. The solution for this hard optimization problem is effective only when one wants to determine the realization for a specific Boolean function, but it leads to very large computation times when used to estimate the number of different potential Boolean functions realized by the cell. Surprisingly, it turns out that for small values of n, the fastest method to evaluate the functional capabilities is the random exploration of the parameter
+
+li=O,n ), space. Each step of this process consists of randomly generating a set of parameters (I,
+
+0 C 1; C - I,, ,
+
+n+l
+
+and evaluating the piecewiselinear cell model to determine the Boolean function ID which corresponds to our
+
+randomly generated parameter point. Each time a new function is discovered, a list is updated with the new
+
+function ID, its actual realization, and its robustness. The algorithm evaluates the degree of robustness rbs for the
+
+realization associated with a given parameter point and updates the list with the most robust realization found for
+
+each function. For the case n=3 inputs and m=3 nests the algorithm'reyuired only two minutes to run, a list of all
+
+256 Boolean functions and their realizations being generated and made available at
+
+,".*fI ftp://bayview.eecs.berkeley.edu/pub/dal~2bool3.maOt.bserve that all 256 Boolean functions with 3 inputs
+
+have RTD-CNN realizations having onlypositive synaptic parameters 1;
+
+and therefore a very simple and
+
+compact synaptic circuit. For the case n=4 and m=2 nests, the theory predicts that all 65536 Boolean functions should have an RTD-CNN cell realization. In practice, the random search algorithm was found to follow a logarithmic rule in the rate of newly discovered Boolean functions as a function of time and, therefore, it is not efficient to find the entire set of genes. At this moment we have a list of 50664 realizations made available at ftp://bayview.eecs.berkeley.edu/pub/rd/all-2bool4.mat.The realizations are not equally robust, which is a shortcoming that should be considered in further designs. However, it is impressive that almost 77% of the Boolean functions with, 4 inputs have been found to have a realization when using a circuit with a very simple synaptic unit and only 2 additional "nesting" units. For comparison, a standard uncoupled CNN cell with 4 inputs (and 12 CMOS transistors per synapse [4])can implement only about 2% of the whole set of Boolean functions; namely, the linearly separable Boolean ones.
+
+187
+
+4. Conclusions and perspectives
+A highly compact and versatile RTD-CNN cell is proposed based on the theory of multi-nested universal CNN cells [ 11, and the full description of its circuit realization is given. Our circuit supports recently reported nano-technologies allowing operation at room temperature, such as monolithic and vertical integration of RTDs
+with FET transistors using IU-V semiconductors [3]. A simple piecewiselinear model for our cell is provided
+and the functional capabilities of the RTD-CNN cell were evaluated. The results are consistent with the theory in [ 11, the proposed cell exhibiting a higher functionality than obtained in standard CNN cells. Further simulations
+in Spice using realistic device models [Z]. c o n f i i that the simple piecewise linear model is accurate enough to
+capture the main features and for a first design of the circuit parameters. The functional capabilities of our cell are far beyond those of the standard CNN cell while having a reduced number of devices and the same number of gene parameters. The vertical integration of RTDs offers the advantage of a significant increase in the density of cells per chip, since the RTD devices do not occupy additional area. Several issues have to be addressed in the future: (i) The development of an efficient optimization method to provide a redization in short time; (ii) Additional optimization of the RTD-CNN circuit for speed, power, and area; (iii) The investigation of potential advantages of adding recurrent synapses to our CNN cell.
+Acknowledgments: This work was supported in part by the ONR grant N00014-99-1-0339 and by the MURI ONR grant N00014-98-1-0594. We would also l i e to thank Dr. D. M.Chow and Dr.J. N. Schulman for helpful discussions during the initial phase of the work.
+References
+'-[l]R.Dogaru and L. 0.Chua, "Universal CNN cells", Intl. Journal of Bifirrcation and Chaos, vol. 9, pp. 1-48, Jan. 1999.
+[2] M. Haggi, R. Dogaru and L.O. Chua, "Physical modeling of RTD based CNN cells", in IEEE International Workshopon Cellular Neural ,Networksand their Applications, May 2000.
+[3] K. J. Chen, T. Akeyoshi and K. Maezawa, "Monolithic integration of resonant tunneling diodes and FETs for monostable-bistable transition logic elements (MOBILE)", IEEE Electron Device Letters, vol. 16, pp. 70-72, February 1995.
+[4] L.O. Chua, CNN: A paradigmfor complexity, World Scientific, 1998. [5] H. Mizuta and T. Tanoue, Thephysics and Applications of Resonant Tunneling Diodes, Cambridge
+University Press, 1995. [6lR.H. Mathews, J.P. Sage, T.C.L.G. Solner, S.D. Calawa, Chang-Lee. Chen, L.J. Mahoney, P.A.
+Maki and K.M. Molvar, "A new RTD-FET logic family", Proceedings of the IEEE, vol. 87, pp. 596-604, April 1999. [7]W. Williamson 111, S. B. Enquist, D.H. Chow, H.L. Dunlap, S. Subramaniam, P. Lei; G.H. Bernstein, B.K. Gilbert, "12 GHz clocked operationof ultralow power interband resonant tunneling diode pipelined logic gates", IEEE Journal of Solid-state Circuits, vol. 32, pp. 222-230, February 1997. [8]J.P.A. van der Wagt, A.C. Seabaugh, and E.A. Beam, 111, "RTD/HFET low standby power SRAM gain cell", IEEE Electron Device Letters, vol. 19, pp. 7-9, January 1998. 191 R. Dogaru, L.O.Chua and M. Hilnggi, "A Compact and Universal RTD-Based CNN Cell: Circuit, Piecewise-Linear Model, and Functional Capabilities," Memorandum UCBRRL M99/72, Electronics Research Laboratory, University of California at Berkeley, 1999. ftp://bayview.eecs.berkeley.edu/pub/rd/rtdcell.pdf [lOIW. Liu, I, Fundamentalsof III-Vdevices,John Wiley & Sons., 1999. [lllL.O. Chua and S.M. Kang, "Section-wise piecewise-linear functions: canonical representation, properties and applications", Proceedings ofthe IEEE, vol. 65, pp. 915-929, June 1977. i12lC.P. Lee, B.M. Welch and R. Zucca, "Saturated resistor load for GaAs integrated circuits", IEEE Transactions on Microwave Theory and Techniques, vol. M1T-30, pp. 1007-1013, July 1982. [13lK. Maezawa, T. Akeyoshy, and T. Mizutani,"Functions and applications of monostable-bistable transition logic elements (MOBILES) having multiple-input terminals", IEEE ?tans. Electron Devices, vol. 41, pp. 148-154.1994.
+188
+

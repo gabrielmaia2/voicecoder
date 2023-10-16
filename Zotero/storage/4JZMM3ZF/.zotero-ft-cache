@@ -1,0 +1,266 @@
+SPIKING NEURAL NETWORKS TRAINED WITH BACKPROPAGATION FOR LOW POWER NEUROMORPHIC IMPLEMENTATION OF VOICE ACTIVITY DETECTION
+Flavio Martinelli∗, Giorgia Dellaferrera∗, Pablo Mainar†, Milos Cernak†
+∗E´ cole Polytechnique Fe´de´rale de Lausanne (EPFL), Switzerland †Logitech Europe S.A., Lausanne, Switzerland
+
+arXiv:1910.09993v2 [eess.AS] 30 Apr 2020
+
+ABSTRACT
+Recent advances in Voice Activity Detection (VAD) are driven by artiﬁcial and Recurrent Neural Networks (RNNs), however, using a VAD system in battery-operated devices requires further power efﬁciency. This can be achieved by neuromorphic hardware, which enables Spiking Neural Networks (SNNs) to perform inference at very low energy consumption. Spiking networks are characterized by their ability to process information efﬁciently, in a sparse cascade of binary events in time called spikes. However, a big performance gap separates artiﬁcial from spiking networks, mostly due to a lack of powerful SNN training algorithms. To overcome this problem we exploit an SNN model that can be recast into a recurrent network and trained with known deep learning techniques. We describe a training procedure that achieves low spiking activity and apply pruning algorithms to remove up to 85% of the network connections with no performance loss. The model competes with state-of-the-art performance at a fraction of the power consumption comparing to other methods.
+Index Terms— Spiking Neural Networks, Voice Activity Detection, Power Efﬁciency, Backpropagation, Neuromorphic Microchips.
+1. INTRODUCTION
+Voice Activity Detection (VAD) is the preliminary, gating, step in most of speech processing applications. It tackles the non-trivial problem of discriminating speech signals from environmental background noise, the latter being the main source of performance impairment of Automatic Speech Recognition (ASR) systems [1]. The issue of power consumption is particularly relevant if such systems are embedded in battery-powered devices, therefore an embedded always-on voice detector should be evaluated considering both detection performance and energy consumption; such criteria are in contrast between each other.
+Contemporary VAD approaches range from the digital signal processing ones [2–5] to data-driven (trained) ones, such as Gaussian Mixture Models (GMM) [6, 7], and recent deep learning approaches using Artiﬁcial, Convolutional [8]
+
+or Recurrent Neural Networks [9] (ANNs, CNNs or RNNs). Notably, ANN-based techniques outperform all previous methods but these models are computationally heavy limiting their deployment on battery-powered devices. This problem is often targeted by reducing the size and complexity of the ANN models with various compressing techniques [10] and dedicated low power hardware.
+In this work, we propose an energy-efﬁcient VAD algorithm based on spiking networks that respect the implementability constraints of the current state-of-the-art neuromorphic chips. Neuromorphic hardware’s main strength is the very low power consumption (c.f. Table 1 of [11]), making it suitable for embedded machine learning tasks. Spiking neurons, in comparison to ANN units, represent more closely biological neurons, are more complex and show higher computational capacity [12]. However, spiking networks still lack a powerful training algorithm such as what backpropagation is for ANNs. Moreover, at the moment, biologically derived learning rules for SNNs do not match performances of ANNs or other SNN training techniques [13].
+Our model is inspired by the recently proposed formulation of discrete-time SNNs as Recurrent Neural Networks [14–16], overcoming the non-differentiability of the spike activation function by using a surrogate gradient that allows the backpropagation of errors. RNN is to be intended as the large class of networks sharing time dynamics and recurrent connections, as stated also in [14]. This formulation of SNNs into RNNs is a key component in our work since it broadens the pool of available optimization techniques to the ones developed for deep learning.
+With respect to ANN to SNN conversion methods [17], our models exploit the neurons’ time dynamics, explicitly adding another dimension to the encoding space of information. Such information is encoded in the synchronicity of the spikes, thus reducing the number of binary events needed to represent the signal; hence reducing energy consumption.
+To deploy such models into neuromorphic hardware one must take into consideration some architectural constraints, mainly the limited number of connections per neuron. We assess this issue by showing that ’lottery tickets’ subnetworks [18] can be found in our models, reducing the number of connections to 15% the original without decrease of performance.
+
+2. METHODS
+
+2.1. Spiking network model
+
+The key insight of the spiking network proposed by Neftci et al. [14] and Bellec et al. [15] is the reformulation of the Leaky Integrate and Fire (LIF) model with synaptic currents [19] into discrete-time equations and its equivalence to a Recurrent Neural Network with binary activation functions and reset functions. Here we brieﬂy summarize the link between continuous-time LIF and the model proposed in [14].
+The LIF model is a widely used neuron model implemented in most of neuromorphic chips, it describes the state of neuron i with voltage membrane Vi(t) and synaptic current Ii(t) variables, evolving through time according to these differential equations:
+
+τmemV˙i(t) = −Vi(t) + RIi(t),
+
+τsynI˙i(t) = −Ii(t) + wijsj(t)
+
+(1)
+
+j
+
+where sj(t) = k δ(t − tk) are input spikes coming from the presynaptic neuron j; δ being the Dirac’s delta distribution.
+The synaptic current variable Ii(t) is incremented each time a spike reaches neuron i from neuron j (proportionally to the synaptic weight wij) and follows the behaviour of a leaky integrator with decay constant τsyn. The voltage variable also follows the same behaviour with constant τmem. A neuron emits a spike whenever its membrane voltage potential reaches a set threshold θ, then, immediately after the spike, the neuron’s potential is reset to zero. Eqs.1 can be approximated in discrete timesteps with R = θ = 1 and ∆T sufﬁciently small:
+
+Vi(t + ∆T ) = αVi(t) + Ii(t) − Si(t),
+
+Ii(t + ∆T ) = βIi(t) + wijSj(t)
+
+(2)
+
+j
+
+with
+
+decay
+
+constants
+
+α
+
+and
+
+β
+
+equivalent
+
+to
+
+exp(−
+
+∆T τmem
+
+)
+
+and
+
+exp(−
+
+∆T τsyn
+
+)
+
+respectively.
+
+Spikes can be now expressed as
+
+result of a binary activation function applied to the membrane
+
+potential of the neuron: Si(t) = Θ(Vi(t) − θ); Θ being the
+
+Heaviside function. Finally, the reset mechanism is given by
+
+subtracting the spike function Si to Vi.
+
+Equations 2 are mathematically equivalent to an RNN
+
+with V, I as internal states and Θ(V − θ) as activation func-
+
+tion. This allows to train this model using the tools of deep
+
+learning, computing the gradients from eqs.2 with Backprop-
+
+agation Through Time (BPTT). The activation function’s derivative, Θ˙ = δ, is zero every-
+
+where except at the origin, where it is not deﬁned, prevent-
+
+ing the backpropagation of errors. It is thus been proposed
+
+to substitute its derivative with the derivative of a surrogate
+
+continuous and differentiable function that allows the ﬂow of
+
+gradient through the network [15, 16, 20, 21]. The choice for our model fell on the derivative of the fast sigmoid [21]:
+
+1
+
+(1 + λ|Vi(t) − θ|)2
+
+(3)
+
+where λ = 10 sets the steepness of the sigmoid. The gradient is not allowed to ﬂow through the reset of
+the voltage variable since it has been noticed that the reset function’s large negative gradient contributes to changes in weights that force the neuron potential to be repelled from the threshold and therefore silencing the network [22].
+The model’s parameters (e.g. w) can be trained to minimize a loss function with BPTT by using eqs.2 in the forward pass. The backward pass is computed using the same eqs. but substituting the derivative of S(t) with eq.3.
+
+2.2. Preprocessing and temporal spike encoding
+
+The features given to the SNN model are extracted from audio tracks sampled at 16 kHz. 128 log Mel ﬁlterbank coefﬁcients are computed on windows of 64 ms with 75% of overlap which leads to a feature vector of 128 coefﬁcients every 16 ms. Each coefﬁcient is then normalized between 0 and 1 with respect to the minimum and maximum value in the entire training dataset. For the testing dataset, the same procedure is performed using the training normalization coefﬁcients and clipping every resulting value to the interval [0, 1].
+The 128 normalized coefﬁcients of each audio frame, xk, are then encoded into spike patterns of T time-steps, following the rule of time-to-ﬁrst-spike [19]. The higher the value the earlier the corresponding neuron k will spike.
+
+Sk(t) = δ[t − T · (1 − xk) ]
+
+(4)
+
+where δ[·] is the discrete impulse function and the quantity T · (1 − xk) is rounded to the nearest integer. Each audio frame is therefore represented by one pattern of length T time-steps containing 128 impulses (spikes), one for each feature coefﬁcient k. This encoding exploits the fact that the network dynamics (eqs.2) are invariant to a global shift of the input pattern in time, therefore to a global shift in coefﬁcients magnitude, implying that the information is conveyed in the synchronicity between spikes of different input neurons rather than the absolute timing of each spike. This allows for a minimal description of the input vector with 128 events or spikes per audio frame, achieving high sparsity.
+
+2.3. Experiments
+We present two different architectures that can tackle the problem, both take as input a feature vector corresponding to a 64ms audio frame encoded into a spiking pattern of 128 input neurons, T = 100 timesteps and ∆T = 1. Spikes are sent to the hidden layers in a fully-connected feedforward fashion and reach the output layer composed of two neurons: one coding for voice and the other for no voice.
+
+Neurons in the network follow eqs.2 with the exception that output neurons do not have an activation function, namely, they do not spike and do not get reset. We deﬁne a loss function on the maximum voltage reached by the output neurons, speciﬁcally on the cross-entropy between the softmax of the two maximum values and the true labels ([1, 0] for ’no-speech’ and [0, 1] for ’speech’). For both the experiments we minimized the loss function using the Adam optimization method [23] (learning rate = 10−4, batch size = 256). The classiﬁed label is given by the difference between the maxima of the voltage traces of the output neurons: if max(Vspeech) − max(Vno speech) > ρ, the frame is labelled as speech and vice-versa for no-speech. ρ can be set to zero or tuned to bias the classiﬁer towards one class.
+The ﬁrst network architecture, SNN h1, is composed of one hidden layer of 200 neurons with τsyn = 5, τmem = 10. It classiﬁes each audio frame independently from the others. To overcome the lack of contextual information, the predicted labels (0 for no-speech and 1 for speech) are smoothed with a median ﬁlter of size 11, consisting of 224ms of audio.
+The second architecture, SNN h2, has been designed to include past contextual information about the classiﬁed audio frame. The network is fed with 5 successive frames, which amount to 500 time-steps, and asked to classify the last. To include a longer memory effect in the neurons a second hidden layer of 15 neurons with τmem = 300 is introduced after a hidden layer of 100 neurons and τmem = 10 while τsyn = 5 for all neurons, consisting of 14.330 weights. The classiﬁcation is performed on the maximum values of the output neurons voltage while the last frame is presented. The same median ﬁlter is then applied to the predicted labels.
+An implementation of the networks can be found in [24].
+2.4. Pruning
+Deployment of the described architectures on neuromorphic chips need to account for architectural constraints of the chip’s internal routings. One major constraint is the maximum number of input/output connections that each neuron can have in the chip. Moreover, reducing the number of spikes received by each neuron, Synaptic Operations (SOPs), reduces the power consumption of the chip. Pruning techniques for spiking networks have been proposed in [25], we tested instead whether the Lottery Ticket Hypothesis [18] developed for ANNs applies also to our SNN h1 spiking model. The proposed technique consists in training the network multiple times starting from the same initialization weight vector: at the end of each iteration (which consists of a full training procedure) the connections which weights are closest to zero gets pruned, the successive training iteration is initialized with the same initialization vector but pruned of the connections found in the preceding iteration. This method allows for direct control on the number of connections pruned and shows limited to no accuracy loss in many ANN models [18].
+
+Method / SNR +15 +10 +5 0 -5 -10
+
+Sohn [4]
+
+11.1 13.4 19.7 25.9 31.3 37.6
+
+Segbroeck [28] 6.1 6.0 10.4 10.8 18.3 23.2
+
+Neurogram [29] 5.5 5.9 10.2 10.0 17.5 23.7
+
+SNN h1-w SNN h2-w SNN h1 SNN h2
+
+2.9 4.5 7.1 9.7 12.5 16.3 5.0 5.8 7.3 9.6 12.2 15.7 2.4 3.4 5.9 10.2 16.3 26.5 3.9 4.5 6.2 9.4 14.1 21.1
+
+Table 1. DCF% scores comparison adapted from [29]. In grey the best performing model for each SNR (dB). Models with sufﬁx −w are trained with a weighted loss function to match the DCF metric, lack of sufﬁx refers to a balanced loss.
+
+3. RESULTS
+The described models (SNN h1 and SNN h2) are trained and tested on the QUT-NOISE-TIMIT [26] corpus, developed for testing VAD applications in noisy scenarios. It contains 600 hours of audio tracks with different levels and types of background noise mixed with the TIMIT [27] clean speech corpus. The dataset is divided into two parts, group A and B, in which same noise types have been recorded in different locations. We trained the models on the former and tested them on the latter, each of them totalled around 16.87 × 106 audio frames.
+Following the protocol suggested by the dataset creators [26], we grouped the SNR levels into low (15dB, 10dB), medium (5dB, 0dB) and high (-5dB, -10dB) and trained a different model for each noise level group. Training a single model on all SNR levels outperforms the models trained solely for medium and high noise, suggesting that knowledge of all levels is beneﬁcial to the ﬁnal performance and being SNR agnostic is most suitable for real-world applications.
+We compared to the following standard untrained techniques: advanced front-end [2] (ETSI), ITU-T G.729 Annex B [3] (G729B), Likelihood Ratio test [4] (Sohn) and Long Term Spectral Divergence [5] (LTSD). Recent trained methods, producing different models for each noise levels, are also compared: GMM trained on Mel Frequency Cepstral Coefﬁcients [6] (GMM-MFCC), Complete Linkage Clustering [7] (CLC), ANNs (Segbroeck, Neurogram) [28,29] and a Convolutional Neural Network [8] (CNN).
+Table 1 compares models trained on all noise levels and evaluated on the Detection Cost Function, DCF = 0.25F AR + 0.75M R, MR and FAR being miss and false alarm rates, extending the table of results from Neurogram [29] and showing substantial improvements.
+The results shown in ﬁg.1 compare our SNNs with the protocol previously mentioned evaluated with the Half Total Error Rate: HT ER = 0.5M R + 0.5F AR. The proposed one-hidden layer model, SNN h1, scores 4.6%, 12.4% and 25.2% for low, medium and high noise levels, respectively, being able to compete with trained models and outperform-
+
+HTER %
+Hit rate %
+
+40
+
+SNN h1 SNN h2
+
+35
+
+CNN [8] CLC[7]
+
+30
+
+GMM-MFCC[6] LTSD[5]
+
+25
+
+Sohn[4] G729B[3]
+
+20
+
+ETSI[2]
+
+15
+
+10
+
+5
+
+0
+
+Low noise
+
+Medium noise
+
+High noise
+
+Fig. 1. Comparisons of HTER% values for different noise levels. Dark and light patterned shades highlight M ISS and F A contributions, respectively. Legend order, top to bottom, is respected in the bars’ order, left to right.
+
+ing the standard untrained models. The second model proposed, with two hidden layers and different membrane time constants, SNN h2, scores 6.7%, 12.0% and 22.7%, achieving slightly better performances in medium and high noise scenarios but losing performance on low noise levels. The models’ classiﬁcation outcomes can be biased with the parameter ρ to tailor for a speciﬁc application and compute the Receiver Operating Characteristic (ROC) curve in ﬁg. 2.
+The pruning procedure described in section 2.4 consists of 4 iterations in which the connections from input to hidden layer of the SNN-h1 model are pruned up to 15% (with steps of 70%, 40%, 20%, 15%). The pruned model, SNN h1−p, does not lose any signiﬁcant performance with respect to the original fully connected model, suggesting that the Lottery Ticket Hypothesis holds even for these types of networks. Power consumption is strongly dependent on the type of chip and network chosen. Lacking such hardware, our estimates follow the benchmark results of TrueNorth [30] and must be interpreted as indicative values. Following ﬁg.4B in [30] we ﬁnd the total TrueNorth power consumption of 105 (80) mW for SNN h1(SNN h1-p) at 3.7 (1.8) average spiking rate and 80 (13) average active synapses per neuron. Dividing by the total number of neurons in the TrueNorth chip (4096 × 256) and multiplying by the ones in our networks we estimate the power consumption of table 2. The pruned network achieves the same performance as SNN h1 consuming 25% less energy with 40% less spiking activity. The power estimates in
+
+Rate
+SNN h1 1 - 4.7 SNN h1-p 1 - 2.9
+
+#Params
+26k 4096
+
+Power
+33.0 µW 25.1 µW
+
+HTERs %
+4.6 12.4 25.2 4.7 12.5 25.8
+
+Table 2. Comparison between SNN h1 and its pruned version. Average neuron spiking rate per inference is shown for the input and hidden layers, the number of parameters and estimated power consumption follow. The three HTER values correspond to low, medium and high noise respectively.
+
+100 80 60 40 20 00.1
+
+1.0 False Alarm rate %10.0
+
++15 +10 +05 +00 - 05 - 10 =HiFtA
+100.0
+
+Fig. 2. ROC curve for the model SNN h1, the lower black thick line corresponds to Hit rate = False Alarm rate.
+
+table 2 do not include feature preprocessing and encoding and assume that total power consumption in the TrueNorth chip scales linearly with the number of neurons. Dedicated chips, with advanced mixed analogue-digital implementations, might lower even more these estimates. Current low power VAD implementations reach less than 1µW , but at a performance cost: e.g. in [31] babble noise at 5dB scores 84% and 72% on hit rate and correct rejections whereas similar conditions (”CAFE” of [26]) on SNN h1 reach 97%, 84%; other power comparisons can be found in table 1 of [31].
+
+4. CONCLUSIONS AND LIMITATIONS
+We proposed a novel VAD application using an SNN model and we showed that it competes with state of the art algorithms while keeping a very low energy consumption. We addressed the connectivity limitations of neuromorphic chips by testing the lottery ticket hypothesis [18] with positive results, achieving even less energy consumption. Previous studies [15, 22, 32] applied similar models to simple image datasets, where the features precise values are not necessary to solve the task, namely the task can be solved by using only binary features [32]. The novelty of the proposed work lies in showing how these models are able to process more complex continuous features such as Mel ﬁlterbank coefﬁcients in a realworld application, highlighting the power of the method and the high level of sparsity these features can be represented with temporal coding, in contrast with ANN to SNN conversion methods that rely on spike rates to convey information [17] such as the spiking VAD solution proposed in [16] at 26.1 mW. The main limitation of the model is the computationally heavy training procedure that constrains hyperparameter optimization. We reached competitive performance by using basic features and encoding schemes, room for improvement can be found by exploring more elaborate architectures, features, and their conversion into spike patterns. With this example we want to stimulate further research on these models, applied to different tasks, suggesting that they can compete with embedded deep learning approaches with a good tradeoff between energy consumption and performance.
+
+5. REFERENCES
+[1] Javier Ramirez, Juan Manuel Go´rriz, and Jose´ Carlos Segura, “Voice activity detection. fundamentals and speech recognition system robustness,” in Robust speech recognition and understanding. June 2007, IntechOpen.
+[2] Jin-Yu Li, Bo Liu, Ren-Hua Wang, and Li-Rong Dai, “A complexity reduction of etsi advanced front-end for dsr,” in 2004 IEEE International Conference on Acoustics, Speech, and Signal Processing. IEEE, 2004, vol. 1, pp. I–61.
+[3] Adil Benyassine, Eyal Shlomot, et al., “Itu-t recommendation g. 729 annex b: a silence compression scheme for use with g. 729 optimized for v. 70 digital simultaneous voice and data applications,” IEEE Communications Magazine, vol. 35, no. 9, pp. 64–73, 1997.
+[4] Jongseo Sohn, Nam Soo Kim, and Wonyong Sung, “A statistical model-based voice activity detection,” IEEE signal processing letters, vol. 6, no. 1, pp. 1–3, 1999.
+[5] Javier Ramırez, Jose´ C Segura, Carmen Benıtez, Angel De La Torre, and Antonio Rubio, “Efﬁcient voice activity detection algorithms using long-term speech information,” Speech communication, vol. 42, no. 3-4, pp. 271–287, 2004.
+[6] Tim Ng, Bing Zhang, Long Nguyen, et al., “Developing a speech activity detection system for the darpa rats program,” in Thirteenth annual conference of the international speech communication association, 2012.
+[7] Houman Ghaemmaghami, David Dean, et al., “Completelinkage clustering for voice activity detection in audio and visual speech,” in INTERSPEECH, 2015, pp. 2292–2296.
+[8] Diego Augusto Silva, Jose´ Augusto Stuchi, Ricardo P Velloso Violato, and Lu´ıs Gustavo D Cuozzo, “Exploring convolutional neural networks for voice activity detection,” in Cognitive Technologies, pp. 37–47. Springer, 2017.
+[9] Gregory Gelly et al., “Optimization of rnn-based speech activity detection,” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 26, no. 3, pp. 646–656, 2017.
+[10] Yu Cheng, Duo Wang, Pan Zhou, and Tao Zhang, “A survey of model compression and acceleration for deep neural networks,” arXiv preprint arXiv:1710.09282, 2017.
+[11] Charlotte Frenkel et al., “A 0.086-mm 12.7-pj/sop 64k-synapse 256-neuron online-learning digital spiking neuromorphic processor in 28-nm cmos,” IEEE transactions on biomedical circuits and systems, vol. 13, no. 1, pp. 145–158, 2018.
+[12] Wolfgang Maass, “Networks of spiking neurons: the third generation of neural network models,” Neural networks, vol. 10, no. 9, pp. 1659–1671, 1997.
+[13] Amirhossein Tavanaei, Masoud Ghodrati, Saeed Reza Kheradpisheh, Timothe´e Masquelier, and Anthony Maida, “Deep learning in spiking neural networks,” Neural Networks, 2018.
+[14] Emre O Neftci, Hesham Mostafa, and Friedemann Zenke, “Surrogate gradient learning in spiking neural networks,” arXiv preprint arXiv:1901.09948, 2019.
+[15] Guillaume Bellec, Darjan Salaj, Anand Subramoney, Robert Legenstein, et al., “Long short-term memory and learning-tolearn in networks of spiking neurons,” in Advances in Neural Information Processing Systems, 2018, pp. 787–797.
+
+[16] Steven K Esser, Paul A Merolla, John V Arthur, Andrew S Cassidy, et al., “Convolutional networks for fast energy-efﬁcient neuromorphic computing,” Proc. Nat. Acad. Sci. USA, vol. 113, no. 41, pp. 11441–11446, 2016.
+[17] Bodo Rueckauer, Iulia-Alexandra Lungu, Yuhuang Hu, Michael Pfeiffer, and Shih-Chii Liu, “Conversion of continuous-valued deep networks to efﬁcient event-driven networks for image classiﬁcation,” Frontiers in neuroscience, vol. 11, pp. 682, 2017.
+[18] Jonathan Frankle and Michael Carbin, “The lottery ticket hypothesis: Finding sparse, trainable neural networks,” in International Conference on Learning Representations, 2019.
+[19] Wulfram Gerstner, Werner M Kistler, Richard Naud, et al., Neuronal dynamics: From single neurons to networks and models of cognition, Cambridge University Press, 2014.
+[20] Sumit Bam Shrestha and Garrick Orchard, “Slayer: Spike layer error reassignment in time,” in Advances in Neural Information Processing Systems, 2018, pp. 1412–1421.
+[21] Friedemann Zenke and Surya Ganguli, “Superspike: Supervised learning in multilayer spiking neural networks,” Neural computation, vol. 30, no. 6, pp. 1514–1541, 2018.
+[22] Friedemann Zenke and Tim P. Vogels, “Rapid spatiotemporal coding in trained multi-layer and recurrent spiking neural networks ,” poster presented at COSYNE 2019, Cascais, Portugal.
+[23] Diederik P. Kingma and Jimmy Ba, “Adam: A method for stochastic optimization,” CoRR, vol. abs/1412.6980, 2014.
+[24] Flavio Martinelli et al., “Spiking neural networks trained with backpropagation for low power neuromorphic implementation of voice activity detection,” https://www.codeocean. com/, 02 2020.
+[25] Guillaume Bellec, David Kappel, Wolfgang Maass, et al., “Deep rewiring: Training very sparse deep networks,” in International Conference on Learning Representations, 2018.
+[26] David B Dean, Sridha Sridharan, et al., “The qut-noisetimit corpus for the evaluation of voice activity detection algorithms,” Proceedings of Interspeech 2010, 2010.
+[27] Victor Zue, Stephanie Seneff, and James Glass, “Speech database development at mit: Timit and beyond,” Speech communication, vol. 9, no. 4, pp. 351–356, 1990.
+[28] Maarten Van Segbroeck, Andreas Tsiartas, and Shrikanth Narayanan, “A robust frontend for vad: exploiting contextual, discriminative and spectral cues of human voice.,” in INTERSPEECH, 2013, pp. 704–708.
+[29] Wissam A Jassim and Naomi Harte, “Voice activity detection using neurograms,” in 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2018, pp. 5524–5528.
+[30] Paul Merolla et al., “A million spiking-neuron integrated circuit with a scalable communication network and interface,” Science, vol. 345, no. 6197, pp. 668–673, 2014.
+[31] Minchang Cho et al., “17.2 a 142nw voice and acoustic activity detection chip for mm-scale sensor nodes using timeinterleaved mixer-based frequency scanning,” in 2019 IEEE International Solid-State Circuits Conference-(ISSCC). IEEE, 2019, pp. 278–280.
+[32] Hesham Mostafa, “Supervised learning based on temporal coding in spiking neural networks,” IEEE transactions on neural networks and learning systems, vol. 29, no. 7, 2017.
+

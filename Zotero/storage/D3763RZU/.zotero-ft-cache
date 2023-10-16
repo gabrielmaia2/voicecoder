@@ -1,0 +1,1172 @@
+A Survey on Methods and Theories of Quantized Neural Networks
+Yunhui Guo University of California, San Diego Computer Science and Engineering Department
+yug185@eng.ucsd.edu
+
+arXiv:1808.04752v2 [cs.LG] 16 Dec 2018
+
+Abstract
+Deep neural networks are the state-of-the-art methods for many real-world tasks, such as computer vision, natural language processing and speech recognition. For all its popularity, deep neural networks are also criticized for consuming a signiﬁcant amount of memory and draining battery life of devices during training and inference. This makes it hard to deploy these models on mobile or embedded devices which have tight resource constraints. Quantization is recognized as one of the most effective approaches to satisfy the extreme memory requirements that deep neural network models demand. Instead of adopting 32-bit ﬂoating point format to represent weights, quantized representations store weights using more compact formats such as integers or even binary numbers. Despite a possible degradation in predictive performance, quantization provides a potential solution to greatly reduce the model size and the energy consumption. In this survey, we give a thorough review of different aspects of quantized neural networks. Current challenges and trends of quantized neural networks are also discussed.
+1 Introduction
+Since the success on the ImageNet dataset [Krizhevsky et al., 2012], deep neural networks has drawn a huge amount of attention from academia, industry and media. Subsequent works show that deep neural network models can achieve the state-of-the-art results on many real-world tasks, such as computer vision [He et al., 2016a], natural language processing [Young et al., 2017] and speech recognition [Hinton et al., 2012a]. One constraint that hinders the wide use of deep neural network models is that it consumes a huge amount of memory to store the models. For example, AlexNet [Krizhevsky et al., 2012] requires 200MB memory, VGG-Net [Simonyan and Zisserman, 2014] requires 500MB memory and ResNet-101 [He et al., 2016a] requires 200MB memory. For mobile or embedded devices that do not have enough memory space, it is hard to deploy these models into production stack. Quantization is a potential solution to this problem. Quantized neural networks represent weights, activations or
+
+even gradients with a small numbers of bits, such as 8 bits or even 1 bit. In this way, we can effectively shrink the model size and accelerate both the training and the inference procedures.
+Quantizing neural networks dates back to the 1990s [Fiesler et al., 1990; Balzer et al., 1991; Tang and Kwan, 1993; Marchesi et al., 1993]. In the early days, the main reason to quantize these models is to make it easier for digital hardware implementation. Recently, the research of quantizing neural networks has revived due to the success of deep neural networks and their huge sizes. A slew of new quantization methods and methodologies have been proposed. These efforts have enabled the quantized neural networks to have the same accuracy level as their full-precision counterparts. In this paper, we give a thorough survey on methods and approaches of quantized neural networks. We also discuss the challenges of quantizing neural networks and address future trends.
+The rest of the paper is organized as follows: Section 2 gives background on neural networks and specially on quantized neural networks. Section 3 introduces some common quantization methods. In section 4, we discuss the quantization of different network components. In section 5, we compare two types of quantization methodologies. Section 6 gives some case studies. Section 7 discusses about why quantized neural networks work well in practice. In section 8 we discuss possible future directions of quantized neural networks.
+
+2 Background
+
+2.1 Neural Networks
+
+Feed-forward Neural Networks
+
+A feed-forward neural network is the artiﬁcial neural network
+
+without loops. It is the simplest and oldest type of artiﬁcial
+
+neural network. A feed-forward neural network consists of
+
+three parts: input layer, hidden layers and output layer. An
+
+example of a feed-forward neural network is shown in Fig 1.
+
+Usually there are multiple hidden layers. Each hidden layer
+
+transforms its input to some representations that the next layer
+
+can compute. We use wilj to denote the weight from node i
+
+in layer l − 1 to the node j in layer l. In a fully connected
+
+feed-forward neural network, given an input vector xl−1 ∈
+
+Rm in layer l − 1, the output of node j in next layer can
+
+be computed as zjl = g(
+
+m i=0
+
+wilj xli−1),
+
+where
+
+g(x)
+
+is
+
+an
+
+activation function.
+
+Table 1: Speciﬁcations of four CNN architectures
+
+AlexNet VGGNet-16 (with batch normalization)
+GoogleNet ResNet-152
+
+# of parameters 60M 138M 6.9M 60.2 M
+
+Layers 8 16 22 152
+
+ﬂops 725M 15484M 1566M 11300M
+
+Top-1 error rate on ImageNet 43.45% 26.63% 31.30% 22.16%
+
+If there are m neurons in layer l−1 and n neurons in layer l, with fully-connected layer the weights between the two layers are represented as an m × n matrix. This matrix consumes a large amount of memory when m or n is too large. For example, if a gray-scale input image of the neural network is of size 256 × 256 and the ﬁrst hidden layer has 512 neurons. Storing the weight matrix with ﬂoating-point numbers requires 128M memory. In practice, the images are much larger than this example so a fully-connected layer cannot scale well.
+Figure 1: A three-layer feedforward neural network. Convolutional Neural Networks Convolutional neural network (CNN) is a type of artiﬁcial neural network that has been successfully applied in many areas, especially in visual imagery [LeCun et al., 1998]. A convolutional neural network consists of three building blocks: convolutional layer, pooling layer and fully-connected layer. A simple convolutional neural network is shown in Fig 2.
+Figure 2: An illustration of convolutional neural networks.
+
+Convolutional layer is a major building block of CNNs. It is used to extract features from images. In each convolutional layer we have a set of ﬁlters. During the forward pass, we slide each ﬁlter across the image and compute dot products between the ﬁlter and the local receptive ﬁeld. The output of the convolutional layer is called activation map that gives the response of each ﬁlter. Given an image I and a m × n ﬁlter F , an element ai,j in the activation map can be computed as,
+
+mn
+
+ai,j =
+
+Ii+a−1,j+b−1 × Fa,b
+
+(1)
+
+a=1 b=1
+
+The convolution operation is computationally very expen-
+
+sive. For example, the total time complexity of all convolu-
+
+tional layers can be expressed as O(
+
+d l=1
+
+nl−1
+
+·
+
+s2l
+
+·
+
+nl
+
+·
+
+m2l )
+
+[He and Sun, 2015]. Here l is the index of a convolutional
+
+layer and d is the number of convolutional layers. nl is the number of ﬁlters in the l-th layer. nl−1 is the number of input channels of the l-th layer. sl is the spatial size of the ﬁlter. ml is the spatial size of the activation map. The computational
+
+cost of the convolutional layer motivates us to use low bit-
+
+width ﬁlters and inputs. With low bit-width ﬁlters and inputs,
+
+the dot product can be efﬁciently implemented by bitwise op-
+
+erations which can greatly accelerate the computation.
+
+The success of Alexnet [Krizhevsky et al., 2012] at
+
+ILSVRC 2012 spawned a lot of novel CNN architectures. In
+
+this paper, we focus on the following four CNN architectures,
+
+• AlexNet [Krizhevsky et al., 2012]
+
+• VGGNet [Simonyan and Zisserman, 2014]
+
+• GoogleNet [Szegedy et al., 2015]
+
+• ResNet [He et al., 2016a]
+
+The performance of these models is impressive, however their huge size hinders them from being widely used. This motivates researchers to develop quantization methods to further reduce the model size. The four architectures are widely used as baselines to compare the effectiveness of different quantization approaches. The speciﬁcations of these models are given in Table 1. More details can be found in the corresponding papers.
+
+Recurrent Neural Networks (RNNs) and LSTM
+Recurrent neural networks (RNNs) and Long Short-Term Memory (LSTM) [Hochreiter and Schmidhuber, 1997] are used to model the dynamics of sequences. Different from feed-forward neural networks and convolutional neural networks (CNNs), RNNs and LSTM may include loops that are used to consider the previous computations. An example of RNN is shown in Fig 3. The motivation to quantize RNNs and LSTM is not fundamentally different from quantizing feed-forward neural networks and CNNs. In order to
+
+Figure 3: A recurrent neural network.
+
+achieve satisfactory performances, we need millions of parameters to model complex sequential relations [Amodei et al., 2016] which makes it infeasible to deploy these models
+into embedded or mobile devices.
+
+2.2 Quantized Neural Networks
+The research of quantized neural networks has attracted a lot of attention from the deep learning community [Courbariaux et al., 2015; Rastegari et al., 2016; Zhou et al., 2017a]. The goal of quantization is to compact the models without performance degradation. Achieving this goal calls for joint solutions from machine learning, optimization computer architecture, and hardware design, etc. With quantized neural networks, we can use bitwise operations rather than ﬂoating-point operations to perform the forward and backpropagation. A simple example is that for two binary vectors, their dot product can be computed as follows,
+
+a · b = bitcount(a and b)
+
+(2)
+
+where bitcount() is a function that counts the number of 1s in a binary vector. We can also save energy with quantized neural networks. The computational operations in quantized neural networks are typically bitwise operations which are carried out by the arithmetic logic unit (ALU). An ALU consumes much less energy than a ﬂoating-point unit (FPU). For mobile applications where power consumption is critical, a quantized neural network is preferable over its full precision counterpart.
+A lot of techniques have been proposed recently to quantize neural networks. Broadly speaking, these techniques can be classiﬁed into two types: deterministic quantization and stochastic quantization. In deterministic quantization, there is an one-to-one mapping between the quantized value and the real value. While in stochastic quantization, the weights, activations or gradients are discretely distributed. The quantized value is sampled from the discrete distributions.
+There are three components that can be quantized in a neural network: weights, activations and gradients. The motivation and methods to quantize these components are slightly different. With quantized weights and activations we get smaller model size. In a distributed training environment, we can save communication cost with quantized gradients. Generally, it is more difﬁcult to quantize the gradients than quantizing weights and activations since high-precision gradients are needed to make the optimization algorithm converge.
+We use quantization codebook to denote the set of discrete values used to represent the real values. From the perspec-
+
+tive of quantization codebook, the works on quantized neural networks can be roughly classiﬁed into two categories: ﬁxed codebook quantization and adaptive codebook quantization. In ﬁxed codebook quantization, the weights are quantized into some predeﬁned codebook while in adaptive codebook quantization the codebook is learned from the data. Some commonly used codebooks are {−1, 1}, {−1, 0, 1} or powerof-two numbers, which provides binary network, ternary network and power-of-two network separately.
+The recent quantized neural networks have achieved accuracy similar to their full-precision counterparts. For example, a binary network [Courbariaux et al., 2015] can obtain 98.8% accuracy on the MNIST dataset. For large datasets such as ImageNet, a ternary network [Zhu et al., 2016] can obtain comparable performance to the full-precision network. However, there are still several challenges need to be addressed. Training quantized networks needs more tuning and the working mechanism of quantized networks are not well understood. Exploring new quantization methods and developing theories for quantized neural networks are important.
+
+3 Quantization Techniques
+3.1 Deterministic quantization
+Rounding Rounding is possibly the simplest way to quantize real values. In [Courbariaux et al., 2015], the authors proposed the following deterministic rounding function,
+
+xb = Sign(x) = +1 x ≥ 0,
+
+(3)
+
+−1 otherwise
+
+where xb is the binarized variable and x is the real-valued variable. This function can produce binarized weights, activations or gradients. During forward propagation, the realvalue weights are quantized via the Sign(x) function and the quantized weights are used to generate the outputs. However, during back-propagation we cannot back-propagate the errors through the Sign(x) function since the gradients are zero almost everywhere. The usual strategy is to use “straightthrough estimator” (STE) [Hinton et al., 2012b] which is a heuristic way to estimate the gradient of a stochastic neuron. Assume E is the loss function, with STE the forward and backward computations of above rounding function are as follows,
+
+Forward: xb = Sign(x)
+
+∂E ∂E
+
+(4)
+
+Backward: ∂x = ∂xb I|x|≤1
+
+where I|x|≤1 is an indicator function deﬁned as,
+
+1 |x| ≤ 1,
+
+I|x|≤1 = 0 otherwise
+
+(5)
+
+In order to round a ﬂoating-point number to the nearest ﬁxed-point representation, in [Gupta et al., 2015] the authors proposed the following rounding scheme,
+
+Round(x, [IL, FL]) =
+
+x x+
+
+if x ≤ x ≤ x + 2 ,
+if x + 2 < x ≤ x + (6)
+
+In a ﬁxed-point representation, IL represents the number of
+
+integer bits and FL represents the number of fractional bits.
+
+is the smallest positive number that can be represented in
+
+this ﬁxed-point format. x is deﬁned as the largest integer
+
+multiple of . For values that are beyond the range of this
+
+ﬁxed-point format, the authors normalized them to either the
+
+lower or the upper bound of the ﬁxed-point representation.
+
+[Rastegari et al., 2016] extended Equation (4) as follows,
+
+Forward: xb = Sign(x) × EF (|x|)
+
+∂E ∂E
+
+(7)
+
+Backward: ∂x = ∂xb
+
+where EF (|x|) is the mean of absolute weight values of each output channel. In [Zhou et al., 2016], instead of doing a channel-wise scaling, the authors replaced EF (|x|) with a constant scalar for all the ﬁlters.
+More recently, [Polino et al., 2018] proposed a general
+rounding function,
+
+Q(x) = sc−1(Qˆ(sc(x))),
+
+(8)
+
+where sc(x) is a scaling function which maps the values
+
+from arbitrary range to the values in [0, 1]. Qˆ(x) is the actual
+
+quantization function. Given a quantization level parameter
+
+s, the uniform quantization function with s + 1 levels can be
+
+deﬁned as,
+
+Qˆ(x, s) =
+
+xs
+
+ξ +
+
+(9)
+
+ss
+
+where,
+
+ξ=
+
+1
+
+xs −
+
+xs
+
+>
+
+1 2
+
+,
+
+0 otherwise
+
+The intuition of this quantization function is that x will be assigned to the nearest quantization point of s − 1 equally spaced points between 0 and 1. This a generalized version of the Sign(x) function and can be used to quantized the real values into multi-levels. In [Shuang et al., 2018], the authors proposed a heuristic rounding function to quantize a real value to a k-bit integer,
+
+x Q(x, k) = Clip{σ(k) · round[ ], −1 + σ(k), 1 − σ(k)}
+σ(k) (10)
+The idea is to quantize real values with uniform distance σ(k), where σ(k) = 21−k. Clip restricts the quantized values in the range of [−1 + σ(k), 1 − σ(k)] and round replaces the continuous values with their nearest discrete points.
+
+Challenges: Use a rounding function is an easy way to convert real values into quantized values. However, the network performance may drop dramatically after each rounding operation. It is necessary to keep the real values as reference during training which increases the memory overhead. Meanwhile,
+
+since the parameter space is much smaller if we use discrete values, it is harder for the training process to converge. Finally, rounding operation cannot exploit the structural information of the weights in the network.
+
+Vector Quantization To the best of our knowledge, [Gong et al., 2014] is the ﬁrst paper to systematically consider using vector quantization to quantize and compress neural networks. The basic idea of vector quantization is to cluster the weights into groups and use the centroid of each group to replace the actual weights during inference.
+For a weight matrix W ∈ Rm×n, we can perform k-means clustering to do vector quantization,
+
+mn l
+
+min
+
+wij − ck
+
+2 2
+
+ijk
+
+(11)
+
+where ck is the centroid. After clustering, each weight is assigned to a cluster index. Although this is a simple approach, the authors showed that on the ImageNet dataset [Deng et al., 2009], this method can achieve 16 ∼ 24 times compression of the network with only 1% loss of classiﬁcation accuracy using the state-of-the-art CNNs. In [Han et al., 2015], the authors adopted a similar approach to [Gong et al., 2014] except that after clustering, they retrained the network to ﬁne-tune the quantized centroids.
+While simple and effective, [Choi et al., 2016] pointed out the above quantization method have two drawbacks. The ﬁrst one is that we cannot control the loss of accuracy caused by the k-means clustering. The second is that k-means clustering does not impose any compression ratio constraint. To solve the problems, the authors proposed a Hessianweighted k-means clustering approach. The basic idea is to use the Hessian-weighted distortion to measure the performance degradation that will be caused by the quantization of weights. In this way, those weights have an large impact on the performance of the network are prevented from deviating from their original values too much.
+There are many extensions to vector quantization. For example, product quantization [Gong et al., 2014] is a way that partitions the weight matrix into many disjoint submatrices and performs quantization in each sub-matrix. In [Wu et al., 2016], the authors adopted product quantization with error correction to quantize network parameters to enable fast training and testing. Residual quantization [Gong et al., 2014] quantizes the vectors into k clusters and then recursively quantize the residuals. In [Park et al., 2017], the authors adopted a way which is similar to vector quantization. They used an idea based on weight entropy [Guias¸u, 1971] to group weights into N clusters. There are more clusters for important ranges of weights. In this way, they can achieve automatic and ﬂexible multi-bit quantization.
+
+Challenges: Due to the number of weights in the network, the computation of the k-means clustering is expensive. Compared with rounding methods, it is hard to use vector quantization to achieve binary weights. Vector quantization is typically used for quantizing pre-trained models. Hence, if the task is to train a quantized network from scratch, it is prefer-
+
+able to use a carefully designed rounding functions. Vector quantization ignores the local information of the network.
+
+Quantization as Optimization
+Recently, a number of works have considered formulating the quantization problem as an optimization problem. In XNORnet [Rastegari et al., 2016], in order to ﬁnd the best binary approximation to the real-value ﬁlters, the authors solved the following optimization problem,
+
+J(B, α) = W − αB 2
+
+(12)
+
+where W is a real-value ﬁlter, B is the binary ﬁlter and α is a positive scaling factor. The optimal B and α are given as follows,
+
+B∗ = Sign(W ),
+
+α∗ = 1 n
+
+W
+
+l1
+
+(13)
+
+where n is the number of the elements in the ﬁlter. Interest-
+
+ingly, this gives a result similar to Equation (3) except that in
+
+this case there is an additional scaling factor.
+
+In [Li et al., 2016], the authors relaxed the binary constraint
+
+to ternary values and solved the following optimization prob-
+
+lem,
+
+α∗, W t∗ =
+
+argminα,W t J (α, W t) =
+
+W − αW t
+
+2 2
+
+s.t. α ≥ 0, Wit ∈ −1, 0, 1, i = 1, 2, ..., n.
+
+(14)
+
+In this way, higher accuracy can be achieved compared to
+
+XNOR-net [Rastegari et al., 2016]. Instead of ﬁxing the code-
+
+book in ternarization, in [Zhu et al., 2016] the authors used a
+
+trained quantization method to learn the ternary values which
+
+gives the network more ﬂexibility. In [Mellempudi et al.,
+
+2017], the authors introduced multiple scaling factors into
+
+ternary network to account for the unsymmetry between pos-
+
+itive and negative weights. In [Wang and Cheng, 2017], the
+
+authors proposed the following semi-discrete decomposition
+
+for a weight matrix W ∈ Rm×n:
+
+minX,D,Y
+
+W − XDY T
+
+2 F
+
+(15)
+
+where X ∈ {−1, 0, +1}m×k, Y ∈ {−1, 0, +1}n×k and D ∈ Rk×k+ is a nonnegative diagonal matrix. By choosing
+
+different k, we can make a trade-off between compression
+
+ratio and performance loss.
+
+A different type of approach is to minimize the loss func-
+
+tion directly with respect to the quantized weights. In [Hou
+
+et al., 2016], the authors considered the effect of binariza-
+
+tion on the loss function during training and proposed a loss-
+
+aware binarization algorithm. They formulated the binariza-
+
+tion problem as the following optimization problem:
+
+minwˆ E(wˆ ) s.t. wˆ l = αlbl, αl > 0, bl ∈ {±1}nl , l = 1, ..., L,
+(16) where E is the loss function and nl is the number of the parameters in layer l and L is the number of layers. The problem then is rewritten to a formulation that can be solved by proximal Newton method.
+In [Carreira-Perpina´n and Idelbayev, 2017], the authors formulated the quantization problem as following non-convex optimization problem,
+
+minwˆ,wE(wˆ ) s.t. wˆ = ∆(w)
+
+(17)
+
+where w is the real-valued weights and wˆ is the quantized
+
+weights. E(wˆ ) is the loss function of the quantized network
+
+and ∆ is a quantization function that converts real-valued
+
+weights to discrete values. As compared to [Hou et al., 2016],
+
+this is a more general setting since it allows us to use dif-
+
+ferent quantization functions. Then they used the “learning-
+
+compression” algorithm to train the network. In [Leng et al.,
+
+2017], the authors formulated the quantization problem as a
+
+discretely constraint non-convex optimization problem and
+
+used the idea of Alternating Direction Method of Multipli-
+
+ers (ADMM) to decouple the continuous variables from the
+
+discrete constraints. The optimization problem is formally de-
+
+ﬁned as,
+
+minwE(w) s.t. wij ∈ −2N , ..., −21, −20, 0, +20, +21, ..., +2N
+(18)
+
+The authors further introduced a scaling factor to each layer to expand the constraint space. Then the problem is
+
+converted into a form that can be solved by ADMM. More recently, [Lu Hou, 2018] extended [Hou et al., 2016] to lossaware ternarization and m-bit quantization. The authors also used proximal Newton algorithm and obtained a closed-form update for the optimization problem.
+In [Zhou et al., 2017b], the authors considered the problem of ﬁnding the optimal quantized representation for each layer. Later in the work of [Soroosh Khoram, 2018] the authors proposed an adaptive quantization method which incorporates the loss function into an optimization problem to consider the importance of different connections. The optimization problems is as follows,
+
+minwNQ(w) =
+
+n i=1
+
+Nq (wi )
+
+s.t. E(w) ≤ E¯
+
+(19)
+
+where Nq(wi) is the minimum number of bits used to represent wi and NQ(w) is the total number of bits in the network. E¯ is used to bound the accuracy loss. The intuition is to use more precise representation for important weights while allocating few bits for unimportant weights. Different from above works, the work in [Deng et al., 2017] proposed gated XNOR networks which use discrete state transition method to optimize the weights in discrete space.
+
+Challenges: The convergence of the proposed optimization algorithms relies on weak assumptions which may not hold for deep neural networks. This makes the theoretical analysis of these algorithms not very convincing. Some of the methods need second-order information for updating the weights which leads to high computational complexity. From a practical perspective, it calls for more efforts to implement the proposed optimization algorithms which hinders their widespread use.
+3.2 Stochastic Quantization
+Random Rounding In random rounding, the real value has no one-to-one mapping to the quantized value. Typically, the quantized value is
+
+sampled from a discrete distribution which is parameterized by the real values. For example, in [Courbariaux et al., 2015] the authors proposed the following random rounding function,
+
+xb = +1 with probability p = σ(x), −1 with probability 1 − p
+
+where σ is the ”hard sigmoid” function:
+
+x+1
+
+x+1
+
+σ(x) = clip( 2 , 0, 1) = max(0, min(1, 2 ))
+
+The intuition is that if x is a positive value, we will have a high probability to quantize it to +1, otherwise to -1. This gives us a more ﬂexible quantization scheme. In [Muller and Indiveri, 2015] the authors used the idea in integer programming. The proposed random rounding function maps each real value probabilistically to either the nearest discrete point or to the second nearest discrete point based on the distance to the corresponding point. In [Lin et al., 2015], the authors extended binary random rounding to the ternary case. They ﬁrst split the interval [−1, 1] into two sub-intervals: [−1, 0] and (0, 1]. If the real-valued weight w is in [−1, 0], then the weight is quantized as follows,
+
+P (wibj = −1) = wij; P (wibj = 0) = 1 − wij (20)
+The case for w ∈ (0, 1] is similar. In [Polino et al., 2018], the authors also proposed a random rounding scheme based on Equation (7). In this case, we sample ξ ∼ Bernoulli(xs − xs ). This allows us to quantize the real values to multi-levels probabilistically. One important property of this random rounding function is that it is an unbiased estimator of the input, which means that E(Q(x)) = x. This reveals that this random rounding method equals to add noises into the training process.
+
+Challenges: Random rounding provides a way to inject noises into the training process. It can act as a regularizer and enable conditional computation. However, with random rounding methods we need to estimate the gradient of the discrete neurons. Such estimation often has a high variance. This fact may cause oscillations in the loss function during training. The work of [Bengio et al., 2013] provides an overview of possible solutions for estimating gradients for discrete neurons.
+Probabilistic Quantization
+The weights in a trained network often follow some distributions. Figure 4 shows the histogram of weight values in the LeNet [LeCun et al., 1998] after trained on MNIST dataset. It is obvious that most of the weight values are close to zero and the distribution is roughly Gaussian. The behavior of the weights inspired researchers to quantize the network from a probabilistic perspective.
+In probabilistic quantization, the weights are assumed to be discretely distributed. A learning algorithm is used to infer the parameters of the distributions. In [Soudry et al., 2014], the authors developed the Expectation Back-propagation algorithm to train neural networks with binary or ternary weights. They ﬁrst assumed some discrete prior distribution on the
+
+weights p(w|D0), and then updated the weights in an online setting based on the Bayesian formula,
+
+p(w|Dn) ∝ p(yn|xn, w)p(w|Dn−1)
+
+(21)
+
+Above update rule is intractable in general, the authors adopted mean-ﬁeld approximation and the Central Limit Theorem (CLT) to obtain an approximated solution.
+In [Shayar et al., 2017], the authors assumed that each weight is sampled independently from a multinomial distribution and the loss function of the network is as follows,
+
+N
+
+L(w) = Ew∼w[ l(f (xi, w), yi)]
+
+(22)
+
+i=1
+
+This function is not differentiable due to the discreteness. The authors used local reparameterization trick [Kingma et al., 2015] and the Central Limit Theorem (CLT) to approximate the discrete distributions by a smooth Gaussian distribution. In this way, the gradients can be back-propagated through the discrete nodes.
+Another type of probabilistic quantization is based on variational inference [Jordan et al., 1999]. The main idea is to place a quantizing prior on the weights and then use variational inference to obtain the discrete posterior distribution of the weights. Assume a dataset D = (xn, yn)Nn=1 and let p(Y |X, w) be a parameterized neural network model that predicts outputs Y given inputs X and parameters w. In Bayesian neural networks, we want to estimate the posterior distribution of the weights given the data: P (w|D) = p(D|w)p(w)/p(D). P (w) is the prior distribution of the weights. To analytically solve the true posterior is intractable. One approach is to use variational inference algorithm to approximate the true posterior. The true posterior distribution is approximated by a parameterized distribution qφ(w). To ﬁnd qφ(w), we need to minimize the Kullback-Leibler divergence between the true and the approximated posterior distribution: DKL(qφ(w)||p(w|D). This optimization problem can be further converted to maximize the following “evidence lower bound” (ELBO),
+
+N
+L(φ) = Eqφ(w)[log p(yn|xn, w)] − DKL(qφ(w)||p(w))
+n=1
+(23)
+
+Figure 4: The histogram of weight values of LeNet-5 [LeCun et al., 1998] after training on MNIST. The blue line is the ﬁtted Gaussian distribution.
+
+Table 2: Summarization of different quantization methods
+
+Types
+
+Techniques Rounding
+
+Descrition
+Using a quantization function to convert continuous values into discrete values
+
+Characteristics
+Simple to implement, can achieve good performance, often need to store the real values.
+
+Deterministic Quantization Vector Quantization
+
+Cluster the real values into subgroups
+
+Simple to implement, can explore structural redundancy, only can be used to quantize pre-trained models.
+
+Quantization as Optimization
+
+Convert the quantization problem into an optimization problem
+
+Guaranteed to converge to a local minimum, more difﬁcult to implement
+
+Stochastic Quantization
+
+Random rounding
+
+Sampling quantized values according to given probabilities Simple to implement, introduce noises as regularizers
+
+Probabilistic Quantization
+
+Assume the weights are discretely distributed
+
+Consider structural redundancy, automatic regularization,
+
+or learn multi-modal posterior disribution over weights
+
+easy to interpret
+
+The ﬁrst term of the right-hand side of Equation (21) is the
+
+negative of reconstruction error, which means that maximize
+
+this term will ensure good predictive performance. The sec-
+
+ond term of the right-hand side of Equation (21) regularizes
+
+the approximated posterior to be close to the prior distribu-
+
+tion.
+
+Traditional Bayesian neural networks do not involve quan-
+
+tization. In [Kingma et al., 2015], the authors connected the
+
+variational training of Bayesian neural networks with dropout
+
+[Srivastava et al., 2014]. In dropout training, Bernoulli noises
+
+or Gaussian noises are added to the weights. In traditional
+
+dropout training, the dropout rate p is ﬁxed. [Kingma et al.,
+
+2015] shown that adding multiplicative noise on weights is
+
+equivalent to learn adaptive dropout rate for each weight. If
+
+we add a Gaussian noise ξij
+
+∼
+
+N (1, α
+
+=
+
+p 1−p
+
+)
+
+on
+
+each
+
+weight, then the weight is distributed as follows:
+
+wij
+
+=
+
+θij ξij
+
+=
+
+θij (1 +
+
+√ α
+
+ij )
+
+∼
+
+N (θij , αθi2j )
+
+(24)
+
+In a Bayesian neural networks setting, the gradient of the weights can be computed as,
+
+∆w log p(y|x, w) = ∆w log p(y|x, θξˆ)
+
+= ∆w q(w|θ, α)] log p(y|x, w)dw (25)
+
+where ξˆ ∼ N (ξ|1, αI). The gradient of ELBO with respect to the weights is Equation 25 plus the gradient of the KL divergence term. To exactly recover the ELBO loss, [Kingma et al., 2015] adopted a prior distribution on the weights which makes the KL divergence term in Equation 23 does not depend on θ but on α. This allows us to learn different dropout rates for different weights. [Molchanov et al., 2017] shown that we can prune the weights that have high dropout rates and still achieve good predictive performance.
+In [Jan Achterhold, 2018], the authors introduces a ”multi-spike-and-slab” prior which has multiple spikes at locations ck, k ∈ 1...K. After training, they found that most weights of low variance are distributed very closely around the quantization target values ck and can thus be replaced by the corresponding ck without signiﬁcant loss in accuracy. Weights of large variance can be pruned.
+
+Challenges: Probabilistic quantization can leverage the beneﬁts of Bayesian neural networks which leads to very sparse models. However, it relies on a carefully chosen prior distribution of the weights and the model is often intractable. Meanwhile, some types of neural network models, such as recurrent neural networks, cannot be quantized under this framework.
+3.3 Discussion
+The above quantization techniques enable us to quantize neural networks from different perspectives. We summarize all the techniques in Table 5. The merits and drawbacks of these techniques can guide us to select the proper one in different situations. In general, deterministic quantization should be preferred if we want to quantize neural networks for hardware accelerations since we can specify the appropriate quantization levels in advance in order to run the quantized networks on dedicated hardware. This can give us predictive performance improvement on hardware. Round rounding enables us to quantize the weights in a data-dependent manner. This leads to conditional computation [Bengio et al., 2013] that can increase the capacity of neural networks. Probabilistic quantization differs from deterministic quantization in that the quantized weights are more interpretable. We can understand the distributions of the weights with probabilistic quantization and gain more insights into how the network works. With probabilistic quantization, we can also have sparser models due to regularization effects of the Bayesian methods.
+4 Quantization of Network Components
+4.1 Weight Quantization
+The motivation to quantize weights is clear: to reduce model size and accelerate training and inference process. Most of the methods we talked above can be used to quantize weights. In this section, we introduce more weight quantization strategies that we did not cover before.
+[Anwar et al., 2015] proposed a layer-wise quantization scheme to reduce the performance degradation. In [Kim and Smaragdis, 2016], the authors adopted a two-step pipeline. In the ﬁrst step, the weights are compressed into the range of [−1, 1] and in the second step the compressed weights are used to initialize the parameters of a binary network. In [Zhou et al., 2017a], the authors proposed incremental network
+
+quantization (INQ) which consists of three steps: weight partition, group-wise quantization and re-training. They quantized the weights in a group-wise manner to allow some groups of weights to compensate the accuracy loss due to the quantization of other groups. The work in [Gudovskiy and Rigazio, 2017] extended this method to power-of-two setting.
+In [Lin et al., 2016] the authors tried to ﬁnd the optimal ﬁxed point bit-width allocation across layers. They examined how much noise can be introduced by quantizing different layers. [Lin et al., 2017] approximated the full-precision weights with a linear combination of multiple binary bases. The results show that it is the ﬁrst time that a binary neural network can achieve prediction accuracy comparable to its full-precision counterpart on ImageNet dataset. In [Moons et al., 2017], the authors studied how to develop energy efﬁcient quantized neural network. The work in [Guo et al., 2017] introduced network sketching to quantize a pre-trained model. The idea is to use binary basis to approximate pre-trained ﬁlters. They ﬁrst proposed a heuristic algorithm to ﬁnd the binary basis and then provided a reﬁned version to better approximation. In [Mohamed Amer, 2018], the authors proposed an end-to-end training framework to optimize original loss function, quantization error and the total number of bits simultaneously. However, the accuracy is not comparable to other quantized neural networks.
+Challenges
+• Quantized weights make neural networks harder to converge. A smaller learning rate is needed to ensure the network to have good performance [Shuang et al., 2018]. Determine how to control the stability of the training process in a quantized neural network with quantized weights is critical.
+• Quantized weights make back-propagation infeasible since gradient cannot back-propagate through discrete neurons. Approximation methods are needed to estimate the the gradients of the loss function with respect to the input of the discrete neurons. Developing low-variance, unbiased gradient estimates is essential for the success of weight quantization.
+• It is known that the weights in neural networks often follow some general structures. For an approach that trains quantized networks from scratch, how to quantize the weights locally while maintain their global structure is an issue.
+4.2 Activation Quantization
+Quantized activations can replace inner-products with binary operations which can further speed up the network training. We can also reduce the much memory by avoiding fullprecision activations. [Vanhoucke et al., 2011] quantized the activations to 8 bits. They used a sigmoid function which limits the activations to the range of [0, 1] and quantized the activations after training the network. In [Courbariaux et al., 2015; Rastegari et al., 2016; Zhou et al., 2016] the authors adopted a similar approach. They introduced a continuous approximation of the non-differentiable operator during back-propagation to enable the gradients can back-propagate
+
+through the discrete neurons. More recently, [Cai et al., 2017] proposed an half-wave Gaussian quantizer to approximate the ReLU unit. In the forward approximation, they used a halfwave Gaussian quantization function,
+
+Q(x) = qi if x ∈ (ti, ti+1],
+
+(26)
+
+0 x ≤ 0,
+
+If use mean squared error to measure the performance, the optimal quantizers can be found as follows,
+
+Q∗(x) = argmin Ex[(Q(x) − x)2]
+
+(27)
+
+Q
+
+They used batch normalization [Ioffe and Szegedy, 2015] and Lloyd’s algorithm to ﬁnd the optimal solution. During backpropagation, they further introduced three possible approximation method to avoid the gradient vanishing problem.
+In [Mishra et al., 2017], the authors proposed wide reduced-precision networks (WRPN) to quantize activation and weights. They found that activations actually occupy more memory than weights. They adopted a strategy that increases the number of ﬁlters in each layer to compensate the accuracy degradation due to quantization.
+
+Challenges
+
+• There are some reasons that make the quantization of activations more difﬁcult than that of weights [Cai et al., 2017]. The ﬁrst one is that we need to back-propagate through the non-differentiable operators. Consider the back-propagation equation,
+
+∂L
+
+∂L
+
+∂wij = g (aj ) k wjk ∂ak xi
+
+(28)
+
+When we replace g(aj) with a binary operator, the derivative g (aj) is almost zero everywhere which makes gradient descent algorithm infeasible.
+• The quantized activations can lead to “gradient mismatch” problem [Lin and Talathi, 2016] which means that there is a discrepancy between the quantized activation with the computed backward gradient.
+
+4.3 Gradient Quantization
+Gradient quantization is a new branch of research in quantization of neural networks. The motivation to quantize gradients is to reduce the communication cost during distributed stochastic gradient descent (SGD) training of large neural networks.
+In a distributed SGD training, one case is that each minibatch data is spread over multiple computing nodes, this is called data-parallel training as shown in Fig 5 (a). Each node has a copy of the weights and need to compute a sub-gradient, and then broadcast its sub-gradient to all other nodes. Each node must accumulate the sub-gradients from other nodes to update the weights. This process causes a signiﬁcant performance bottleneck because of the exchange of gradients. To solve this problem, [Seide et al., 2014] proposed to use 1-bit to represent the sub-gradient. This can reduce the bandwidth greatly. The authors reported a ten times speed-up compared
+
+Table 3: Summarization of Quantization of Network Components
+
+Components Weights
+Activations Gradients
+
+Beneﬁts from Quantization Smaller model size
+Faster training and inference Less energy
+Smaller memory footprint during training Allows replacement of dot-products by bitwise operations
+Less energy Communication and memory savings in parallel network training
+
+Challenges Hard to converge with quantized weights
+Require approximate gradients Accuracy degradation
+“Gradient mismatch” problem
+Convergence requirement
+
+(a)
+
+(b)
+
+Figure 5: Parallel training of deep neural networks.
+
+with traditional approaches without a great loss in accuracy. In [Strom, 2015] the authors proposed a threshold quantization method to quantize gradients. A ﬁxed threshold is selected in advance. Gradients that are greater than the threshold are quantized to +1, and those less than the threshold are quantized to 0. [Alistarh et al., 2016] also considered the problem of gradient communication in the parallel SGD. They proposed Quantized SGD (QSGD) to allow each node to make a trade-off between the precision the gradients with the accuracy of the model. QSGD used the idea of random rounding to quantized the gradients to a set of discrete values and utilized lossless code to generate efﬁcient encoding. In [Dryden et al., 2016], the authors proposed a simple adaptive quantization method to select a proportion of gradients to be quantized and sent.
+In a different setting, there is a centralized parameter server that performs gradient synchronization by accumulating all sub-gradients and averaging them to update the weights. This is called model-parallel training as shown in Fig 5 (b). The updated weights are sent back to each node to do computation. As the number of nodes increases, the communication cost becomes intolerable. [Wen et al., 2017] addressed this problem by introducing a method called TernGrad that quantizes the gradients into three levels {−1, 0, 1}. Before being sent to the centralized parameter server, each sub-gradient is quantized as follows,
+
+∆˜ t = ternarize(∆t) = st · Sign(∆t) ◦ bt
+
+(29)
+
+where st = max(abs(∆t)), ◦ is the Hadamard product and
+
+bt is a random binary vector that follows a Bernoulli distribution,
+
+P (btk = 1|∆t) = |∆tk|/st,
+
+(30)
+
+P (btk = 0|∆t) = 1 − |∆tk|/st,
+
+In this way, th communication cost between the server and workers can be reduced by about 20 × compared with sending full-precision gradients.
+In a single-machine environment, we can also gain beneﬁts by quantizing gradients. In order to reduce the computational cost in the backward pass, the work in [Rastegari et al., 2016] quantized the gradients into 2-bits to enable an efﬁcient training process. In [Zhou et al., 2016], the authors also quantized the gradients during back-propagation. They found that using a random rounding method is very important to make quantized gradients work well. They designed the following k-bit quantization function,
+
+f˜γk (dr)
+
+=
+
+dr 2max0(|dr|)[quantizek( 2max0(|dr|)
+
++
+
+1 2
+
+)
+
+−
+
+1 ]
+2
+
+(31)
+
+where dr
+
+=
+
+∂c ∂r
+
+is the
+
+gradient
+
+of
+
+the output r
+
+in some
+
+layer
+
+and quantizek is used to quantize a real number input ri ∈
+
+[0, 1] into a k-bit output number ro ∈ [0, 1],
+
+ro
+
+=
+
+2k
+
+1 −
+
+round((2k 1
+
+−
+
+1)ri)
+
+(32)
+
+They also added additional noises during the training process to compensate for the loss of accuracy due to quantization.
+
+Challenges
+• The magnitude and sign of gradients are both important for updating the weights. To quantize gradients, we must address the question of how to take both factors into account.
+• A naive way to quantize gradients may not work well in practice since it may violate the conditions needed for stochastic gradient descent algorithm to converge. More sophisticated methods are needed in this case.
+4.4 Discussion
+We summarize the beneﬁts and challenges of quantizing different network components in Table 3. Achieving highly efﬁcient quantized neural networks calls for a systematic solution to quantize weights, activations and gradients. Quantized weights and activations occupy less memory compared with full-precision counterparts. Meanwhile, the training and
+
+Table 4: Summarization of ﬁxed codebook and adaptive codebook quantization.
+
+Approaches Fixed codebook quantization Adaptive codebook quantization
+
+Types Binarization Scaled binarization Ternarization Scaled Ternarization Powers of two Soft Quantization Hard Quantization
+
+Codebook {-1,1} {-a, b}
+{-1, 0, 1} {-a,0,b} {0, ±1, ± 2−1,...,± 2−L }
+Learned from data Learned from data
+
+Representative works [Courbariaux et al., 2015]
+[Rastegari et al., 2016] [Hwang and Sung, 2014] [Zhu et al., 2016; Kim et al., 2014]
+[Tang and Kwan, 1993] [Jan Achterhold, 2018] [Gong et al., 2014; Choi et al., 2016]
+
+inference speed can be greatly accelerated since the dotproducts between weights and activations can be replaced by bitwise operations. Quantized gradients can reduce the overhead of gradient synchronization in parallel neural network training. In a single worker scenario, quantized gradients can accelerate back-propagation training as well as requiring less memory.
+
+sharing [Nowlan and Hinton, 1992] in which the distribution of weight values is modeled as a mixture of Gaussians. Adaptive quantization is more ﬂexible than ﬁxed codebook quantization but the ﬁnal codebook may need more bits to represent. The beneﬁt of adaptive quantization is that it can avoid ad hoc modiﬁcations to the training algorithm.
+
+5 A Comparison of Two Quantization Methodologies
+5.1 Fixed codebook quantization
+In ﬁxed codebook quantization, the codebook is predeﬁned. For example, [Courbariaux et al., 2015] quantized the weights of the network to {−1, 1}. [Hwang and Sung, 2014] assumed the codebook is {−1, 0, 1}. In [Rastegari et al., 2016], the authors further relaxed the constraints to quantize the weights to {a, −a}. In a more general setting, the weights are quantized into power-of-two numbers that can make the digital implementation of neural networks much faster [Tang and Kwan, 1993; Gudovskiy and Rigazio, 2017].
+In order to achieve ﬁxed codebook quantization, we must deﬁne a codebook ﬁrst. How the codebook is designed has a dramatic impact on the performance of the quantized network. A small codebook means that we can only search the parameters in a limited space, which makes the optimization problem very hard. With predeﬁned codebook, it is sometimes necessary to modify the backward step to enable the gradients ﬂow through the discrete neurons. This causes the “gradient mismatch” problem as we discussed in Section 4.2. Approximation is often needed in this case.
+5.2 Adaptive Codebook Quantization
+In adaptive codebook quantization, the codebook is learned from the data. Vector quantization and probabilistic quantization are two possible methods to achieve adaptive codebook quantization. In vector quantization, in order to learn the codebook, we must let the real values minimize some sort of distortion measure and cluster them into different buckets. In probabilistic quantization, the codebook can be inferred from the posterior distributions of the weights.
+Two kinds of adaptive codebook quantization exist: hard quantization and soft quantization. In hard quantization, the real value is assigned exactly to be one of the discrete values. In soft quantization the real value is assigned to be some discrete value according to a probability distribution. The soft quantization is mostly inspired by the idea of weight
+
+6 Quantized Neural Networks: Case Studies
+Neural networks can be quantized during and after training. In this section we introduce some recently proposed quantized neural networks that utilize these this perspective.
+6.1 Quantization During Training
+BinaryConnect [Courbariaux et al., 2015] BinaryConnect is a method that leverages binary weights during the forward and backward pass. As far as we known, it is the ﬁrst time that a binary network can achieve near state-of-art results on datasets such as MNIST and CIFAR-10. BinaryConnect uses the Sign(x) function to binarize the weights during the forward pass. The real-valued weights are also kept to do parameter update in the backward pass. The algorithm is shown in Algorithm 1.
+
+Algorithm 1 The training process of BinaryConnect
+
+Notation: L is the number of layers in the network. wt−1 is the weight at time t − 1. bt−1 is the bias at time t − 1. ak is the activation of layer k. E is the loss function. Input: a mini-batch of data (inputs, labels), a learning rate η. Forward pass:
+
+• wb ← binarize(wt−1)
+
+• For k = 1 to L, compute ak based on ak−1, wb and bt−1.
+
+Backward pass:
+
+•
+
+Compute the gradient of the output layer
+
+∂E ∂aL
+
+•
+
+For k = L to 2, compute
+
+∂E ∂ ak−1
+
+based on
+
+∂E ∂ak
+
+and wb.
+
+Parameter update:
+
+•
+
+Compute
+
+∂E ∂wb
+
+and
+
+∂E ∂ bt−1
+
+based on
+
+∂E ∂ak
+
+and ak−1
+
+•
+
+wt ← clip(wt−1 − η
+
+∂E ∂wb
+
+)
+
+•
+
+bt ← bt−1 − η
+
+∂E ∂ bt−1
+
+Algorithm 2 The training process of XNOR-net
+
+Notation: L is the number of layers in the network. wt−1 is the weight at time t − 1. bt−1 is the bias at time t − 1. ak is the activation of layer k. n is the number of elements in a ﬁlter.
+E is the loss function. Input: a minibatch of data (inputs, labels),a learning rate ηt. Forward pass:
+
+1. for l = 1 to L do:
+
+2. for kth ﬁlter in lth layer do:
+
+3.
+
+alk
+
+=
+
+1 n
+
+wltk−1
+
+l1
+
+4.
+
+blk = Sign(wltk−1)
+
+5.
+
+wlbk = alkblk
+
+6. Compute activations based on binarized ﬁlters
+
+Backward pass:
+
+1.
+
+Compute backward gradient
+
+∂E wb
+
+based on wb
+
+Parameter update:
+
+1.
+
+Update wt using wt−1 and
+
+∂E wb
+
+XNOR-Net [Rastegari et al., 2016] XNOR-Net is the ﬁrst attempt to present an evaluation of binary neural networks on large-scale datasets like ImageNet. They use a different binarization method compared with BinaryConnect. XNORNet binarizes inputs, weights, activations and gradients together which can greatly accelerate the network training and inference process. XNOR-net binarizes the gradients in the backward pass with a slightly drop in accuracy. The algorithm is shown in Algorithm 2.
+
+DoReFa-Net [Zhou et al., 2016] DoReFa-Net further improves XNOR-net by using more sophisticated rounding mechanism. They claim that it is the ﬁrst time that during the backward pass quantized gradients with less than 8 bits can work successfully. DoReFa-Net can binarize weights, activations and gradients to arbitrary bit-width. The forward pass and backward pass can both be greatly accelerated. We omit the details of the algorithm here due to space limitation.
+
+ABC-Net [Tang et al., 2017] In ABC-Net, the authors studied carefully why the previous binary networks may fail. And they proposed following strategies to alleviate the potential problems,
+
+• Use a smaller learning rate to prevent the frequent changes of the directions of weight values.
+
+• Use PReLU [He et al., 2015] rather than ReLU as the activation function.
+
+• Use the following regularization function rather than a L2 regularization,
+
+L Nl Ml
+
+L=λ
+
+(1 − (wl,ij )2)
+
+l=1 i=1 j=1
+
+(33)
+
+where L is the number of layers. Nl and Ml are the dimensions of the weight matrix in layer l.
+
+In order to successfully quantize the ﬁnal layer, the authors also added an additional scale layer after the binarized ﬁnal layer to improve the compression rate of the algorithm.
+Figure 6 shows the general procedures of quantizing neural networks during training. It can be noted that the fullprecision weights must be saved in the training phase which can cause a large memory overhead.
+
+Figure 6: the general procedures of quantizing neural networks during training. Wt−1 and Wt are real-valued weights while Wb is the quantized weights.
+6.2 Quantization After Training DeepCompression [Han et al., 2015] DeepCompression is a three stage pipeline that can reduce the memory requirement of network by 35× to 49× without accuracy degradation. The algorithm ﬁrst prunes the unimportant connections. Then the remaining weights are quantized to discrete values. Finally, Huffman coding is used to encode the weight values. Figure 7 shows the pipeline of DeepCompression,
+
+Figure 7: The pipelines of DeepCompression [Han et al., 2015].
+
+In order to compensate the loss of accuracy, DeepCompression also retrains the remaining connections and the quantized centroids. In this way, high compression rate can be achieved while maintaining a good network performance.
+
+Entropy-constrained scalar quantization (ECSQ) [Choi et al., 2016] Entropy-constrained scalar quantization (ECSQ) was proposed to improve the performance the vector quantization in 2016. In this work, the authors use the second-order information of the loss function to measure the importance of different weights. The loss function is expanded via Taylor series as follows,
+
+δE(w)
+
+≈
+
+∂E(w) T δw +
+
+1 δwT H(w)δw
+
+(34)
+
+∂w
+
+2
+
+Table 5: Top 1 error rates of different quantized neural networks on the validation set.
+
+Datasets MNIST Cifar-10
+ImageNet
+
+Networks Methods
+Binary-Connect [Courbariaux et al., 2015] BNN [Hubara et al., 2016] LAB [Hou et al., 2016]
+Gated XNOR Networks [Deng et al., 2017] LR-net [Shayar et al., 2017] WAGE [Shuang et al., 2018]
+Binary-Connect [Courbariaux et al., 2015] BNN [Hubara et al., 2016] TTQ [Zhu et al., 2016]
+XNOR-Net [Rastegari et al., 2016] Gated XNOR Networks [Deng et al., 2017]
+LR-net [Shayar et al., 2017] LAT [Lu Hou, 2018]
+WAGE [Shuang et al., 2018]
+Binary-Connect [Courbariaux et al., 2015] DeepCompression [Han et al., 2015] BNN [Hubara et al., 2016] TTQ [Zhu et al., 2016] DOREFA-Net [Zhou et al., 2016] XNOR-Net [Rastegari et al., 2016] INQ [Zhou et al., 2017a] BinaryNet [Tang et al., 2017] ABC-Net [Lin et al., 2017] WRPN (binary) [Mishra et al., 2017] LR-net [Shayar et al., 2017] WAGE [Shuang et al., 2018]
+
+MLP
+1.20% 0.70% 1.18% 0.68% 0.50% 0.40%
+— — — — — — — —
+— — — — — — — — — — — —
+
+AlexNet
+— — — — — —
+8.4% 10.2%
+— 10.2% 7.5%
+— 10.38%
+—
+64.6% 42.8% 72.1% 42.5% 44.4% 55.8% 42.6% 53.4%
+— 51.7%
+— 51.6%
+
+VGGNet-16
+— — — — — —
+— — — — — 6.74% — 6.78%
+— 31.17%
+— — — — 29.2% — — — — —
+
+GoogleNet
+— — — — — —
+— — — — — — — —
+— — — — — 34.5% 31.0% — — 34.98% — —
+
+ResNet-x
+— — — — — —
+— — 6.4% (x = 56) — — — — —
+— — — 33.4% (x = 18) 40.8% (x=18) 48.8% (x = 18) 7.6% (x=50) — 35.5% (x=18) 30.15% (x=34) 36.5% (x=18) —
+
+where H(w) is the Hessian matrix. To connect Equation (34)
+
+with network quantization, the authors approximated the Hes-
+
+sian matrix as a diagonal matrix and treated δw as the quan-
+
+tization error. The loss due to quantization can be expressed
+
+as,
+
+1 δE(w) ≈
+2
+
+N
+
+hii(w)|wi − w¯ i|2
+
+(35)
+
+i=1
+
+where w˜ is the quantized version of real-valued weights w. In the k-means clustering step, the weights are weighted by the corresponding entries in the Hessian matrix. The results show that this method can achieve nearly the same accuracy level as a full-precision network on ImageNet dataset.
+
+Incremental network quantization (INQ) [Zhou et al., 2017a] The work in [Zhou et al., 2017a] proposed Incremental network quantization (INQ). INQ consists of three independent operations: weight partition, group-wise quan-
+
+tization and re-training. In the step of weight partition, the weights in each layer are divided into two groups. One group of weights are quantized while the another group of weights are kept with full-precision values. The network is retrained with the remaining full-precision weights to compensate for the loss due to quantization. This process is continued until all the weights are quantized. Compared with other quantization methods, this approach combines the beneﬁts of quantizing during training and quantizing after training.
+6.3 Performance Comparison of Different Quantized Neural Networks
+We report the performance of different quantized neural networks in Table 5. All the results are directly taken from the original papers. The performance of quantized neural networks improved rapidly in the recent years and now can achieve near the state-of-the-art results on ImageNet with binarized weights. We have following observations,
+
+• We can achieve much higher accuracy with quantized neural networks if we use more bits to represent weights. In [Shayar et al., 2017], the authors found that binary networks are much harder to train compared with a ternary counterpart.
+• In general, the methods that quantize networks after training obtain better results as compared with those that quantize during training. This is understandable since in the case of quantizing after training we have well pretrained models as reference.
+• For some datasets and architectures, there is still a performance gap between the quantized neural networks and full-precision ones.
+
+binarization and post-binarization weights are approximately proportional to each other, i.e., a · wb ∼ a · wc. Where a is the activation of one layer, wb is the binarized version of full-precision weight wc. a ∼ b means that a = cb, where c is a scalar.
+The implication is that although binarization may change
+the numerical values dramatically, the statistical properties of
+the forward computation are nearly kept.
+
+7 Why Does Quantization Work?
+Deep neural networks have a huge number of parameters, but not all parameters are of equal importance. As pointed out in [Denil et al., 2013], in the best cases more than 95% of the parameters in a neural network can be predicted without a drop in predictive performance. This means that we can use simpler parameterization to maintain the expressive power of deep neural networks. Recent work in model compression [Molchanov et al., 2017] suggests that nearly 99% of weights can be pruned in some types of neural networks.
+Deep neural networks are also robust to noise [Sung et al., 2015; Merolla et al., 2016]. Adding noise to weights or inputs sometimes can achieve better performance [Srivastava et al., 2014]. Random noise acts as regularizers which can potentially generalize the network better. In a quantized neural network, low-precision operations can be regarded as noise which may not hurt the network performance. Recent theories [Li et al., 2017; Anderson and Berg, 2017] suggest that quantized neural networks still maintain many important properties of full-precision ones which guarantees their performance.
+Despite the success of many quantized neural networks on real datasets, the theoretical understanding is still very limited. [Li et al., 2017] analyzes the convergence properties of stochastic gradient descent (SGD) when the weights are quantized. The authors analyzed the convergence property of BinaryConnect [Courbariaux et al., 2015]. They found that if we assume the loss function is L-Lipschitz smooth, the loss of the BinaryConnect network will converge at a rate linear in ∆ to the loss of a full-precision network in expectation, where ∆ is the resolution of the quantization function. The authors further gave some results on non-convex cases.
+[Anderson and Berg, 2017] analyzed the properties of binarized neural network from a geometrical perspective. They found that the binarization operation preserves some important properties of the full-precision networks, i.e,
+• Angle Preservation Property: They found that binarization almost preserves the direction of full-precision high-dimensional vectors. The angle between a random normal vector with its binarized version converges to 37◦.
+• Dot Product Proportionality Property: They showed that the dot products of the activations with the pre-
+
+Figure 8: The red curves are distribution of angles a random vector of dimension d and its binarized version. The blue curves are are distribution of angles two random vectors [Anderson and Berg, 2017].
+8 Future of Quantized Neural Networks
+Quantized neural networks make it practical to deploy deep neural network models into production stack. This enables embedded system based deep learning applications. However, there is still a large gap between the performance of quantized neural networks and full-precision neural networks. To bridge this gap, more sophisticated methods must be developed. Nearly all the works about quantized neural networks focus on feed-forward networks or convolutional neural networks and classiﬁcation task. Recently, some researchers have looked at recurrent neural networks [Ott et al., 2016; Hou et al., 2016; He et al., 2016b; Clark et al., 2017; Lu Hou, 2018; Chen Xu and Zha, 2018] and other tasks such as semantic segmentation [Wen et al., 2016], video processing [O’Connor and Welling, 2016] and so on. We believe that the wide use of deep neural networks will drive researchers to develop more task-speciﬁc quantized neural networks.
+We consider the following possible directions for the next steps:
+• Develop more sophisticated rounding mechanism to train quantized neural network from scratch. One possible approach is to use the structure information of the weights to guide the rounding process.
+• Design quantized neural networks for tasks such as natural language processing, speech recognition and so on. Due to the varieties of deep learning models, a generally applicable quantization method is necessary.
+• Develop theoretical guidance for quantizing neural networks.
+9 Conclusion
+In this paper, we have provided a comprehensive survey on the recent progress of quantized neural networks. We have
+
+traced back to the origins of the research of quantized neural networks and presented many newly developed methods. Both theories and applications of these methods are surveyed. We have pointed out some potential challenges in quantizing neural networks and have gave some general advice. We also identiﬁed several potential research directions. Quantized neural networks promote the application of deep learning models in mobile devices and embedded systems. We expect that they will make a signiﬁcant impact in the future.
+References
+[Alistarh et al., 2016] Dan Alistarh, Jerry Li, Ryota Tomioka, and Milan Vojnovic. Qsgd: Randomized quantization for communication-optimal stochastic gradient descent. arXiv preprint arXiv:1610.02132, 2016.
+[Amodei et al., 2016] Dario Amodei, Sundaram Ananthanarayanan, Rishita Anubhai, Jingliang Bai, Eric Battenberg, Carl Case, Jared Casper, Bryan Catanzaro, Qiang Cheng, Guoliang Chen, et al. Deep speech 2: End-to-end speech recognition in english and mandarin. In International Conference on Machine Learning, pages 173–182, 2016.
+[Anderson and Berg, 2017] Alexander G. Anderson and Cory P. Berg. The high-dimensional geometry of binary neural networks. CoRR, abs/1705.07199, 2017.
+[Anwar et al., 2015] Sajid Anwar, Kyuyeon Hwang, and Wonyong Sung. Fixed point optimization of deep convolutional neural networks for object recognition. In Acoustics, Speech and Signal Processing (ICASSP), 2015 IEEE International Conference on, pages 1131–1135. IEEE, 2015.
+[Balzer et al., 1991] Wolfgang Balzer, Masanobu Takahashi, Jun Ohta, and Kazuo Kyuma. Weight quantization in boltzmann machines. Neural Networks, 4(3):405–409, 1991.
+[Bengio et al., 2013] Yoshua Bengio, Nicholas Le´onard, and Aaron Courville. Estimating or propagating gradients through stochastic neurons for conditional computation. arXiv preprint arXiv:1308.3432, 2013.
+[Cai et al., 2017] Zhaowei Cai, Xiaodong He, Jian Sun, and Nuno Vasconcelos. Deep learning with low precision by half-wave gaussian quantization. arXiv preprint arXiv:1702.00953, 2017.
+[Carreira-Perpina´n and Idelbayev, 2017] Miguel A CarreiraPerpina´n and Yerlan Idelbayev. Model compression as constrained optimization, with application to neural nets. part ii: quantization. arXiv preprint arXiv:1707.04319, 2017.
+[Chen Xu and Zha, 2018] Zhouchen Lin Wenwu Ou Yuanbin Cao Zhirong Wang Chen Xu, Jianqiang Yao and Hongbin Zha. Alternating multi-bit quantization for recurrent neural networks. International Conference on Learning Representations, 2018.
+[Choi et al., 2016] Yoojin Choi, Mostafa El-Khamy, and Jungwon Lee. Towards the limit of network quantization. arXiv preprint arXiv:1612.01543, 2016.
+
+[Clark et al., 2017] Aidan Clark, Vinay Uday Prabhu, and John Whaley. A contextual discretization framework for compressing recurrent neural networks. 2017.
+[Courbariaux et al., 2015] Matthieu Courbariaux, Yoshua Bengio, and Jean-Pierre David. Binaryconnect: Training deep neural networks with binary weights during propagations. In Advances in Neural Information Processing Systems, pages 3123–3131, 2015.
+[Cui et al., 2017] Wanlin Cui, Yeseong Kim, and Tajana S Rosing. Cross-platform machine learning characterization for task allocation in iot ecosystems. In Computing and Communication Workshop and Conference (CCWC), 2017 IEEE 7th Annual, pages 1–7. IEEE, 2017.
+[Deng et al., 2009] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei. ImageNet: A Large-Scale Hierarchical Image Database. In CVPR09, 2009.
+[Deng et al., 2017] Lei Deng, Peng Jiao, Jing Pei, Zhenzhi Wu, and Guoqi Li. Gated xnor networks: Deep neural networks with ternary weights and activations under a uniﬁed discretization framework. arXiv preprint arXiv:1705.09283, 2017.
+[Denil et al., 2013] Misha Denil, Babak Shakibi, Laurent Dinh, Nando De Freitas, et al. Predicting parameters in deep learning. In Advances in neural information processing systems, pages 2148–2156, 2013.
+[Dryden et al., 2016] Nikoli Dryden, Tim Moon, Sam Ade Jacobs, and Brian Van Essen. Communication quantization for data-parallel training of deep neural networks. In Machine Learning in HPC Environments (MLHPC), Workshop on, pages 1–8. IEEE, 2016.
+[Fiesler et al., 1990] Emile Fiesler, Amar Choudry, and H John Caulﬁeld. Weight discretization paradigm for optical neural networks. In The Hague’90, 12-16 April, pages 164–173. International Society for Optics and Photonics, 1990.
+[Garcia Lopez et al., 2015] Pedro Garcia Lopez, Alberto Montresor, Dick Epema, Anwitaman Datta, Teruo Higashino, Adriana Iamnitchi, Marinho Barcellos, Pascal Felber, and Etienne Riviere. Edge-centric computing: Vision and challenges. ACM SIGCOMM Computer Communication Review, 45(5):37–42, 2015.
+[Gong et al., 2014] Yunchao Gong, Liu Liu, Ming Yang, and Lubomir Bourdev. Compressing deep convolutional networks using vector quantization. arXiv preprint arXiv:1412.6115, 2014.
+[Gudovskiy and Rigazio, 2017] Denis A Gudovskiy and Luca Rigazio. Shiftcnn: Generalized low-precision architecture for inference of convolutional neural networks. arXiv preprint arXiv:1706.02393, 2017.
+[Guias¸u, 1971] Silviu Guias¸u. Weighted entropy. Reports on Mathematical Physics, 2(3):165–179, 1971.
+[Guo et al., 2017] Yiwen Guo, Anbang Yao, Hao Zhao, and Yurong Chen. Network sketching: Exploiting binary structure in deep cnns. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5955– 5963, 2017.
+
+[Gupta et al., 2015] Suyog Gupta, Ankur Agrawal, Kailash Gopalakrishnan, and Pritish Narayanan. Deep learning with limited numerical precision. In International Conference on Machine Learning, pages 1737–1746, 2015.
+[Han et al., 2015] Song Han, Huizi Mao, and William J Dally. Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding. arXiv preprint arXiv:1510.00149, 2015.
+[He and Sun, 2015] Kaiming He and Jian Sun. Convolutional neural networks at constrained time cost. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5353–5360, 2015.
+[He et al., 2015] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Delving deep into rectiﬁers: Surpassing human-level performance on imagenet classiﬁcation. In Proceedings of the IEEE international conference on computer vision, pages 1026–1034, 2015.
+[He et al., 2016a] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 770–778, 2016.
+[He et al., 2016b] Qinyao He, He Wen, Shuchang Zhou, Yuxin Wu, Cong Yao, Xinyu Zhou, and Yuheng Zou. Effective quantization methods for recurrent neural networks. arXiv preprint arXiv:1611.10176, 2016.
+[Hinton et al., 2012a] Geoffrey Hinton, Li Deng, Dong Yu, George E Dahl, Abdel-rahman Mohamed, Navdeep Jaitly, Andrew Senior, Vincent Vanhoucke, Patrick Nguyen, Tara N Sainath, et al. Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups. IEEE Signal Processing Magazine, 29(6):82–97, 2012.
+[Hinton et al., 2012b] Geoffrey Hinton, Nitsh Srivastava, and Kevin Swersky. Neural networks for machine learning. coursera, video lectures, 264, 2012b. 2012.
+[Hochreiter and Schmidhuber, 1997] Sepp Hochreiter and Ju¨rgen Schmidhuber. Long short-term memory. Neural computation, 9(8):1735–1780, 1997.
+[Hou et al., 2016] Lu Hou, Quanming Yao, and James T Kwok. Loss-aware binarization of deep networks. arXiv preprint arXiv:1611.01600, 2016.
+[Hubara et al., 2016] Itay Hubara, Matthieu Courbariaux, Daniel Soudry, Ran El-Yaniv, and Yoshua Bengio. Binarized neural networks. In Advances in neural information processing systems, pages 4107–4115, 2016.
+[Hwang and Sung, 2014] Kyuyeon Hwang and Wonyong Sung. Fixed-point feedforward deep neural network design using weights+ 1, 0, and- 1. In Signal Processing Systems (SiPS), 2014 IEEE Workshop on, pages 1–6. IEEE, 2014.
+[Ioffe and Szegedy, 2015] Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift. In International conference on machine learning, pages 448–456, 2015.
+
+[Jan Achterhold, 2018] Anke Schmeink Tim Genewein Jan Achterhold, Jan Mathias Koehler. Variational network quantization. International Conference on Learning Representations, 2018. accepted as poster.
+[Jiang and Mao, 2015] Zhefeng Jiang and Shiwen Mao. Energy delay tradeoff in cloud ofﬂoading for multi-core mobile devices. IEEE Access, 3:2306–2316, 2015.
+[Jordan et al., 1999] Michael I Jordan, Zoubin Ghahramani, Tommi S Jaakkola, and Lawrence K Saul. An introduction to variational methods for graphical models. Machine learning, 37(2):183–233, 1999.
+[Kang et al., 2017] Yiping Kang, Johann Hauswald, Cao Gao, Austin Rovinski, Trevor Mudge, Jason Mars, and Lingjia Tang. Neurosurgeon: Collaborative intelligence between the cloud and mobile edge. In Proceedings of the Twenty-Second International Conference on Architectural Support for Programming Languages and Operating Systems, pages 615–629. ACM, 2017.
+[Kim and Smaragdis, 2016] Minje Kim and Paris Smaragdis. Bitwise neural networks. arXiv preprint arXiv:1601.06071, 2016.
+[Kim et al., 2014] Jonghong Kim, Kyuyeon Hwang, and Wonyong Sung. X1000 real-time phoneme recognition vlsi using feed-forward deep neural networks. In Acoustics, Speech and Signal Processing (ICASSP), 2014 IEEE International Conference on, pages 7510–7514. IEEE, 2014.
+[Kingma et al., 2015] Diederik P Kingma, Tim Salimans, and Max Welling. Variational dropout and the local reparameterization trick. In Advances in Neural Information Processing Systems, pages 2575–2583, 2015.
+[ko2, 2018] Edge-host partitioning of deep neural networks with feature space encoding for resource-constrained internet-of-things platforms. https://arxiv.org/ pdf/1802.03835.pdf, 2018. ArXiv Preprint.
+[Konecˇny` et al., 2016] Jakub Konecˇny`, H Brendan McMahan, Felix X Yu, Peter Richta´rik, Ananda Theertha Suresh, and Dave Bacon. Federated learning: Strategies for improving communication efﬁciency. arXiv preprint arXiv:1610.05492, 2016.
+[Krizhevsky et al., 2012] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classiﬁcation with deep convolutional neural networks. In Advances in neural information processing systems, pages 1097–1105, 2012.
+[LeCun et al., 1998] Yann LeCun, Le´on Bottou, Yoshua Bengio, and Patrick Haffner. Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11):2278–2324, 1998.
+[Leng et al., 2017] Cong Leng, Hao Li, Shenghuo Zhu, and Rong Jin. Extremely low bit neural network: Squeeze the last bit out with admm. arXiv preprint arXiv:1707.09870, 2017.
+[Li et al., 2016] Fengfu Li, Bo Zhang, and Bin Liu. Ternary weight networks. arXiv preprint arXiv:1605.04711, 2016.
+
+[Li et al., 2017] Hao Li, Soham De, Zheng Xu, Christoph Studer, Hanan Samet, and Tom Goldstein. Training quantized nets: A deeper understanding. In I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems 30, pages 5813–5823. Curran Associates, Inc., 2017.
+[Lin and Talathi, 2016] Darryl D Lin and Sachin S Talathi. Overcoming challenges in ﬁxed point training of deep convolutional networks. arXiv preprint arXiv:1607.02241, 2016.
+[Lin et al., 2015] Zhouhan Lin, Matthieu Courbariaux, Roland Memisevic, and Yoshua Bengio. Neural networks with few multiplications. arXiv preprint arXiv:1510.03009, 2015.
+[Lin et al., 2016] Darryl Lin, Sachin Talathi, and Sreekanth Annapureddy. Fixed point quantization of deep convolutional networks. In International Conference on Machine Learning, pages 2849–2858, 2016.
+[Lin et al., 2017] Xiaofan Lin, Cong Zhao, and Wei Pan. Towards accurate binary convolutional neural network. In Advances in Neural Information Processing Systems, pages 344–352, 2017.
+[Lu Hou, 2018] James T. Kwok Lu Hou. Loss-aware weight quantization of deep networks. International Conference on Learning Representations, 2018.
+[Marchesi et al., 1993] Michele Marchesi, Gianni Orlandi, Francesco Piazza, and Aurelio Uncini. Fast neural networks without multipliers. IEEE transactions on Neural Networks, 4(1):53–62, 1993.
+[McMahan and Ramage, 2017] Brendan McMahan and Daniel Ramage. Federated learning: Collaborative machine learning without centralized training data. https://ai.googleblog.com/2017/04/ federated-learning-collaborative.html, 2017.
+[Mellempudi et al., 2017] Naveen Mellempudi, Abhisek Kundu, Dheevatsa Mudigere, Dipankar Das, Bharat Kaul, and Pradeep Dubey. Ternary neural networks with ﬁnegrained quantization. arXiv preprint arXiv:1705.01462, 2017.
+[Merolla et al., 2016] Paul Merolla, Rathinakumar Appuswamy, John Arthur, Steve K Esser, and Dharmendra Modha. Deep neural networks are robust to weight binarization and other non-linear distortions. arXiv preprint arXiv:1606.01981, 2016.
+[Mishra et al., 2017] Asit Mishra, Eriko Nurvitadhi, Jeffrey J Cook, and Debbie Marr. Wrpn: Wide reduced-precision networks. arXiv preprint arXiv:1709.01134, 2017.
+[Mohamed Amer, 2018] Graham W. Taylor Sek Chai Mohamed Amer, Aswin Raghavan. Bit-regularized optimization of neural nets, 2018.
+[Molchanov et al., 2017] Dmitry Molchanov, Arsenii Ashukha, and Dmitry Vetrov. Variational dropout sparsiﬁes deep neural networks. arXiv preprint arXiv:1701.05369, 2017.
+
+[Moons et al., 2017] Bert Moons, Koen Goetschalckx, Nick Van Berckelaer, and Marian Verhelst. Minimum energy quantized neural networks. arXiv preprint arXiv:1711.00215, 2017.
+[MQTT, ] MQTT. Mqtt protocol.
+[Muller and Indiveri, 2015] Lorenz K Muller and Giacomo Indiveri. Rounding methods for neural networks with low resolution synaptic weights. arXiv preprint arXiv:1504.05767, 2015.
+[Nowlan and Hinton, 1992] Steven J Nowlan and Geoffrey E Hinton. Simplifying neural networks by soft weightsharing. Neural computation, 4(4):473–493, 1992.
+[O’Connor and Welling, 2016] Peter O’Connor and Max Welling. Sigma delta quantized networks. arXiv preprint arXiv:1611.02024, 2016.
+[Ott et al., 2016] Joachim Ott, Zhouhan Lin, Ying Zhang, Shih-Chii Liu, and Yoshua Bengio. Recurrent neural networks with limited numerical precision. arXiv preprint arXiv:1608.06902, 2016.
+[Park et al., 2017] Eunhyeok Park, Junwhan Ahn, and Sungjoo Yoo. Weighted-entropy-based quantization for deep neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5456–5464, 2017.
+[Polino et al., 2018] Antonio Polino, Razvan Pascanu, and Dan Alistarh. Model compression via distillation and quantization. International Conference on Learning Representations, 2018. accepted as poster.
+[Rastegari et al., 2016] Mohammad Rastegari, Vicente Ordonez, Joseph Redmon, and Ali Farhadi. Xnor-net: Imagenet classiﬁcation using binary convolutional neural networks. In European Conference on Computer Vision, pages 525–542. Springer, 2016.
+[Reiss and Stricker, 2012] Attila Reiss and Didier Stricker. Introducing a new benchmarked dataset for activity monitoring. In Wearable Computers (ISWC), 2012 16th International Symposium on, pages 108–109. IEEE, 2012.
+[Seide et al., 2014] Frank Seide, Hao Fu, Jasha Droppo, Gang Li, and Dong Yu. 1-bit stochastic gradient descent and its application to data-parallel distributed training of speech dnns. In Fifteenth Annual Conference of the International Speech Communication Association, 2014.
+[Shayar et al., 2017] Oran Shayar, Dan Levi, and Ethan Fetaya. Learning discrete weights using the local reparameterization trick. arXiv preprint arXiv:1710.07739, 2017.
+[Shuang et al., 2018] Wu Shuang, Li Guoqi, Shi Luping, and Chen Feng. Training and inference with integers in deep neural networks. International Conference on Learning Representations, 2018. accepted as oral presentation.
+[Simonyan and Zisserman, 2014] Karen Simonyan and Andrew Zisserman. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556, 2014.
+
+[Soroosh Khoram, 2018] Jing Li Soroosh Khoram. Adaptive quantization of neural networks. International Conference on Learning Representations, 2018.
+[Soudry et al., 2014] Daniel Soudry, Itay Hubara, and Ron Meir. Expectation backpropagation: Parameter-free training of multilayer neural networks with continuous or discrete weights. In Advances in Neural Information Processing Systems, pages 963–971, 2014.
+[Srivastava et al., 2014] Nitish Srivastava, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. Dropout: A simple way to prevent neural networks from overﬁtting. The Journal of Machine Learning Research, 15(1):1929–1958, 2014.
+[Strom, 2015] Nikko Strom. Scalable distributed dnn training using commodity gpu cloud computing. In Sixteenth Annual Conference of the International Speech Communication Association, 2015.
+[Sung et al., 2015] Wonyong Sung, Sungho Shin, and Kyuyeon Hwang. Resiliency of deep neural networks under quantization. arXiv preprint arXiv:1511.06488, 2015.
+[Szegedy et al., 2015] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, and Andrew Rabinovich. Going deeper with convolutions. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 1–9, 2015.
+[Tang and Kwan, 1993] Chuan Zhang Tang and Hon Keung Kwan. Multilayer feedforward neural networks with single powers-of-two weights. IEEE Transactions on Signal Processing, 41(8):2724–2727, 1993.
+[Tang et al., 2017] Wei Tang, Gang Hua, and Liang Wang. How to train a compact binary neural network with high accuracy? 2017.
+[Tong et al., 2016] Liang Tong, Yong Li, and Wei Gao. A hierarchical edge cloud architecture for mobile computing. In INFOCOM 2016-The 35th Annual IEEE International Conference on Computer Communications, IEEE, pages 1–9. IEEE, 2016.
+[Tsai et al., 2014] Chun-Wei Tsai, Chin-Feng Lai, MingChao Chiang, Laurence T Yang, et al. Data mining for internet of things: A survey. IEEE Communications Surveys and Tutorials, 16(1):77–97, 2014.
+[Vanhoucke et al., 2011] Vincent Vanhoucke, Andrew Senior, and Mark Z Mao. Improving the speed of neural networks on cpus. In Proc. Deep Learning and Unsupervised Feature Learning NIPS Workshop, volume 1, page 4. Citeseer, 2011.
+[Wang and Cheng, 2017] Peisong Wang and Jian Cheng. Fixed-point factorized networks. In 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3966–3974. IEEE, 2017.
+[Wen et al., 2016] He Wen, Shuchang Zhou, Zhe Liang, Yuxiang Zhang, Dieqiao Feng, Xinyu Zhou, and Cong
+
+Yao. Training bit fully convolutional network for fast semantic segmentation. arXiv preprint arXiv:1612.00212, 2016.
+[Wen et al., 2017] Wei Wen, Cong Xu, Feng Yan, Chunpeng Wu, Yandan Wang, Yiran Chen, and Hai Li. Terngrad: Ternary gradients to reduce communication in distributed deep learning. In Advances in Neural Information Processing Systems, pages 1508–1518, 2017.
+[Wu et al., 2016] Jiaxiang Wu, Cong Leng, Yuhang Wang, Qinghao Hu, and Jian Cheng. Quantized convolutional neural networks for mobile devices. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 4820–4828, 2016.
+[Yi et al., 2015] Shanhe Yi, Zijiang Hao, Zhengrui Qin, and Qun Li. Fog computing: Platform and applications. In Hot Topics in Web Systems and Technologies (HotWeb), 2015 Third IEEE Workshop on, pages 73–78. IEEE, 2015.
+[Young et al., 2017] Tom Young, Devamanyu Hazarika, Soujanya Poria, and Erik Cambria. Recent trends in deep learning based natural language processing. arXiv preprint arXiv:1708.02709, 2017.
+[Zhou et al., 2016] Shuchang Zhou, Yuxin Wu, Zekun Ni, Xinyu Zhou, He Wen, and Yuheng Zou. Dorefa-net: Training low bitwidth convolutional neural networks with low bitwidth gradients. arXiv preprint arXiv:1606.06160, 2016.
+[Zhou et al., 2017a] Aojun Zhou, Anbang Yao, Yiwen Guo, Lin Xu, and Yurong Chen. Incremental network quantization: Towards cnns with low-precision weights. arXiv preprint arXiv:1702.03044, 2017.
+[Zhou et al., 2017b] Yiren Zhou, Seyed-Mohsen MoosaviDezfooli, Ngai-Man Cheung, and Pascal Frossard. Adaptive quantization for deep neural network. arXiv preprint arXiv:1712.01048, 2017.
+[Zhu et al., 2016] Chenzhuo Zhu, Song Han, Huizi Mao, and William J Dally. Trained ternary quantization. arXiv preprint arXiv:1612.01064, 2016.
+

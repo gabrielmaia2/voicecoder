@@ -1,0 +1,9417 @@
+Pattern Recognition and Machine Learning
+Solutions to the Exercises: Tutors’ Edition
+Markus Svense´n and Christopher M. Bishop
+Copyright ⃝c 2002–2009
+This is the solutions manual (Tutors’ Edition) for the book Pattern Recognition and Machine Learning (PRML; published by Springer in 2006). This release was created September 8, 2009. Any future releases (e.g. with corrections to errors) will be announced on the PRML web-site (see below) and published via Springer.
+PLEASE DO NOT DISTRIBUTE
+Most of the solutions in this manual are intended as a resource for tutors teaching courses based on PRML and the value of this resource would be greatly diminished if was to become generally available. All
+tutors who want a copy should contact Springer directly.
+The authors would like to express their gratitude to the various people who have provided feedback on earlier releases of this document. The authors welcome all comments, questions and suggestions about the solutions as well as reports on (potential) errors in text or formulae in this document; please send any such feedback to
+prml-fb@microsoft.com Further information about PRML is available from
+http://research.microsoft.com/∼cmbishop/PRML
+
+Contents
+
+Contents
+
+5
+
+Chapter 1: Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+
+Chapter 2: Probability Distributions . . . . . . . . . . . . . . . . . . . . 28
+
+Chapter 3: Linear Models for Regression . . . . . . . . . . . . . . . . . . 62
+
+Chapter 4: Linear Models for Classiﬁcation . . . . . . . . . . . . . . . . 78
+
+Chapter 5: Neural Networks . . . . . . . . . . . . . . . . . . . . . . . . 93
+
+Chapter 6: Kernel Methods . . . . . . . . . . . . . . . . . . . . . . . . . 114
+
+Chapter 7: Sparse Kernel Machines . . . . . . . . . . . . . . . . . . . . . 128
+
+Chapter 8: Graphical Models . . . . . . . . . . . . . . . . . . . . . . . . 136
+
+Chapter 9: Mixture Models and EM . . . . . . . . . . . . . . . . . . . . 150
+
+Chapter 10: Approximate Inference . . . . . . . . . . . . . . . . . . . . . 163
+
+Chapter 11: Sampling Methods . . . . . . . . . . . . . . . . . . . . . . . 198
+
+Chapter 12: Continuous Latent Variables . . . . . . . . . . . . . . . . . . 207
+
+Chapter 13: Sequential Data . . . . . . . . . . . . . . . . . . . . . . . . 223
+
+Chapter 14: Combining Models . . . . . . . . . . . . . . . . . . . . . . . 246
+
+5
+
+6
+
+CONTENTS
+
+Solutions 1.1–1.4
+
+7
+
+Chapter 1 Introduction
+
+1.1 Substituting (1.1) into (1.2) and then differentiating with respect to wi we obtain
+
+N
+
+M
+
+wj xjn − tn xin = 0.
+
+(1)
+
+n=1 j=0
+
+Re-arranging terms then gives the required result.
+
+1.2 For the regularized sum-of-squares error function given by (1.4) the corresponding linear equations are again obtained by differentiation, and take the same form as
+(1.122), but with Aij replaced by Aij, given by
+
+Aij = Aij + λIij .
+
+(2)
+
+1.3 Let us denote apples, oranges and limes by a, o and l respectively. The marginal probability of selecting an apple is given by
+
+p(a) = p(a|r)p(r) + p(a|b)p(b) + p(a|g)p(g)
+
+=
+
+3 10
+
+×
+
+0.2
+
++
+
+1 2
+
+×
+
+0.2
+
++
+
+3 10
+
+×
+
+0.6
+
+=
+
+0.34
+
+(3)
+
+where the conditional probabilities are obtained from the proportions of apples in each box.
+
+To ﬁnd the probability that the box was green, given that the fruit we selected was an orange, we can use Bayes’ theorem
+
+p(g|o) = p(o|g)p(g) .
+
+(4)
+
+p(o)
+
+The denominator in (4) is given by
+
+p(o) = p(o|r)p(r) + p(o|b)p(b) + p(o|g)p(g)
+
+= 4 × 0.2 + 1 × 0.2 + 3 × 0.6 = 0.36
+
+(5)
+
+10
+
+2
+
+10
+
+from which we obtain
+
+p(g|o) =
+
+3
+
+×
+
+0.6
+
+1 =.
+
+(6)
+
+10 0.36 2
+
+1.4 We are often interested in ﬁnding the most probable value for some quantity. In the case of probability distributions over discrete variables this poses little problem. However, for continuous variables there is a subtlety arising from the nature of probability densities and the way they transform under non-linear changes of variable.
+
+8
+
+Solution 1.4
+
+Consider ﬁrst the way a function f (x) behaves when we change to a new variable y where the two variables are related by x = g(y). This deﬁnes a new function of y given by
+
+f (y) = f (g(y)).
+
+(7)
+
+Suppose f (x) has a mode (i.e. a maximum) at x so that f ′(x) = 0. The correspond-
+
+ing mode of f (y) will occur for a value y obtained by differentiating both sides of (7) with respect to y
+
+f ′(y) = f ′(g(y))g′(y) = 0.
+
+(8)
+
+Assuming g′(y) ̸= 0 at the mode, then f ′(g(y)) = 0. However, we know that f ′(x) = 0, and so we see that the locations of the mode expressed in terms of each of the variables x and y are related by x = g(y), as one would expect. Thus, ﬁnding a mode with respect to the variable x is completely equivalent to ﬁrst transforming to the variable y, then ﬁnding a mode with respect to y, and then transforming back to x.
+
+Now consider the behaviour of a probability density px(x) under the change of variables x = g(y), where the density with respect to the new variable is py(y) and is given by ((1.27)). Let us write g′(y) = s|g′(y)| where s ∈ {−1, +1}. Then ((1.27))
+can be written py(y) = px(g(y))sg′(y).
+
+Differentiating both sides with respect to y then gives
+
+p′y(y) = sp′x(g(y)){g′(y)}2 + spx(g(y))g′′(y).
+
+(9)
+
+Due to the presence of the second term on the right hand side of (9) the relationship x = g(y) no longer holds. Thus the value of x obtained by maximizing px(x) will not be the value obtained by transforming to py(y) then maximizing with respect to y and then transforming back to x. This causes modes of densities to be dependent on the choice of variables. In the case of linear transformation, the second term on the right hand side of (9) vanishes, and so the location of the maximum transforms according to x = g(y).
+This effect can be illustrated with a simple example, as shown in Figure 1. We begin by considering a Gaussian distribution px(x) over x with mean µ = 6 and standard deviation σ = 1, shown by the red curve in Figure 1. Next we draw a sample of N = 50, 000 points from this distribution and plot a histogram of their values, which as expected agrees with the distribution px(x).
+Now consider a non-linear change of variables from x to y given by
+
+x = g(y) = ln(y) − ln(1 − y) + 5.
+
+(10)
+
+The inverse of this function is given by
+
+y = g−1(x) =
+
+1
+
+(11)
+
+1 + exp(−x + 5)
+
+Figure 1 Example of the transformation of the mode of a density under a non-
+
+1
+
+linear change of variables, illus-
+
+trating the different behaviour com-
+
+pared to a simple function. See the y
+
+text for details.
+
+0.5
+
+Solutions 1.5–1.6
+
+9
+
+py (y )
+
+g−1 (x)
+
+px(x)
+
+0
+
+0
+
+5
+
+x
+
+10
+
+which is a logistic sigmoid function, and is shown in Figure 1 by the blue curve.
+If we simply transform px(x) as a function of x we obtain the green curve px(g(y)) shown in Figure 1, and we see that the mode of the density px(x) is transformed via the sigmoid function to the mode of this curve. However, the density over y transforms instead according to (1.27) and is shown by the magenta curve on the left side of the diagram. Note that this has its mode shifted relative to the mode of the green curve.
+To conﬁrm this result we take our sample of 50, 000 values of x, evaluate the corresponding values of y using (11), and then plot a histogram of their values. We see that this histogram matches the magenta curve in Figure 1 and not the green curve!
+1.5 Expanding the square we have
+E[(f (x) − E[f (x)])2] = E[f (x)2 − 2f (x)E[f (x)] + E[f (x)]2] = E[f (x)2] − 2E[f (x)]E[f (x)] + E[f (x)]2 = E[f (x)2] − E[f (x)]2
+
+as required. 1.6 The deﬁnition of covariance is given by (1.41) as
+
+cov[x, y] = E[xy] − E[x]E[y].
+
+Using (1.33) and the fact that p(x, y) = p(x)p(y) when x and y are independent, we obtain
+
+E[xy] =
+
+p(x, y)xy
+
+xy
+
+=
+
+p(x)x p(y)y
+
+x
+
+y
+
+= E[x]E[y]
+
+10
+
+Solutions 1.7–1.8
+
+and hence cov[x, y] = 0. The case where x and y are continuous variables is analogous, with (1.33) replaced by (1.34) and the sums replaced by integrals.
+1.7 The transformation from Cartesian to polar coordinates is deﬁned by
+
+x = r cos θ
+
+(12)
+
+y = r sin θ
+
+(13)
+
+and hence we have x2 + y2 = r2 where we have used the well-known trigonometric result (2.177). Also the Jacobian of the change of variables is easily seen to be
+
+∂(x, y) = ∂(r, θ)
+=
+
+∂x ∂x ∂r ∂θ
+
+∂y ∂y
+
+∂r ∂θ
+
+cos θ sin θ
+
+−r sin θ r cos θ
+
+=r
+
+where again we have used (2.177). Thus the double integral in (1.125) becomes
+
+I2 =
+
+2π ∞
+
+exp
+
+0
+
+0
+
+−
+
+r2 2σ2
+
+r dr dθ
+
+(14)
+
+∞
+
+u1
+
+=
+
+2π
+0
+
+exp − 2σ2
+
+du 2
+
+(15)
+
+u = π exp − 2σ2
+
+∞
+−2σ2
+0
+
+(16)
+
+= 2πσ2
+
+(17)
+
+where we have used the change of variables r2 = u. Thus
+
+I = 2πσ2 1/2 .
+
+Finally, using the transformation y = x − µ, the integral of the Gaussian distribution becomes
+
+∞
+N x|µ, σ2 dx
+−∞
+
+=
+
+1 (2πσ2)1/2
+
+∞
+exp
+−∞
+
+y2 − 2σ2
+
+dy
+
+I = (2πσ2)1/2 = 1
+
+as required.
+
+1.8 From the deﬁnition (1.46) of the univariate Gaussian distribution, we have
+
+∞
+E[x] =
+−∞
+
+1 2πσ2
+
+1/2
+exp
+
+−
+
+1 2σ2
+
+(x
+
+−
+
+µ)2
+
+x dx.
+
+(18)
+
+Solution 1.9
+
+11
+
+Now change variables using y = x − µ to give
+
+∞
+E[x] =
+−∞
+
+1 2πσ2
+
+1/2
+exp
+
+−
+
+1 2σ2
+
+y2
+
+(y + µ) dy.
+
+(19)
+
+We now note that in the factor (y + µ) the ﬁrst term in y corresponds to an odd integrand and so this integral must vanish (to show this explicitly, write the integral as the sum of two integrals, one from −∞ to 0 and the other from 0 to ∞ and then show that these two integrals cancel). In the second term, µ is a constant and pulls outside the integral, leaving a normalized Gaussian distribution which integrates to 1, and so we obtain (1.49).
+
+To derive (1.50) we ﬁrst substitute the expression (1.46) for the normal distribution into the normalization result (1.48) and re-arrange to obtain
+
+∞
+exp
+−∞
+
+−
+
+1 2σ2
+
+(x
+
+−
+
+µ)2
+
+dx = 2πσ2 1/2 .
+
+(20)
+
+We now differentiate both sides of (20) with respect to σ2 and then re-arrange to
+
+obtain
+
+1 2πσ2
+
+1/2 ∞
+exp
+−∞
+
+−
+
+1 2σ2
+
+(x
+
+−
+
+µ)2
+
+(x − µ)2 dx = σ2
+
+(21)
+
+which directly shows that
+
+E[(x − µ)2] = var[x] = σ2.
+
+(22)
+
+Now we expand the square on the left-hand side giving
+
+E[x2] − 2µE[x] + µ2 = σ2.
+
+Making use of (1.49) then gives (1.50) as required. Finally, (1.51) follows directly from (1.49) and (1.50)
+
+E[x2] − E[x]2 = µ2 + σ2 − µ2 = σ2.
+
+1.9 For the univariate case, we simply differentiate (1.46) with respect to x to obtain
+
+dN dx
+
+x|µ, σ2
+
+= −N
+
+x|µ, σ2
+
+x−µ σ2 .
+
+Setting this to zero we obtain x = µ.
+
+Similarly, for the multivariate case we differentiate (1.52) with respect to x to obtain
+
+∂ ∂x
+
+N
+
+(x|µ,
+
+Σ)
+
+=
+
+1 − 2 N (x|µ, Σ)∇x
+
+(x − µ)TΣ−1(x − µ)
+
+= −N (x|µ, Σ)Σ−1(x − µ),
+
+where we have used (C.19), (C.20)1 and the fact that Σ−1 is symmetric. Setting this derivative equal to 0, and left-multiplying by Σ, leads to the solution x = µ.
+
+1NOTE: In the 1st printing of PRML, there are mistakes in (C.20); all instances of x (vector) in the denominators should be x (scalar).
+
+12
+
+Solutions 1.10–1.11
+
+1.10 Since x and z are independent, their joint distribution factorizes p(x, z) = p(x)p(z), and so
+
+E[x + z] =
+
+(x + z)p(x)p(z) dx dz
+
+(23)
+
+= xp(x) dx + zp(z) dz
+
+(24)
+
+= E[x] + E[z].
+
+(25)
+
+Similarly for the variances, we ﬁrst note that
+
+(x + z − E[x + z])2 = (x − E[x])2 + (z − E[z])2 + 2(x − E[x])(z − E[z]) (26)
+
+where the ﬁnal term will integrate to zero with respect to the factorized distribution p(x)p(z). Hence
+
+var[x + z] =
+
+(x + z − E[x + z])2p(x)p(z) dx dz
+
+= (x − E[x])2p(x) dx + (z − E[z])2p(z) dz
+
+= var(x) + var(z).
+
+(27)
+
+For discrete variables the integrals are replaced by summations, and the same results are again obtained.
+
+1.11 We use ℓ to denote ln p(X|µ, σ2) from (1.54). By standard rules of differentiation
+
+we obtain
+
+∂ℓ 1 N ∂µ = σ2 (xn − µ).
+n=1
+
+Setting this equal to zero and moving the terms involving µ to the other side of the
+
+equation we get
+
+1N
+
+1
+
+σ2
+
+xn = σ2 N µ
+
+n=1
+
+and by multiplying ing both sides by σ2/N we get (1.55).
+
+Similarly we have
+
+∂ℓ
+
+1
+
+∂σ2 = 2(σ2)2
+
+N
+
+(xn − µ)2 −
+
+N 2
+
+1 σ2
+
+n=1
+
+and setting this to zero we obtain
+
+N1
+
+1
+
+2 σ2 = 2(σ2)2
+
+N
+(xn − µ)2.
+
+n=1
+
+Multiplying both sides by 2(σ2)2/N and substituting µML for µ we get (1.56).
+
+Solutions 1.12–1.14
+
+13
+
+1.12
+
+If m = n then xnxm = x2n and using (1.50) we obtain E[x2n] = µ2 + σ2, whereas if n ̸= m then the two data points xn and xm are independent and hence E[xnxm] = E[xn]E[xm] = µ2 where we have used (1.49). Combining these two results we
+obtain (1.130).
+
+Next we have
+
+1N
+
+E[µML] = N
+
+E[xn] = µ
+
+(28)
+
+n=1
+
+using (1.49).
+
+Finally, consider E[σM2 L]. From (1.55) and (1.56), and making use of (1.130), we
+
+have
+
+⎡
+
+⎤
+
+E[σM2 L]
+
+=
+
+E⎣ 1 N
+
+N
+
+1 xn − N
+
+N
+
+xm
+
+2
+⎦
+
+n=1
+
+m=1
+
+=
+
+1 N
+
+N
+
+E
+
+x2n
+
+−
+
+2 N
+
+xn
+
+N
+
+1 xm + N 2
+
+N
+
+N
+xmxl
+
+n=1
+
+m=1
+
+m=1 l=1
+
+= µ2 + σ2 − 2 µ2 + 1 σ2 + µ2 + 1 σ2
+
+N
+
+N
+
+= N − 1 σ2
+
+(29)
+
+N
+
+as required.
+
+1.13 In a similar fashion to solution 1.12, substituting µ for µML in (1.56) and using (1.49) and (1.50) we have
+
+E{xn}
+
+1 N
+
+N
+
+(xn − µ)2
+
+n=1
+
+=
+
+1 N
+
+N
+
+Exn
+
+x2n − 2xnµ + µ2
+
+n=1
+
+= 1 N µ2 + σ2 − 2µµ + µ2 N
+n=1
+
+= σ2
+
+1.14
+
+Deﬁne
+
+wiSj
+
+=
+
+1 2 (wij
+
++
+
+wji)
+
+wiAj
+
+=
+
+1 2 (wij
+
+−
+
+wji).
+
+(30)
+
+from which the (anti)symmetry properties follow directly, as does the relation wij = wiSj + wiAj. We now note that
+
+D
+
+D
+
+wiAj xixj
+
+=
+
+1 2
+
+D
+
+D
+
+1D
+
+wij xixj − 2
+
+D
+wjixixj = 0
+
+i=1 j=1
+
+i=1 j=1
+
+i=1 j=1
+
+(31)
+
+14
+
+Solution 1.15
+
+from which we obtain (1.132). The number of independent components in wiSj can be found by noting that there are D2 parameters in total in this matrix, and that entries
+off the leading diagonal occur in constrained pairs wij = wji for j ̸= i. Thus we start with D2 parameters in the matrix wiSj, subtract D for the number of parameters on the leading diagonal, divide by two, and then add back D for the leading diagonal and we obtain (D2 − D)/2 + D = D(D + 1)/2.
+
+1.15 The redundancy in the coefﬁcients in (1.133) arises from interchange symmetries between the indices ik. Such symmetries can therefore be removed by enforcing an ordering on the indices, as in (1.134), so that only one member in each group of equivalent conﬁgurations occurs in the summation.
+To derive (1.135) we note that the number of independent parameters n(D, M ) which appear at order M can be written as
+
+D i1
+
+iM −1
+
+n(D, M ) =
+
+··· 1
+
+i1=1 i2=1 iM =1
+
+(32)
+
+which has M terms. This can clearly also be written as
+
+D
+n(D, M ) =
+i1 =1
+
+i1
+
+iM −1
+
+··· 1
+
+i2=1 iM =1
+
+(33)
+
+where the term in braces has M −1 terms which, from (32), must equal n(i1, M −1). Thus we can write
+D
+
+n(D, M ) = n(i1, M − 1)
+
+(34)
+
+i1 =1
+
+which is equivalent to (1.135).
+
+To prove (1.136) we ﬁrst set D = 1 on both sides of the equation, and make use of 0! = 1, which gives the value 1 on both sides, thus showing the equation is valid for D = 1. Now we assume that it is true for a speciﬁc value of dimensionality D and then show that it must be true for dimensionality D + 1. Thus consider the left-hand side of (1.136) evaluated for D + 1 which gives
+
+D+1 (i + M − 2)!
+
+(D + M − 1)! (D + M − 1)!
+
+=
+
++
+
+(i − 1)!(M − 1)!
+
+(D − 1)!M ! D!(M − 1)!
+
+i=1
+
+= (D + M − 1)!D + (D + M − 1)!M D!M !
+
+= (D + M )!
+
+(35)
+
+D!M !
+
+which equals the right hand side of (1.136) for dimensionality D + 1. Thus, by induction, (1.136) must hold true for all values of D.
+
+Solution 1.16
+
+15
+
+Finally we use induction to prove (1.137). For M = 2 we ﬁnd obtain the standard
+
+result
+
+n(D, 2)
+
+=
+
+1 2
+
+D(D
+
++
+
+1),
+
+which
+
+is
+
+also
+
+proved
+
+in
+
+Exercise
+
+1.14.
+
+Now
+
+assume
+
+that (1.137) is correct for a speciﬁc order M − 1 so that
+
+n(D,
+
+M
+
+−
+
+1)
+
+=
+
+(D + M − 2)! (D − 1)! (M − 1)! .
+
+(36)
+
+Substituting this into the right hand side of (1.135) we obtain
+
+D (i + M − 2)!
+
+n(D, M ) =
+
+(37)
+
+(i − 1)! (M − 1)!
+
+i=1
+
+which, making use of (1.136), gives
+
+(D + M − 1)!
+
+n(D, M ) = (D − 1)! M !
+
+(38)
+
+and hence shows that (1.137) is true for polynomials of order M . Thus by induction (1.137) must be true for all values of M .
+
+1.16 NOTE: In the 1st printing of PRML, this exercise contains two typographical errors. On line 4, M 6th should be M th and on the l.h.s. of (1.139), N (d, M ) should be N (D, M ).
+The result (1.138) follows simply from summing up the coefﬁcients at all order up to and including order M . To prove (1.139), we ﬁrst note that when M = 0 the right hand side of (1.139) equals 1, which we know to be correct since this is the number of parameters at zeroth order which is just the constant offset in the polynomial. Assuming that (1.139) is correct at order M , we obtain the following result at order M +1
+
+M +1
+
+N (D, M + 1) =
+
+n(D, m)
+
+m=0
+
+M
+
+=
+
+n(D, m) + n(D, M + 1)
+
+m=0
+
+(D + M )!
+
+(D + M )!
+
+= D!M ! + (D − 1)!(M + 1)!
+
+(D + M )!(M + 1) + (D + M )!D
+
+=
+
+D!(M + 1)!
+
+= (D + M + 1)! D!(M + 1)!
+
+which is the required result at order M + 1.
+
+16
+
+Solutions 1.17–1.18
+
+Now assume M ≫ D. Using Stirling’s formula we have
+
+(D + M )D+M e−D−M
+
+n(D, M ) ≃
+
+D! M M e−M
+
+M D+M e−D
+
+D D+M
+
+=
+
+D! MM
+
+1+ M
+
+M De−D
+
+D(D + M )
+
+≃
+
+1+
+
+D!
+
+M
+
+≃ (1 + D)e−D M D D!
+
+which grows like M D with M . The case where D ≫ M is identical, with the roles of D and M exchanged. By numerical evaluation we obtain N (10, 3) = 286 and N (100, 3) = 176,851.
+
+1.17
+
+Using integration by parts we have
+
+Γ(x + 1) =
+
+∞
+uxe−u du
+
+0
+
+∞
+
+=
+
+−e−uux
+
+∞ 0
+
++
+
+xux−1e−u du = 0 + xΓ(x). (39)
+
+0
+
+For x = 1 we have
+
+∞
+
+Γ(1) =
+
+e−u du =
+
+−e−u
+
+∞ 0
+
+=
+
+1.
+
+(40)
+
+0
+
+If x is an integer we can apply proof by induction to relate the gamma function to the factorial function. Suppose that Γ(x + 1) = x! holds. Then from the result (39) we have Γ(x + 2) = (x + 1)Γ(x + 1) = (x + 1)!. Finally, Γ(1) = 1 = 0!, which completes the proof by induction.
+
+1.18 On the right-hand side of (1.142) we make the change of variables u = r2 to give
+
+1 2 SD
+
+∞ 0
+
+e−uuD/2−1
+
+du
+
+=
+
+1 2 SDΓ(D/2)
+
+(41)
+
+where we have used the deﬁnition (1.141) of the Gamma function. On the left hand side of (1.142) we can use (1.126) to obtain πD/2. Equating these we obtain the
+desired result (1.143).
+
+The volume of a sphere of radius 1 in D-dimensions is obtained by integration
+
+VD = SD
+
+1
+rD−1 dr
+
+=
+
+SD .
+
+0
+
+D
+
+(42)
+
+For D = 2 and D = 3 we obtain the following results
+
+S2 = 2π,
+
+S3 = 4π,
+
+V2 = πa2,
+
+V3
+
+=
+
+4 πa3. 3
+
+(43)
+
+Solutions 1.19–1.20
+
+17
+
+1.19 The volume of the cube is (2a)D. Combining this with (1.143) and (1.144) we obtain (1.145). Using Stirling’s formula (1.146) in (1.145) the ratio becomes, for large D,
+
+volume of sphere πe D/2 1
+
+=
+
+(44)
+
+volume of cube 2D D
+
+which goes to 0 as D → ∞. The distance from the center of the cube to the mid point of one of the sides is a, since this is whe√re it makes contact with the sphere. Similarly th√e distance to one of the corners is a D from Pythagoras’ theorem. Thus the ratio is D.
+
+1.20 Since p(x) is radially symmetric it will be roughly constant over the shell of radius r and thickness ϵ. This shell has volume SDrD−1ϵ and since ∥x∥2 = r2 we have
+
+p(x) dx ≃ p(r)SDrD−1ϵ
+
+(45)
+
+shell
+
+from which we obtain (1.148). We can ﬁnd the stationary points of p(r) by differentiation
+
+d p(r) ∝
+dr
+
+(D − 1)rD−2 + rD−1
+
+r − σ2
+
+r2 exp − 2σ2 = 0.
+
+(46)
+
+√ Solving for r, and using D ≫ 1, we obtain r ≃ Dσ.
+
+Next we note that
+
+p(r + ϵ)
+
+∝
+
+(r + ϵ)D−1 exp
+
+(r + ϵ)2 − 2σ2
+
+(r + ϵ)2
+
+= exp − 2σ2 + (D − 1) ln(r + ϵ) .
+
+(47)
+
+We now expand p(r) around the point r. Since this is a stationary point of p(r) we must keep terms up to second order. Making use of the expansion ln(1 + x) = x − x2/2 + O(x3), together with D ≫ 1, we obtain (1.149).
+Finally, from (1.147) we see that the probability density at the origin is given by
+
+1 p(x = 0) = (2πσ2)1/2
+
+while the density at ∥x∥ = r is given from (1.147) by
+
+1
+
+r2
+
+1
+
+D
+
+p(∥x∥ = r) = (2πσ2)1/2 exp − 2σ2
+
+= (2πσ2)1/2 exp
+
+− 2
+
+√ where we have used r ≃ Dσ. Thus the ratio of densities is given by exp(D/2).
+
+18
+
+Solutions 1.21–1.24
+
+1.21 Since the square root function is monotonic for non-negative numbers, we can take the square root of the relation a b to obtain a1/2 b1/2. Then we multiply both sides by the non-negative quantity a1/2 to obtain a (ab)1/2.
+The probability of a misclassiﬁcation is given, from (1.78), by
+
+p(mistake) =
+
+p(x, C2) dx + p(x, C1) dx
+
+R1
+
+R2
+
+=
+
+p(C2|x)p(x) dx + p(C1|x)p(x) dx.
+
+(48)
+
+R1
+
+R2
+
+Since we have chosen the decision regions to minimize the probability of misclassiﬁcation we must have p(C2|x) p(C1|x) in region R1, and p(C1|x) p(C2|x) in region R2. We now apply the result a b ⇒ a1/2 b1/2 to give
+
+p(mistake)
+
+{p(C1|x)p(C2|x)}1/2p(x) dx
+R1
+
++ {p(C1|x)p(C2|x)}1/2p(x) dx
+R2
+
+= {p(C1|x)p(x)p(C2|x)p(x)}1/2 dx
+
+(49)
+
+since the two integrals have the same integrand. The ﬁnal integral is taken over the whole of the domain of x.
+
+1.22 Substituting Lkj = 1 − δkj into (1.81), and using the fact that the posterior probabilities sum to one, we ﬁnd that, for each x we should choose the class j for which 1 − p(Cj|x) is a minimum, which is equivalent to choosing the j for which the posterior probability p(Cj|x) is a maximum. This loss matrix assigns a loss of one if the example is misclassiﬁed, and a loss of zero if it is correctly classiﬁed, and hence
+minimizing the expected loss will minimize the misclassiﬁcation rate.
+
+1.23 From (1.81) we see that for a general loss matrix and arbitrary class priors, the expected loss is minimized by assigning an input x to class the j which minimizes
+
+1
+
+Lkjp(Ck|x) = p(x) Lkjp(x|Ck)p(Ck)
+
+k
+
+k
+
+and so there is a direct trade-off between the priors p(Ck) and the loss matrix Lkj.
+
+1.24 A vector x belongs to class Ck with probability p(Ck|x). If we decide to assign x to class Cj we will incur an expected loss of k Lkjp(Ck|x), whereas if we select the reject option we will incur a loss of λ. Thus, if
+
+j = arg min Lklp(Ck|x)
+
+(50)
+
+l
+
+k
+
+Solutions 1.25–1.26
+
+19
+
+then we minimize the expected loss if we take the following action
+
+choose
+
+class j, if minl k Lklp(Ck|x) < λ; reject, otherwise.
+
+(51)
+
+For a loss matrix Lkj = 1 − Ikj we have k Lklp(Ck|x) = 1 − p(Cl|x) and so we reject unless the smallest value of 1 − p(Cl|x) is less than λ, or equivalently if the largest value of p(Cl|x) is less than 1 − λ. In the standard reject criterion we reject if the largest posterior probability is less than θ. Thus these two criteria for rejection are equivalent provided θ = 1 − λ.
+1.25 The expected squared loss for a vectorial target variable is given by
+E[L] = ∥y(x) − t∥2p(t, x) dx dt.
+
+Our goal is to choose y(x) so as to minimize E[L]. We can do this formally using the calculus of variations to give
+δE[L] = 2(y(x) − t)p(t, x) dt = 0. δy(x)
+Solving for y(x), and using the sum and product rules of probability, we obtain
+
+y(x) =
+
+tp(t, x) dt =
+p(t, x) dt
+
+tp(t|x) dt
+
+which is the conditional average of t conditioned on x. For the case of a scalar target variable we have
+y(x) = tp(t|x) dt
+which is equivalent to (1.89).
+1.26 NOTE: In the 1st printing of PRML, there is an error in equation (1.90); the integrand of the second integral should be replaced by var[t|x]p(x). We start by expanding the square in (1.151), in a similar fashion to the univariate case in the equation preceding (1.90),
+∥y(x) − t∥2 = ∥y(x) − E[t|x] + E[t|x] − t∥2 = ∥y(x) − E[t|x]∥2 + (y(x) − E[t|x])T(E[t|x] − t) +(E[t|x] − t)T(y(x) − E[t|x]) + ∥E[t|x] − t∥2.
+Following the treatment of the univariate case, we now substitute this into (1.151) and perform the integral over t. Again the cross-term vanishes and we are left with
+E[L] = ∥y(x) − E[t|x]∥2p(x) dx + var[t|x]p(x) dx
+
+20
+
+Solutions 1.27–1.28
+
+from which we see directly that the function y(x) that minimizes E[L] is given by E[t|x].
+1.27 Since we can choose y(x) independently for each value of x, the minimum of the expected Lq loss can be found by minimizing the integrand given by
+
+|y(x) − t|qp(t|x) dt
+
+(52)
+
+for each value of x. Setting the derivative of (52) with respect to y(x) to zero gives the stationarity condition
+
+q|y(x) − t|q−1sign(y(x) − t)p(t|x) dt
+
+y(x)
+
+∞
+
+=q
+
+|y(x) − t|q−1p(t|x) dt − q
+
+|y(x) − t|q−1p(t|x) dt = 0
+
+−∞
+
+y(x)
+
+which can also be obtained directly by setting the functional derivative of (1.91) with respect to y(x) equal to zero. It follows that y(x) must satisfy
+
+y(x)
+
+∞
+
+|y(x) − t|q−1p(t|x) dt =
+
+|y(x) − t|q−1p(t|x) dt.
+
+(53)
+
+−∞
+
+y(x)
+
+For the case of q = 1 this reduces to
+
+y(x)
+
+∞
+
+p(t|x) dt = p(t|x) dt.
+
+(54)
+
+−∞
+
+y(x)
+
+which says that y(x) must be the conditional median of t. For q → 0 we note that, as a function of t, the quantity |y(x) − t|q is close to 1 everywhere except in a small neighbourhood around t = y(x) where it falls to zero. The value of (52) will therefore be close to 1, since the density p(t) is normalized, but reduced slightly by the ‘notch’ close to t = y(x). We obtain the biggest reduction in (52) by choosing the location of the notch to coincide with the largest value of p(t), i.e. with the (conditional) mode.
+1.28 From the discussion of the introduction of Section 1.6, we have
+
+h(p2) = h(p) + h(p) = 2 h(p).
+
+We then assume that for all k K, h(pk) = k h(p). For k = K + 1 we have h(pK+1) = h(pKp) = h(pK) + h(p) = K h(p) + h(p) = (K + 1) h(p).
+
+Moreover,
+
+h(pn/m) = n h(p1/m) = n m h(p1/m) = n h(pm/m) = n h(p)
+
+m
+
+m
+
+m
+
+Solutions 1.29–1.30
+
+21
+
+and so, by continuity, we have that h(px) = x h(p) for any real number x. Now consider the positive real numbers p and q and the real number x such that p = qx. From the above discussion, we see that
+h(p) h(qx) x h(q) h(q) ln(p) = ln(qx) = x ln(q) = ln(q)
+
+and hence h(p) ∝ ln(p). 1.29 The entropy of an M -state discrete variable x can be written in the form
+
+M
+
+M
+
+1
+
+H (x)
+
+=
+
+−
+
+i=1
+
+p(xi) ln p(xi)
+
+=
+
+i=1
+
+p(xi) ln
+
+. p(xi)
+
+(55)
+
+The function ln(x) is concave⌢ and so we can apply Jensen’s inequality in the form (1.115) but with the inequality reversed, so that
+
+M
+
+1
+
+H(x) ln i=1 p(xi) p(xi) = ln M.
+
+(56)
+
+1.30 NOTE: In PRML, there is a minus sign (’−’) missing on the l.h.s. of (1.103). From (1.113) we have
+
+KL(p∥q) = − p(x) ln q(x) dx + p(x) ln p(x) dx.
+
+(57)
+
+Using (1.46) and (1.48)– (1.50), we can rewrite the ﬁrst integral on the r.h.s. of (57) as
+
+−
+
+p(x) ln q(x) dx =
+
+N (x|µ, σ2) 1 2
+
+ln(2πs2)
+
++
+
+(x
+
+− m)2 s2
+
+=
+
+1 2
+
+ln(2πs2)
+
++
+
+1 s2
+
+N (x|µ, σ2)(x2 − 2xm + m2) dx
+
+=
+
+1 2
+
+ln(2πs2)
+
++
+
+σ2
+
++
+
+µ2
+
+− 2µm s2
+
++
+
+m2
+
+.
+
+dx (58)
+
+The second integral on the r.h.s. of (57) we recognize from (1.103) as the negative differential entropy of a Gaussian. Thus, from (57), (58) and (1.110), we have
+
+KL(p∥q)
+
+=
+
+1 2
+
+ln(2πs2)
+
++
+
+σ2
+
++
+
+µ2
+
+− 2µm + m2 s2
+
+−
+
+1 − ln(2πσ2)
+
+=
+
+1 2
+
+ln
+
+s2 σ2
+
++
+
+σ2
+
++
+
+µ2
+
+− 2µm s2
+
++
+
+m2
+
+−
+
+1
+
+.
+
+22
+
+Solutions 1.31–1.33
+
+1.31 We ﬁrst make use of the relation I(x; y) = H(y) − H(y|x) which we obtained in (1.121), and note that the mutual information satisﬁes I(x; y) 0 since it is a form of Kullback-Leibler divergence. Finally we make use of the relation (1.112) to obtain the desired result (1.152).
+To show that statistical independence is a sufﬁcient condition for the equality to be satisﬁed, we substitute p(x, y) = p(x)p(y) into the deﬁnition of the entropy, giving
+
+H(x, y) =
+
+p(x, y) ln p(x, y) dx dy
+
+=
+
+p(x)p(y) {ln p(x) + ln p(y)} dx dy
+
+= p(x) ln p(x) dx + p(y) ln p(y) dy
+
+= H(x) + H(y).
+
+To show that statistical independence is a necessary condition, we combine the equality condition
+H(x, y) = H(x) + H(y)
+with the result (1.112) to give
+
+H(y|x) = H(y).
+
+We now note that the right-hand side is independent of x and hence the left-hand side must also be constant with respect to x. Using (1.121) it then follows that the mutual information I[x, y] = 0. Finally, using (1.120) we see that the mutual information is a form of KL divergence, and this vanishes only if the two distributions are equal, so that p(x, y) = p(x)p(y) as required.
+1.32 When we make a change of variables, the probability density is transformed by the Jacobian of the change of variables. Thus we have
+
+p(x) = p(y) ∂yi = p(y)|A|
+
+(59)
+
+∂xj
+
+where | · | denotes the determinant. Then the entropy of y can be written
+
+H(y) = − as required.
+
+p(y) ln p(y) dy = −
+
+p(x) ln p(x)|A|−1 dx = H(x) + ln |A| (60)
+
+1.33 The conditional entropy H(y|x) can be written
+
+H(y|x) = −
+
+p(yi|xj)p(xj) ln p(yi|xj)
+
+(61)
+
+ij
+
+Solution 1.34
+
+23
+
+which equals 0 by assumption. Since the quantity −p(yi|xj) ln p(yi|xj) is nonnegative each of these terms must vanish for any value xj such that p(xj) ̸= 0. However, the quantity p ln p only vanishes for p = 0 or p = 1. Thus the quantities p(yi|xj) are all either 0 or 1. However, they must also sum to 1, since this is a normalized probability distribution, and so precisely one of the p(yi|xj) is 1, and the rest are 0. Thus, for each value xj there is a unique value yi with non-zero probability.
+1.34 Obtaining the required functional derivative can be done simply by inspection. However, if a more formal approach is required we can proceed as follows using the techniques set out in Appendix D. Consider ﬁrst the functional
+
+I[p(x)] = p(x)f (x) dx.
+
+Under a small variation p(x) → p(x) + ϵη(x) we have
+
+I[p(x) + ϵη(x)] = p(x)f (x) dx + ϵ η(x)f (x) dx
+
+and hence from (D.3) we deduce that the functional derivative is given by
+
+δI = f (x). δp(x)
+
+Similarly, if we deﬁne
+
+J[p(x)] = p(x) ln p(x) dx
+
+then under a small variation p(x) → p(x) + ϵη(x) we have
+
+J[p(x) + ϵη(x)] = p(x) ln p(x) dx
+
++ϵ
+
+η(x) ln p(x) dx +
+
+1 p(x) η(x) dx
+
++ O(ϵ2)
+
+p(x)
+
+and hence
+
+δJ = p(x) + 1. δp(x)
+
+Using these two results we obtain the following result for the functional derivative
+
+− ln p(x) − 1 + λ1 + λ2x + λ3(x − µ)2.
+
+Re-arranging then gives (1.108).
+To eliminate the Lagrange multipliers we substitute (1.108) into each of the three constraints (1.105), (1.106) and (1.107) in turn. The solution is most easily obtained
+
+24
+
+Solutions 1.35–1.36
+
+by comparison with the standard form of the Gaussian, and noting that the results
+
+λ1
+
+=
+
+1 − 1 ln 2πσ2 2
+
+(62)
+
+λ2 = 0
+
+(63)
+
+1
+
+λ3 = 2σ2
+
+(64)
+
+do indeed satisfy the three constraints.
+Note that there is a typographical error in the question, which should read ”Use calculus of variations to show that the stationary point of the functional shown just before (1.108) is given by (1.108)”.
+For the multivariate version of this derivation, see Exercise 2.14.
+
+1.35 NOTE: In PRML, there is a minus sign (’−’) missing on the l.h.s. of (1.103).
+Substituting the right hand side of (1.109) in the argument of the logarithm on the right hand side of (1.103), we obtain
+
+H[x] = − p(x) ln p(x) dx
+
+=−
+
+p(x)
+
+−
+
+1 2
+
+ln(2πσ2)
+
+−
+
+(x − µ)2 2σ2
+
+dx
+
+=
+
+1 2
+
+ln(2πσ2)
+
++
+
+1 σ2
+
+p(x)(x − µ)2 dx
+
+= 1 ln(2πσ2) + 1 , 2
+
+where in the last step we used (1.107).
+
+1.36 Consider (1.114) with λ = 0.5 and b = a + 2ϵ (and hence a = b − 2ϵ),
+
+0.5f (a) + 0.5f (b) > f (0.5a + 0.5b) = 0.5f (0.5a + 0.5(a + 2ϵ)) + 0.5f (0.5(b − 2ϵ) + 0.5b) = 0.5f (a + ϵ) + 0.5f (b − ϵ)
+
+We can rewrite this as
+
+f (b) − f (b − ϵ) > f (a + ϵ) − f (a)
+
+We then divide both sides by ϵ and let ϵ → 0, giving f ′(b) > f ′(a).
+
+Since this holds at all points, it follows that f ′′(x) 0 everywhere.
+
+Solutions 1.37–1.38
+
+25
+
+To show the implication in the other direction, we make use of Taylor’s theorem
+
+(with the remainder in Lagrange form), according to which there exist an x⋆ such
+
+that
+
+f (x)
+
+=
+
+f (x0)
+
++
+
+f ′(x0)(x
+
+−
+
+x0)
+
++
+
+1 f ′′(x⋆)(x 2
+
+−
+
+x0)2.
+
+Since we assume that f ′′(x) > 0 everywhere, the third term on the r.h.s. will always
+
+be positive and therefore
+
+f (x) > f (x0) + f ′(x0)(x − x0)
+
+Now let x0 = λa + (1 − λ)b and consider setting x = a, which gives
+
+f (a) > f (x0) + f ′(x0)(a − x0)
+
+= f (x0) + f ′(x0) ((1 − λ)(a − b)) .
+
+(65)
+
+Similarly, setting x = b gives
+
+f (b) > f (x0) + f ′(x0)(λ(b − a)).
+
+(66)
+
+Multiplying (65) by λ and (66) by 1 − λ and adding up the results on both sides, we obtain
+λf (a) + (1 − λ)f (b) > f (x0) = f (λa + (1 − λ)b)
+as required.
+
+1.37 From (1.104), making use of (1.111), we have
+
+H[x, y] = − p(x, y) ln p(x, y) dx dy
+
+= − p(x, y) ln (p(y|x)p(x)) dx dy
+
+= − p(x, y) (ln p(y|x) + ln p(x)) dx dy
+
+= − p(x, y) ln p(y|x) dx dy − p(x, y) ln p(x) dx dy
+
+= − p(x, y) ln p(y|x) dx dy − p(x) ln p(x) dx
+
+= H[y|x] + H[x].
+
+1.38 From (1.114) we know that the result (1.115) holds for M = 1. We now suppose that it holds for some general value M and show that it must therefore hold for M + 1. Consider the left hand side of (1.115)
+
+M +1
+
+f
+
+λixi
+
+i=1
+
+=f =f
+
+M
+λM+1xM+1 + λixi
+i=1 M
+λM+1xM+1 + (1 − λM+1) ηixi
+i=1
+
+(67) (68)
+
+26
+
+Solution 1.39
+
+where we have deﬁned
+
+ηi
+
+=
+
+1
+
+λi . − λM+1
+
+(69)
+
+We now apply (1.114) to give
+
+M +1
+
+f
+
+λixi
+
+i=1
+
+M
+
+λM+1f (xM+1) + (1 − λM+1)f
+
+ηixi . (70)
+
+i=1
+
+We now note that the quantities λi by deﬁnition satisfy
+
+M +1
+
+λi = 1
+
+(71)
+
+i=1
+
+and hence we have
+M
+
+λi = 1 − λM+1
+
+(72)
+
+i=1
+
+Then using (69) we see that the quantities ηi satisfy the property
+
+M
+
+1
+
+M
+
+i=1 ηi = 1 − λM+1 i=1 λi = 1.
+
+(73)
+
+Thus we can apply the result (1.115) at order M and so (70) becomes
+
+M +1
+
+f
+
+λixi
+
+i=1
+
+M
+
+M +1
+
+λM+1f (xM+1) + (1 − λM+1) ηif (xi) =
+
+λif (xi) (74)
+
+i=1
+
+i=1
+
+where we have made use of (69).
+
+1.39 From Table 1.3 we obtain the marginal probabilities by summation and the conditional probabilities by normalization, to give
+
+x 0 2/3 1 1/3
+p(x)
+
+y 01 1/3 2/3
+p(y) y 01
+x 0 1/2 1/2 10 1 p(y|x)
+
+y 01 x 0 1 1/2 1 0 1/2 p(x|y)
+
+Figure 2 Diagram showing the relationship between marginal, conditional and joint entropies and the mutual information.
+
+Solution 1.40
+
+27
+
+H[x, y]
+
+H[x|y] I[x, y] H[y|x]
+
+H [x]
+
+H [x]
+
+From these tables, together with the deﬁnitions
+
+H(x) = − p(xi) ln p(xi)
+
+(75)
+
+i
+
+H(x|y) = −
+
+p(xi, yj) ln p(xi|yj)
+
+(76)
+
+ij
+
+and similar deﬁnitions for H(y) and H(y|x), we obtain the following results
+
+(a)
+
+H (x)
+
+=
+
+ln
+
+3
+
+−
+
+2 3
+
+ln
+
+2
+
+(b)
+
+H (y)
+
+=
+
+ln
+
+3
+
+−
+
+2 3
+
+ln
+
+2
+
+(c)
+
+H (y|x)
+
+=
+
+2 3
+
+ln 2
+
+(d)
+
+H (x|y)
+
+=
+
+2 3
+
+ln 2
+
+(e) H(x, y) = ln 3
+
+(f)
+
+I (x;
+
+y)
+
+=
+
+ln
+
+3
+
+−
+
+4 3
+
+ln
+
+2
+
+where we have used (1.121) to evaluate the mutual information. The corresponding diagram is shown in Figure 2.
+
+1.40 The arithmetic and geometric means are deﬁned as
+
+1K
+
+x¯A = K
+
+xk and x¯G =
+
+k
+
+K
+xk
+k
+
+1/K
+,
+
+respectively. Taking the logarithm of x¯A and x¯G, we see that
+
+1K ln x¯A = ln K xk
+k
+
+1K and ln x¯G = K ln xk.
+k
+
+By matching f with ln and λi with 1/K in (1.115), taking into account that the logarithm is concave rather than convex and the inequality therefore goes the other way, we obtain the desired result.
+
+28
+
+Solutions 1.41–2.2
+
+1.41 From the product rule we have p(x, y) = p(y|x)p(x), and so (1.120) can be written as
+
+I(x; y) = − p(x, y) ln p(y) dx dy + p(x, y) ln p(y|x) dx dy
+
+= − p(y) ln p(y) dy + p(x, y) ln p(y|x) dx dy
+
+= H(y) − H(y|x).
+
+(77)
+
+Chapter 2 Probability Distributions
+
+2.1 From the deﬁnition (2.2) of the Bernoulli distribution we have
+p(x|µ) = p(x = 0|µ) + p(x = 1|µ)
+x∈{0,1}
+= (1 − µ) + µ = 1 xp(x|µ) = 0.p(x = 0|µ) + 1.p(x = 1|µ) = µ
+x∈{0,1}
+(x − µ)2p(x|µ) = µ2p(x = 0|µ) + (1 − µ)2p(x = 1|µ)
+x∈{0,1}
+= µ2(1 − µ) + (1 − µ)2µ = µ(1 − µ).
+The entropy is given by
+
+H[x] = −
+
+p(x|µ) ln p(x|µ)
+
+x∈{0,1}
+
+=−
+
+µx(1 − µ)1−x {x ln µ + (1 − x) ln(1 − µ)}
+
+x∈{0,1}
+
+= −(1 − µ) ln(1 − µ) − µ ln µ.
+
+2.2 The normalization of (2.261) follows from
+
+p(x = +1|µ) + p(x = −1|µ) =
+
+1+µ 2
+
++
+
+1−µ 2
+
+= 1.
+
+The mean is given by
+
+1+µ
+
+1−µ
+
+E[x] =
+
+−
+
+= µ.
+
+2
+
+2
+
+Solution 2.3
+
+29
+
+To evaluate the variance we use
+
+E[x2] = 1 − µ + 1 + µ = 1
+
+2
+
+2
+
+from which we have
+
+var[x] = E[x2] − E[x]2 = 1 − µ2.
+
+Finally the entropy is given by
+
+x=+1
+
+H[x] = − p(x|µ) ln p(x|µ)
+
+x=−1
+
+= − 1 − µ ln 1 − µ − 1 + µ ln 1 + µ .
+
+2
+
+2
+
+2
+
+2
+
+2.3 Using the deﬁnition (2.10) we have
+
+N
+
+N
+
+n + n−1
+
+N!
+
+N!
+
+= n!(N − n)! + (n − 1)!(N + 1 − n)!
+
+(N + 1 − n)N ! + nN !
+
+(N + 1)!
+
+=
+
+n!(N + 1 − n)! = n!(N + 1 − n)!
+
+= N +1 .
+
+(78)
+
+n
+
+To prove the binomial theorem (2.263) we note that the theorem is trivially true for N = 0. We now assume that it holds for some general value N and prove its correctness for N + 1, which can be done as follows
+
+N
+(1 + x)N+1 = (1 + x)
+
+N xn
+
+n
+
+n=0
+
+=
+
+N
+
+N
+
+N +1
+xn +
+
+N
+
+xn
+
+n
+
+n−1
+
+n=0
+
+n=1
+
+=
+
+N
+
+N
+x0 +
+
+N
+
+N
+
++
+
+xn + N xN+1
+
+0
+
+n
+
+n−1
+
+N
+
+n=1
+
+= N + 1 x0 + N N + 1 xn + N + 1 xN+1
+
+0
+
+n
+
+N +1
+
+n=1
+
+= N+1 N + 1 xn
+
+(79)
+
+n
+
+n=0
+
+30
+
+Solutions 2.4–2.5
+
+which completes the inductive proof. Finally, using the binomial theorem, the normalization condition (2.264) for the binomial distribution gives
+
+N
+
+N
+
+µn(1 − µ)N−n
+
+=
+
+N
+(1 − µ)N
+
+N
+
+n
+
+n
+
+n=0
+
+n=0
+
+µn 1−µ
+
+= (1 − µ)N 1 + µ
+
+N
+=1
+
+(80)
+
+1−µ
+
+as required.
+
+2.4 Differentiating (2.264) with respect to µ we obtain
+
+N N µn(1 − µ)N−n n − (N − n) = 0.
+
+n
+
+µ (1 − µ)
+
+n=1
+
+Multiplying through by µ(1 − µ) and re-arranging we obtain (2.11). If we differentiate (2.264) twice with respect to µ we obtain
+
+N N µn(1 − µ)N−n n
+n=1
+
+n (N − n) 2 n (N − n) µ − (1 − µ) − µ2 − (1 − µ)2 = 0.
+
+We now multiply through by µ2(1 − µ)2 and re-arrange, making use of the result (2.11) for the mean of the binomial distribution, to obtain
+
+E[n2] = N µ(1 − µ) + N 2µ2.
+
+Finally, we use (1.40) to obtain the result (2.12) for the variance.
+
+2.5 Making the change of variable t = y + x in (2.266) we obtain
+
+∞
+
+∞
+
+Γ(a)Γ(b) =
+
+xa−1
+
+exp(−t)(t − x)b−1 dt dx.
+
+(81)
+
+0
+
+x
+
+We now exchange the order of integration, taking care over the limits of integration
+
+∞t
+
+Γ(a)Γ(b) =
+
+xa−1 exp(−t)(t − x)b−1 dx dt.
+
+(82)
+
+00
+
+The change in the limits of integration in going from (81) to (82) can be understood by reference to Figure 3. Finally we change variables in the x integral using x = tµ to give
+
+Γ(a)Γ(b) =
+
+∞
+
+1
+
+exp(−t)ta−1tb−1t dt µa−1(1 − µ)b−1 dµ
+
+0
+
+0
+
+1
+
+= Γ(a + b) µa−1(1 − µ)b−1 dµ.
+
+(83)
+
+0
+
+Figure 3 Plot of the region of integration of (81) in (x, t) space.
+t
+
+Solutions 2.6–2.7
+
+31
+
+t=x
+
+x
+
+2.6 From (2.13) the mean of the beta distribution is given by
+
+E[µ] = 1 Γ(a + b) µ(a+1)−1(1 − µ)b−1 dµ. 0 Γ(a)Γ(b)
+Using the result (2.265), which follows directly from the normalization condition for the Beta distribution, we have
+
+E[µ]
+
+=
+
+Γ(a + b) Γ(a)Γ(b)
+
+Γ(a + 1 + b) Γ(a + 1)Γ(b)
+
+=
+
+a
+
+a +
+
+b
+
+where we have used the property Γ(x + 1) = xΓ(x). We can ﬁnd the variance in the same way, by ﬁrst showing that
+
+E[µ2] = Γ(a + b) 1 Γ(a + 2 + b) µ(a+2)−1(1 − µ)b−1 dµ Γ(a)Γ(b) 0 Γ(a + 2)Γ(b)
+
+Γ(a + b) Γ(a + 2 + b)
+
+a
+
+a+1
+
+= Γ(a)Γ(b) Γ(a + 2)Γ(b) = (a + b) (a + 1 + b) .
+
+(84)
+
+Now we use the result (1.40), together with the result (2.15) to derive the result (2.16) for var[µ]. Finally, we obtain the result (2.269) for the mode of the beta distribution simply by setting the derivative of the right hand side of (2.13) with respect to µ to zero and re-arranging.
+
+2.7 NOTE: In PRML, the exercise text contains a typographical error. On the third line, “mean value of x” should be “mean value of µ”.
+Using the result (2.15) for the mean of a Beta distribution we see that the prior mean is a/(a + b) while the posterior mean is (a + n)/(a + b + n + m). The maximum likelihood estimate for µ is given by the relative frequency n/(n+m) of observations
+
+32
+
+Solutions 2.8–2.9
+
+of x = 1. Thus the posterior mean will lie between the prior mean and the maximum
+
+likelihood solution provided the following equation is satisﬁed for λ in the interval
+
+(0, 1)
+
+λ a + (1 − λ) n =
+
+a+n .
+
+a+b
+
+n+m a+b+n+m
+
+which represents a convex combination of the prior mean and the maximum likeli-
+
+hood estimator. This is a linear equation for λ which is easily solved by re-arranging
+
+terms to give
+
+λ=
+
+1
+
+.
+
+1 + (n + m)/(a + b)
+
+Since a > 0, b > 0, n > 0, and m > 0, it follows that the term (n + m)/(a + b) lies in the range (0, ∞) and hence λ must lie in the range (0, 1).
+
+2.8 To prove the result (2.270) we use the product rule of probability
+
+Ey [Ex[x|y]] =
+
+xp(x|y) dx p(y) dy
+
+=
+
+xp(x, y) dx dy = xp(x) dx = Ex[x]. (85)
+
+For the result (2.271) for the conditional variance we make use of the result (1.40), as well as the relation (85), to give
+
+Ey [varx[x|y]] + vary [Ex[x|y]] = Ey Ex[x2|y] − Ex[x|y]2 +Ey Ex[x|y]2 − Ey [Ex[x|y]]2
+= Ex[x2] − Ex[x]2 = varx[x]
+
+where we have made use of Ey [Ex[x2|y]] = Ex[x2] which can be proved by analogy with (85).
+
+2.9 When we integrate over µM−1 the lower limit of integration is 0, while the upper
+
+limit is 1 −
+
+M −2 j=1
+
+µj
+
+since
+
+the
+
+remaining
+
+probabilities
+
+must
+
+sum
+
+to
+
+one
+
+(see
+
+Fig-
+
+ure 2.4). Thus we have
+
+pM−1(µ1, . . . , µM−2) =
+
+M −2
+
+= CM
+
+µαk k−1
+
+k=1
+
+1− 0
+1− 0
+
+M −2 j=1
+
+µj
+
+pM (µ1, . . . , µM−1) dµM−1
+
+µ M −2
+j=1
+
+µj
+
+αM −1 −1 M −1
+
+M −1
+1 − µj
+j=1
+
+αM −1
+dµM −1 .
+
+In order to make the limits of integration equal to 0 and 1 we change integration variable from µM−1 to t using
+
+µM−1 = t
+
+M −2
+1 − µj
+j=1
+
+Solution 2.10
+
+33
+
+which gives
+
+pM−1(µ1, . . . , µM−2)
+
+M −2
+
+= CM
+
+µαk k−1
+
+k=1
+
+M −2
+
+= CM
+
+µαk k−1
+
+k=1
+
+M −2
+1 − µj
+j=1
+M −2
+1 − µj
+j=1
+
+αM−1+αM −1
+
+1
+tαM−1−1(1 − t)αM −1 dt
+0
+
+αM−1+αM −1
+Γ(αM−1)Γ(αM )
+Γ(αM−1 + αM )
+
+(86)
+
+where we have used (2.265). The right hand side of (86) is seen to be a normalized
+Dirichlet distribution over M −1 variables, with coefﬁcients α1, . . . , αM−2, αM−1+ αM , (note that we have effectively combined the ﬁnal two categories) and we can identify its normalization coefﬁcient using (2.38). Thus
+
+CM
+
+=
+
+Γ(α1 + . . . + αM )
+
+· Γ(αM−1 + αM )
+
+Γ(α1) . . . Γ(αM−2)Γ(αM−1 + αM ) Γ(αM−1)Γ(αM )
+
+= Γ(α1 + . . . + αM )
+
+(87)
+
+Γ(α1) . . . Γ(αM )
+
+as required.
+
+2.10 Using the fact that the Dirichlet distribution (2.38) is normalized we have
+
+M
+µαk k−1
+k=1
+
+dµ
+
+=
+
+Γ(α1) · · · Γ(αM ) Γ(α0)
+
+(88)
+
+where dµ denotes the integral over the (M − 1)-dimensional simplex deﬁned by 0 µk 1 and k µk = 1. Now consider the expectation of µj which can be written
+
+E[µj ]
+
+=
+
+Γ(α0) Γ(α1) · · · Γ(αM )
+
+M
+
+µj
+
+µαk k−1 dµ
+
+k=1
+
+=
+
+Γ(α0)
+
+· Γ(α1) · · · Γ(αj + 1) · · · Γ(αM ) = αj
+
+Γ(α1) · · · Γ(αM )
+
+Γ(α0 + 1)
+
+α0
+
+where we have made use of (88), noting that the effect of the extra factor of µj is to increase the coefﬁcient αj by 1, and then made use of Γ(x + 1) = xΓ(x). By similar reasoning we have
+
+var[µj ]
+
+=
+
+E[µ2j ]
+
+−
+
+E[µj ]2
+
+=
+
+αj (αj α0(α0
+
++ 1) + 1)
+
+−
+
+αj2 α02
+
+=
+
+αj(α0 − αj) α02(α0 + 1)
+
+.
+
+34
+
+Solution 2.11
+
+Likewise, for j ̸= l we have
+
+cov[µj µl ]
+
+=
+
+E[µj µl ]
+
+−
+
+E[µj ]E[µl ]
+
+=
+
+αj αl α0(α0 +
+
+1)
+
+−
+
+αj α0
+
+αl α0
+
+=
+
+−
+
+αj αl α02(α0 +
+
+1)
+
+.
+
+2.11 We ﬁrst of all write the Dirichlet distribution (2.38) in the form
+
+M
+Dir(µ|α) = K(α) µαk k−1
+k=1
+
+where
+
+K(α) =
+
+Γ(α0)
+
+.
+
+Γ(α1) · · · Γ(αM )
+
+Next we note the following relation
+
+∂ ∂αj
+
+M
+µαk k−1
+k=1
+
+=
+
+∂M
+
+∂αj
+
+exp ((αk
+k=1
+
+−
+
+1) ln µk)
+
+M
+
+=
+
+ln µj exp {(αk − 1) ln µk}
+
+k=1
+
+M
+
+= ln µj
+
+µαk k−1
+
+k=1
+
+from which we obtain
+
+1
+
+1
+
+M
+
+E[ln µj] = K(α) · · · ln µj µαk k−1 dµ1 . . . dµM
+
+0
+
+0
+
+k=1
+
+=
+
+∂ K (α)
+∂αj
+
+1
+
+1M
+
+···
+
+µαk k−1 dµ1 . . . dµM
+
+0
+
+0 k=1
+
+∂1 = K(α)
+∂µj K(α)
+
+∂ = − ln K(α).
+∂µj
+
+Finally, using the expression for K(α), together with the deﬁnition of the digamma function ψ(·), we have
+E[ln µj] = ψ(αj) − ψ(α0).
+
+Solutions 2.12–2.13
+
+35
+
+2.12 The normalization of the uniform distribution is proved trivially
+
+b1
+
+b−a
+
+dx =
+
+= 1.
+
+a b−a
+
+b−a
+
+For the mean of the distribution we have
+
+b1
+
+x2 b b2 − a2 a + b
+
+E[x] =
+
+x dx =
+
+=
+
+=
+
+.
+
+a b−a
+
+2(b − a) a 2(b − a)
+
+2
+
+The variance can be found by ﬁrst evaluating
+
+E[x2] =
+
+b 1 x2 dx = a b−a
+
+x3 b b3 − a3 a2 + ab + b2
+
+=
+
+=
+
+3(b − a) a 3(b − a)
+
+3
+
+and then using (1.40) to give
+
+var[x]
+
+=
+
+E[x2] − E[x]2
+
+=
+
+a2
+
++ ab + b2
+
+−
+
+(a + b)2
+
+=
+
+(b − a)2 .
+
+3
+
+4
+
+12
+
+2.13 Note that this solution is the multivariate version of Solution 1.30. From (1.113) we have
+
+KL(p∥q) = − p(x) ln q(x) dx + p(x) ln p(x) dx.
+
+Using (2.43), (2.57), (2.59) and (2.62), we can rewrite the ﬁrst integral on the r.h.s. of () as
+
+− p(x) ln q(x) dx
+
+=
+
+N (x|µ, Σ2) 1 D ln(2π) + ln |L| + (x − m)TL−1(x − m) dx
+
+2
+
+= 1 D ln(2π) + ln |L| + Tr[L−1(µµT + Σ)] 2
+
+−µL−1m − mTL−1µ + mTL−1m .
+
+(89)
+
+The second integral on the r.h.s. of () we recognize from (1.104) as the negative differential entropy of a multivariate Gaussian. Thus, from (), (89) and (B.41), we have
+KL(p∥q) = 1 ln |L| + Tr[L−1(µµT + Σ)] 2 |Σ|
+− µTL−1m − mTL−1µ + mTL−1m − D
+
+36
+
+Solution 2.14
+
+2.14 As for the univariate Gaussian considered in Section 1.6, we can make use of Lagrange multipliers to enforce the constraints on the maximum entropy solution. Note that we need a single Lagrange multiplier for the normalization constraint (2.280), a D-dimensional vector m of Lagrange multipliers for the D constraints given by (2.281), and a D × D matrix L of Lagrange multipliers to enforce the D2 constraints represented by (2.282). Thus we maximize
+
+H[p] = − p(x) ln p(x) dx + λ p(x) dx − 1
+
++mT p(x)x dx − µ
+
++Tr L p(x)(x − µ)(x − µ)T dx − Σ .
+
+(90)
+
+By functional differentiation (Appendix D) the maximum of this functional with respect to p(x) occurs when
+0 = −1 − ln p(x) + λ + mTx + Tr{L(x − µ)(x − µ)T}.
+
+Solving for p(x) we obtain
+
+p(x) = exp λ − 1 + mTx + (x − µ)TL(x − µ) .
+
+(91)
+
+We now ﬁnd the values of the Lagrange multipliers by applying the constraints. First we complete the square inside the exponential, which becomes
+
+λ−1+
+
+x − µ + 1 L−1m
+
+T
+L
+
+x − µ + 1 L−1m
+
++ µTm − 1 mTL−1m.
+
+2
+
+2
+
+4
+
+We now make the change of variable y = x − µ + 1 L−1m. 2
+The constraint (2.281) then becomes
+
+exp λ − 1 + yTLy + µTm − 1 mTL−1m y + µ − 1 L−1m dy = µ.
+
+4
+
+2
+
+In the ﬁnal parentheses, the term in y vanishes by symmetry, while the term in µ simply integrates to µ by virtue of the normalization constraint (2.280) which now takes the form
+exp λ − 1 + yTLy + µTm − 1 mTL−1m dy = 1. 4
+
+and hence we have
+
+− 1 L−1m = 0 2
+
+Solutions 2.15–2.16
+
+37
+
+where again we have made use of the constraint (2.280). Thus m = 0 and so the density becomes
+p(x) = exp λ − 1 + (x − µ)TL(x − µ) .
+Substituting this into the ﬁnal constraint (2.282), and making the change of variable x − µ = z we obtain
+exp λ − 1 + zTLz zzT dx = Σ.
+
+Applying
+
+an
+
+analogous
+
+argument
+
+to
+
+that
+
+used
+
+to
+
+derive
+
+(2.64)
+
+we
+
+obtain
+
+L
+
+=
+
+−
+
+1 2
+
+Σ.
+
+Finally, the value of λ is simply that value needed to ensure that the Gaussian distri-
+
+bution is correctly normalized, as derived in Section 2.3, and hence is given by
+
+1
+
+1
+
+λ − 1 = ln (2π)D/2 |Σ|1/2 .
+
+2.15 From the deﬁnitions of the multivariate differential entropy (1.104) and the multivariate Gaussian distribution (2.43), we get
+
+H[x] = − N (x|µ, Σ) ln N (x|µ, Σ) dx
+
+=
+
+1 N (x|µ, Σ)
+
+D ln(2π) + ln |Σ| + (x − µ)TΣ−1(x − µ)
+
+dx
+
+2
+
+= 1 D ln(2π) + ln |Σ| + Tr Σ−1Σ 2 1
+= (D ln(2π) + ln |Σ| + D) 2
+
+2.16
+
+We we
+
+have also
+
+p(x1) = N (x1|µ1, τ1−1) and have p(x|x2) = N (x|µ1 +
+
+p(x2) = x2, τ1−1).
+
+N (x2|µ2, We now
+
+τ2−1). Since x = x1 + x2 evaluate the convolution
+
+integral given by (2.284) which takes the form
+
+p(x) =
+
+τ1 1/2 2π
+
+τ2 2π
+
+1/2
+
+∞
+exp
+−∞
+
+− τ1 2
+
+(x
+
+−
+
+µ1
+
+−
+
+x2)2
+
+−
+
+τ2 2
+
+(x2
+
+−
+
+µ2)2
+
+dx2. (92)
+
+Since the ﬁnal result will be a Gaussian distribution for p(x) we need only evaluate
+
+its precision, since, from (1.110), the entropy is determined by the variance or equiv-
+
+alently the precision, and is independent of the mean. This allows us to simplify the
+
+calculation by ignoring such things as normalization constants.
+
+We begin by considering the terms in the exponent of (92) which depend on x2 which are given by
+
+−
+
+1 2
+
+x22(τ1
+
++
+
+τ2)
+
++
+
+x2
+
+{τ1(x
+
+−
+
+µ1)
+
++
+
+τ2µ2}
+
+=
+
+1 − 2 (τ1 + τ2)
+
+x2
+
+−
+
+τ1(x
+
+− µ1) + τ1 + τ2
+
+τ2µ2
+
+2 + {τ1(x − µ1) + τ2µ2}2 2(τ1 + τ2)
+
+38
+
+Solutions 2.17–2.18
+
+where we have completed the square over x2. When we integrate out x2, the ﬁrst term on the right hand side will simply give rise to a constant factor independent of x. The second term, when expanded out, will involve a term in x2. Since the precision of x is given directly in terms of the coefﬁcient of x2 in the exponent, it is only such terms that we need to consider. There is one other term in x2 arising from
+the original exponent in (92). Combining these we have
+
+− τ1 x2 +
+
+τ12
+
+x2 = − 1 τ1τ2 x2
+
+2
+
+2(τ1 + τ2)
+
+2 τ1 + τ2
+
+from which we see that x has precision τ1τ2/(τ1 + τ2). We can also obtain this result for the precision directly by appealing to the general result (2.115) for the convolution of two linear-Gaussian distributions.
+The entropy of x is then given, from (1.110), by
+
+1 H[x] = ln
+
+2π(τ1 + τ2)
+
+.
+
+2
+
+τ1τ2
+
+2.17 We can use an analogous argument to that used in the solution of Exercise 1.14.
+Consider a general square matrix Λ with elements Λij. Then we can always write Λ = ΛA + ΛS where
+
+ΛSij
+
+=
+
+Λij
+
++ 2
+
+Λji ,
+
+ΛAij
+
+=
+
+Λij
+
+− 2
+
+Λji
+
+(93)
+
+and it is easily veriﬁed that ΛS is symmetric so that ΛSij = ΛSji, and ΛA is antisym-
+metric so that ΛAij = −ΛSji. The quadratic form in the exponent of a D-dimensional multivariate Gaussian distribution can be written
+
+1D D
+
+2
+
+(xi − µi)Λij(xj − µj)
+
+(94)
+
+i=1 j=1
+
+where Λ = Σ−1 is the precision matrix. When we substitute Λ = ΛA + ΛS into (94) we see that the term involving ΛA vanishes since for every positive term there
+is an equal and opposite negative term. Thus we can always take Λ to be symmetric.
+
+2.18
+
+We start by pre-multiplying both sides of (2.45) by u†i , the conjugate transpose of
+
+ui. This gives us
+
+u†i Σui = λiu†i ui.
+
+(95)
+
+Next consider the conjugate transpose of (2.45) and post-multiply it by ui, which
+
+gives us
+
+u†i Σ†ui = λ∗i u†i ui.
+
+(96)
+
+where λ∗i is the complex conjugate of λi. We now subtract (95) from (96) and use the fact the Σ is real and symmetric and hence Σ = Σ†, to get
+
+0 = (λ∗i − λi)u†i ui.
+
+Solution 2.19
+
+39
+
+Hence λ∗i = λi and so λi must be real. Now consider
+uTi uj λj = uTi Σuj = uTi ΣTuj = (Σui)T uj = λiuTi uj ,
+where we have used (2.45) and the fact that Σ is symmetric. If we assume that 0 ̸= λi ̸= λj ̸= 0, the only solution to this equation is that uTi uj = 0, i.e., that ui and uj are orthogonal. If 0 ̸= λi = λj ̸= 0, any linear combination of ui and uj will be an eigenvector with eigenvalue λ = λi = λj, since, from (2.45),
+Σ(aui + buj) = aλiui + bλjuj = λ(aui + buj).
+Assuming that ui ̸= uj, we can construct
+uα = aui + buj uβ = cui + duj
+
+such that uα and uβ are mutually orthogonal and of unit length. Since ui and uj are orthogonal to uk (k ̸= i, k ̸= j), so are uα and uβ. Thus, uα and uβ satisfy (2.46).
+Finally, if λi = 0, Σ must be singular, with ui lying in the nullspace of Σ. In this case, ui will be orthogonal to the eigenvectors projecting onto the rowspace of Σ and we can chose ∥ui∥ = 1, so that (2.46) is satisﬁed. If more than one eigenvalue equals zero, we can chose the corresponding eigenvectors arbitrily, as long as they remain in the nullspace of Σ, and so we can chose them to satisfy (2.46).
+
+2.19 We can write the r.h.s. of (2.48) in matrix form as
+
+D
+λiuiuTi = UΛUT = M,
+i=1
+
+where U is a D × D matrix with the eigenvectors u1, . . . , uD as its columns and Λ is a diagonal matrix with the eigenvalues λ1, . . . , λD along its diagonal.
+
+Thus we have
+
+UTMU = UTUΛUTU = Λ.
+
+However, from (2.45)–(2.47), we also have that
+
+UTΣU = UTΛU = UTUΛ = Λ,
+
+40
+
+Solutions 2.20–2.22
+
+and so M = Σ and (2.48) holds. Moreover, since U is orthonormal, U−1 = UT and so
+
+D
+
+Σ−1 = UΛUT −1 = UT −1 Λ−1U−1 = UΛ−1UT =
+
+λiuiuTi .
+
+i=1
+
+2.20 Since u1, . . . , uD constitute a basis for RD, we can write
+
+a = aˆ1u1 + aˆ2u2 + . . . + aˆDuD,
+
+where aˆ1, . . . , aˆD are coefﬁcients obtained by projecting a on u1, . . . , uD. Note that they typically do not equal the elements of a.
+Using this we can write
+
+aTΣa = aˆ1uT1 + . . . + aˆDuTD Σ (aˆ1u1 + . . . + aˆDuD)
+
+and combining this result with (2.45) we get
+
+aˆ1uT1 + . . . + aˆDuTD (aˆ1λ1u1 + . . . + aˆDλDuD) .
+
+Now, since uTi uj = 1 only if i = j, and 0 otherwise, this becomes aˆ21λ1 + . . . + aˆ2DλD
+
+and since a is real, we see that this expression will be strictly positive for any nonzero a, if all eigenvalues are strictly positive. It is also clear that if an eigenvalue, λi, is zero or negative, there exist a vector a (e.g. a = ui), for which this expression will be less than or equal to zero. Thus, that a matrix has eigenvectors which are all strictly positive is a sufﬁcient and necessary condition for the matrix to be positive deﬁnite.
+
+2.21 A D × D matrix has D2 elements. If it is symmetric then the elements not on the leading diagonal form pairs of equal value. There are D elements on the diagonal so the number of elements not on the diagonal is D2 − D and only half of these are independent giving D2 − D . 2
+If we now add back the D elements on the diagonal we get
+
+D2 − D
+
+D(D + 1)
+
++D =
+
+.
+
+2
+
+2
+
+2.22 Consider a matrix M which is symmetric, so that MT = M. The inverse matrix M−1 satisﬁes MM−1 = I.
+
+Solutions 2.23–2.24
+
+41
+
+Taking the transpose of both sides of this equation, and using the relation (C.1), we
+
+obtain
+
+M−1 T MT = IT = I
+
+since the identity matrix is symmetric. Making use of the symmetry condition for
+
+M we then have
+
+M−1 T M = I
+
+and hence, from the deﬁnition of the matrix inverse,
+
+M−1 T = M−1
+
+and so M−1 is also a symmetric matrix.
+
+2.23 Recall that the transformation (2.51) diagonalizes the coordinate system and that
+the quadratic form (2.44), corresponding to the square of the Mahalanobis distance,
+is then given by (2.50). This corresponds to a shift in the origin of the coordinate
+system and a rotation so that the hyper-ellipsoidal contours along which the Maha-
+lanobis distance is constant become axis aligned. The volume contained within any
+one such contour is unchanged by shifts and rotations. We now make the further transformation zi = λ1i/2yi for i = 1, . . . , D. The volume within the hyper-ellipsoid then becomes
+
+D
+
+D
+
+dyi = λ1i /2
+
+i=1
+
+i=1
+
+D
+dzi = |Σ|1/2VD∆D
+i=1
+
+where we have used the property that the determinant of Σ is given by the product
+of its eigenvalues, together with the fact that in the z coordinates the volume has become a sphere of radius ∆ whose volume is VD∆D.
+
+2.24 Multiplying the left hand side of (2.76) by the matrix (2.287) trivially gives the identity matrix. On the right hand side consider the four blocks of the resulting partitioned matrix:
+
+upper left
+
+AM − BD−1CM = (A − BD−1C)(A − BD−1C)−1 = I
+
+upper right
+−AMBD−1 + BD−1 + BD−1CMBD−1 = −(A − BD−1C)(A − BD−1C)−1BD−1 + BD−1 = −BD−1 + BD−1 = 0
+
+lower left
+
+CM − DD−1CM = CM − CM = 0
+
+42
+
+Solutions 2.25–2.28
+
+lower right −CMBD−1 + DD−1 + DD−1CMBD−1 = DD−1 = I.
+
+Thus the right hand side also equals the identity matrix.
+2.25 We ﬁrst of all take the joint distribution p(xa, xb, xc) and marginalize to obtain the distribution p(xa, xb). Using the results of Section 2.3.2 this is again a Gaussian distribution with mean and covariance given by
+
+µ=
+
+µa µb
+
+,
+
+Σ=
+
+Σaa Σba
+
+Σab Σbb
+
+.
+
+From Section 2.3.1 the distribution p(xa, xb) is then Gaussian with mean and covariance given by (2.81) and (2.82) respectively.
+
+2.26 Multiplying the left hand side of (2.289) by (A + BCD) trivially gives the identity matrix I. On the right hand side we obtain
+
+(A + BCD)(A−1 − A−1B(C−1 + DA−1B)−1DA−1) = I + BCDA−1 − B(C−1 + DA−1B)−1DA−1 −BCDA−1B(C−1 + DA−1B)−1DA−1 = I + BCDA−1 − BC(C−1 + DA−1B)(C−1 + DA−1B)−1DA−1 = I + BCDA−1 − BCDA−1 = I
+
+2.27 From y = x + z we have trivially that E[y] = E[x] + E[z]. For the covariance we have
+
+cov[y] = E (x − E[x] + y − E[y])(x − E[x] + y − E[y])T = E (x − E[x])(x − E[x])T + E (y − E[y])(y − E[y])T + E (x − E[x])(y − E[y])T + E (y − E[y])(x − E[x])T
+
+=0
+
+=0
+
+= cov[x] + cov[z]
+
+where we have used the independence of x and z, together with E [(x − E[x])] = E [(z − E[z])] = 0, to set the third and fourth terms in the expansion to zero. For 1-dimensional variables the covariances become variances and we obtain the result of Exercise 1.10 as a special case.
+
+2.28 For the marginal distribution p(x) we see from (2.92) that the mean is given by the upper partition of (2.108) which is simply µ. Similarly from (2.93) we see that the covariance is given by the top left partition of (2.105) and is therefore given by Λ−1. Now consider the conditional distribution p(y|x). Applying the result (2.81) for the conditional mean we obtain
+µy|x = Aµ + b + AΛ−1Λ(x − µ) = Ax + b.
+
+Solutions 2.29–2.30
+
+43
+
+Similarly applying the result (2.82) for the covariance of the conditional distribution we have
+cov[y|x] = L−1 + AΛ−1AT − AΛ−1ΛΛ−1AT = L−1
+
+as required.
+
+2.29 We ﬁrst deﬁne
+
+X = Λ + ATLA
+
+(97)
+
+and
+
+W = −LA, and thus WT = −ATLT = −ATL,
+
+(98)
+
+since L is symmetric. We can use (97) and (98) to re-write (2.104) as
+
+R=
+
+X WT WL
+
+and using (2.76) we get
+
+X WT WL
+
+−1
+=
+
+M
+
+−MWTL−1
+
+−L−1WM L−1 + L−1WMWTL−1
+
+where now
+
+M = X − WTL−1W −1 .
+
+Substituting X and W using (97) and (98), respectively, we get
+
+M = Λ + ATLA − ATLL−1LA −1 = Λ−1,
+
+−MWTL−1 = Λ−1ATLL−1 = Λ−1AT and
+L−1 + L−1WMWTL−1 = L−1 + L−1LAΛ−1ATLL−1 = L−1 + AΛ−1AT,
+
+as required.
+
+2.30 Substituting the leftmost expression of (2.105) for R−1 in (2.107), we get
+
+Λ−1 AΛ−1
+
+Λ−1AT S−1 + AΛ−1AT
+
+Λµ − ATSb Sb
+
+=
+
+Λ−1 Λµ − ATSb + Λ−1ATSb AΛ−1 Λµ − ATSb + S−1 + AΛ−1AT Sb
+
+=
+
+µ − Λ−1ATSb + Λ−1ATSb Aµ − AΛ−1ATSb + b + AΛ−1ATSb
+
+=
+
+µ Aµ − b
+
+44
+
+Solutions 2.31–2.32
+
+2.31 Since y = x + z we can write the conditional distribution of y given x in the form
+
+p(y|x) = N (y|µz + x, Σz). This gives a decomposition of the joint distribution
+
+of x and y in the form p(x, y) = p(y|x)p(x) where p(x) = N (x|µx, Σx). This
+
+therefore takes the form Λ−1 → Σx, A → I, b
+
+of (2.99) and (2.100) in → µz and L−1 → Σz.
+
+which we can identify µ → µx, We can now obtain the marginal
+
+distribution p(y) by making use of the result (2.115) from which we obtain p(y) =
+
+N (y|µx + µz, Σz + Σx). Thus both the means and the covariances are additive, in agreement with the results of Exercise 2.27.
+
+2.32 The quadratic form in the exponential of the joint distribution is given by
+
+− 1 (x
+
+−
+
+µ)TΛ(x
+
+−
+
+µ)
+
+−
+
+1 (y
+
+−
+
+Ax
+
+−
+
+b)TL(y
+
+−
+
+Ax
+
+−
+
+b).
+
+(99)
+
+2
+
+2
+
+We now extract all of those terms involving x and assemble them into a standard Gaussian quadratic form by completing the square
+
+= − 1 xT(Λ + ATLA)x + xT Λµ + ATL(y − b) + const 2
+= − 1 (x − m)T(Λ + ATLA)(x − m) 2
++ 1 mT(Λ + ATLA)m + const 2
+
+(100)
+
+where
+
+m = (Λ + ATLA)−1 Λµ + ATL(y − b) .
+
+We can now perform the integration over x which eliminates the ﬁrst term in (100). Then we extract the terms in y from the ﬁnal term in (100) and combine these with the remaining terms from the quadratic form (99) which depend on y to give
+
+= − 1 yT L − LA(Λ + ATLA)−1ATL y 2
++yT L − LA(Λ + ATLA)−1ATL b
++LA(Λ + ATLA)−1Λµ .
+
+(101)
+
+We can identify the precision of the marginal distribution p(y) from the second order term in y. To ﬁnd the corresponding covariance, we take the inverse of the precision and apply the Woodbury inversion formula (2.289) to give
+
+L − LA(Λ + ATLA)−1ATL −1 = L−1 + AΛ−1AT
+
+(102)
+
+which corresponds to (2.110).
+Next we identify the mean ν of the marginal distribution. To do this we make use of (102) in (101) and then complete the square to give
+
+− 1 (y − ν)T L−1 + AΛ−1AT −1 (y − ν) + const 2
+
+Solutions 2.33–2.34
+
+45
+
+where ν = L−1 + AΛ−1AT (L−1 + AΛ−1AT)−1b + LA(Λ + ATLA)−1Λµ .
+
+Now consider the two terms in the square brackets, the ﬁrst one involving b and the second involving µ. The ﬁrst of these contribution simply gives b, while the term in µ can be written
+= L−1 + AΛ−1AT LA(Λ + ATLA)−1Λµ = A(I + Λ−1ATLA)(I + Λ−1ATLA)−1Λ−1Λµ = Aµ
+
+where we have used the general result (BC)−1 = C−1B−1. Hence we obtain (2.109).
+
+2.33 To ﬁnd the conditional distribution p(x|y) we start from the quadratic form (99) corresponding to the joint distribution p(x, y). Now, however, we treat y as a constant and simply complete the square over x to give
+
+− 1 (x − µ)TΛ(x − µ) − 1 (y − Ax − b)TL(y − Ax − b)
+
+2
+
+2
+
+= − 1 xT(Λ + ATLA)x + xT {Λµ + AL(y − b)} + const 2
+
+= − 1 (x − m)T(Λ + ATLA)(x − m) 2
+
+where, as in the solution to Exercise 2.32, we have deﬁned
+
+m = (Λ + ATLA)−1 Λµ + ATL(y − b)
+
+from which we obtain directly the mean and covariance of the conditional distribution in the form (2.111) and (2.112).
+
+2.34 Differentiating (2.118) with respect to Σ we obtain two terms:
+
+− N ∂ ln |Σ| − 1 ∂
+
+2 ∂Σ
+
+2 ∂Σ
+
+N
+(xn − µ)TΣ−1(xn − µ).
+
+n=1
+
+For the ﬁrst term, we can apply (C.28) directly to get
+
+N −
+
+∂
+
+N ln |Σ| = −
+
+Σ−1
+
+T
+
+=
+
+N −
+
+Σ−1.
+
+2 ∂Σ
+
+2
+
+2
+
+For the second term, we ﬁrst re-write the sum
+
+N
+(xn − µ)TΣ−1(xn − µ) = N Tr Σ−1S ,
+n=1
+
+46
+
+Solution 2.35
+
+where
+
+S= 1 N
+
+N
+(xn − µ)(xn − µ)T.
+
+n=1
+
+Using this together with (C.21), in which x = Σij (element (i, j) in Σ), and properties of the trace we get
+
+∂ ∂Σij
+
+N
+(xn
+n=1
+
+−
+
+µ)TΣ−1(xn
+
+−
+
+µ)
+
+=
+
+N ∂ Tr Σ−1S ∂Σij
+
+= N Tr ∂ Σ−1S ∂Σij
+
+= −N Tr Σ−1 ∂Σ Σ−1S ∂Σij
+
+= −N Tr ∂Σ Σ−1SΣ−1 ∂Σij
+
+=
+
+−N
+
+Σ−1SΣ−1
+ij
+
+where we have used (C.26). Note that in the last step we have ignored the fact that Σij = Σji, so that ∂Σ/∂Σij has a 1 in position (i, j) only and 0 everywhere else. Treating this result as valid nevertheless, we get
+
+−1 ∂ 2 ∂Σ
+
+N
+
+(xn
+
+− µ)TΣ−1(xn
+
+− µ)
+
+=
+
+N Σ−1SΣ−1. 2
+
+n=1
+
+Combining the derivatives of the two terms and setting the result to zero, we obtain
+
+N Σ−1 = N Σ−1SΣ−1.
+
+2
+
+2
+
+Re-arrangement then yields
+
+Σ=S
+
+as required.
+
+2.35 NOTE: In PRML, this exercise contains a typographical error; E [xnxm] should be E xnxTm on the l.h.s. of (2.291).
+The derivation of (2.62) is detailed in the text between (2.59) (page 82) and (2.62) (page 83).
+If m = n then, using (2.62) we have E[xnxTn] = µµT + Σ, whereas if n ̸= m then the two data points xn and xm are independent and hence E[xnxm] = µµT where we have used (2.59). Combining these results we obtain (2.291). From (2.59) and
+
+Solution 2.36
+
+47
+
+(2.62) we then have
+
+1N
+
+E [ΣML] = N
+
+E
+
+n=1
+
+1N
+
+xn − N
+
+xm
+
+m=1
+
+xTn
+
+−
+
+1 N
+
+N
+
+xTl
+
+l=1
+
+=
+
+1 N
+
+N
+
+E
+
+xnxTn
+
+−
+
+2 N
+
+xn
+
+N
+
+xTm
+
++
+
+1 N2
+
+N
+
+N
+xmxTl
+
+n=1
+
+m=1
+
+m=1 l=1
+
+=
+
+µµT + Σ − 2
+
+µµT +
+
+1 Σ
+
++ µµT +
+
+1 Σ
+
+N
+
+N
+
+=
+
+N −1 Σ
+
+N
+
+(103)
+
+as required.
+
+2.36 NOTE: In the 1st printing of PRML, there are mistakes that affect this solution. The sign in (2.129) is incorrect, and this equation should read
+
+θ(N) = θ(N−1) − aN−1z(θ(N−1)).
+Then, in order to be consistent with the assumption that f (θ) > 0 for θ > θ⋆ and f (θ) < 0 for θ < θ⋆ in Figure 2.10, we should ﬁnd the root of the expected negative log likelihood. This lead to sign changes in (2.133) and (2.134), but in (2.135), these are cancelled against the change of sign in (2.129), so in effect, (2.135) remains unchanged. Also, xn should be xn on the l.h.s. of (2.133). Finally, the labels µ and µML in Figure 2.11 should be interchanged and there are corresponding changes to the caption (see errata on the PRML web site for details).
+Consider the expression for σ(2N) and separate out the contribution from observation xN to give
+
+σ(2N )
+
+=
+
+1 N
+
+N
+(xn − µ)2
+
+n=1
+
+=
+
+1 N
+
+N −1
+(xn
+
+−
+
+µ)2
+
++
+
+(xN − N
+
+µ)2
+
+n=1
+
+=
+
+N− N
+
+1 σ(2N−1)
+
++
+
+(xN − N
+
+µ)2
+
+=
+
+σ(2N −1)
+
+−
+
+1 N
+
+σ(2N
+
+−1)
+
++
+
+(xN − µ)2 N
+
+=
+
+σ(2N −1)
+
++
+
+1 N
+
+(xN − µ)2 − σ(2N−1)
+
+.
+
+(104)
+
+If we substitute the expression for a Gaussian distribution into the result (2.135) for
+
+48
+
+Solution 2.37
+
+the Robbins-Monro procedure applied to maximizing likelihood, we obtain
+
+σ(2N )
+
+=
+
+σ(2N −1)
+
++
+
+aN −1
+
+∂ ∂ σ(2N −1)
+
+−1 2
+
+ln
+
+σ(2N −1)
+
+−
+
+(xN − µ)2 2σ(2N −1)
+
+=
+
+σ(2N−1) + aN−1
+
+1 − 2σ(2N−1)
+
++
+
+(xN − µ)2 2σ(4N −1)
+
+=
+
+σ(2N −1)
+
++
+
+aN −1 2σ(4N −1)
+
+(xN − µ)2 − σ(2N−1)
+
+.
+
+Comparison of (105) with (104) allows us to identify
+
+aN −1
+
+=
+
+2σ(4N−1) . N
+
+(105)
+
+2.37 NOTE: In PRML, this exercise requires the additional assumption that we can use the known true mean, µ, in (2.122). Furthermore, for the derivation of the RobbinsMonro sequential estimation formula, we assume that the covariance matrix is restricted to be diagonal. Starting from (2.122), we have
+
+Σ(MNL)
+
+=
+
+1 N
+
+N
+
+(xn − µ) (xn − µ)T
+
+n=1
+
+=
+
+1 N
+
+N −1
+(xn
+
+−
+
+µ) (xn
+
+−
+
+µ)T
+
+n=1
+
++1 N
+
+(xN
+
+− µ) (xN
+
+− µ)T
+
+=
+
+N− N
+
+1 Σ(MNL−1)
+
++
+
+1 N
+
+(xN
+
+− µ) (xN
+
+− µ)T
+
+=
+
+Σ(MNL−1)
+
++
+
+1 N
+
+(xN − µ) (xN − µ)T − Σ(MNL−1) .
+
+(106)
+
+From Solution 2.34, we know that
+
+∂ ∂ ΣM (NL−1)
+
+ln p(xN |µ, Σ(MNL−1))
+
+=
+
+1 2
+
+ΣM (NL−1) −1
+
+(xN − µ) (xN − µ)T − Σ(MNL−1)
+
+=
+
+1 2
+
+ΣM (NL−1) −2
+
+(xN − µ) (xN − µ)T − Σ(MNL−1)
+
+Σ(MNL−1) −1
+
+where we have used the assumption that Σ(MNL−1), and hence
+
+Σ(MNL−1)
+
+−1
+, is diag-
+
+Solutions 2.38–2.39
+
+49
+
+onal. If we substitute this into the multivariate form of (2.135), we get
+
+ΣM (NL) = Σ(MNL−1) 1
++ AN−1 2
+
+ΣM (NL−1) −2
+
+(xN − µ) (xN − µ)T − ΣM (NL−1)
+
+(107)
+
+where AN−1 is a matrix of coefﬁcients corresponding to aN−1 in (2.135). By comparing (106) with (107), we see that if we choose
+
+2 AN−1 = N
+
+Σ(MNL−1)
+
+2
+.
+
+we recover (106). Note that if the covariance matrix was restricted further, to the form σ2I, i.e. a spherical Gaussian, the coefﬁcient in (107) would again become a
+scalar.
+
+2.38 The exponent in the posterior distribution of (2.140) takes the form
+
+−
+
+1 2σ02 (µ
+
+−
+
+µ0)2
+
+−
+
+1 2σ2
+
+N
+(xn
+n=1
+
+−
+
+µ)2
+
+µ2 =−
+2
+
+1N σ02 + σ2
+
++µ
+
+µ0 σ02
+
++
+
+1 σ2
+
+N
+xn
+n=1
+
++ const.
+
+where ‘const.’ denotes terms independent of µ. Following the discussion of (2.71) we see that the variance of the posterior distribution is given by
+
+Similarly the mean is given by
+
+1 N1 σN2 = σ2 + σ02 .
+
+µN =
+
+N 1 −1 σ2 + σ02
+
+µ0 σ02
+
++
+
+1 σ2
+
+N
+xn
+n=1
+
+=
+
+σ2 N σ02 +
+
+σ2
+
+µ0
+
++
+
+N σ02 N σ02 + σ2
+
+µML.
+
+(108) (109)
+
+2.39 From (2.142), we see directly that
+
+1 1 N 1 N −1 1
+
+1
+
+1
+
+σN2 = σ02 + σ2 = σ02 + σ2 + σ2 = σN2 −1 + σ2 .
+
+We also note for later use, that
+
+1 σN2
+
+=
+
+σ2 + N σ02 σ02σ2
+
+=
+
+σ2 + σN2 −1 σN2 −1σ2
+
+(110) (111)
+
+50
+
+Solution 2.39
+
+and similarly
+
+1 σN2 −1
+
+=
+
+σ2
+
++
+
+(N − σ02σ2
+
+1)σ02
+
+.
+
+(112)
+
+Using (2.143), we can rewrite (2.141) as
+
+µN
+
+=
+
+σ2 N σ02 +
+
+σ2 µ0
+
++
+
+σ02
+
+N n=1
+
+xn
+
+N σ02 + σ2
+
+=
+
+σ2µ0 + σ02 N σ02 +
+
+N −1 n=1
+
+xn
+
+σ2
+
++
+
+N
+
+σ02 σ02
+
+xN + σ2
+
+.
+
+Using (2.141), (111) and (112), we can rewrite the ﬁrst term of this expression as
+
+σN2 σ2µ0 + σ02
+
+N −1 n=1
+
+xn
+
+σN2 −1 (N − 1)σ02 + σ2
+
+=
+
+σN2 σN2 −1
+
+µN
+
+−1.
+
+Similarly, using (111), the second term can be rewritten as
+
+and so
+
+σN2 σ2
+
+xN
+
+µN
+
+=
+
+σN2 σN2 −1
+
+µN
+
+−1
+
++
+
+σN2 σ2
+
+xN
+
+.
+
+(113)
+
+Now consider
+
+p(µ|µN , σN2 ) = p(µ|µN−1, σN2 −1)p(xN |µ, σ2)
+
+= N (µ|µN−1, σN2 −1)N (xN |µ, σ2)
+
+∝ exp − 1 2
+
+µ2N −1
+
+− 2µµN−1 σN2 −1
+
++
+
+µ2
+
++
+
+x2N
+
+−
+
+2xN µ σ2
+
++
+
+µ2
+
+=
+
+exp
+
+−1 2
+
+σ2(µ2N−1 − 2µµN−1 + µ2) σN2 −1σ2
+
++
+
+σN2
+
+−1(x2N − 2xN σN2 −1σ2
+
+µ
+
++
+
+µ2)
+
+=
+
+exp
+
+−
+
+1 2
+
+(σN2 −1
+
++
+
+σ2)µ2
+
+− 2(σ2µN−1 σN2 −1σ2
+
++
+
+σN2 −1xN
+
+)µ
+
++ C,
+
+where C accounts for all the remaining terms that are independent of µ. From this, we can directly read off
+
+1 σN2
+
+=
+
+σ2 + σN2 −1 σN2 −1σ2
+
+=
+
+1 σN2 −1
+
+1 + σ2
+
+Solutions 2.40–2.41
+
+51
+
+and
+
+µN
+
+=
+
+σ2µN−1 + σN2 −1xN σN2 −1 + σ2
+
+=
+
+σ2 σN2 −1 +
+
+σ2 µN−1
+
++
+
+σN2 σN2 −1
+
+−1
++
+
+σ2
+
+xN
+
+=
+
+σN2 σN2 −1
+
+µN
+
+−1
+
++
+
+σN2 σ2
+
+xN
+
+and so we have recovered (110) and (113).
+
+2.40 The posterior distribution is proportional to the product of the prior and the likelihood function
+N
+p(µ|X) ∝ p(µ) p(xn|µ, Σ).
+n=1
+Thus the posterior is proportional to an exponential of a quadratic form in µ given by
+
+− 1 (µ 2
+
+−
+
+µ0)TΣ−0 1(µ
+
+−
+
+µ0)
+
+−
+
+1 2
+
+N
+
+(xn − µ)TΣ−1(xn − µ)
+
+n=1
+
+=
+
+− 1 µT 2
+
+Σ−0 1 + N Σ−1
+
+µ + µT
+
+N
+
+Σ−0 1µ0 + Σ−1
+
+xn
+
+n=1
+
++ const
+
+where ‘const.’ denotes terms independent of µ. Using the discussion following (2.71) we see that the mean and covariance of the posterior distribution are given by
+
+µN = Σ−0 1 + N Σ−1 −1 Σ−0 1µ0 + Σ−1N µML Σ−N1 = Σ−0 1 + N Σ−1
+
+(114) (115)
+
+where µML is the maximum likelihood solution for the mean given by
+
+1N
+
+µML = N
+
+xn.
+
+n=1
+
+2.41
+
+If we consider the integral of the Gamma distribution over τ and make the change of
+
+variable bτ = u we have
+
+∞
+Gam(τ |a, b) dτ =
+
+1
+
+∞
+baτ a−1 exp(−bτ ) dτ
+
+0
+
+Γ(a) 0
+
+1 =
+
+∞
+baua−1 exp(−u)b1−ab−1 du
+
+Γ(a) 0
+
+=1
+
+where we have used the deﬁnition (1.141) of the Gamma function.
+
+52
+
+Solutions 2.42–2.43
+
+2.42 We can use the same change of variable as in the previous exercise to evaluate the mean of the Gamma distribution
+
+1 E[τ ] =
+
+∞
+baτ a−1τ exp(−bτ ) dτ
+
+Γ(a) 0
+
+1 =
+
+∞
+baua exp(−u)b−ab−1 du
+
+Γ(a) 0
+
+= Γ(a + 1) = a bΓ(a) b
+
+where we have used the recurrence relation Γ(a + 1) = aΓ(a) for the Gamma function. Similarly we can ﬁnd the variance by ﬁrst evaluating
+
+E[τ 2] = 1
+
+∞
+baτ a−1τ 2 exp(−bτ ) dτ
+
+Γ(a) 0
+
+=1
+
+∞
+baua+1 exp(−u)b−a−1b−1 du
+
+Γ(a) 0
+
+Γ(a + 2) (a + 1)Γ(a + 1) a(a + 1)
+
+= b2Γ(a) =
+
+b2Γ(a)
+
+= b2
+
+and then using
+
+var[τ ]
+
+=
+
+E[τ 2] − E[τ ]2
+
+=
+
+a(a + 1) b2
+
+−
+
+a2 b2
+
+=
+
+a b2 .
+
+Finally, the mode of the Gamma distribution is obtained simply by differentiation
+
+d
+
+τ a−1 exp(−bτ )
+
+=
+
+a−1 −b
+
+τ a−1 exp(−bτ ) = 0
+
+dτ
+
+τ
+
+from which we obtain
+
+mode[τ ] = a − 1 . b
+
+Notice that the mode only exists if a 1, since τ must be a non-negative quantity. This is also apparent in the plot of Figure 2.13.
+
+2.43 To prove the normalization of the distribution (2.293) consider the integral
+
+∞
+
+|x|q
+
+∞
+
+xq
+
+I=
+
+exp
+−∞
+
+− 2σ2
+
+dx = 2
+0
+
+exp − 2σ2
+
+dx
+
+and make the change of variable
+
+xq u = 2σ2 .
+
+Solution 2.44
+
+53
+
+Using the deﬁnition (1.141) of the Gamma function, this gives
+
+I = 2 ∞ 2σ2 (2σ2u)(1−q)/q exp(−u) du = 2(2σ2)1/qΓ(1/q)
+
+0q
+
+q
+
+from which the normalization of (2.293) follows.
+For the given noise distribution, the conditional distribution of the target variable given the input variable is
+
+p(t|x, w, σ2)
+
+=
+
+q 2(2σ2 )1/q Γ(1/q )
+
+exp
+
+|t − y(x, w)|q
+
+−
+
+2σ2
+
+.
+
+The likelihood function is obtained by taking products of factors of this form, over all pairs {xn, tn}. Taking the logarithm, and discarding additive constants, we obtain the desired result.
+
+2.44 From Bayes’ theorem we have
+
+p(µ, λ|X) ∝ p(X|µ, λ)p(µ, λ),
+
+where the factors on the r.h.s. are given by (2.152) and (2.154), respectively. Writing this out in full, we get
+
+p(µ, λ) ∝
+
+λ1/2 exp
+
+λµ2 −
+
+2
+
+N
+exp
+
+λµ
+
+N
+
+λ xn − 2
+
+N
+
+x2n
+
+n=1
+
+n=1
+
+(βλ)1/2 exp
+
+−βλ 2
+
+µ2 − 2µµ0 + µ20
+
+λa−1 exp (−bλ) ,
+
+where we have used the deﬁntions of the Gaussian and Gamma distributions and we have ommitted terms independent of µ and λ. We can rearrange this to obtain
+
+λN/2λa−1 exp
+
+−
+
+b+ 1 2
+
+N
+
+x2n
+
++
+
+β 2
+
+µ20
+
+λ
+
+n=1
+
+(λ(N + β))1/2 exp − λ(N + β) 2
+
+µ2 − 2 N +β
+
+N
+βµ0 + xn
+
+µ
+
+n=1
+
+and by completing the square in the argument of the second exponential,
+
+⎧⎛
+
+λN/2λa−1
+
+exp
+
+⎪⎨ −
+⎪⎩
+
+⎜⎝b
+
++
+
+1 2
+
+N n=1
+
+x2n
+
++
+
+β 2
+
+µ20
+
+−
+
+βµ0 +
+
+N n=1
+
+xn
+
+2(N + β)
+
+2
+
+⎞ ⎟⎠
+
+⎫ ⎪⎬ λ⎪⎭
+
+(λ(N + β))1/2 exp − λ(N + β) µ − βµ0 +
+
+N n=1
+
+xn
+
+2
+
+N +β
+
+54
+
+Solutions 2.45–2.46
+
+we arrive at an (unnormalised) Gaussian-Gamma distribution,
+
+N µ|µN , ((N + β)λ)−1 Gam (λ|aN , bN ) ,
+
+with parameters
+
+µN
+
+=
+
+βµ0 +
+
+N n=1
+
+xn
+
+N +β
+
+N
+
+aN
+
+=
+
+a+ 2
+
+bN
+
+=
+
+1 b+
+2
+
+N
+
+x2n
+
++
+
+β 2
+
+µ20
+
+−
+
+N
+
++ 2
+
+β
+
+µ2N .
+
+n=1
+
+2.45 We do this, as in the univariate case, by considering the likelihood function of Λ for a given data set {x1, . . . , xN }:
+
+N
+N (xn|µ, Λ−1)
+
+∝
+
+|Λ|N/2 exp
+
+−1 2
+
+N
+(xn − µ)TΛ(xn − µ)
+
+n=1
+
+n=1
+
+= |Λ|N/2 exp − 1 Tr [ΛS] , 2
+
+where S = n(xn − µ)(xn − µ)T. By simply comparing with (2.155), we see that the functional dependence on Λ is indeed the same and thus a product of this likelihood and a Wishart prior will result in a Wishart posterior.
+
+2.46 From (2.158), we have
+
+∞ bae(−bτ )τ a−1
+
+τ
+
+1/2
+exp
+
+− τ (x − µ)2
+
+dτ
+
+0
+
+Γ(a)
+
+2π
+
+2
+
+ba =
+
+1
+
+1/2
+
+∞
+τ a−1/2 exp −τ
+
+(x − µ)2 b+
+
+dτ .
+
+Γ(a) 2π
+
+0
+
+2
+
+We now make the proposed change of variable z = τ ∆, where ∆ = b + (x − µ)2/2, yielding
+
+ba Γ(a)
+
+1
+
+1/2
+∆−a−1/2
+
+∞
+za−1/2 exp(−z) dz
+
+2π
+
+0
+
+ba =
+
+1
+
+1/2
+∆−a−1/2Γ(a + 1/2)
+
+Γ(a) 2π
+
+Solution 2.47
+
+55
+
+where we have used the deﬁnition of the Gamma function (1.141). Finally, we substitute b + (x − µ)2/2 for ∆, ν/2 for a and ν/2λ for b:
+
+Γ(−a + 1/2) ba
+
+1
+
+1/2
+∆a−1/2
+
+Γ(a)
+
+2π
+
+Γ ((ν + 1)/2) ν ν/2 1 1/2 ν (x − µ)2 −(ν+1)/2
+
+=
+
++
+
+Γ(ν/2) 2λ
+
+2π
+
+2λ
+
+2
+
+Γ ((ν + 1)/2) ν ν/2 1 1/2 ν −(ν+1)/2
+
+λ(x − µ)2
+
+=
+
+1+
+
+Γ(ν/2) 2λ
+
+2π
+
+2λ
+
+ν
+
+Γ ((ν + 1)/2) λ 1/2
+
+λ(x − µ)2 −(ν+1)/2
+
+=
+
+1+
+
+Γ(ν/2) νπ
+
+ν
+
+−(ν+1)/2
+
+2.47 Ignoring the normalization constant, we write (2.159) as
+
+St(x|µ, λ, ν) ∝
+
+λ(x − µ)2 −(ν−1)/2 1+
+ν
+
+ν−1
+
+λ(x − µ)2
+
+= exp −
+
+ln 1 +
+
+.
+
+2
+
+ν
+
+(116)
+
+For large ν, we make use of the Taylor expansion for the logarithm in the form
+
+ln(1 + ϵ) = ϵ + O(ϵ2)
+
+(117)
+
+to re-write (116) as
+
+ν−1
+
+λ(x − µ)2
+
+exp −
+
+ln 1 +
+
+2
+
+ν
+
+= exp − ν − 1 λ(x − µ)2 + O(ν−2)
+
+2
+
+ν
+
+=
+
+exp
+
+λ(x − µ)2 −
+
++
+
+O(ν −1 )
+
+.
+
+2
+
+We see that in the limit ν → ∞ this becomes, up to an overall constant, the same as a Gaussian distribution with mean µ and precision λ. Since the Student distribution is normalized to unity for all values of ν it follows that it must remain normalized in this limit. The normalization coefﬁcient is given by the standard expression (2.42) for a univariate Gaussian.
+
+56
+
+Solutions 2.48–2.49
+
+2.48 Substituting expressions for the Gaussian and Gamma distributions into (2.161), we have
+
+∞
+
+St(x|µ, Λ, ν) =
+
+N x|µ, (ηΛ)−1 Gam(η|ν/2, ν/2) dη
+
+0
+
+=
+
+(ν/2)ν/2 |Λ|1/2 Γ(ν/2) (2π)D/2
+
+∞
+ηD/2ην/2−1e−νη/2e−η∆2/2 dη.
+0
+
+Now we make the change of variable
+
+τ = η ν + 1 ∆2 −1 22
+
+which gives
+
+St(x|µ, Λ, ν)
+
+=
+
+(ν/2)ν/2 |Λ|1/2 Γ(ν/2) (2π)D/2
+
+ν + 1 ∆2 −D/2−ν/2 22
+
+∞
+τ D/2+ν/2−1e−τ dτ
+
+0
+
+Γ(ν/2 + d/2) |Λ|1/2
+
+∆2 −D/2−ν/2
+
+=
+
+Γ(ν/2)
+
+(π ν )D/2
+
+1+ ν
+
+as required.
+The correct normalization of the multivariate Student’s t-distribution follows directly from the fact that the Gaussian and Gamma distributions are normalized. From (2.161) we have
+
+St (x|µ, Λ, ν) dx = =
+
+N x|µ, (ηΛ)−1 Gam (η|ν/2, ν/2) dη dx N x|µ, (ηΛ)−1 dx Gam (η|ν/2, ν/2) dη
+
+= Gam (η|ν/2, ν/2) dη = 1.
+
+2.49 If we make the change of variable z = x − µ, we can write
+E[x] = St(x|µ, Λ, ν)x dx = St(z|0, Λ, ν)(z + µ) dz.
+In the factor (z + µ) the ﬁrst term vanishes as a consequence of the fact that the zero-mean Student distribution is an even function of z that is St(−z|0, Λ, ν) = St(−z|0, Λ, ν). This leaves the second term, which equals µ since the Student distribution is normalized.
+
+Solution 2.50
+
+57
+
+The covariance of the multivariate Student can be re-expressed by using the expression for the multivariate Student distribution as a convolution of a Gaussian with a Gamma distribution given by (2.161) which gives
+
+cov[x] = St(x|µ, Λ, ν)(x − µ)(x − µ)T dx
+
+∞
+
+=
+
+N (x|µ, ηΛ)(x − µ)(x − µ)T dx Gam(η|ν/2, ν/2) dη
+
+0
+
+∞
+
+=
+
+η−1Λ−1Gam(η|ν/2, ν/2) dη
+
+0
+
+where we have used the standard result for the covariance of a multivariate Gaussian. We now substitute for the Gamma distribution using (2.146) to give
+
+cov[x] =
+
+1
+
+ν ν/2
+
+∞
+e−νη/2ην/2−2 dηΛ−1
+
+Γ(ν/2) 2
+
+0
+
+= ν Γ(ν/2 − 2) Λ−1 2 Γ(ν/2)
+
+=
+
+ν Λ−1
+
+ν−2
+
+where we have used the integral representation for the Gamma function, together with the standard result Γ(1 + x) = xΓ(x).
+
+The mode of the Student distribution is obtained by differentiation
+
+∇xSt(x|µ, Λ, ν)
+
+=
+
+Γ(ν/2 + D/2) Γ(ν/2)
+
+|Λ|1/2 (π ν )D/2
+
+∆2 1+
+ν
+
+−D/2−ν/2−1
+
+1 Λ(x
+
+−
+
+µ).
+
+ν
+
+Provided Λ is non-singular we therefore obtain
+
+mode[x] = µ.
+
+2.50
+
+Just like in univariate case (Exercise 2.47), we ignore the normalization coefﬁcient, which leaves us with
+
+∆2 −ν/2−D/2
+
+νD
+
+∆2
+
+1+
+
+= exp − + ln 1 +
+
+ν
+
+22
+
+ν
+
+where ∆2 is the squared Mahalanobis distance given by
+
+∆2 = (x − µ)TΛ(x − µ).
+
+Again we make use of (117) to give
+
+exp
+
+−
+
+νD +
+
+∆2 ln 1 +
+
+22
+
+ν
+
+= exp − ∆2 + O(1/ν) . 2
+
+As in the univariate case, in the limit ν → ∞ this becomes, up to an overall constant, the same as a Gaussian distribution, here with mean µ and precision Λ; the univariate normalization argument also applies in the multivariate case.
+
+58
+
+Solutions 2.51–2.54
+
+2.51 Using the relation (2.296) we have 1 = exp(iA) exp(−iA) = (cos A + i sin A)(cos A − i sin A) = cos2 A + sin2 A.
+Similarly, we have
+cos(A − B) = ℜ exp{i(A − B)} = ℜ exp(iA) exp(−iB) = ℜ(cos A + i sin A)(cos B − i sin B) = cos A cos B + sin A sin B.
+Finally
+sin(A − B) = ℑ exp{i(A − B)} = ℑ exp(iA) exp(−iB) = ℑ(cos A + i sin A)(cos B − i sin B) = sin A cos B − cos A sin B.
+
+2.52 Expressed in terms of ξ the von Mises distribution becomes
+
+p(ξ) ∝ exp m cos(m−1/2ξ) .
+
+For large m we have cos(m−1/2ξ) = 1 − m−1ξ2/2 + O(m−2) and so p(ξ) ∝ exp −ξ2/2
+
+and hence p(θ) ∝ exp{−m(θ − θ0)2/2}. 2.53 Using (2.183), we can write (2.182) as
+
+N
+
+N
+
+N
+
+(cos θ0 sin θn − cos θn sin θ0) = cos θ0 sin θn − sin cos θn = 0.
+
+n=1
+
+n=1
+
+n=1
+
+Rearranging this, we get
+
+n sin θn n cos θn
+
+=
+
+sin θ0 cos θ0
+
+= tan θ0,
+
+which we can solve w.r.t. θ0 to obtain (2.184).
+
+2.54 Differentiating the von Mises distribution (2.179) we have
+
+p′(θ)
+
+=
+
+1 −
+2πI0(m)
+
+exp
+
+{m
+
+cos(θ
+
+−
+
+θ0)}
+
+sin(θ
+
+−
+
+θ0)
+
+which vanishes when θ = θ0 or when θ = θ0 + π (mod2π). Differentiating again we have
+
+p′′(θ)
+
+=
+
+1 −
+2πI0(m)
+
+exp
+
+{m
+
+cos(θ
+
+−
+
+θ0)}
+
+sin2(θ − θ0) + cos(θ − θ0)
+
+.
+
+Solutions 2.55–2.56
+
+59
+
+Since I0(m) > 0 we see that p′′(θ) < 0 when θ = θ0, which therefore represents a maximum of the density, while p′′(θ) > 0 when θ = θ0 + π (mod2π), which is therefore a minimum.
+
+2.55 NOTE: In the 1st printing of PRML, equation (2.187), which will be the starting point for this solution, contains a typo. The “−” on the r.h.s. should be a “+”, as is easily seen from (2.178) and (2.185).
+From (2.169) and (2.184), we see that ¯θ = θ0ML. Using this together with (2.168) and (2.177), we can rewrite (2.187) as follows:
+
+A(mML) =
+
+1N N cos θn
+n=1
+
+cos θ0ML +
+
+1N N sin θn
+n=1
+
+sin θ0ML
+
+= ¯r cos ¯θ cos θ0ML + ¯r sin ¯θ sin θ0ML = ¯r cos2 θ0ML + sin2 θ0ML
+
+= ¯r.
+
+2.56 We can most conveniently cast distributions into standard exponential family form by taking the exponential of the logarithm of the distribution. For the Beta distribution (2.13) we have
+
+Beta(µ|a, b) = Γ(a + b) exp {(a − 1) ln µ + (b − 1) ln(1 − µ)} Γ(a)Γ(b)
+which we can identify as being in standard exponential form (2.194) with
+
+h(µ) = 1
+
+Γ(a + b) g(a, b) =
+Γ(a)Γ(b)
+
+u(µ) =
+
+ln µ ln(1 − µ)
+
+η(a, b) =
+
+a−1 b−1
+
+.
+
+(118) (119) (120) (121)
+
+Applying the same approach to the gamma distribution (2.146) we obtain
+
+ba
+
+Gam(λ|a, b) =
+
+exp {(a − 1) ln λ − bλ} .
+
+Γ(a)
+
+60
+
+Solution 2.57
+
+from which it follows that
+
+h(λ) = 1 ba
+g(a, b) = Γ(a)
+
+u(λ) =
+
+λ ln λ
+
+η(a, b) =
+
+−b a−1
+
+.
+
+(122) (123) (124) (125)
+
+Finally, for the von Mises distribution (2.179) we make use of the identity (2.178) to give
+1 p(θ|θ0, m) = 2πI0(m) exp {m cos θ cos θ0 + m sin θ sin θ0}
+from which we ﬁnd
+
+h(θ) = 1
+
+1 g(θ0, m) = 2πI0(m)
+
+u(θ) =
+
+cos θ sin θ
+
+η(θ0, m) =
+
+m cos θ0 m sin θ0
+
+.
+
+(126) (127) (128) (129)
+
+2.57 Starting from (2.43), we can rewrite the argument of the exponential as
+
+− 1 Tr Σ−1xxT + µTΣ−1x − 1 µTΣ−1µ.
+
+2
+
+2
+
+The last term is indepedent of x but depends on µ and Σ and so should go into g(η).
+The second term is already an inner product and can be kept as is. To deal with the ﬁrst term, we deﬁne the D2-dimensional vectors z and λ, which consist of the columns of xxT and Σ−1, respectively, stacked on top of each other. Now we can
+write the multivariate Gaussian distribution on the form (2.194), with
+
+η= u(x) =
+
+Σ−1µ
+
+−
+
+1 2
+
+λ
+
+x
+
+z
+
+h(x) = (2π)−D/2
+
+g(η) = |Σ|−1/2 exp − 1 µTΣ−1µ . 2
+
+Solutions 2.58–2.60
+
+61
+
+2.58 Taking the ﬁrst derivative of (2.226) we obtain, as in the text,
+
+−∇ ln g(η) = g(η) h(x) exp ηTu(x) u(x) dx
+
+Taking the gradient again gives
+
+−∇∇ ln g(η) = g(η) h(x) exp ηTu(x) u(x)u(x)T dx
+
++∇g(η) h(x) exp ηTu(x) u(x) dx
+
+= E[u(x)u(x)T] − E[u(x)]E[u(x)T] = cov[u(x)]
+
+where we have used the result (2.226).
+
+2.59
+
+1x
+
+1
+
+f
+
+dx =
+
+σσ
+
+σ
+
+1 =
+σ
+
+σ =
+σ
+
+dx f (y) dy
+dy f (y)σ dy f (y) dy = 1,
+
+since f (x) integrates to 1.
+
+2.60
+
+The value of the density p(x) at a point xn is given by hj(n), where the notation j(n)
+
+denotes that data point xn falls within region j. Thus the log likelihood function
+
+takes the form
+
+N
+
+N
+
+ln p(xn) = ln hj(n).
+
+n=1
+
+n=1
+
+We now need to take account of the constraint that p(x) must integrate to unity. Since p(x) has the constant value hi over region i, which has volume ∆i, the normalization constraint becomes i hi∆i = 1. Introducing a Lagrange multiplier λ we then minimize the function
+
+N
+ln hj(n) + λ
+n=1
+
+hi∆i − 1
+i
+
+with respect to hk to give
+
+0
+
+=
+
+nk hk
+
++ λ∆k
+
+where nk denotes the total number of data points falling within region k. Multiplying both sides by hk, summing over k and making use of the normalization constraint,
+
+62
+
+Solutions 2.61–3.1
+
+we obtain λ = −N . Eliminating λ then gives our ﬁnal result for the maximum likelihood solution for hk in the form
+
+hk
+
+=
+
+nk N
+
+1 .
+∆k
+
+Note that, for equal sized bins ∆k = ∆ we obtain a bin height hk which is proportional to the fraction of points falling within that bin, as expected.
+
+2.61 From (2.246) we have
+
+p(x) = K N V (ρ)
+
+where V (ρ) is the volume of a D-dimensional hypersphere with radius ρ, where in turn ρ is the distance from x to its Kth nearest neighbour in the data set. Thus, in polar coordinates, if we consider sufﬁciently large values for the radial coordinate r, we have
+p(x) ∝ r−D.
+
+If we consider the integral of p(x) and note that the volume element dx can be written as rD−1 dr, we get
+
+p(x) dx ∝ r−DrD−1 dr = r−1 dr
+
+which diverges logarithmically.
+
+Chapter 3 Linear Models for Regression
+
+3.1 NOTE: In the 1st printing of PRML, there is a 2 missing in the denominator of the argument to the ‘tanh’ function in equation (3.102).
+Using (3.6), we have
+
+2σ(2a) − 1
+
+=
+
+1
+
+2 + e−2a
+
+−
+
+1
+
+2
+
+1 + e−2a
+
+= 1 + e−2a − 1 + e−2a
+
+1 − e−2a = 1 + e−2a
+
+ea − e−a = ea + e−a
+
+= tanh(a)
+
+Solutions 3.2–3.3
+
+63
+
+If we now take aj = (x − µj)/2s, we can rewrite (3.101) as
+
+M
+
+y(x, w) = w0 + wjσ(2aj)
+
+j=1
+
+=
+
+w0 +
+
+M
+
+wj 2
+
+(2σ(2aj )
+
+−
+
+1
+
++
+
+1)
+
+j=1
+
+M
+
+= u0 + uj tanh(aj),
+
+j=1
+
+where uj = wj/2, for j = 1, . . . , M , and u0 = w0 +
+
+M j=1
+
+wj
+
+/2.
+
+3.2 We ﬁrst write
+
+Φ(ΦTΦ)−1ΦTv = Φv = ϕ1v˜(1) + ϕ2v˜(2) + . . . + ϕM v˜(M)
+where ϕm is the m-th column of Φ and v = (ΦTΦ)−1ΦTv. By comparing this with the least squares solution in (3.15), we see that
+
+y = ΦwML = Φ(ΦTΦ)−1ΦTt
+
+corresponds to a projection of t onto the space spanned by the columns of Φ. To see
+that this is indeed an orthogonal projection, we ﬁrst note that for any column of Φ,
+ϕj , Φ(ΦTΦ)−1ΦTϕj = Φ(ΦTΦ)−1ΦTΦ j = ϕj
+
+and therefore
+
+(y − t)T ϕj = (ΦwML − t)T ϕj = tT
+
+Φ(ΦTΦ)−1ΦT − I
+
+T
+ϕj
+
+=0
+
+and thus (y − t) is ortogonal to every column of Φ and hence is orthogonal to S.
+
+3.3 If we deﬁne R = diag(r1, . . . , rN ) to be a diagonal matrix containing the weighting coefﬁcients, then we can write the weighted sum-of-squares cost function in the form
+
+ED (w)
+
+=
+
+1 (t 2
+
+−
+
+Φw)TR(t
+
+−
+
+Φw).
+
+Setting the derivative with respect to w to zero, and re-arranging, then gives
+
+w⋆ = ΦTRΦ −1 ΦTRt
+
+which reduces to the standard solution (3.15) for the case R = I.
+If we compare (3.104) with (3.10)–(3.12), we see that rn can be regarded as a precision (inverse variance) parameter, particular to the data point (xn, tn), that either replaces or scales β.
+
+64
+
+Solution 3.4
+
+Alternatively, rn can be regarded as an effective number of replicated observations of data point (xn, tn); this becomes particularly clear if we consider (3.104) with rn taking positive integer values, although it is valid for any rn > 0.
+
+3.4 Let
+
+D
+yn = w0 + wi(xni + ϵni)
+i=1 D
+= yn + wiϵni
+i=1
+
+where yn = y(xn, w) and ϵni ∼ N (0, σ2) and we have used (3.105). From (3.106) we then deﬁne
+
+E
+
+=
+
+1 2
+
+N
+
+{yn − tn}2
+
+n=1
+
+1N =
+2
+
+yn2 − 2yntn + t2n
+
+n=1 ⎧
+
+=
+
+1 2
+
+N
+
+⎨ ⎩yn2 + 2yn
+
+D
+
+wiϵni +
+
+D
+
+2
+
+wiϵni
+
+n=1
+
+i=1
+
+i=1
+
+⎫
+
+D
+
+⎬
+
+−2tnyn − 2tn
+
+wiϵni + t2n⎭ .
+
+i=1
+
+If we take the expectation of E under the distribution of ϵni, we see that the second and ﬁfth terms disappear, since E[ϵni] = 0, while for the third term we get
+
+⎡
+D
+
+⎤
+
+2
+
+D
+
+E⎣
+
+wiϵni ⎦ =
+
+wi2σ2
+
+i=1
+
+i=1
+
+since the ϵni are all independent with variance σ2. From this and (3.106) we see that
+
+as required.
+
+E
+
+E
+
+1 = ED + 2
+
+D
+wi2σ2,
+
+i=1
+
+Solutions 3.5–3.6
+
+65
+
+3.5 We can rewrite (3.30) as
+
+1 2
+
+M
+|wj|q − η
+
+0
+
+j=1
+
+where we have incorporated the 1/2 scaling factor for convenience. Clearly this does not affect the constraint.
+
+Employing the technique described in Appendix E, we can combine this with (3.12) to obtain the Lagrangian function
+
+1 L(w, λ) = 2
+
+N
+
+{tn − wTφ(xn)}2 +
+
+λ 2
+
+n=1
+
+M
+|wj|q − η
+j=1
+
+and by comparing this with (3.29) we see immediately that they are identical in their dependence on w.
+Now suppose we choose a speciﬁc value of λ > 0 and minimize (3.29). Denoting the resulting value of w by w⋆(λ), and using the KKT condition (E.11), we see that the value of η is given by
+M
+η = |wj⋆(λ)|q.
+j=1
+
+3.6 We ﬁrst write down the log likelihood function which is given by
+
+ln L(W, Σ) = − N ln |Σ| − 1
+
+2
+
+2
+
+N
+(tn − WTφ(xn))TΣ−1(tn − WTφ(xn)).
+
+n=1
+
+First of all we set the derivative with respect to W equal to zero, giving
+
+N
+0 = − Σ−1(tn − WTφ(xn))φ(xn)T.
+n=1
+
+Multiplying through by Σ and introducing the design matrix Φ and the target data
+
+matrix T we have
+
+ΦTΦW = ΦTT
+
+Solving for W then gives (3.15) as required.
+
+The maximum likelihood solution for Σ is easily found by appealing to the standard result from Chapter 2 giving
+
+Σ= 1 N
+
+N
+(tn − WM T Lφ(xn))(tn − WM T Lφ(xn))T.
+
+n=1
+
+as required. Since we are ﬁnding a joint maximum with respect to both W and Σ we see that it is WML which appears in this expression, as in the standard result for an unconditional Gaussian distribution.
+
+66
+
+Solutions 3.7–3.8
+
+3.7 From Bayes’ theorem we have
+
+p(w|t) ∝ p(t|w)p(w),
+
+where the factors on the r.h.s. are given by (3.10) and (3.48), respectively. Writing this out in full, we get
+
+p(w|t) ∝
+
+N
+N tn|wTφ(xn), β−1 N (w|m0, S0)
+
+n=1
+
+∝ exp − β (t − Φw)T(t − Φw) 2
+
+exp
+
+−
+
+1 2
+
+(w
+
+−
+
+m0
+
+)TS−0 1(w
+
+−
+
+m0)
+
+=
+
+exp
+
+−
+
+1 2
+
+wT
+
+S−0 1 + βΦTΦ
+
+w − βtTΦw − βwTΦTt + βtTt
+
+mT0 S−0 1w − wTS−0 1m0 + mT0 S−0 1m0
+
+=
+
+exp
+
+−1 2
+
+wT
+
+S−0 1 + βΦTΦ
+
+w−
+
+S−0 1m0
+
++ βΦTt
+
+T
+w
+
+−wT S−0 1m0 + βΦTt + βtTt + mT0 S−0 1m0
+
+=
+
+exp
+
+−1 2
+
+(w
+
+−
+
+mN
+
+)T
+
+S−N1
+
+(w
+
+−
+
+mN
+
+)
+
+exp
+
+−1 2
+
+βtTt + mT0 S−0 1m0 − mTN S−N1mN
+
+where we have used (3.50) and (3.51) when completing the square in the last step. The ﬁrst exponential corrsponds to the posterior, unnormalized Gaussian distribution over w, while the second exponential is independent of w and hence can be absorbed into the normalization factor.
+
+3.8 Combining the prior
+
+p(w) = N (w|mN , SN )
+
+and the likelihood
+
+p(tN+1|xN+1, w) =
+
+β 2π
+
+1/2
+exp
+
+−
+
+β 2
+
+(tN +1
+
+−
+
+wT φN +1 )2
+
+(130)
+
+where φN+1 = φ(xN+1), we obtain a posterior of the form
+
+p(w|tN+1, xN+1, mN , SN )
+
+∝ exp
+
+− 1 (w 2
+
+−
+
+mN )TS−N1(w
+
+−
+
+mN )
+
+−
+
+1 2 β(tN+1
+
+−
+
+wT φN +1 )2
+
+.
+
+Solutions 3.9–3.11
+
+67
+
+We can expand the argument of the exponential, omitting the −1/2 factors, as follows
+(w − mN )TS−N1(w − mN ) + β(tN+1 − wTφN+1)2 = wTS−N1w − 2wTS−N1mN + βwTφTN+1φN+1w − 2βwTφN+1tN+1 + const = wT(S−N1 + βφN+1φTN+1)w − 2wT(S−N1mN + βφN+1tN+1) + const,
+where const denotes remaining terms independent of w. From this we can read off the desired result directly,
+
+p(w|tN+1, xN+1, mN , SN ) = N (w|mN+1, SN+1),
+
+with and
+
+S−N1+1 = S−N1 + βφN+1φTN+1. mN+1 = SN+1(S−N1mN + βφN+1tN+1).
+
+3.9 Identifying (2.113) with (3.49) and (2.114) with (130), such that
+
+x ⇒ w µ ⇒ mN Λ−1 ⇒ SN
+
+y ⇒ tN+1 A ⇒ φ(xN+1)T = φTN+1 b ⇒ 0 L−1 ⇒ βI, (2.116) and (2.117) directly give
+
+(131) (132)
+
+p(w|tN+1, xN+1) = N (w|mN+1, SN+1)
+
+where SN+1 and mN+1 are given by (131) and (132), respectively. 3.10 Using (3.3), (3.8) and (3.49), we can re-write (3.57) as
+
+p(t|x, t, α, β) = N (t|φ(x)Tw, β−1)N (w|mN , SN ) dw.
+
+By matching the ﬁrst factor of the integrand with (2.114) and the second factor with (2.113), we obtain the desired result directly from (2.115).
+
+3.11 From (3.59) we have
+
+σN2 +1(x)
+
+=
+
+1 β
+
++
+
+φ(x)T SN +1 φ(x)
+
+(133)
+
+where SN+1 is given by (131). From (131) and (3.110) we get
+
+SN+1 = S−N1 + βφN+1φTN+1 −1
+
+=
+
+SN −
+
+SN φN+1β1/2 β1/2φTN+1SN 1 + βφTN+1SN φN+1
+
+=
+
+SN
+
+−
+
+βSN φN+1φTN+1SN 1 + βφTN+1SN φN+1
+
+.
+
+68
+
+Solution 3.12
+
+Using this and (3.59), we can rewrite (133) as
+
+σN2 +1(x)
+
+=
+
+1 + φ(x)T β
+
+SN
+
+−
+
+βSN φN+1φTN+1SN 1 + βφTN+1SN φN+1
+
+φ(x)
+
+=
+
+σN2 (x)
+
+−
+
+βφ(x)TSN φN+1φTN+1SN 1 + βφTN+1SN φN+1
+
+φ(x)
+
+.
+
+(134)
+
+Since SN is positive deﬁnite, the numerator and denominator of the second term in (134) will be non-negative and positive, respectively, and hence σN2 +1(x) σN2 (x).
+
+3.12 It is easiest to work in log space. The log of the posterior distribution is given by
+
+N
+ln p(w, β|t) = ln p(w, β) + ln p(tn|wTφ(xn), β−1)
+
+n=1
+
+=
+
+M 2
+
+ln β
+
+−
+
+1 2
+
+ln |S0| −
+
+β (w
+2
+
+−
+
+m0)TS−0 1(w
+
+−
+
+m0)
+
+−b0β + (a0 − 1) ln β
+
++ N ln β − β
+
+2
+
+2
+
+N
+{wTφ(xn) − tn}2 + const.
+
+n=1
+
+Using the product rule, the posterior distribution can be written as p(w, β|t) = p(w|β, t)p(β|t). Consider ﬁrst the dependence on w. We have
+
+ln p(w|β, t) = − β wT 2
+
+ΦTΦ + S−0 1
+
+w + wT
+
+βS−0 1m0 + βΦTt
+
++ const.
+
+Thus we see that p(w|β, t) is a Gaussian distribution with mean and covariance given by
+
+mN = SN S−0 1m0 + ΦTt βS−N1 = β S−0 1 + ΦTΦ .
+
+(135) (136)
+
+To ﬁnd p(β|t) we ﬁrst need to complete the square over w to ensure that we pick up all terms involving β (any terms independent of β may be discarded since these will be absorbed into the normalization coefﬁcient which itself will be found by inspection at the end). We also need to remember that a factor of (M/2) ln β will be absorbed by the normalisation factor of p(w|β, t). Thus
+
+ln p(β|t)
+
+=
+
+−
+
+β 2
+
+mT0 S−0 1
+
+m0
+
++
+
+β 2
+
+mTN S−N1mN
+
+N
+
+β
+
++ 2 ln β − b0β + (a0 − 1) ln β − 2
+
+N
+
+t2n + const.
+
+n=1
+
+Solutions 3.13–3.14
+
+69
+
+We recognize this as the log of a Gamma distribution. Reading off the coefﬁcients of β and ln β we then have
+
+N aN = a0 + 2
+
+bN
+
+=
+
+1 b0 + 2
+
+N
+
+mT0 S−0 1m0 − mTN S−N1mN +
+
+t2n
+
+.
+
+n=1
+
+(137) (138)
+
+3.13 Following the line of presentation from Section 3.3.2, the predictive distribution is now given by
+
+p(t|x, t) =
+
+N t|φ(x)Tw, β−1 N w|mN , β−1SN dw Gam (β|aN , bN ) dβ (139)
+
+We begin by performing the integral over w. Identifying (2.113) with (3.49) and (2.114) with (3.8), using (3.3), such that
+x ⇒ w µ ⇒ mN Λ−1 ⇒ SN y ⇒ t A ⇒ φ(x)T = φT b ⇒ 0 L−1 ⇒ β−1, (2.115) and (136) give
+p(t|β) = N t|φTmN , β−1 + φTSN φ = N t|φTmN , β−1 1 + φT(S0 + φTφ)−1φ .
+Substituting this back into (139) we get
+
+p(t|x, X, t) = N t|φTmN , β−1s Gam (β|aN , bN ) dβ,
+
+where we have deﬁned
+
+s = 1 + φT(S0 + φTφ)−1φ.
+
+We can now use (2.158)– (2.160) to obtain the ﬁnal result:
+
+p(t|x, X, t) = St (t|µ, λ, ν)
+
+where
+
+µ = φTmN
+
+λ = aN s−1 bN
+
+ν = 2aN .
+
+3.14 For α = 0 the covariance matrix SN becomes
+
+SN = (βΦTΦ)−1.
+
+(140)
+
+70
+
+Solution 3.14
+
+Let us deﬁne a new set of orthonormal basis functions given by linear combinations of the original basis functions so that
+
+ψ(x) = Vφ(x)
+
+(141)
+
+where V is an M × M matrix. Since both the original and the new basis functions are linearly independent and span the same space, this matrix must be invertible and hence
+φ(x) = V−1ψ(x).
+For the data set {xn}, (141) and (3.16) give
+Ψ = ΦVT
+
+and consequently
+
+Φ = ΨV−T
+
+where V−T denotes (V−1)T. Orthonormality implies
+
+ΨTΨ = I.
+
+Note that (V−1)T = (VT)−1 as is easily veriﬁed. From (140), the covariance matrix then becomes
+SN = β−1(ΦTΦ)−1 = β−1(V−TΨTΨV−1)−1 = β−1VTV.
+Here we have used the orthonormality of the ψi(x). Hence the equivalent kernel becomes
+k(x, x′) = βφ(x)TSN φ(x′) = φ(x)TVTVφ(x′) = ψ(x)Tψ(x′)
+as required. From the orthonormality condition, and setting j = 1, it follows that
+
+N
+
+N
+
+ψi(xn)ψ1(xn) = ψi(xn) = δi1
+
+n=1
+
+n=1
+
+where we have used ψ1(x) = 1. Now consider the sum
+
+N
+
+N
+
+NM
+
+k(x, xn) =
+
+ψ(x)Tψ(xn) =
+
+ψi(x)ψi(xn)
+
+n=1
+
+n=1
+
+n=1 i=1
+
+M
+
+=
+
+ψi(x)δi1 = ψ1(x) = 1
+
+i=1
+
+which proves the summation constraint as required.
+
+Solutions 3.15–3.16
+
+71
+
+3.15 This is easily shown by substituting the re-estimation formulae (3.92) and (3.95) into
+
+(3.82), giving
+
+E(mN )
+
+=
+
+β 2
+
+∥t
+
+−
+
+ΦmN ∥2
+
++
+
+α 2
+
+mTN
+
+mN
+
+N −γ γ N = 2 +2= 2 .
+
+3.16 The likelihood function is a product of independent univariate Gaussians and so can
+
+be written as a joint Gaussian distribution over t with diagonal covariance matrix in
+
+the form
+
+p(t|w, β) = N (t|Φw, β−1IN ).
+
+(142)
+
+Identifying (2.113) with the prior distribution p(w) = N (w|0, α−1I) and (2.114)
+
+with (142), such that
+
+x ⇒ w µ ⇒ 0 Λ−1 ⇒ α−1IM
+
+y ⇒ t A ⇒ Φ b ⇒ 0 L−1 ⇒ β−1IN ,
+
+(2.115) gives
+
+p(t|α, β) = N (t|0, β−1IN + α−1ΦΦT).
+
+Taking the log we obtain
+
+ln p(t|α, β) = − N 2
+
+ln(2π) −
+
+1 ln 2
+
+β−1IN
+
++ α−1ΦΦT
+
+− 1 tT 2
+
+β−1IN + α−1ΦΦT
+
+t.
+
+Using the result (C.14) for the determinant we have
+
+(143)
+
+β−1IN + α−1ΦΦT
+
+= β−N IN + βα−1ΦΦT = β−N IM + βα−1ΦTΦ = β−N α−M αIM + βΦTΦ = β−N α−M |A|
+
+where we have used (3.81). Next consider the quadratic term in t and make use of the identity (C.7) together with (3.81) and (3.84) to give
+
+−1t 2
+
+β−1IN + α−1ΦΦT
+
+−1 t
+
+=
+
+− 1 tT 2
+
+βIN − βΦ
+
+αIM + βΦTΦ −1 ΦTβ
+
+t
+
+= − β tTt + β2 tTΦA−1ΦTt
+
+2
+
+2
+
+=
+
+−β 2
+
+tTt
+
++
+
+1 2
+
+mTN
+
+AmN
+
+=
+
+−β 2
+
+∥t
+
+−
+
+ΦmN ∥2
+
+−
+
+α 2
+
+mTN
+
+mN
+
+72
+
+Solutions 3.17–3.18
+
+where in the last step, we have exploited results from Solution 3.18. Substituting for the determinant and the quadratic term in (143) we obtain (3.86).
+3.17 Using (3.11), (3.12) and (3.52) together with the deﬁnition for the Gaussian, (2.43), we can rewrite (3.77) as follows:
+
+p(t|α, β) = p(t|w, β)p(w|α) dw
+
+=
+
+β N/2 α M/2
+
+2π
+
+2π
+
+exp (−βED(w)) exp
+
+− α wTw 2
+
+dw
+
+β N/2 α M/2
+
+=
+
+exp (−E(w)) dw,
+
+2π
+
+2π
+
+where E(w) is deﬁned by (3.79).
+
+3.18 We can rewrite (3.79)
+
+β ∥t − Φw∥2 + α wTw
+
+2
+
+2
+
+= β tTt − 2tTΦw + wTΦTΦw + α wTw
+
+2
+
+2
+
+= 1 βtTt − 2βtTΦw + wTAw 2
+
+where, in the last line, we have used (3.81). We now use the tricks of adding 0 = mTNAmN − mTNAmN and using I = A−1A, combined with (3.84), as follows:
+
+1 βtTt − 2βtTΦw + wTAw 2
+
+1 =
+
+βtTt − 2βtTΦA−1Aw + wTAw
+
+2
+
+1 =
+2
+
+βtTt − 2mTN Aw + wTAw + mTN AmN − mTN AmN
+
+1 =2
+
+βtTt − mTN AmN
+
++
+
+1 2 (w
+
+−
+
+mN )TA(w
+
+−
+
+mN ).
+
+Here the last term equals term the last term of (3.80) and so it remains to show that
+
+the ﬁrst term equals the r.h.s. of (3.82). To do this, we use the same tricks again:
+
+1 2
+
+βtTt − mTN AmN
+
+=1 2
+
+βtTt − 2mTN AmN + mTN AmN
+
+=1 2
+
+βtTt − 2mTN AA−1ΦTtβ + mTN
+
+αI + βΦTΦ
+
+mN
+
+1 =
+2
+
+βtTt − 2mTN ΦTtβ + βmTN ΦTΦmN + αmTN mN
+
+1 =2
+
+β(t − ΦmN )T(t − ΦmN ) + αmTN mN
+
+=
+
+β 2
+
+∥t
+
+−
+
+ΦmN ∥2
+
++
+
+α 2
+
+mTN
+
+mN
+
+Solutions 3.19–3.21
+
+73
+
+as required.
+
+3.19 From (3.80) we see that the integrand of (3.85) is an unnormalized Gaussian and hence integrates to the inverse of the corresponding normalizing constant, which can be read off from the r.h.s. of (2.43) as
+
+(2π)M/2 |A−1|1/2.
+
+Using (3.78), (3.85) and the properties of the logarithm, we get
+
+ln p(t|α, β) = M (ln α − ln(2π)) + N (ln β − ln(2π)) + ln exp{−E(w)} dw
+
+2
+
+2
+
+M
+
+N
+
+1
+
+M
+
+=
+
+(ln α − ln(2π)) + 2
+
+2 (ln β − ln(2π)) − E(mN ) − 2 ln |A| +
+
+2
+
+ln(2π)
+
+which equals (3.86).
+
+3.20 We only need to consider the terms of (3.86) that depend on α, which are the ﬁrst, third and fourth terms.
+Following the sequence of steps in Section 3.5.2, we start with the last of these terms,
+1 − ln |A|.
+2
+From (3.81), (3.87) and the fact that that eigenvectors ui are orthonormal (see also Appendix C), we ﬁnd that the eigenvectors of A to be α+λi. We can then use (C.47) and the properties of the logarithm to take us from the left to the right side of (3.88).
+The derivatives for the ﬁrst and third term of (3.86) are more easily obtained using standard derivatives and (3.82), yielding
+
+1 2
+
+M α
+
++ mTN mN
+
+.
+
+We combine these results into (3.89), from which we get (3.92) via (3.90). The expression for γ in (3.91) is obtained from (3.90) by substituting
+
+for M and re-arranging.
+
+M λi + α i λi + α
+
+3.21 The eigenvector equation for the M × M real, symmetric matrix A can be written as
+Aui = ηiui
+
+74
+
+Solution 3.21
+
+where {ui} are a set of M orthonormal vectors, and the M eigenvalues {ηi} are all real. We ﬁrst express the left hand side of (3.117) in terms of the eigenvalues of A. The log of the determinant of A can be written as
+
+M
+
+M
+
+ln |A| = ln ηi = ln ηi.
+
+i=1
+
+i=1
+
+Taking the derivative with respect to some scalar α we obtain
+
+d
+
+M1d
+
+dα ln |A| = i=1 ηi dα ηi.
+
+We now express the right hand side of (3.117) in terms of the eigenvector expansion and show that it takes the same form. First we note that A can be expanded in terms of its own eigenvectors to give
+
+M
+A = ηiuiuTi
+i=1
+and similarly the inverse can be written as
+
+A−1
+
+=
+
+M i=1
+
+1 ηi
+
+uiuTi
+
+.
+
+Thus we have
+
+Tr A−1 d A dα
+
+= Tr
+
+M i=1
+
+1 ηi
+
+ui
+
+uTi
+
+d dα
+
+M j=1
+
+ηj uj uTj
+
+= Tr
+
+M i=1
+
+1 ηi
+
+uiuTi
+
+M
+
+dηj dα
+
+uj uTj
+
++
+
+ηj
+
+bj uTj + uj bTj
+
+j=1
+
+= Tr
+
+M i=1
+
+1 ηi
+
+uiuTi
+
+M j=1
+
+dηj dα
+
+uj
+
+uTj
+
++Tr
+
+M i=1
+
+1 ηi
+
+ui
+
+uTi
+
+M j=1
+
+ηj
+
+bj uTj + uj bTj
+
+(144)
+
+where bj = duj/ dα. Using the properties of the trace and the orthognality of
+
+Solution 3.21
+
+75
+
+eigenvectors, we can rewrite the second term as
+
+Tr
+
+M i=1
+
+1 ηi
+
+uiuTi
+
+M
+ηj
+j=1
+
+bj uTj + uj bTj
+
+= Tr
+
+M i=1
+
+1 ηi
+
+ui
+
+uTi
+
+M j=1
+
+2ηj uj bTj
+
+= Tr
+
+M i=1
+
+M j=1
+
+2ηj ηi
+
+ui
+
+uTi uj
+
+bTj
+
+M
+
+= Tr
+
+bj uTj + uj bTj
+
+i=1
+
+= Tr
+
+d dα
+
+M
+
+uiuTi
+
+.
+
+i
+
+However,
+
+M
+uiuTi = I
+i
+
+which is constant and thus its derivative w.r.t. α will be zero and the second term in (144) vanishes.
+
+For the ﬁrst term in (144), we again use the properties of the trace and the orthognality of eigenvectors to obtain
+
+Tr
+
+A−1 d A
+
+M
+=
+
+1 dηi .
+
+dα
+
+i=1 ηi dα
+
+We have now shown that both the left and right hand sides of (3.117) take the same form when expressed in terms of the eigenvector expansion. Next, we use (3.117) to differentiate (3.86) w.r.t. α, yielding
+
+d ln p(t|αβ) dα
+
+=
+
+M 2
+
+1 α
+
+−
+
+1 2
+
+mTN
+
+mN
+
+−
+
+1 Tr
+2
+
+A−1 d A dα
+
+=
+
+1 2
+
+M α
+
+− mTN mN
+
+− Tr
+
+A−1
+
+=
+
+1 2
+
+M α
+
+− mTN mN
+
+−
+
+i
+
+1 λi + α
+
+which we recognize as the r.h.s. of (3.89), from which (3.92) can be derived as detailed in Section 3.5.2, immediately following (3.89).
+
+76
+
+Solutions 3.22–3.23
+
+3.22 Using (3.82) and (3.93)—the derivation of latter is detailed in Section 3.5.2—we get the derivative of (3.86) w.r.t. β as the r.h.s. of (3.94). Rearranging this, collecting the β-dependent terms on one side of the equation and the remaining term on the other, we obtain (3.95).
+3.23 From (3.10), (3.112) and the properties of the Gaussian and Gamma distributions (see Appendix B), we get
+
+p(t) = =
+
+p(t|w, β)p(w|β) dwp(β) dβ
+
+β
+
+N/2
+exp
+
+− β (t − Φw)T(t − Φw)
+
+2π
+
+2
+
+β 2π
+
+M/2
+|S0|−1/2 exp
+
+−
+
+β 2
+
+(w
+
+−
+
+m0)T
+
+S−0 1
+
+(w
+
+−
+
+m0
+
+)
+
+dw
+
+Γ(a0)−1ba00 βa0−1 exp(−b0β) dβ
+
+=
+
+ba0 0 ((2π)M+N |S0|)1/2
+
+exp − β (t − Φw)T(t − Φw) 2
+
+exp
+
+−
+
+β 2
+
+(w
+
+−
+
+m0
+
+)TS−0 1(w
+
+−
+
+m0)
+
+dw
+
+βa0−1βN/2βM/2 exp(−b0β) dβ
+
+=
+
+ba0 0 ((2π)M+N |S0|)1/2
+
+exp
+
+−
+
+β 2
+
+(w
+
+−
+
+mN
+
+)T
+
+S−N1
+
+(w
+
+−
+
+mN
+
+)
+
+dw
+
+exp
+
+−β 2
+
+tTt + mT0 S−0 1m0 − mTN S−N1mN
+
+βaN −1βM/2 exp(−b0β) dβ
+
+where we have completed the square for the quadratic form in w, using
+
+mN = SN S−0 1m0 + ΦTt
+
+S−N1 = β S−0 1 + ΦTΦ
+
+N aN = a0 + 2
+
+bN
+
+=
+
+1 b0 + 2
+
+N
+
+mT0 S−0 1m0 − mTN S−N1mN +
+
+t2n
+
+.
+
+n=1
+
+Now we are ready to do the integration, ﬁrst over w and then β, and re-arrange the
+
+terms to obtain the desired result
+
+Solution 3.24
+
+77
+
+p(t)
+
+=
+
+((2π)M
+
+ba0 0
++N
+
+|S0
+
+|)1/2
+
+(2π)M/2
+
+|SN
+
+|1/2
+
+=
+
+1 (2π)N/2
+
+|SN |1/2 |S0|1/2
+
+ba0 0 baNN
+
+Γ(aN ) . Γ(a0)
+
+βaN −1 exp(−bN β) dβ
+
+3.24 Substituting the r.h.s. of (3.10), (3.112) and (3.113) into (3.119), we get
+
+p(t)
+
+=
+
+N
+
+(t|Φw, β−1I) N (w|m0, β−1S0) Gam (β|a0 N (w|mN , β−1SN ) Gam (β|aN , bN )
+
+,
+
+b0
+
+)
+
+.
+
+(145)
+
+Using the deﬁnitions of the Gaussian and Gamma distributions, we can write this as
+
+β
+
+N/2
+exp
+
+− β ∥t − Φw∥2
+
+2π
+
+2
+
+β 2π
+
+M/2
+|S0|1/2 exp
+
+−
+
+β 2
+
+(w
+
+−
+
+m0)T
+
+S−0 1
+
+(w
+
+−
+
+m0
+
+)
+
+Γ(a0)−1ba00 βa0−1 exp(−b0β)
+
+β 2π
+
+M/2
+|SN |1/2 exp
+
+−
+
+β 2
+
+(w
+
+−
+
+mN
+
+)TS−N1
+
+(w
+
+−
+
+mN
+
+)
+
+−1
+Γ(aN )−1baNN βaN −1 exp(−bN β) . (146)
+
+Concentrating on the factors corresponding to the denominator in (145), i.e. the fac-
+
+78
+
+Solution 4.1
+
+tors inside {. . .})−1 in (146), we can use (135)–(138) to get
+
+N w|mN , β−1SN Gam (β|aN , bN )
+
+=
+
+β 2π
+
+M/2
+|SN |1/2 exp
+
+−β 2
+
+wTS−N1w − wTS−N1mN − mTN S−N1w
+
++mTN S−N1mN Γ(aN )−1baNN βaN −1 exp(−bN β)
+
+=
+
+β 2π
+
+M/2
+|SN |1/2 exp
+
+−β 2
+
+wTS−0 1w + wTΦTΦw − wTS−0 1m0
+
+−wTΦTt − mT0 S−N1w − tTΦw + mTN S−N1mN
+
+Γ(aN )−1baNN βa0+N/2−1
+
+exp
+
+−
+
+1 b0 + 2
+
+mT0 S−0 1m0 − mTN S−N1mN + tTt
+
+β
+
+=
+
+β 2π
+
+M/2
+|SN |1/2 exp
+
+−β 2
+
+(w − m0)TS0(w − m0) + ∥t − Φw∥2
+
+Γ(aN )−1baNN βaN +N/2−1 exp(−b0β).
+
+Substituting this into (146), the exponential factors along with βa0+N/2−1(β/2π)M/2 cancel and we are left with (3.118).
+
+Chapter 4 Linear Models for Classiﬁcation
+
+4.1 Assume that the convex hulls of {xn} and {ym} intersect. Then there exist a point z such that
+
+z = αnxn = βmym
+
+n
+
+m
+
+where βm 0 for all m and m βm = 1. If {xn} and {ym} also were to be linearly separable, we would have that
+
+wTz + w0 = αnwTxn + w0 = αn(
+
+n
+
+n
+
+since wTxn + w0 > 0 and the {αn} are all non-negative and sum to 1, but by the corresponding argument
+
+wTz + w0 = βmwTym + w0 = βm(wTym + w0) < 0,
+
+m
+
+m
+
+Solution 4.2
+
+79
+
+which is a contradiction and hence {xn} and {ym} cannot be linearly separable if their convex hulls intersect.
+If we instead assume that {xn} and {ym} are linearly separable and consider a point z in the intersection of their convex hulls, the same contradiction arise. Thus no such point can exist and the intersection of the convex hulls of {xn} and {ym} must be empty.
+
+4.2 For the purpose of this exercise, we make the contribution of the bias weights explicit in (4.15), giving
+
+1
+
+ED (W)
+
+=
+
+Tr 2
+
+(XW + 1w0T − T)T(XW + 1w0T − T)
+
+,
+
+(147)
+
+where w0 is the column vector of bias weights (the top row of W transposed) and 1 is a column vector of N ones. We can take the derivative of (147) w.r.t. w0, giving
+2N w0 + 2(XW − T)T1.
+
+Setting this to zero, and solving for w0, we obtain w0 = ¯t − WTx¯
+
+(148)
+
+where
+
+¯t = 1 TT1 and x¯ = 1 XT1.
+
+N
+
+N
+
+If we subsitute (148) into (147), we get
+
+1
+
+ED (W)
+
+=
+
+Tr 2
+
+(XW + T − XW − T)T(XW + T − XW − T)
+
+,
+
+where
+
+T = 1¯tT and X = 1x¯T.
+
+Setting the derivative of this w.r.t. W to zero we get
+
+W = (XTX)−1XTT = X†T,
+
+where we have deﬁned X = X − X and T = T − T. Now consider the prediction for a new input vector x⋆,
+y(x⋆) = WTx⋆ + w0 = WTx⋆ + ¯t − WTx¯
+T
+= ¯t − TT X† (x⋆ − x¯).
+
+(149)
+
+If we apply (4.157) to ¯t, we get aT¯t = 1 aTTT1 = −b. N
+
+80
+
+Solutions 4.3–4.5
+
+Therefore, applying (4.157) to (149), we obtain
+
+T
+aTy(x⋆) = aT¯t + aTTT X† (x⋆ − x¯) = aT¯t = −b,
+
+since aTTT = aT(T − T)T = b(1 − 1)T = 0T.
+
+4.3 When we consider several simultaneous constraints, (4.157) becomes
+
+Atn + b = 0,
+
+(150)
+
+where A is a matrix and b is a column vector such that each row of A and element of b correspond to one linear constraint.
+If we apply (150) to (149), we obtain
+
+T
+Ay(x⋆) = A¯t − ATT X† (x⋆ − x¯) = A¯t = −b,
+
+since ATT = A(T − T)T = b1T − b1T = 0T. Thus Ay(x⋆) + b = 0.
+4.4 NOTE: In the 1st printing of PRML, the text of the exercise refers equation (4.23) where it should refer to (4.22). From (4.22) we can construct the Lagrangian function
+
+L = wT(m2 − m1) + λ wTw − 1 .
+
+Taking the gradient of L we obtain
+
+∇L = m2 − m1 + 2λw
+
+(151)
+
+and setting this gradient to zero gives
+
+1 w = − 2λ (m2 − m1)
+
+form which it follows that w ∝ m2 − m1.
+
+4.5 Starting with the numerator on the r.h.s. of (4.25), we can use (4.23) and (4.27) to rewrite it as follows:
+
+(m2 − m1)2 = wT(m2 − m1) 2
+= wT(m2 − m1)(m2 − m1)Tw = wTSBw.
+
+(152)
+
+Solution 4.6
+
+81
+
+Similarly, we can use (4.20), (4.23), (4.24), and (4.28) to rewrite the denominator of the r.h.s. of (4.25):
+
+s21 + s22 =
+
+(yn − m1)2 + (yk − m2)2
+
+n∈C1
+
+k∈C2
+
+=
+
+wT(xn − m1) 2 +
+
+wT(xk − m2) 2
+
+n∈C1
+
+k∈C2
+
+=
+
+wT(xn − m1)(xn − m1)Tw
+
+n∈C1
+
++ wT(xk − m2)(xk − m2)Tw
+
+k∈C2
+= wTSWw.
+
+(153)
+
+Substituting (152) and (153) in (4.25) we obtain (4.26).
+
+4.6 Using (4.21) and (4.34) along with the chosen target coding scheme, we can re-write the l.h.s. of (4.33) as follows:
+
+N
+
+N
+
+wTxn − w0 − tn xn =
+
+wTxn − wTm − tn xn
+
+n=1
+
+n=1
+
+N
+=
+n=1
+
+xnxTn − xnmT w − xntn
+
+=
+
+xnxTn − xnmT w − xntn
+
+n∈C1
+
+xmxTm − xmmT w − xmtm
+m∈C2
+
+=
+
+xnxTn − N1m1mT
+n∈C1
+
+N w − N1m1 N1
+
+xmxTm − N2m2mT
+m∈C2
+
+N w + N2m2 N2
+
+=
+
+xnxTn +
+
+xmxTm − (N1m1 + N2m2)mT w
+
+n∈C1
+
+m∈C2
+
+−N (m1 − m2).
+
+(154)
+
+82
+
+Solution 4.7
+
+We then use the identity
+
+(xi − mk) (xi − mk)T =
+
+xixTi − ximTk − mkxTi + mkmTk
+
+i∈Ck
+
+i∈Ck
+
+=
+
+xixTi − NkmkmTk
+
+i∈Ck
+
+together with (4.28) and (4.36) to rewrite (154) as
+
+SW + N1m1mT1 + N2m2mT2
+
+−(N1m1
+
++
+
+N2m2)
+
+1 N
+
+(N1m1
+
++
+
+N2m2)
+
+w − N (m1 − m2)
+
+=
+
+SW +
+
+N1
+
+−
+
+N12 N
+
+m1mT1
+
+−
+
+N1N2 N
+
+(m1mT2
+
++
+
+m2m1)
+
++
+
+N2
+
+−
+
+N22 N
+
+m2mT2
+
+w − N (m1 − m2)
+
+=
+
+SW
+
++
+
+(N1
+
++
+
+N2)N1 N
+
+−
+
+N12
+
+m1mT1
+
+−
+
+N1N2 N
+
+(m1mT2
+
++
+
+m2m1)
+
++
+
+(N1
+
++
+
+N2)N2 N
+
+−
+
+N22
+
+m2mT2
+
+w − N (m1 − m2)
+
+=
+
+SW
+
++
+
+N2N1 N
+
+m1mT1 − m1mT2 − m2m1 + m2mT2
+
+w
+
+−N (m1 − m2)
+
+=
+
+SW
+
++
+
+N2N1 N
+
+SB
+
+w − N (m1 − m2),
+
+where in the last line we also made use of (4.27). From (4.33), this must equal zero, and hence we obtain (4.37).
+
+4.7 From (4.59) we have
+
+1
+
+1 + e−a − 1
+
+1 − σ(a) = 1 − 1 + e−a = 1 + e−a
+
+e−a
+
+1
+
+= 1 + e−a = ea + 1 = σ(−a).
+
+Solutions 4.8–4.9
+
+83
+
+The inverse of the logistic sigmoid is easily found as follows
+
+1 y = σ(a) = 1 + e−a ⇒ 1 − 1 = e−a
+y
+
+⇒
+
+1−y ln
+
+y
+
+= −a
+
+⇒
+
+y ln 1 − y
+
+= a = σ−1(y).
+
+4.8 Substituting (4.64) into (4.58), we see that the normalizing constants cancel and we are left with
+
+exp
+
+−
+
+1 2
+
+(x
+
+−
+
+µ1)T
+
+Σ−1
+
+(x
+
+−
+
+µ1)
+
+p(C1)
+
+a = ln
+
+exp
+
+−
+
+1 2
+
+(x
+
+−
+
+µ2)T
+
+Σ−1
+
+(x
+
+−
+
+µ2)
+
+p(C2)
+
+=
+
+−1 2
+
+xΣTx − xΣµ1 − µT1 Σx + µT1 Σµ1
+
+−xΣTx + xΣµ2 + µT2 Σx − µT2 Σµ2
+
++ ln p(C1) p(C2)
+
+=
+
+(µ1
+
+−
+
+µ2)T
+
+Σ−1x
+
+−
+
+1 2
+
+µT1 Σ−1µ1 − µT2 Σµ2
+
++ ln p(C1) . p(C2)
+
+Substituting this into the rightmost form of (4.57) we obtain (4.65), with w and w0 given by (4.66) and (4.67), respectively.
+
+4.9 The likelihood function is given by
+
+NK
+
+p ({φn, tn}|{πk}) =
+
+{p(φn |Ck )πk }tnk
+
+n=1 k=1
+
+and taking the logarithm, we obtain
+
+NK
+
+ln p ({φn, tn}|{πk}) =
+
+tnk {ln p(φn|Ck) + ln πk} .
+
+n=1 k=1
+
+(155)
+
+In order to maximize the log likelihood with respect to πk we need to preserve the constraint k πk = 1. This can be done by introducing a Lagrange multiplier λ and maximizing
+
+K
+
+ln p ({φn, tn}|{πk}) + λ
+
+πk − 1 .
+
+k=1
+
+84
+
+Solution 4.10
+
+Setting the derivative with respect to πk equal to zero, we obtain
+
+N tnk + λ = 0. n=1 πk
+
+Re-arranging then gives
+
+N
+−πkλ = tnk = Nk.
+n=1
+
+(156)
+
+Summing both sides over k we ﬁnd that λ = −N , and using this to eliminate λ we obtain (4.159).
+
+4.10 If we substitute (4.160) into (155) and then use the deﬁnition of the multivariate Gaussian, (2.43), we obtain
+
+ln p ({φn, tn}|{πk}) =
+
+1N K
+
+− 2
+
+tnk
+
+n=1 k=1
+
+ln |Σ| + (φn − µk)TΣ−1(φ − µ) ,
+
+(157)
+
+where we have dropped terms independent of {µk} and Σ.
+Setting the derivative of the r.h.s. of (157) w.r.t. µk, obtained by using (C.19), to zero, we get
+NK
+tnkΣ−1(φn − µk) = 0.
+n=1 k=1
+Making use of (156), we can re-arrange this to obtain (4.161).
+Rewriting the r.h.s. of (157) as
+
+1N −b
+2
+
+K
+tnk ln |Σ| + Tr Σ−1(φn − µk)(φ − µk)T
+
+,
+
+n=1 k=1
+
+we can use (C.24) and (C.28) to calculate the derivative w.r.t. Σ−1. Setting this to zero we obtain
+
+1N 2
+
+T
+tnk Σ − (φn − µn)(φn − µk)T = 0.
+
+n=1 k
+
+Again making use of (156), we can re-arrange this to obtain (4.162), with Sk given by (4.163).
+Note that, as in Exercise 2.34, we do not enforce that Σ should be symmetric, but simply note that the solution is automatically symmetric.
+
+Solutions 4.11–4.13
+
+85
+
+4.11 The generative model for φ corresponding to the chosen coding scheme is given by
+
+M
+p (φ | Ck) = p (φm | Ck)
+m=1
+
+where
+
+L
+p (φm | Ck) = µφkmmll,
+l=1
+
+where in turn {µkml} are the parameters of the multinomial models for φ. Substituting this into (4.63) we see that
+
+ak = ln p (φ | Ck) p (Ck)
+
+M
+
+= ln p (Ck) + ln p (φm | Ck)
+
+m=1
+
+ML
+
+= ln p (Ck) +
+
+φml ln µkml,
+
+m=1 l=1
+
+which is linear in φml.
+
+4.12 Differentiating (4.59) we obtain
+
+dσ
+
+e−a
+
+da = (1 + e−a)2
+
+e−a = σ(a) 1 + e−a
+
+1 + e−a
+
+1
+
+= σ(a) 1 + e−a − 1 + e−a
+
+= σ(a)(1 − σ(a)).
+
+4.13 We start by computing the derivative of (4.90) w.r.t. yn
+
+∂E ∂yn
+
+=
+
+1 − tn − tn 1 − yn yn
+
+= yn(1 − tn) − tn(1 − yn) yn(1 − yn)
+
+= yn − yntn − tn + yntn yn(1 − yn)
+
+= yn − tn . yn(1 − yn)
+
+(158)
+(159) (160)
+
+86
+
+Solutions 4.14–4.15
+
+From (4.88), we see that
+
+∂yn ∂an
+
+=
+
+∂σ(an) ∂an
+
+=
+
+σ(an) (1
+
+− σ(an))
+
+=
+
+yn(1 − yn).
+
+(161)
+
+Finally, we have
+
+∇an = φn
+
+(162)
+
+where ∇ denotes the gradient with respect to w. Combining (160), (161) and (162) using the chain rule, we obtain
+
+∇E
+
+=
+
+N n=1
+
+∂E ∂yn
+
+∂yn ∂an
+
+∇an
+
+N
+
+=
+
+(yn − tn)φn
+
+n=1
+
+as required.
+
+4.14 If the data set is linearly separable, any decision boundary separating the two classes will have the property
+
+wTφn
+
+0 if tn = 1, < 0 otherwise.
+
+Moreover, from (4.90) we see that the negative log-likelihood will be minimized
+(i.e., the likelihood maximized) when yn = σ (wTφn) = tn for all n. This will be the case when the sigmoid function is saturated, which occurs when its argument, wTφ, goes to ±∞, i.e., when the magnitude of w goes to inﬁnity.
+
+4.15 NOTE: In PRML, “concave” should be “convex” on the last line of the exercise.
+Assuming that the argument to the sigmoid function (4.87) is ﬁnite, the diagonal elements of R will be strictly positive. Then
+
+vTΦTRΦv = vTΦTR1/2
+
+R1/2Φv
+
+=
+
+R1/2Φv
+
+2
+>0
+
+where R1/2 is a diagonal matrix with elements (yn(1 − yn))1/2, and thus ΦTRΦ is positive deﬁnite. Now consider a Taylor expansion of E(w) around a minima, w⋆,
+E(w) = E(w⋆) + 1 (w − w⋆)T H (w − w⋆) 2
+where the linear term has vanished since w⋆ is a minimum. Now let
+w = w⋆ + λv
+
+Solutions 4.16–4.18
+
+87
+
+where v is an arbitrary, non-zero vector in the weight space and consider
+
+∂2E ∂λ2
+
+=
+
+vTHv
+
+>
+
+0.
+
+This shows that E(w) is convex. Moreover, at the minimum of E(w),
+
+H (w − w⋆) = 0
+
+and since H is positive deﬁnite, H−1 exists and w = w⋆ must be the unique minimum.
+
+4.16 If the values of the {tn} were known then each data point for which tn = 1 would contribute p(tn = 1|φ(xn)) to the log likelihood, and each point for which tn = 0 would contribute 1 − p(tn = 1|φ(xn)) to the log likelihood. A data point whose probability of having tn = 1 is given by πn will therefore contribute
+
+πnp(tn = 1|φ(xn)) + (1 − πn)(1 − p(tn = 1|φ(xn)))
+
+and so the overall log likelihood for the data set is given by
+
+N
+πn ln p (tn = 1 | φ(xn)) + (1 − πn) ln (1 − p (tn = 1 | φ(xn))) .
+n=1
+
+(163)
+
+This can also be viewed from a sampling perspective by imagining sampling the value of each tn some number M times, with probability of tn = 1 given by πn, and then constructing the likelihood function for this expanded data set, and dividing by M . In the limit M → ∞ we recover (163).
+
+4.17 From (4.104) we have
+
+∂yk = ∂ak
+
+eak i eai −
+
+eak
+
+2
+
+i eai = yk(1 − yk),
+
+∂yk ∂aj
+
+eak eaj
+
+=−
+
+i eai 2 = −ykyj ,
+
+j ̸= k.
+
+Combining these results we obtain (4.106).
+
+4.18 NOTE: In the 1st printing of PRML, the text of the exercise refers equation (4.91) where it should refer to (4.106).
+
+From (4.108) we have
+
+∂E = − tnk .
+
+∂ynk
+
+ynk
+
+88
+
+Solution 4.19
+
+If we combine this with (4.106) using the chain rule, we get
+
+∂E ∂anj
+
+= K ∂E ∂ynk k=1 ∂ynk ∂anj
+
+=
+
+−
+
+K k=1
+
+tnk ynk
+
+ynk
+
+(Ikj
+
+−
+
+ynj )
+
+= ynj − tnj ,
+
+where we have used that ∀n : k tnk = 1. If we combine this with (162), again using the chain rule, we obtain (4.109).
+
+4.19 Using the cross-entropy error function (4.90), and following Exercise 4.13, we have
+
+∂E =
+
+yn − tn .
+
+∂yn yn(1 − yn)
+
+(164)
+
+Also
+
+∇an = φn.
+
+From (4.115) and (4.116) we have
+
+(165)
+
+∂yn = ∂Φ(an) = √1 e−a2n .
+
+∂an
+
+∂an
+
+2π
+
+Combining (164), (165) and (166), we get
+
+(166)
+
+∇E
+
+=
+
+N n=1
+
+∂E ∂yn
+
+∂yn ∂an
+
+∇an
+
+=
+
+N n=1
+
+yn − tn yn(1 − yn)
+
+√1 2π
+
+e−a2n φn.
+
+(167)
+
+In order to ﬁnd the expression for the Hessian, it is is convenient to ﬁrst determine
+
+∂ yn − tn = ∂yn yn(1 − yn)
+= Then using (165)–(168) we have
+
+yn(1 − yn) yn2 (1 − yn)2
+
+−
+
+(yn − tn)(1 − 2yn) yn2 (1 − yn)2
+
+yn2 + tn − 2yntn yn2 (1 − yn)2
+
+.
+
+(168)
+
+∇∇E
+
+=
+
+N n=1
+
+∂ ∂yn
+
+yn − tn yn(1 − yn)
+
+√1 2π
+
+e−a2n
+
+φn
+
+∇yn
+
++
+
+yn − tn yn(1 − yn)
+
+√1 2π
+
+e−a2n
+
+(−2an)φn∇an
+
+=
+
+N n=1
+
+yn2
+
++ tn yn(1
+
+− 2yntn − yn)
+
+√1 2π
+
+e−a2n
+
+−
+
+2an(yn
+
+−
+
+tn)
+
+√e−2a2n φnφTn . 2πyn(1 − yn)
+
+Solutions 4.20–4.21
+
+89
+
+4.20 NOTE: In the 1st printing of PRML, equation (4.110) contains an incorrect leading minus sign (‘−’) on the right hand side.
+We ﬁrst write out the components of the M K × M K Hessian matrix in the form
+
+∂2E
+
+N
+
+∂wki∂wjl
+
+=
+
+ynk (Ikj
+n=1
+
+− ynj )φniφnl.
+
+To keep the notation uncluttered, consider just one term in the summation over n and show that this is positive semi-deﬁnite. The sum over n will then also be positive semi-deﬁnite. Consider an arbitrary vector of dimension M K with elements uki. Then
+
+uTHu =
+
+ukiyk(Ikj − yj )φiφlujl
+
+i,j,k,l
+
+=
+
+bj yk(Ikj − yj )bk
+
+j,k
+
+2
+
+=
+
+ykb2k −
+
+bk yk
+
+k
+
+k
+
+where
+
+bk = ukiφni.
+i
+
+We now note that the quantities yk satisfy 0 yk 1 and k yk = 1. Furthermore, the function f (b) = b2 is a concave function. We can therefore apply Jensen’s inequality to give
+
+ykb2k = ykf (bk) f
+
+k
+
+k
+
+ykbk =
+k
+
+2
+yk bk
+k
+
+and hence
+
+uTHu 0.
+
+Note that the equality will never arise for ﬁnite values of ak where ak is the set of arguments to the softmax function. However, the Hessian can be positive semi-
+deﬁnite since the basis vectors φni could be such as to have zero dot product for a linear subspace of vectors uki. In this case the minimum of the error function would comprise a continuum of solutions all having the same value of the error function.
+
+4.21 NOTE: In PRML, (4.116) should read
+
+1 Φ(a) =
+
+1 + erf
+
+√a
+
+.
+
+2
+
+2
+
+Note that Φ should be Φ (i.e. not bold) on the l.h.s.
+
+90
+
+Solutions 4.22–4.23
+
+We consider the two cases where a 0 and a < 0 separately. In the ﬁrst case, we can use (2.42) to rewrite (4.114) as
+
+Φ(a) =
+
+0
+N (θ|0, 1) dθ +
+
+a √1
+
+exp
+
+θ2 −
+
+dθ
+
+−∞
+
+0 2π
+
+2
+
+√
+
+= 1 + √1
+
+a/ 2
+
+√
+
+exp −u2 2 du
+
+2
+
+2π 0
+
+=
+
+1 2
+
+1 + erf
+
+√a 2
+
+,
+
+where, in the last line, we have used (4.115). When a < 0, the symmetry of the Gaussian distribution gives
+
+Φ(a) = 1 − Φ(−a).
+
+Combining this with the above result, we get
+
+Φ(a) = 1 − 1 1 + erf − √a
+
+2
+
+2
+
+= 1 1 + erf √a ,
+
+2
+
+2
+
+where we have used the fact that the erf function is is anti-symmetric, i.e., erf(−a) = −erf (a).
+
+4.22 Starting from (4.136), using (4.135), we have
+
+p (D) = p (D | θ) p (θ) dθ
+
+≃ p (D | θMAP) p (θMAP)
+
+exp
+
+−
+
+1 2
+
+(θ
+
+−
+
+θMAP)A−1(θ
+
+−
+
+θMAP)
+
+dθ
+
+(2π)M/2 = p (D | θMAP) p (θMAP) |A|1/2 ,
+
+where A is given by (4.138). Taking the logarithm of this yields (4.137).
+
+4.23 NOTE: In the 1st printing of PRML, the text of the exercise contains a typographical error. Following the equation, it should say that H is the matrix of second derivatives of the negative log likelihood.
+The BIC approximation can be viewed as a large N approximation to the log model evidence. From (4.138), we have
+
+A = −∇∇ ln p(D|θMAP)p(θMAP) = H − ∇∇ ln p(θMAP)
+
+Solution 4.24
+
+91
+
+and if p(θ) = N (θ|m, V0), this becomes
+
+A = H + V0−1.
+
+If we assume that the prior is broad, or equivalently that the number of data points is large, we can neglect the term V0−1 compared to H. Using this result, (4.137) can be rewritten in the form
+
+ln p(D)
+
+≃
+
+ln p(D|θMAP)
+
+−
+
+1 2 (θMAP
+
+−
+
+m)V0−1(θMAP
+
+−
+
+m)
+
+−
+
+1 2
+
+ln |H|
+
++
+
+const
+
+(169)
+
+as required. Note that the phrasing of the question is misleading, since the assump-
+
+tion of a broad prior, or of large N , is required in order to derive this form, as well
+
+as in the subsequent simpliﬁcation.
+
+We now again invoke the broad prior assumption, allowing us to neglect the second term on the right hand side of (169) relative to the ﬁrst term.
+
+Since we assume i.i.d. data, H = −∇∇ ln p(D|θMAP) consists of a sum of terms, one term for each datum, and we can consider the following approximation:
+
+N
+H = Hn = N H
+n=1
+where Hn is the contribution from the nth data point and
+
+1N H = N Hn.
+n=1
+Combining this with the properties of the determinant, we have
+
+ln |H| = ln |N H| = ln N M |H| = M ln N + ln |H|
+
+where M is the dimensionality of θ. Note that we are assuming that H has full rank M . Finally, using this result together (169), we obtain (4.139) by dropping the ln |H| since this O(1) compared to ln N .
+4.24 Consider a rotation of the coordinate axes of the M -dimensional vector w such that w = (w∥, w⊥) where wTφ = w∥∥φ∥, and w⊥ is a vector of length M − 1. We then have
+
+σ(wTφ)q(w) dw =
+
+σ w∥∥φ∥ q(w⊥|w∥)q(w∥) dw∥ dw⊥
+
+= σ(w∥∥φ∥)q(w∥) dw∥.
+Note that the joint distribution q(w⊥, w∥) is Gaussian. Hence the marginal distribution q(w∥) is also Gaussian and can be found using the standard results presented in
+
+92
+
+Solutions 4.25–4.26
+
+Section 2.3.2. Denoting the unit vector
+
+1 e= φ
+∥φ∥
+
+we have
+
+q(w∥) = N (w∥|eTmN , eTSN e).
+
+Deﬁning a = w∥∥φ∥ we see that the distribution of a is given by a simple re-scaling of the Gaussian, so that
+
+q(a) = N (a|φTmN , φTSN φ)
+
+where we have used ∥φ∥e = φ. Thus we obtain (4.151) with µa given by (4.149) and σa2 given by (4.150).
+4.25 From (4.88) we have that
+
+dσ = σ(0)(1 − σ(0))
+da a=0
+
+= 1 1 − 1 = 1.
+
+2
+
+24
+
+(170)
+
+Since the derivative of a cumulative distribution function is simply the corresponding density function, (4.114) gives
+
+dΦ(λa)
+
+= λN (0|0, 1)
+
+da a=0
+
+= λ √1 .
+
+2π
+
+Setting this equal to (170), we see that
+
+√
+
+2π
+
+λ=
+
+or equivalently
+
+4
+
+λ2
+
+=
+
+π .
+
+8
+
+This is illustrated in Figure 4.9.
+
+4.26 First of all consider the derivative of the right hand side with respect to µ, making use of the deﬁnition of the probit function, giving
+
+1 1/2
+
+µ2
+
+1
+
+2π
+
+exp − 2(λ−2 + σ2) (λ−2 + σ2)1/2 .
+
+Now make the change of variable a = µ + σz, so that the left hand side of (4.152)
+
+becomes
+
+∞
+
+1
+
+−∞ Φ(λµ + λσz) (2πσ2)1/2 exp
+
+− 1 z2 2
+
+σ dz
+
+Solutions 5.1–5.2
+
+93
+
+where we have substituted for the Gaussian distribution. Now differentiate with respect to µ, making use of the deﬁnition of the probit function, giving
+
+1
+
+∞
+exp
+
+− 1 z2 − λ2 (µ + σz)2
+
+σ dz.
+
+2π −∞
+
+2
+
+2
+
+The integral over z takes the standard Gaussian form and can be evaluated analytically by making use of the standard result for the normalization coefﬁcient of a Gaussian distribution. To do this we ﬁrst complete the square in the exponent
+
+− 1 z2
+
+−
+
+λ2 (µ
+
++
+
+σz)2
+
+2
+
+2
+
+= − 1 z2(1 + λ2σ2) − zλ2µσ − 1 λ2µ2
+
+2
+
+2
+
+=
+
+−
+
+1 2
+
+z + λ2µσ(1 + λ2σ2)−1
+
+2 (1 + λ2σ2) +
+
+1 λ4µ2σ2 2 (1 + λ2σ2)
+
+−
+
+1 λ2µ2. 2
+
+Integrating over z then gives the following result for the derivative of the left hand side
+
+1
+
+1
+
+(2π)1/2 (1 + λ2σ2)1/2 exp
+
+− 1 λ2µ2 2
+
++
+
+1 2
+
+λ4µ2σ2 (1 + λ2σ2)
+
+1
+
+1
+
+1 λ2µ2
+
+= (2π)1/2 (1 + λ2σ2)1/2 exp − 2 (1 + λ2σ2) .
+
+Thus the derivatives of the left and right hand sides of (4.152) with respect to µ are equal. It follows that the left and right hand sides are equal up to a function of σ2 and λ. Taking the limit µ → −∞ the left and right hand sides both go to zero, showing
+that the constant of integration must also be zero.
+
+Chapter 5 Neural Networks
+5.1 NOTE: In the 1st printing of PRML, the text of this exercise contains a typographical error. On line 2, g(·) should be replaced by h(·). See Solution 3.1.
+5.2 The likelihood function for an i.i.d. data set, {(x1, t1), . . . , (xN , tN )}, under the conditional distribution (5.16) is given by
+N
+N tn|y(xn, w), β−1I .
+n=1
+
+94
+
+Solution 5.3
+
+If we take the logarithm of this, using (2.43), we get
+
+N
+ln N tn|y(xn, w), β−1I
+
+n=1
+
+=
+
+−1 2
+
+N
+
+(tn − y(xn, w))T (βI) (tn − y(xn, w)) + const
+
+n=1
+
+=
+
+−β 2
+
+N
+
+∥tn − y(xn, w)∥2 + const,
+
+n=1
+
+where ‘const’ comprises terms which are independent of w. The ﬁrst term on the right hand side is proportional to the negative of (5.11) and hence maximizing the log-likelihood is equivalent to minimizing the sum-of-squares error.
+
+5.3 In this case, the likelihood function becomes
+
+N
+p(T|X, w, Σ) = N (tn|y(xn, w), Σ) ,
+n=1
+with the corresponding log-likelihood function
+
+ln p(T|X, w, Σ)
+
+N
+
+1
+
+= − (ln |Σ| + K ln(2π)) −
+
+2
+
+2
+
+N
+(tn − yn)TΣ−1(tn − yn),
+
+n=1
+
+(171)
+
+where yn = y(xn, w) and K is the dimensionality of y and t.
+If we ﬁrst treat Σ as ﬁxed and known, we can drop terms that are independent of w from (171), and by changing the sign we get the error function
+
+1 E(w) =
+2
+
+N
+(tn − yn)TΣ−1(tn − yn).
+
+n=1
+
+If we consider maximizing (171) w.r.t. Σ, the terms that need to be kept are
+
+N
+
+1
+
+− ln |Σ| −
+
+2
+
+2
+
+N
+(tn − yn)TΣ−1(tn − yn).
+
+n=1
+
+By rewriting the second term we get
+
+−N
+
+ln |Σ|
+
+−
+
+1 Tr
+
+2
+
+2
+
+N
+Σ−1 (tn − yn)(tn − yn)T
+
+.
+
+n=1
+
+Solutions 5.4–5.5
+
+95
+
+Using results from Appendix C, we can maximize this by setting the derivative w.r.t. Σ−1 to zero, yielding
+
+1 Σ=
+N
+
+N
+(tn − yn)(tn − yn)T.
+
+n=1
+
+Thus the optimal value for Σ depends on w through yn.
+A possible way to address this mutual dependency between w and Σ when it comes to optimization, is to adopt an iterative scheme, alternating between updates of w and Σ until some convergence criterion is reached.
+
+5.4 Let t ∈ {0, 1} denote the data set label and let k ∈ {0, 1} denote the true class label. We want the network output to have the interpretation y(x, w) = p(k = 1|x). From the rules of probability we have
+
+1
+p(t = 1|x) = p(t = 1|k)p(k|x) = (1 − ϵ)y(x, w) + ϵ(1 − y(x, w)).
+k=0
+The conditional probability of the data label is then
+p(t|x) = p(t = 1|x)t(1 − p(t = 1|x)1−t.
+
+Forming the likelihood and taking the negative logarithm we then obtain the error function in the form
+N
+E(w) = − {tn ln [(1 − ϵ)y(xn, w) + ϵ(1 − y(xn, w))]
+n=1
++(1 − tn) ln [1 − (1 − ϵ)y(xn, w) − ϵ(1 − y(xn, w))]} .
+
+See also Solution 4.16.
+
+5.5 For the given interpretation of yk(x, w), the conditional distribution of the target vector for a multiclass neural network is
+K
+p(t|w1, . . . , wK ) = yktk .
+k=1
+Thus, for a data set of N points, the likelihood function will be
+
+NK
+
+p(T|w1, . . . , wK ) =
+
+yntnkk .
+
+n=1 k=1
+
+Taking the negative logarithm in order to derive an error function we obtain (5.24) as required. Note that this is the same result as for the multiclass logistic regression model, given by (4.108) .
+
+96
+
+Solutions 5.6–5.9
+
+5.6 Differentiating (5.21) with respect to the activation an corresponding to a particular data point n, we obtain
+
+∂E ∂an
+
+=
+
+1 −tn yn
+
+∂yn ∂an
+
+1 + (1 − tn) 1 − yn
+
+∂yn . ∂an
+
+From (4.88), we have
+
+∂yn ∂an
+
+=
+
+yn(1
+
+− yn).
+
+Substituting (173) into (172), we get
+
+(172) (173)
+
+∂E ∂an
+
+=
+
+−tn
+
+yn(1 − yn
+
+yn)
+
++
+
+(1
+
+−
+
+tn)
+
+yn(1 − yn (1 − yn)
+
+)
+
+= yn − tn
+
+as required.
+
+5.7 See Solution 4.17.
+
+5.8 From (5.59), using standard derivatives, we get
+
+d tanh
+
+ea
+
+ea(ea − e−a)
+
+e−a
+
+e−a(ea − e−a)
+
+da
+
+= ea + e−a − (ea + e−a)2 + ea + e−a + (ea + e−a)2
+
+ea + e−a 1 − e2a − e−2a + 1
+
+= ea + e−a +
+
+(ea + e−a)2
+
+e2a − 2 + e−2a = 1 − (ea + e−a)2
+
+=
+
+1
+
+−
+
+(ea (ea
+
+− e−a)(ea + e−a) (ea
+
+− e−a) + e−a)
+
+= 1 − tanh2(a)
+
+5.9 This simply corresponds to a scaling and shifting of the binary outputs, which directly gives the activation function, using the notation from (5.19), in the form
+
+y = 2σ(a) − 1.
+
+The corresponding error function can be constructed from (5.21) by applying the inverse transform to yn and tn, yielding
+
+E(w) = − N 1 + tn ln 1 + yn + 1 − 1 + tn ln 1 − 1 + yn
+
+2
+
+2
+
+2
+
+2
+
+n=1
+
+1N
+
+=− 2
+
+{(1 + tn) ln(1 + yn) + (1 − tn) ln(1 − yn)} + N ln 2
+
+n=1
+
+Solutions 5.10–5.11
+
+97
+
+where the last term can be dropped, since it is independent of w.
+To ﬁnd the corresponding activation function we simply apply the linear transformation to the logistic sigmoid given by (5.19), which gives
+2 y(a) = 2σ(a) − 1 = 1 + e−a − 1
+1 − e−a ea/2 − e−a/2 = 1 + e−a = ea/2 + e−a/2 = tanh(a/2).
+
+5.10 From (5.33) and (5.35) we have
+
+uTi Hui = uTi λiui = λi.
+
+Assume that H is positive deﬁnite, so that (5.37) holds. Then by setting v = ui it
+
+follows that
+
+λi = uTi Hui > 0
+
+(174)
+
+for all values of i. Thus, if H is positive deﬁnite, all of its eigenvalues will be positive.
+
+Conversely, assume that (174) holds. Then, for any vector, v, we can make use of (5.38) to give
+
+vTHv = = =
+
+T
+
+ciui H
+i T
+
+cj uj
+j
+
+ciui
+i
+
+λj cj uj
+j
+
+λic2i > 0
+i
+
+where we have used (5.33) and (5.34) along with (174). Thus, if all of the eigenvalues are positive, the Hessian matrix will be positive deﬁnite.
+
+5.11 NOTE: In PRML, Equation (5.32) contains a typographical error: = should be ≃.
+We start by making the change of variable given by (5.35) which allows the error function to be written in the form (5.36). Setting the value of the error function E(w) to a constant value C we obtain
+
+E(w⋆) + 1 2
+
+λiαi2 = C.
+
+i
+
+Re-arranging gives
+
+λiαi2 = 2C − 2E(w⋆) = C
+i
+
+98
+
+Solutions 5.12–5.15
+
+where C is also a constant. This is the equation for an ellipse whose axes are aligned with the coordinates described by the variables {αi}. The length of axis j is found by setting αi = 0 for all i ̸= j, and solving for αj giving
+
+αj =
+
+1/2
+C
+λj
+
+which is inversely proportional to the square root of the corresponding eigenvalue.
+
+5.12 NOTE: See note in Solution 5.11.
+From (5.37) we see that, if H is positive deﬁnite, then the second term in (5.32) will be positive whenever (w − w⋆) is non-zero. Thus the smallest value which E(w) can take is E(w⋆), and so w⋆ is the minimum of E(w).
+Conversely, if w⋆ is the minimum of E(w), then, for any vector w ̸= w⋆, E(w) > E(w⋆). This will only be the case if the second term of (5.32) is positive for all values of w ̸= w⋆ (since the ﬁrst term is independent of w). Since w − w⋆ can be set to any vector of real numbers, it follows from the deﬁnition (5.37) that H must be positive deﬁnite.
+
+5.13 From exercise 2.21 we know that a W × W matrix has W (W + 1)/2 independent elements. Add to that the W elements of the gradient vector b and we get
+
+W (W + 1)
+
+W (W + 1) + 2W W 2 + 3W W (W + 3)
+
++W =
+
+=
+
+=
+
+.
+
+2
+
+2
+
+2
+
+2
+
+5.14 We are interested in determining how the correction term
+
+δ
+
+=
+
+E′(wij )
+
+−
+
+E(wij
+
++
+
+ϵ)
+
+− 2ϵ
+
+E(wij
+
+−
+
+ϵ)
+
+(175)
+
+depend on ϵ.
+
+Using Taylor expansions, we can rewrite the numerator of the ﬁrst term of (175) as
+
+E (wij )
+
++
+
+ϵE ′ (wij )
+
++
+
+ϵ2 2
+
+E′′(wij )
+
++
+
+O(ϵ3)
+
+−
+
+E (wij )
+
++
+
+ϵE ′ (wij )
+
+−
+
+ϵ2 2
+
+E′′(wij )
+
++
+
+O(ϵ3)
+
+=
+
+2ϵE ′ (wij )
+
++
+
+O(ϵ3).
+
+Note that the ϵ2-terms cancel. Substituting this into (175) we get,
+
+δ
+
+=
+
+2ϵE′(wij) + 2ϵ
+
+O(ϵ3)
+
+−
+
+E′(wij )
+
+=
+
+O(ϵ2).
+
+5.15 The alternative forward propagation scheme takes the ﬁrst line of (5.73) as its starting point. However, rather than proceeding with a ‘recursive’ deﬁnition of ∂yk/∂aj, we instead make use of a corresponding deﬁnition for ∂aj/∂xi. More formally
+
+Jki
+
+=
+
+∂yk ∂xi
+
+=
+
+j
+
+∂yk ∂aj ∂aj ∂xi
+
+Solutions 5.16–5.17
+
+99
+
+where ∂yk/∂aj is deﬁned by (5.75), (5.76) or simply as δkj, for the case of linear output units. We deﬁne ∂aj/∂xi = wji if aj is in the ﬁrst hidden layer and otherwise
+
+∂aj =
+
+∂aj ∂al
+
+∂xi
+
+l ∂al ∂xi
+
+(176)
+
+where
+
+∂aj ∂al
+
+= wjlh′(al).
+
+(177)
+
+Thus we can evaluate Jki by forward propagating ∂aj/∂xi, with initial value wij, alongside aj, using (176) and (177).
+
+5.16 The multivariate form of (5.82) is
+
+1 E=
+2
+
+N
+(yn − tn)T(yn − tn).
+
+n=1
+
+The elements of the ﬁrst and second derivatives then become
+
+∂E ∂wi
+
+=
+
+N
+(yn
+n=1
+
+−
+
+tn
+
+)T
+
+∂yn ∂wi
+
+and
+
+∂2E
+
+N
+
+=
+
+∂wi∂wj n=1
+
+∂yn T ∂yn ∂wj ∂wi
+
++
+
+(yn
+
+−
+
+tn
+
+)T
+
+∂
+
+∂2yn wj ∂wi
+
+.
+
+As for the univariate case, we again assume that the second term of the second derivative vanishes and we are left with
+
+N
+H = BnBTn ,
+n=1
+
+where Bn is a W × K matrix, K being the dimensionality of yn, with elements
+
+(Bn)lk
+
+=
+
+∂ynk . ∂wl
+
+5.17 Taking the second derivatives of (5.193) with respect to two weights wr and ws we obtain
+
+∂2E =
+∂ wr ∂ ws
+
+k
++
+k
+
+∂yk ∂yk p(x) dx ∂wr ∂ws
+
+∂
+
+∂2yk wr ∂ ws
+
+(yk
+
+(x)
+
+−
+
+Etk
+
+[tk
+
+|x])
+
+p(x) dx. (178)
+
+100
+
+Solutions 5.18–5.20
+
+Using the result (1.89) that the outputs yk(x) of the trained network represent the conditional averages of the target data, we see that the second term in (178) vanishes. The Hessian is therefore given by an integral of terms involving only the products of ﬁrst derivatives. For a ﬁnite data set, we can write this result in the form
+
+∂2E
+
+1N
+
+=
+
+∂ykn ∂ykn
+
+∂ wr ∂ ws
+
+N
+n=1
+
+k
+
+∂wr ∂ws
+
+which is identical with (5.84) up to a scaling factor.
+
+5.18 If we introduce skip layer weights, U, into the model described in Section 5.3.2, this will only affect the last of the forward propagation equations, (5.64), which becomes
+
+M
+
+D
+
+yk =
+
+wk(2j)zj +
+
+ukixi.
+
+j=0
+
+i=1
+
+Note that there is no need to include the input bias. The derivative w.r.t. uki can be expressed using the output {δk} of (5.65),
+∂E ∂uki = δkxi.
+
+5.19 If we take the gradient of (5.21) with respect to w, we obtain
+
+N ∂E
+
+N
+
+∇E(w)
+
+=
+
+n=1
+
+∂an
+
+∇an
+
+=
+
+(yn
+n=1
+
+−
+
+tn)∇an,
+
+where we have used the result proved earlier in the solution to Exercise 5.6. Taking the second derivatives we have
+
+N
+∇∇E(w) =
+n=1
+
+∂yn ∂an
+
+∇an∇an
+
++
+
+(yn
+
+−
+
+tn)∇∇an
+
+.
+
+Dropping the last term and using the result (4.88) for the derivative of the logistic sigmoid function, proved in the solution to Exercise 4.12, we ﬁnally get
+
+N
+
+N
+
+∇∇E(w) ≃ yn(1 − yn)∇an∇an = yn(1 − yn)bnbTn
+
+n=1
+
+n=1
+
+where bn ≡ ∇an.
+
+5.20 Using the chain rule, we can write the ﬁrst derivative of (5.24) as
+
+∂E N =
+
+K
+
+∂E ∂ank .
+
+∂wi n=1 k=1 ∂ank ∂wi
+
+(179)
+

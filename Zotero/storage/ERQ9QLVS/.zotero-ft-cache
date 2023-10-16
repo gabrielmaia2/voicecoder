@@ -1,0 +1,1298 @@
+Lossless Compression of Digital Audio
+Mat Hans, Ronald W. Schafer* Client and Media Systems Laboratory HP Laboratories Palo Alto HPL-1999-144 November, 1999
+Email: mat_hans@hp.com rws@ece.gatech.edu
+
+audio cooling, lossless compression, Internet audio
+
+The first part of this paper surveys and classifies the best performing currently available lossless compression algorithms for stereo-CD-quality digital audio signals sampled at 44.1 kHz and quantized to 16 bits. This study finds that these algorithms appear to have reached a limit in compression that is very modest compared to what can be achieved with lossy audio coding technology. With this limit as a target, we designed a computationally efficient algorithm for lossless audio compression (which we call AudioPaK). This new lossless compression algorithm uses only a small number of integer arithmetic operations and performs as well, or better than most state-of-the-art lossless compression algorithms. The main operations of the algorithm are prediction with integer coefficients and Golomb-Rice coding. The second part of the paper presents the complete architecture of AudioPaK including suggestions on parallelizing parts of the algorithm using the MMX instruction set.
+
+Internal Accession Date Only
+∗ Center for Signal & Image Processing at the School of Electrical and Computer Engineering,
+Georgia Institute of the Technology, Atlanta, Georgia.
+© Copyright Hewlett-Packard Company 1999
+
+GY$j 8Z{Y bB, YsR At IBt $t Y ss BP jBRRk {B8}RR$Bt BP R}{Y stI sZI$B R$tsjR js$%jk j$j YsR At }ZAj$RYI Bt jBRRjRR {B8}RR$Bt BP YR R$tsjR VjYBZY jBRRjRR sZI$B {B8}RR$Bt $R tB j$,jk B A{B8 s IB8$ts$t {YtBjBk $ 8sk A{B8 s ZRPZj {B8}j8t B jBRRk {B8}RR$Bt sjB$Y8R $t RB8 s}}j${s$BtR qY$R $R A{sZR sR b b$jj R jBRRjRR {B8}RR$Bt sjB$Y8R sjk BAs$t s {B8}RR$Bt s$B js Yst nUd bY$j jBRRk {B8}RR$Bt sjB$Y8R sjjBb {B8}RR$Bt s$BR B st Z} B d1Ud stI Y$Y 3B jBRRk sjB$Y8R Y Y$Y Y {B8}RR$Bt s$B A{B8R Y jBb Y RZj$t htsj sZI$B JZsj$k AZ bYt Y jBbR }BRR$Aj Iss s $R JZ$I jBRRk {Yt$JZR s Y Btjk sjts$% <Bb% jBRRjRR sZI$B {BI$t BP RB ]* JZsj$k I$$sj sZI$B R$tsjR Rs8}jI s ;;d ,<9 stI JZst$9I B dE A$R {BZjI A{B8 st RRt$sj {YtBjBk PB I$$sj 8ZR${ I$R$AZ$Bt B% Y ytt A{sZR RB8 {BtRZ8R b$jj bst B s{JZ$ Y AR }BRR$Aj JZsj$k BP st sZI$B {BI$t PB Y$ Y$YThIj$k RB RkR8 NBRRk sZI$B {B8}RR$Bt {YtBjB$R RZ{Y sR _ep B _n 8sk tB A s{{}sAj PB Y$R s}}j${s$Bt
+ytt RBZ{R s j$8$I stI b$jj j$,jk 8s$t {BtRs$tI A{sZR Y I8stI PB R%${ {Bt$tZR B $t{sR s jsR sR PsR sR Yst Y s BP BbY BP stR8$RR$Bt {s}s{T $k qYPB {B8}RR$Bt b$jj {Bt$tZ B A $8}Bst PB ytt stR8$RR$Bt BP sZI$B R$tsjR y $R sRBtsAj B RZR PB -s8}j Ys 8ZR${ I$R$AZ$Bt s}}j${s$BtR b$jj B& B Y {BtRZ8 Y$Yjk {B8}RRI sZI$B {j$}R PB ABbR$t stI Rj{$Bt VP Rj{T $Bt Y {BtRZ8 bYB $R s{{ZRB8I B sZI$B ]* JZsj$k 8sk JZ$ s{{RR B s jBRRjRRjk {B8}RRI {B}k BP Y B$$tsj v s {B}k b$YBZ stk I$RB$Bt IZ B Y {B8}RR$Bt sjB$Y8
+ZR${ I$R$AZ$Bt B% Y ytt $R tB Y Btjk s}}j${s$Bt PB bY${Y jBRRjRR sZI$B
+1
+
+{B8}RR$Bt {YtBjBk $R BP $tR qY$R {YtBjBk {st sjRB A ZRI PB s{Y$%$t stI 8$-$t BP Y$YThIj$k {BI$tR $t }BPRR$Btsj t%$Bt8tR yt Y$R {sR jBRRjRR {B8T }RR$Bt s%B$IR Y IsIs$BtR $t{ZI $t 8Zj$}j t{BI$t stI I{BI$t bYt ZR$t jBRRk {B8}RR$Bt {BIR qY$R }BAj8 s$RR }s${Zjsjk $t Y }BR }BIZ{$Bt $tIZRk stI B{{ZR bYt Y R$tsjR s 8BI$hI B bYt I$&t {BI$t PB8sR s ZRI NBRRjRR sZI$B {BI$t $R sjRB ZRI $t Y tb *z* RstIsI PB RBs BP sZI$B R$tsjR s Y$Y RBjZ$Bt stI Rs8}j$t sR >EH
+qY hR R{$Bt BP Y$R }s} $R s RZ%k stI s {jsRR$h{s$Bt BP Y {Zt RsTBPTYT s jBRRjRR sZI$B {B8}RR$Bt sjB$Y8R wjBRRjRR {BIRD qY$R RZIk htIR Ys jBRRjRR sZI$B {BIR Ys% s{YI s j$8$ $t bYs {st A s{Y$%I PB jBRRjRR {B8}RR$Bt BP sZI$B qY R{BtI R{$Bt $R s {B8}j IR{$}$Bt BP s tb jBRRjRR sZI$B {BI {sjjI VZI$B_s bY${Y YsR jBb sjB$Y8${ {B8}j-$k stI }PB8R sR bjj B %t A Yst 8BR BP Y jBRRjRR sZI$B {BIR Ys Ys% At IR{$AI $t Y j$sZ
+d 7sTBPTYTV PB NBRRjRR VZI$B ]BIR
+NBRRjRR {B8}RR$Bt $R tB s tb }BAj8 $t Y tsj {Bt- BP {B8}Z$t V %s$k BP Z$j$$R RZ{Y sR _,$} s s%s$jsAj stI b$Ijk ZRI B {B8}RR - stI }Bs8 hjR PB RBs B stR8$RR$Bt B% Y ytt qYR }Bs8R s IR$tI B A %k &{$% PB - Iss 3B -s8}j s _BR7{$} %R$Bt BP Y$R }s} B{{Z}$I ;xE( AkR BP RBs bY$j Y _,$}}I %R$Bt B{{Z}$I Btjk EE(;d AkR BP RBs u s {B8}RR$Bt s$B BP ;xE(\EE(;d ) Exx !t Y BY YstI s{, (; Bt BP Y sZI$B hjR {BtR$R$t BP dE A$ Rs8}jR ZRI $t BZ RR B{{Z}$I nndxE; AkR BP RBs APB {B8}RR$Bt
+n
+
+stI ndxndx AkR sP {B8}RR$Bt b$Y _,$} yt Y$R {sR Y {B8}RR$Bt s$B bsR Btjk d( GYs $R tII s sjB$Y8R R}{$h{sjjk IR$tI PB I$$sj sZI$B hjR VjYBZY jBRRjRR {BI$t BP sZI$B YsR tB {$%I s s Isj BP st$Bt RB Ps s tZ8A BP I$&t sjB$Y8R Ys% At I%jB}I stI {BI PB R$t YR sjB$Y8R YsR At 8sI s%s$jsAj $t sj8BR sjj {sRR qY {B8}RR$Bt sjB$Y8R B A I$R{ZRRI $t Y$R }s} s j$RI $t qsAj d qY$R j$R }RtR sjj Y jBRRjRR {BIR Ys b PBZtI $t Y j$sZ
+
+Ws8 BP sjB$Y8
+VZI$B_s *z* NqV] =7y]B8}RR !7JZ$RY _Y$j$}R 7YBt 7Bts{ GV
+
+VZYBR
+ <stR i 7{YsP >ddH _ ]s%t  sj >; x EH  _Zs q N$A{Yt _ WBjj >dH V Gt >1nH ] BtB8k >dMH V Z,R V !B8t i %st I zjZt >dH q iBA$tRBt >1dH i 7}sJZ >11H * N >dEH
+
+qsAj d N$R BP jBRRjRR {B8}RR$Bt sjB$Y8R I$R{ZRRI $t Y$R }s}
+
+B YBZY Rs{Y$t Y GA G Aj$% Ys YR {BIR }Rt Y RsTBPTYTs $t jBRRjRR sZI$B {B8}RR$Bt 7YBt >1dH =7y]B8}RR >1nH NqV] >dH *z* >; x EH stI _Y$j$}R: sjB$Y8R >dH s IR{$AI $t }ZAj${s$BtR $t Y j$sZ ytPB8s$Bt {Bt{t$t Y BY {BIR v 7Bts{ >11H !7JZ$RY %M >dMH stI GV >dEH v {B8R PB8 }RBtsj {B88Zt${s$BtR b$Y Y IR$tR BP YR sjB$Y8R VZI$B_s $R s tb jBRRjRR sZI$B {BI IR{$AI $t 7{$Bt 1
+
+;
+
+dd
+
+sR${ _$t{$}jR BP NBRRjRR ]B8}RR$Bt
+
+3$Z d $R s AjB{, I$ss8 }Rts$Bt BP Y B}s$BtR $t%Bj%I $t {B8}RR$t s R$tj sZI$B {Ysttj Vjj BP Y {Yt$JZR RZI$I s AsRI Bt Y }$t{$}j BP hR 8B%$t IZtIst{k PB8 Y R$tsj stI Yt {BI$t Y RZj$t R$tsj b$Y st ^{$t I$$sj {BI$t R{Y8 es{Y BP Y R}R RYBbt $t 3$Z d b$jj A I$R{ZRRI $t tsj 8R stI $t 8R BP R}{$h{ {BIR
+
+VZI$B
+
+7$tsj
+
+3s8$t
+
+c>zH
+
+
+ytsT]Ysttj *{Bjs$Bt
+
+Ã>zH
+
+
+etB}k ]BI$t
+
+]B8}RRI
+
+7$tsj
+
+3$Z d qY AsR${ B}s$BtR $t 8BR jBRRjRR {B8}RR$Bt sjB$Y8R
+
+3$Z d RYBbR Y B}s$BtR PB s R$tj {Ysttj BP jBRRjRR sZI$B {B8}RR$Bt VjYBZY Y bB {YsttjR BP s RB {BI$t s tsjjk tB $tI}tIt Y I}tIt{ $R BPt bs, stI I$^{Zj B s, $tB s{{BZt qYPB Y 8Zj${Ysttj {sR BP jBRRjRR {B8}RR$Bt YsR tB {$%I 8Z{Y st$Bt $t Y j$sZ ptsjjk RB {YsttjR s {B8}RRI R}ssjk b$YBZ s8}$t B s, sI%sts BP Y {Bjs$Bt Ys 8$Y -$R Abt Y jP stI $Y {YsttjR B Ak R$8}jk {BI$t Y jP {Ysttj stI Y I$&t{ Abt Y bB {YsttjR
+ddd 3s8$t
+qY Ps8$t B}s$Bt $t 3$Z d $R $tBIZ{I B }B%$I PB I$$A$j$k st $8}Bst stI t{RRsk }B}k PB 8BR s}}j${s$BtR Isj$t b$Y I$$sj sZI$B y $R BPt $8}Bst B
+x
+
+JZ${,jk stI R$8}jk I$ s {B8}RRI sZI$B A$ Rs8 stI Y RY %BjZ8 BP Iss }BY$A$R }$$% I{B8}RR$Bt BP Y t$ R$tsj }{I$t Y $Bt B A I$I qYPB s }s{${sj RBjZ$Bt $R B I$%$I Y I$$sj sZI$B R$tsj $tB $tI}tIt Ps8R BP JZsj $8 IZs$Bt qY$R IZs$Bt RYBZjI tB A BB RYB R$t{ R$t$h{st B%YsI 8sk RZj PB8 Y YsI Ys $R }h-I B s{Y Ps8 qY$R YsI $R $8}Bst R$t{ $ IhtR Y {B8}RR$Bt sjB$Y8 }ss8R bY${Y {st {Yst Bt s Ps8TBTPs8 AsR$R B PBjjBb Y %sk$t {Yss{$R${R BP Y $t}Z R$tsj B% $8 3ZY8B I}tI$t Bt Y s}}j${s$Bt Y$R YsI 8sk $t{jZI sII$$Btsj Iss RZ{Y sR 8Zj$8I$s stI Rkt{YBt$9s$Bt $tPB8s$Bt !t Y BY YstI Y Ps8 IZs$Bt RYBZjI tB A BB jBt R$t{ Y$R bBZjI j$8$ Y 8}Bsj sIs}$%$k stI bBZjI 8s, I$$t BP Y {B8}RRI sZI$B A$ Rs8 8B I$^{Zj qY sjB$Y8R RZ%kI {B8}B8$RI b$Y s dn B 1E 8R Ps8 IZs$Bt >d n dd 1dH qY$R $8 $t%sj stRjsR B xE stI ddx1 Rs8}jR PB s Rs8}j$t s BP ;;d ,<9
+dd1 ytsT{Ysttj I{Bjs$Bt
+qY }Z}BR BP Y R{BtI Rs BP Y k}${sj jBRRjRR sZI$B {BI $t 3$Z d $R B 8B% T IZtIst{k Ak I{Bjs$t Y Rs8}jR b$Y$t s Ps8 qY jBRRjRR sZI$B {BIR $t qsAj d ZR bB AsR${ s}}Bs{YR PB $tsT{Ysttj I{Bjs$Bt BR sjB$Y8R 8B% IZtT Ist{k Ak RB8 k} BP 8BI$hI j$ts }I${$% 8BIj$t BP Y R$tsj yt Y$R s}}Bs{Y s j$ts }I${B $R s}}j$I B Y R$tsj Rs8}jR $t s{Y AjB{, RZj$t $t s RJZt{ BP }T I${$Bt B Rs8}jR qY }I${B }ss8R YPB }Rt Y IZtIst{k Ys $R 8B%I PB8 Y R$tsj stI Y jBRRjRRjk {BII }I${B }ss8R stI }I${$Bt B
+E
+
+BY }Rt Y R$tsj $t s{Y AjB{, V R{BtI jRR {B88Bt s}}Bs{Y $R B BAs$t s jBb A$Ts JZst$9I B jBRRk }Rts$Bt BP Y R$tsj stI Yt jBRRjRRjk {B8}RR Y I$&t{ Abt Y jBRRk %R$Bt stI Y B$$tsj R$tsj qYR s}}Bs{YR s I$R{ZRRI $t 8B Is$j AjBb
+
+_I${$% BIj$tU qY AsR${ }$t{$}j BP }I${$% 8BIj$t $R B }I${ Y %sjZ BP
+
+c z c z c z s Rs8}j > H ZR$t Y }{I$t Rs8}jR >
+
+dH >
+
+1H { 3$Z 1 $R s I$ss8 BP $tsT
+
+{Ysttj I{Bjs$Bt ZR$t Y }I${$% 8BIj$t R{Y8 yP Y }I${B }PB8R bjj
+
+c>zH
+
+ L 
+
+Ã>zH
+
+
+
+
+
+
+_I${$Bt
+
+3$Z 1 _I${$Bt 8BIj PB Y $tsT{Ysttj I{Bjs$Bt AjB{,
+
+Ã z Y }I${$Bt B > H b$jj A Zt{BjsI stI YPB Ys% s 4s PJZt{k R}{Z8 Ã z c z N$,b$R > H b$jj Bt s%s A R8sjj Yst > H stI $ b$jj YPB JZ$ Pb A$R PB
+
+$R I$$sj }Rts$Bt
+
+qY }I${$Bt 8BIjR Ys s ZRI $t jBRRjRR {B8}RR$Bt BP sZI$B s AsRI Bt Y
+
+RZ{Z BP 3$Z n qY$R I$ss8 I}${R Y JZs$Bt
+
+ l3- >   3] >  M Ã>zH ) c>zH `
+
+y| c>z bH
+
+> > )d
+
+|u Ã>z bH D
+)d
+
+wdD
+
+`\ i c z bY
+
+ItBR JZst$9s$Bt B Y Rs8 bBI jtY sR Y B$$tsj R$tsj > H yt
+
+ p R p p Y I$ss8 |w D stI | w D s TstRPB8 }BjktB8$sjR wb$Y JZst$9I {B^{$tRD }T
+
+
+
+c>zH
+
+L 
+
+Ã>zH 
+
+
+
+ |wpD
+
+`
+
+L _ 
+
+R| wpD _
+
+3$Z n ptsj RZ{Z PB }I${$Bt
+
+-> >  ]> >  )d Rt$t Y PIPBbsI w
+
+|y c>z
+
+)d bHD stI PIAs{, w
+
+|u Ã>z
+
+bHD 8R $t wdD
+
+R p R}{$%jk yP Y }BjktB8$sj | w D ) ( Y PIAs{, 8R s B8$I stI Y }I${$Bt
+
+` B hj YsR ht$ $8}ZjR R}BtR wtj{$t Y JZst$9 PB Y 8B8tD stI YZR
+ p R p W s }I${B b$Y Btjk |w D $R st 3yi }I${B yP Y PIAs{, 8R s }Rt w | w D ) (D
+
+Y }I${B $R st $tht$ $8}ZjR R}BtR wyyiD }I${B
+
+qY JZst$9s$Bt B}s$Bt $t 3$Z n 8s,R Y }I${B s tBtj$ts }I${B AZ
+
+R$t{ Y JZst$9s$Bt $R B dE A$ }{$R$Bt $ $R sRBtsAj B tj{ Y JZst$9s$Bt $t
+
+ZtIRstI$t Y hRTBI &{R BP Y }I${B stI $t I%jB}$t 8YBIR PB R$8s$t
+
+Y }I${B }ss8R qY JZst$9s$Bt $R t{RRsk PB jBRRjRR {B8}RR$Bt R$t{ b
+c z Ã z bst B A sAj B {BtRZ{ > H -s{jk PB8 > H 8Bjk stI }BRR$Ajk Bt s I$&t Ã z 8s{Y$t s{Y${Z qYPB > H $R ZRZsjjk }RtI b$Y Y Rs8 h-IT}B$t $t c z JZst$9s$Bt R{Y8 sR > H RB sR tB B $tBIZ{ tb JZst$9s$Bt j%jR AjBb Y jsR c z Ã z c z R$t$h{st A$ i{BtRZ{$t > H PB8 > H {st A IBt Ak R$8}jk RBj%$t wdD PB > H $t
+
+M
+
+Ã z 8R BP > H bY${Y jsIR B
+
+l3 3 M -
+
+]
+
+   > > c>zH ) Ã>zH L `
+
+|y c>z bH
+
+> > )d
+
+|u Ã>z bH D
+)d
+
+w1D
+
+bY${Y $R I}${I $t 3$Z ;
+
+Ã>zH
+
+L 
+
+
+L
+
+c>z H
+
+ R| wpD
+
+`
+
+ _ L
+
+|wpD _
+
+3$Z ; ptsj RZ{Z PB {BtRZ{$Bt
+
+N$ts }I${BR s b$Ijk ZRI $t R}{Y stI sZI$B }B{RR$t >dx 1(H yt 8BR s}T
+ p }j${s$BtR st 3yi }I${B $R ZRI stI Y {B^{$tR BP Y }I${$Bt hj |w D s
+I8$tI B 8$t$8$9 Y 8stTRJZsI }I${$Bt B G$YBZ Y JZst$9 stI b$Y
+R p | w D ) ( $t 3$Z n Y }I${$Bt {B^{$tR {st A PBZtI PB Y 3yi {sR Ak R$8}jk
+RBj%$t s R BP j$ts JZs$BtR >1(H GYt 3yi j$ts }I${$Bt $R ZRI $t jBRRjRR sZI$B {B8}RR$Bt Y }I${$Bt {B^{$tR {st A PBZtI Ak RstIsI 8YBIR stI Yt JZstT
+R p $9I PB ZR $t 3$Z n wb$Y | w D ) (D VR RYBbt $t 3$Z ; Y Rs8 {B^{$tR s c z Ã z ZRI $t Y {BtRZ{$Bt BP > H PB8 > H qYPB Y }I${$Bt {B^{$tR 8ZR A
+JZst$9I stI t{BII sR }s BP Y jBRRjRR }Rts$Bt ptsjjk s tb R BP {BT ^{$tR $R I8$tI PB s{Y Ps8 BP Y R$tsj YAk sIs}$t Y }I${B B Y {Yst$t jB{sj RZ{Z BP Y R$tsj qY 8YBI BP I8$ts$Bt BP Y }I${B {B^T
+
+
+{$tR stR PB8 R$8s$Bt BP Y 8$t$8Z8 8stTRJZsI }I${B PB s{Y AjB{, B Y R$8}j {YB${ BP s }I${B PB8 s R8sjj j$Ask BP h-I }I${BR
+yt 8stk BP Y jBRRjRR sZI$B {B8}RR$Bt sjB$Y8R $t BZ RZ%k Y }I${B PB s $%t AjB{, $R {YBRt PB8 s ht$ j$Ask BP {B^{$t RR B s%B$I Y {B8}Zs$Bt JZ$I B R$8s Y B}$8Z8 }I${B {B^{$tR yt YR {sRR Y $It$k BP Y }I${B Ys bsR ZRI PB s $%t Ps8 $R sjj Ys tI A t{BII b$Y Y {B8}RRI }I${$Bt B qY$R $R Y s}}Bs{Y Ys $R PBjjBbI PB -s8}j $t Y {sR bY ABY PIPBbsI stI PIAs{, 8R s $t%Bj%I $t Y }I${$Bt qY$R $R A{sZR Y tsj RBjZ$Bt PB Y 8$t$8Z8 8stTRJZsI }I${B $R 8Z{Y 8B {B8}j${sI $t Y yyi {sR 3B Y$R sRBt yyi }I${$Bt YsR tB At b$Ijk ZRI $t BY s}}j${s$BtR RZ{Y sR R}{Y }B{RR$t yt jBRRjRR {B8}RR$Bt ]s%t  sj >; xH Ys% RYBbt Ys bY$j yyi }I${$Bt YsR Y }Bt$sj B }PB8 A A{sZR $ {st 8s{Y s b$I st BP R}{sj RYs}R Yst 3yi }I${$Bt b$Y Y Rs8 tZ8A BP {B^{$tR Y $8}B%8t $t {B8}RR$Bt }PB8st{ I8BtRsI RB Ps $R 8BIR s AR
+yt tsj s 8$t$8Z8 8stTRJZsI }I${B PB sZI$B R$tsjR b$jj $t%Bj% Ps{$Btsj {B^{$tR qYR 8ZR A JZst$9I stI {BII sR }s BP Y jBRRjRR }Rts$Bt stI Y }I${B 8ZR A $8}j8tI b$Y h-IT}B$t s$Y8${ <Bb% bYt Y }I${$Bt {B^{$tR s $tR $ $R }s${Zjsjk R$8}j B {B8}Z Y }I${$Bt B b$Y $t s$Y8${ Ys {st sR$jk A IBt -s{jk Y Rs8 bsk Bt I$&t {B8}Zs$Bt }jsPB8R
+qY PBjjBb$t j$R RYBbR Y sjB$Y8R Ys s AsRI Bt }I${$% 8BIj$t s{{BI$t B Y k} BP }I${$Bt Ys $R ZRIU
+T 3$t$ $8}ZjR R}BtR w3yiD 8BIjU 7YBt >1dH 7Bts{ >11H GV >dEH _Y$j$}R >dH
+d(
+
+T ytht$ $8}ZjR R}BtR wyyiD 8BIjU !7JZ$RY >dMH *z* >; xH T yt {B^{$tR 3yi 8BIj wh-I B sIs}$%DU 7YBt >1dH <eVi >nH GV >dEH
+=7y]B8}RR >1nH VZI$B_s
+
+qY Is$jR BP YBb Y }I${B 8BIj $R {YBRt s s{Y Ps8 {st A PBZtI $t s{Y BP Y sAB% Pt{R
+
+NBRRk ]BI$t BIjU qY R{BtI s}}Bs{Y B jBRRjRR {B8}RR$Bt $R AsRI Bt BAs$t$t
+? z st s}}B-$8s$Bt B > H Ak RB8 RB BP jBRRk {BI$t R{Y8 Ys 8s$ts$tR Y R$tsj bs%
+
+RYs} b$Y tB $8 RY$P VjYBZY Y$R s}}Bs{Y YsR RB8 }Bt$sjjk ss{$% PsZR
+
+b PBZtI Btjk Bt sjB$Y8 Ys {jsjk ZRI Y$R s}}Bs{Y  _Zs  sj >dH }B}BRI
+
+s 8YBI AsRI Bt stRPB8 {BI$t BP Y sZI$B R$tsj >dxH qY AsR${ $Is BP Y$R 8YBI
+
+$R }RtI $t 3$Z x qY$R sjB$Y8 ZRR st BYBtB8sj stRPB8 ws I$R{ {BR$t
+
+c>zH
+
+>bH
+
+|>bH
+
+
+
+
+
+
+
+`
+
+ x
+
+ L
+
+
+
+c|>bH
+
+
+
+`
+
+Ã>zH
+
+|>bH
+
+
+3$Z x *s$jR BP Y $tsT{Ysttj I{Bjs$Bt AjB{, }B}BRI Ak  _Zs  sj $t Y$ NBRRT
+jRR qstRPB8 VZI$B ]BI wNqV]D BY R$tsjR |>bH stI Ã>zH s tB}k {BII stI stR8$I ` RstIR PB $t Zt{s$Bt >dH
+
+stRPB8D B BAs$t s JZst$9I %R$Bt BP Y R$tsj qY {BR$t stRPB8 stI $R $t%R
+
+  s $tI${sI Ak Y 8s$- 8Zj$}j${s$BtR Ak
+
+stI
+
+x $t 3$Z x qY ZR BP Y
+
+{BR$t stRPB8 $R 8B$%sI Ak Y bjj ,tBbt tk {B8}s{$Bt }B}k BP Y {BR$t
+
+stRPB8 bY${Y }8$R s BBI {BtRZ{$Bt PB8 Btjk s Pb JZst$9I %sjZR BP Y
+
+dd
+
+{f6t (stfV0 bdxr q 6t}( 6'tsj cbzr 6 (stfVs sts tst(6Ws 6( st t6(sk tst(6Ws(6ft (} 6W Æ A d0 q j(6t' {f{6t( |bbr s (t t(f}k {fss0 2{s ( 6t7 (stfVs(6ft fjjfs ek s stst(6Ws(6ft (} j( 6t st s}}fE6Vs(6ft! c|bzr! f ( f6'6tsj 6'tsj cbzr! ( s{fV}6ft (} s s}j6{s(s s( ( {fs 6s (f {fV}( ( 6ssj f Ãbzr A cbzr  c|bzr0 q6 f 6 t(f}k {fss sts (stV6((s sjft' 6( ( {fss {f{6t( |bbr0 ( ( s{fs! ( f6'6tsj 6'tsj {st e fe(s6ts fV cbzr A c|bzrvÃbzr }f76ss (s( ( 6V}jVt(s(6ft f ( 6t7 {f6t (stfVs(6ft sts tst(6Ws(6ft s( ( s{fs 6 6st(6{sj (f (s( s( ( {fs0
+ }f(t(6sj ss7st(s' f (6 sts f( jfk{fs6t'ess s}}fs{ 6 (s( ( jfj }t(s(6ft {ft(s6t 6(6t 6( s jfk jf ss(s s( }t(s(6ft f ( ss6f 6'tsj! 6{ {fjs 7 s s (Vets6j D({4 f ( 6'tsj0 #aUyfV} bInr sjf 6 ({ (s (f }f76s f s jfk {fV}6ft Vfs f f}s(6ft0 q6 s}}fs{ {fjs e j 6t 6(s(6ft  }f'67 (stV66ft f ( 6'tsj 6 s6s f  ss6f 6'tsj s efss{s( f7 ( yt(t( (f s(6ts(6ft 6( 7sk6t' {fV}(s(6ftsj f{ sts ss(s s(0 bdnr
+ddn etB}k {BI$t
+et(f}k {fs6t' Vf7 stsst{k fV ( 6ssj 6'tsj Ãbzr wsts ( Bq {f{6t( 6t ( (stfVess V(fsh0 yt (6 }f{! tf 6tfVs(6ft 6 jf(0 q fjjf6t' ( V(fs s s 6t ( sj'f6(V 6t qsej d `8Vst {fs6t'! t jt'( {fs6t'! sts i6{ {fs6t'0 q h( (f V(fs s jj Dtft sts   ( 6t((s ss (f b"r f ( 6tfVs(6ft0 3t ( f( sts! i6{ {fs6t'! 6{ 6 s 6t fV f ( {fs! 6
+dI
+
+jRR bjj ,tBbt RB b b$jj }B%$I s A$P RZ88sk BP Y 8YBI
+i qY i${ {BI $R {Yss{$9I Ak Btjk Bt }ss8 ItBI Yt{PBY sR  yt Ps{
+
+Y$R {BI $R Y <Z&8st {BI PB s Ns}js{$st }BAsA$j$k ItR$k PZt{$Bt bY${Y $R PBZtI B
+Ã z A s BBI s}}B-$8s$Bt PB Y I$R$AZ$Bt BP Y }I${$Bt R$IZsj Rs8}jR > H PB sjj
+
+Y $tsT{Ysttj I{Bjs$Bt B}s$BtR I$R{ZRRI sAB% >d n d 1dH qB PB8 Y$R {BI
+
+i s tZ8A $R I$%$II $tB Y }sR s R$t A$ Y
+
+jBbTBI A$R stI Y 8s$t$t
+
+Ã z Y$YTBI A$R qY hR }s BP s {BI bBI $R s R$tj A$ $tI${s$t Y R$t BP > H
+
+i qY R{BtI }s {BtR$RR BP Y
+
+jsRTR$t$h{st A$R BP Y A$tsk }Rts$Bt BP Y
+
+Ã z  sARBjZ %sjZ BP > H qY Y$I }s BP Y {BI bBI $R 8sI BP
+
+{BtR{Z$% 9BR
+
+ bY
+
+YsR Y Rs8 A$tsk }Rts$Bt sR Y k ZtZRI 8BR R$t$h{st A$R BP Y
+
+Ã z sARBjZ %sjZ BP > H 3$tsjjk B tI Y$R R$R BP 9BR s A$ R B d $R $tRI qsAj 1
+
+i $%R -s8}jR BP i${ {BIR PB
+
+) n
+
+WZ8A
+( dM Td1
+
+7$t A$
+( ( d
+
+i NBb A$R
+((( (d( d((
+
+WZ8A BP (:R
+( 1 d
+
+3Zjj {BI
+((((d ((d(((d dd(((d
+
+qsAj 1 E e-s8}jR BP i${ {BIR PB
+
+) n
+
+Vjj Y jBRRjRR sZI$B {BIR }RtI $t Y j$sZ Ys ZR Y i${ {BI wNqV] >dH
+i _Y$j$}R >dH 7YBt >1dH GV >dEHD Iht Y R$tj }ss8 B A BP {BtRst %sjZ B%
+st t$ Ps8 qY$R %sjZ $R PBZtI Ak 8stR BP s PZjj Rs{Y B Ak R$8s$Bt 7Z{Y st R$8s$Bt bsR hR $%t $t >1dH sRU
+
+i ) jB1 o wjBÃw1D w/Ã>zH/DDD
+
+wnD
+
+dn
+
+o bY w D $R Y 8sY8s${sj -}{s$Bt PZt{$Bt ws%sD
+dd; 7Z88sk BP ]B8}RR$Bt VjB$Y8 ]Yss{$R${R
+qY {Yss{$R${R BP Y {B8}RR$Bt sjB$Y8R BP Y$R RZIk s RZ88s$9I $t Y$R R{T $Bt
+VZI$B_s wzR$Bt ddD qY$R {BI $R IR{$AI $t Is$j $t 7{$Bt 1 *z* 7stIsI qY$R sjB$Y8 $R AsRI Bt Y bB, BP ]s%t  sj >; x EH y ZRR yyi
+}I${$Bt stI <Z&8st {BI$t PB Y }I${$Bt B R$tsj
+NBRRjRR qstRPB8 VZI$B ]B8}RR$Bt wzR$Bt d(d PB *!7D NqV] $R Y Btjk {BI
+Ys ZRR stRPB8 {BI$t PB I{Bjs$Bt qY i${ {BI$t R{Y8 $R ZRI B }s{, Y stRPB8 {B^{$tR stI Y R$IZsj BR
+=7y]B8}RR wzR$Bt d1 PB G$tIBbRD =7y]B8}RR ZRR s }I${$% k} {B8T
+}Zs$Btsj RZ{Z bY sIs}$%jk %s$I s}}B-$8s$BtR s RZAs{I PB8 Y B$$tsj R$tsj B }BIZ{ st B R$tsj Ys $R jBRRjRRjk {BII qY tsZ BP Y s}}B-$8s$BtR $R tB R}{$hI $t >1nH RB $ $R }BRR$Aj Ys =7y]B8}RR RYBZjI A }js{I $t Y jBRRkT{BI$tTAsRI {jsRR =7y]B8}RR ZRR s AjB{, 4Bs$tT}B$t }Rts$Bt stI <Z&8st {BI$t B {BI ABY Y s}}B-$8s$Bt stI Y R$IZsj R$tsj
+!7JZ$RY wzR$Bt M PB =t$-D qY jBRRjRR sZI$B {BI bY${Y {B8R b$Y !7JZ$RY
+%R$Bt M ZRR yyi j$ts }I${$Bt stI <Z&8st {BI$td d !7JZ$RY $R tB -s{jk st sZI$B {BI $ $R s *7_ t$t Ys ZtR stk {BI$t }Bs8 Y ZR
+d;
+
+_Y$j$}R qY$R sjB$Y8 IR$tI Ak _Y$j$}R >dH ZRR s d(YTBI 3yi j$ts }I${B sjBt
+b$Y Y i${ {BI$t R{Y8
+
+T} + T} g+ 7YBt wzR$Bt 1d PB *!7D qbB {B88stIR b ZRIU
+
+stI
+
+1 qYR bB
+
+{B88stIR Iht I$&t {BIR bY${Y I$& Ak Y$ $tsT{Ysttj I{Bjs$Bt
+
+T} + AjB{, qY }Bs8 B}$Bt
+
+ZRR st 3yi }I${B b$Y $t {B^{$tR wR
+
+T} g+ 7{$Bt 11D bY$j
+
+ZRR s d(YTBI 8$t$8Z8 8stTRJZsI j$ts 3yi }I${T
+
+B BY {BIR ZR Y i${ {BI$t R{Y8 B t{BI Y }I${$Bt B R$tsj
+
+7Bts{ wzR$Bt 1dY PB *!7D 7Bts{ ZRR 3yi j$ts }I${$Bt stI <Z&8st {BI$t yP
+
+Y IPsZj sZ8tR s ZRI s h-IT}B$t $t %R$Bt BP 7{YZ:R sjB$Y8 $R
+
+T0 ZRI B {B8}Z Y 3yi }I${$Bt {B^{$tR yP Y
+
+sZ8t $R $t{jZII $t Y
+
+sZ8tR Yt Y }I${$Bt {B^{$tR s I8$tI Ak Y Xb$tt" BP s {BtR
+
+Abt sZB{Bjs$Bt {B%s$st{ 7{YZ:R stI Z:R sjB$Y8R
+
+Gs%PB8 V{Y$% wzR$Bt dd PB *!7D GV ZRR 3yi j$ts }I${BR PB Y $tsT
+
+{Ysttj I{Bjs$Bt AjB{, qY tB}k {BI$t AjB{, ZRR i${ {BI$t GV B&R
+
+T|g T|3 T|p T|< T|x x j%jR BP {BI$tU
+
+
+
+
+
+
+
+ stI
+
+ qY {B8}RR$Bt s$B bsR PBZtI B
+
+T|x $t{sR 8BIRjk b$Y Y j%j tZ8A qY R$t
+
+$%R Y AR {B8}RR$Bt
+
+T|g s$BR b$Y R$t$h{st $t{sR $t {B8}Zs$Bt $8 B% Y R$t
+
+
+
+bstR >dMH 3B -s8}j !7JZ$RY $R {s}sAj BP Ztt$t R{$}R Ys ts V*_] _ep qb$tz+
+{ qY M %R$Bt BP !7JZ$RY $t{jZIR s jBRRjRR {BI IR$tI Ak Y sZYBR BP !7JZ$RY yt Y$R
+s${j b P B Y$R {BI sR !7JZ$RY
+1 qY {B88stIR ZRI PB 7YBt bU
+} C g1Ãv f ggxQ 9 Q 1 gi } C Sywj3}|W SywjC3v } gC g1Ãv f ggxQ 9 Q 1 gi } gC Sywj3}|W SywjgC3v
+
+dx
+
+d1 _PB8st{ e%sjZs$Bt
+G$Y Y -{}$Bt BP Y *z* 7stIsI sjj Y {B8}RR$Bt sjB$Y8R I$R{ZRRI RB Ps $Y YsI -{ZsAj hjR s%s$jsAj PB IBbtjBsI$t B Yk YsI At }%$BZRjk RI Bt 8s$sj Ys bsR sjRB s{{RR$Aj B ZR qB {B8}s Y$ }PB8st{ b Rj{I s }Rts$% R BP R$- sZI$B hjR PB R$t s{Y BP Y sjB$Y8R Vjj YR hjR Ys% Y ]* PB8s $ ;;d ,<9 RB dE A$R stI s A$4k IR{$AI $t Y PBjjBb$t j$R stI $t qsAj n
+T qs{, ; BP >dH wn 8$t dd RDU sIBtts:R XN$, s z$$t" RBt T qs{, 1( BP >H wn RDU 7s-B}YBt jBb PJZt{k 8ZR${sj R$tsj T qs{, 1 BP >H w1( RDU ]sRstR Y$Y PJZt{k 8ZR${sj R$tsj T qs{, ;M BP >H w1M RDU zB${ JZs T qs{, EE BP >H wdM RDU G$tI tR8Aj T qs{, N)i wdM RDU Y$R s{, bsR {BtRZ{I ZR$t Y jP {Ysttj BP qs{, EE BP >H
+qY $Y {Ysttj $R st -s{ {B}k BP Y jP {Ysttj qYPB Y I$&t{ Abt Y jP stI $Y {Ysttj $R 9B qY$R s{, R%R sR s }BA B sjjBb ZR B I8$t $P s $%t {B8}RR$Bt R{Y8 s,R sI%sts BP $tT{Ysttj {Bjs$Bt
+I qsAj n RZ88s$9R Y B$$tsj hj R$9 $t AkR stI Y R$8sI hRTBI tB}k ( ? z I PB ABY jP stI $Y {YsttjR w > HDn i{sjj Ys ( $R Y tB}k BP s RBZ{ bY s{Y
+nqY R$8s bsR BAs$tI Ak {B8}Z$t s Y$RBs8 b$Y 1dE A$tR stI tB8sj$9$t Ak Y tZ8A BP Rs8}jR B BAs$t }BAsA$j$k R$8sR qY tB}k R$8s $R Yt Y RZ8 B% sjj A$tR BP 7 jB1 7
+dE
+
+Rk8ABj wRs8}jD $R $tI}tIt stI $It${sjjk I$R$AZI 3B R$tsjR RZ{Y sR I$$sj sZI$B
+
+bY Y $R {BtR$IsAj Rs8}jTBTRs8}j {Bjs$Bt Y tB}k b$jj A R$t$h{stjk
+I jBb Yst ( <Bb% YR tB}k R$8sR bY${Y s sjj jRR Yst dE A$R RZR
+Ys RB8 I BP jBRRjRR {B8}RR$Bt RYBZjI A }BRR$Aj $t sjj {sRR ytII BZ RZjR
+
+RYBb Ys {B8}RRI hjR s%s sABZ x A$R\Rs8}j
+
+qs{,
+qs{, (; qs{, 1( qs{, 1 qs{, ;M qs{, EE qs{, N)i
+
+3$j R$9 wAkRD
+nndx1( EME(( nx1M((( ;n1(( ndx1(( ndx1((
+
+I( NP {Ysttj
+wA$R } Rs8}jD
+d;nn d(ME
+1 ddx d(Md d(Mn
+
+I( i$Y {Ysttj
+wA$R } Rs8}jD
+d;1M dd(n
+1E dd;M d(1 d(Mn
+
+qsAj n 3$j R$9 stI hRTBI tB}k PB jP stI $Y {YsttjR w?>zHD
+
+qsAjR ; stI x BZ} Y jBRRjRR {BIR I}tI$t Bt Y s$Y8${ ZRI qsAj ; BZ}R Y $t stI h-IT}B$t s$Y8${ {BIR bY$j qsAj x BZ}R Y 4Bs$tT}B$t s$Y8${ {BIR VZI$B_s $R Y Btjk {BI B ZR Btjk $t s$Y8${ qYR sAjR $% Y {B8}RR$Bt s$B
+
+)
+
+B$$tsj hj R$9
+
+{B8}RRI hj R$9
+
+PB Y R$- -}$8tsj sZI$B hjR qB {Bt% YR tZ8AR $tB A$R\Rs8}j B {B8}s
+  B Y tB}k R$8sR R$8}jk I$%$I dE Ak  3B -s8}j ) n $R JZ$%sjt B xnn
+A$R\Rs8}j V Y BZR $ $R $8}Bst B tB Ys 8BR BP Y {BI$tR PB8 >H {Bts$t s
+R$t$h{st s8BZt BP R$jt{ yt Ps{ b PBZtI Ys s {B8}RR$Bt s$B BP sABZ dn 8sk d
+
+qs{, ytVZIs$B$_sY8${ 3=$-7yI]T}BB8$t}sRR$Y78Bts${{
+
+qs{, (;
+
+dn
+
+dn
+
+d;1
+
+qs{, 1(
+
+nd1
+
+1n
+
+ndn
+
+qs{, 1
+
+1;
+
+1;E
+
+1d
+
+qs{, ;M
+
+1xE
+
+1;d
+
+1Ex
+
+qs{, EE
+
+1;E
+
+1nn
+
+1xx
+
+qs{, N)i
+
+;n
+
+;xM
+
+1xE
+
+qsAj ; ]B8}RR$Bt s$BR PB $t stI h-IT}B$t s$Y8${ jBRRjRR sZI$B {BIR wb R
+Y Ps8 R$9 B ddx1 Rs8}jR PB Y $t {BIR stI b ZRI Y IPsZj sZ8tR PB Y h-IT}B$t {BIRD
+
+qs{, 7YBt 7YB3jtBs$t!T}7BJ$tZ$RsY$YNq8V]${ 7Bts{ GV
+
+T}+
+
+T}g+
+
+T0
+
+T|x
+
+qs{, (;
+
+dnM
+
+d;n
+
+d;n
+
+d;d
+
+d;1 d;E
+
+qs{, 1(
+
+ndd
+
+11
+
+n(d
+
+ndd
+
+ndE n1M
+
+qs{, 1
+
+1;E
+
+1E
+
+1E
+
+1(
+
+11 1Mn
+
+qs{, ;M
+
+1x;
+
+1n1
+
+1xn
+
+1Ex
+
+1E 1
+
+qs{, EE
+
+1;E
+
+1;1
+
+1xd
+
+1x;
+
+1x 1E;
+
+qs{, N)i 1;
+
+1;;
+
+x(d
+
+1(
+
+1xM x1M
+
+qsAj x ]B8}RR$Bt s$BR PB 4Bs$tT}B$t s$Y8${ jBRRjRR sZI$B {BIR wb R Y Ps8
+R$9 B ddx1 Rs8}jR PB 7YBt stI b ZRI Y IPsZj sZ8tR PB !7JZ$RY 7Bts{ NqV] stI GVD
+
+dM
+
+A sR$jk BAs$tI Ak {B8}RR$t Btjk YR R$jt R8tR PB qs{,R 1( 1 ;M stI EE
+
+qY Iss $t qsAjR ; stI x RYBb R%sj Y$tR 3$R tB Ys Y {B8}RR$Bt s$BR
+
+BAs$tI Ak Y %s$BZR RsTBPTYTs jBRRjRR sZI$B {BIR PB Y Rs8 sZI$B hj s %k
+
+R$8$js 3B -s8}j qs{, 1( {B8}RR$Bt s$BR s $t Y st 11 B n1M bY${Y $R
+
+JZ$%sjt B s 8BR s d A$ } Rs8}j I$&t{ 3B Y BY -}$8tsj sZI$B hjR
+
+YR I$&t{R s s 8BRU (Mx A$R } Rs8}j PB qs{, 1 dd1 A$R PB qs{, ;M (M(
+
+A$R PB qs{, EE stI (1 A$R PB qs{, ;
+
+]B8}RR$Bt s$BR sRRB{$sI b$Y qs{, N)i wY$R sZI$B hj bsR {sI B }BA bY${Y
+
+{BIR BB, sI%sts BP $tT{Ysttj I}tIt{$RD RYBb Ys Btjk PB VZI$B_s =7yT
+
+]B8}RR !7JZ$RY stI GV $R Y {B8}RR$Bt s$B b${ Ys BP qs{, EE $tI${s$t
+
+Ys YR {BIR s8} B s, sI%sts BP Y I}tIt{ Abt {YsttjR $t s bsk
+
+Ys bB,R }P{jk $P Y bB {YsttjR s }P{jk {BjsI
+
+T|x 3$tsjjk YR sAjR RYBb Ys {BI GV b$Y Y
+
+sZ8t {BtR$Rtjk $%R Y
+
+AR {B8}RR$Bt s$B PB Y E -}$8tsj sZI$B hjR sjYBZY $t 8BR {sRR $ }PB8I
+
+Btjk Rj$Yjk A Yst BY sjB$Y8R qY$R $R Bt BP Y Pb {BIR bY${Y {BZjI tB
+
+}B%$I sjT$8 {B8}RR$Bt Bt BZ dEE <9  _t$Z8 8s{Y$t yt tsj 4Bs$t
+
+}B$t {B8}Zs$BtR s tB IR$sAj PB Iss {B8}RR$Bt qYk tsjjk s RjBb Yst
+
+$t {B8}Zs$BtR stI 4Bs$t }B$t PB8sR {st %sk Abt {B8}Zs$Btsj }jsPB8R
+
+qY _Y$j$}R sjB$Y8 >1H stI Y *z* 7stIsI sjB$Y8 >; x EH s Y Btjk sjBT
+
+$Y8R $t Y j$R PB bY${Y tB -{ZsAj bsR s%s$jsAj G Ys% tB s8}I s {B8}s$RBt
+
+b$Y Y *z* sjB$Y8 R$t{ $ $R IR$tI PB Y$Y Rs8}j$t sR stI bsR %sjZsI
+
+Bt R$tsjR Ys b tB s%s$jsAj B ZR <Bb% Y bB, Bt bY${Y Y *z* sjB$Y8
+
+d
+
+$R AsRI >xH RYBbR j$j $P stk sI%sts BP Y yyi }I${B B% st 3yi }I${B yt Y {sR BP Y _Y$j$}R sjB$Y8 YBb% Y {B8}RR$Bt s$B bsR }ZAj$RYI $t >dH wPs8 R$9 bsR R B d(1; Rs8}jRD PB {B8}RR$Bt BP sjj ( qs{,R BP >H qB sjjBb s js$% {B8}s$RBt b$Y Y BY {BIR b sjRB {B8}RRI sjj ( qs{,R ZR$t VZI$B_s qsAj E RZ88s$9R RZjR BP Y$R {B8}s$RBt qY $sj${$9I tZ8AR b }ZAj$RYI $t >dH stI Y BY tZ8A }RtR Y }PB8st{ BP VZI$B_s Bt Y t$ 7+V ]* qY RZjR
+
+_Y$j$}R 7YBt !7JZ$RY VZI$B_s
+
+nnd
+
+1nn
+
+ndE
+
+1MM
+
+qsAj E ]B8}RR$Bt s$B PB {B8}j ]* >H
+
+$t qsAj E 8ZR A $t}I b$Y {s 7$t{ b b tB sAj B {B8}s Y _Y$j$}R {B8}RR$Bt sjB$Y8 Bt Y $tI$%$IZsj hjR BP BZ R R b {sttB Isb Y {Bt{jZR$Bt Ys Y$R sjB$Y8 b$jj }PB8 Zt$PB8jk A Yst sjj Y BY sjB$Y8R qY 7+V ]* {Bts$tR 8stk R$8}j RBZtIR RZ{Y sR }Z BtR R$tj $tRZ8tR stI R$jt{ bY${Y 8$Y A 8B sR$jk {B8}RRI Ak RB8 sjB$Y8R stI tB BYR !Y RZjR $t >dH RYBb Y _Y$j$}R sjB$Y8 }PB8$t R$8$jsjk B !7JZ$RY Bt $tI$%$IZsj hjR Ys b Zts%s$jsAj PB BZ RZIk qYR sj$ $tI$%$IZsj {B8}s$RBtR RYBbI R$t$h{stjk jBb {B8}RR$Bt s$BR Yst Y nnd }BI PB Y t$ 7+V I$R,
+dn ]Bt{jZR$Bt BP BZ RZIk
+yt {Bt{jZR$Bt BZ RZIk BP {Ztjk s%s$jsAj jBRRjRR sZI$B {BIR RZRR Ys Y {Zt {YtBjBk YsR s{YI s j$8$ $t bYs {st A s{Y$%I PB jBRRjRR {B8}RR$Bt BP sZI$B
+1(
+
+3ZY8B $t R}$ BP s b$I st BP s}}Bs{YR stI {B8}j-$$R Y I$&t sjB$Y8R }PB8 R$8$jsjk Bt Y Rs8 sZI$B R$tsjR b$Y tsjjk jRR Yst Bt A$ } Rs8}j I$&t{ $t {B8}RRI A$ s
+qYPB s {BI {B8}RR$t s Y$R j$8$ b$Y Y jsR tZ8A BP s$Y8${ B}T s$BtR bBZjI Iht Y AR {YtBjBk PB jBRRjRR sZI$B {B8}RR$Bt qYs $R Y IR$t
+BP s jBRRjRR sZI$B {BI RYBZjI tBb PB{ZR Bt IZ{$t sjB$Y8 {B8}j-$k G$Y Y$R $t
+8$tI b IR$tI s R$8}j jBRRjRR sZI$B {BI bY${Y b {sjjI VZI$B_s qY$R {BI ZRR Btjk s Pb $t s$Y8${ B}s$BtR Bt ABY Y {BI stI Y I{BI R$I qY 8s$t B}s$BtR s }I${$Bt b$Y $t {B^{$tR stI pBjB8A {BI$t bY${Y s IBt Bt s Ps8 AsR$R VR RZ88s$9I $t qsAjR ; x stI E BZ sjB$Y8 }PB8R sR bjj B %t A Yst 8BR RsTBPTYTs jBRRjRR {BIR V {B8}j IR{$}$Bt BP VZI$B_s $R $%t $t Y t- R{$Bt
+1 VZI$B_sU s jBb {B8}j-$k jBRRjRR {BI
+VZI$B_s $R bjj RZ$I PB ytt stR8$RR$Bt A{sZR BP $R jBb $tRZ{$Bt {B8}j-$k stI BBI {B8}RR$Bt }PB8st{ qY sjB$Y8 $R {Bt%t$tjk IR{$AI $t 8R BP Y Rs8 RZ{Z w3$Z dD Ys bsR ZRI B I$R{ZRR sjj Y BY jBRRjRR {B8}RR$Bt sjB$Y8R VZI$B_s I$&R PB8 Y BY sjB$Y8R $t YBb Y IZtIst{k 8B%sj stI {BI$t s $8}j8tI qY Is$jR BP Y sjB$Y8 s I$R{ZRRI AjBb ytPB8s$Bt Bt Y RZ{Z BP Y {B8}RRI A$ Rs8 $R $%t $t V}}tI$- V
+1d
+
+1d 3s8$t
+
+VR $t Y {sR BP sjj Y BY jBRRjRR sZI$B {BIR $t BZ RZIk VZI$B_s I$%$IR Y $t}Z sZI$B R$tsj $tB $tI}tIt Ps8R qY jtY BP s Ps8 $R s {BI }ss8 stI 8sk A R s {BI$t $8 YBb% Y s BBI }s{${sj sRBtR PB ZR$t Ps8 R$9R Ys
+s s 8Zj$}j BP d1 Y tZ8A BP Rs8}jR {s$I Ak st Ve7\e = Ps8; qsAj  RYBbR
+Y RZjR PB Ps8 jtYR st$t PB8 d1 B ;E(M $t 8Zj$}jR BP d1 qY$R Iss RYBbR Ys Y {B8}RR$Bt s$BR s tB %k RtR$$% B Y Ps8 jtY stI RZRR Ys s BBI jtY PB ;;d ,<9 dE A$ sZI$B Rs8}jI Rs8R $R ddx1 Rs8}jR
+
+qs{,
+qs{, (; qs{, 1( qs{, 1 qs{, ;M qs{, EE
+
+d1
+dnM n(1 1x( 1;M 1;1
+
+xE
+dn nd; 1; 1xx 1;
+
+ddx1
+dn nd 1;E 1xE 1;
+
+1n(;
+dnM nd 1;1 1xE 1;E
+
+;E(M
+dnE nd 1n 1xE 1;1
+
+qsAj  ]B8}RR$Bt s$BR PB Y jP {Ysttj BP -}$8tsj sZI$B hjR ZR$t VZI$B_s b$Y
+I$&t Ps8 R$9R w$t tZ8A BP Rs8}jRD
+
+11 ytsT]Ysttj *{Bjs$Bt
+Z{Y BP Y s$Y8${ $t Y sjB$Y8R IR{$AI $t 7{$Bt d $R $t Y {B8}Zs$Bt BP Y }I${$Bt B R$tsj RB Y$R ss $R s }$8 s PB R$8}j$h{s$Bt qYPB Y $tsT{Ysttj I{Bjs$Bt B}s$Bt ZRR s %k R$8}j 3yi sIs}$% }I${$Bt 8YBI
+; qY Ve7\e = $R s RstIsI $t{Btt{$Bt I$$sj $tPs{ RsAj$RYI Ak Y VZI$B et$t$t
+7B{$k wVe7D stI Y eZB}st BsI{sR$t =t$Bt we =D y $R s R$sj stR8$RR$Bt PB8s PB j$tsjk }RtI I$$sj sZI$B Iss bY${Y }8$R stR8$RR$Bt BP bBT{Ysttj I$$sj sZI$B $tPB8s$Bt $t{jZI$t ABY sZI$B stI tBt sZI$B Iss PB8 Bt }BPRR$Btsj sZI$B I%${ B stBY
+11
+
+ZR$t Btjk $t {B^{$tR qY$R s}}B-$8s$Bt bsR hR }B}BRI $t 7YBt >1dH stI
+
+b$jj A I$R{ZRRI $t Is$j Y
+
+qY }I${$Bt 8YBI ZRR Y PBjjBb$t PBZ R$8}j 3yi }I${BR s{Y BP bY${Y YsR
+
+Btjk $t {B^{$tRU
+
+Tz
+
+c|(>zH c|d>zH
+
+) )
+
+(
+ c>z dH
+
+Z
+
+c|1>zH c|n>zH
+
+) )
+
+   1c>z dH c>z 1H     nc>z dH nc>z 1H L c>z nH
+
+qYR }I${BR s 3yi }I${BR R$t{ Yk $t%Bj% j$ts {B8A$ts$BtR BP }sR Rs8}jR
+
+ <Bb% Yk sjRB Ys% st $tR$t $t}s$Bt $t 8R BP Y YTBI }BjktB8$sjR
+
+  Ys Yk Iht i{sjj Ys s w
+
+dDTBI }BjktB8$sj {st A PBZtI Ys }sRRR YBZY
+
+    c z Y }%$BZR Iss }B$tR > dHD c>z 1HD Q Q Q D c>z H qY$R }BjktB8$sj {st A %sjZsI s
+
+z c z Y Y Rs8}j $8 B BAs$t Y }I${I %sjZ |> H qYR }BjktB8$sjR stI Y }I${I
+
+%sjZR Ys Yk }BIZ{ s $jjZRsI $t 3$Z E PB s k}${sj R BP }%$BZR Rs8}jR
+
+Vt $tR$t }B}k BP YR }BjktB8$sj s}}B-$8s$BtR $R Ys Y RZj$t R$IZsj
+
+ Ã z c z c z R$tsjR > H ) > H |> H {st A ^{$tjk {B8}ZI $t Y PBjjBb$t {ZR$% 8sttU T Ã(>zH ) c>zH z   Ãd>zH ) Ã(>zH Ã(>z dH
+
+Z
+
+Ã1>zH Ãn>zH
+
+) )
+
+  Ãd>zH Ãd>z dH   Ã1>zH Ã1>z dH
+
+qY$R }8$R Y t$ R BP }I${$Bt B R$tsjR B A {B8}ZI b$YBZ stk 8Zj$}j${s$BtRx
+s{YxG${RZYBb $t V}}tI$- Ys Y$R sjB$Y8 {st A }ssjjj$9I B s, sI%sts BP ytj:R  7y*
+
+1n
+
+x[n]
+
+x[n-3]
+
+x[n]
+
+x 3[n]
+
+x[n-2]
+
+x[n-1]
+
+x 1[n]
+
+x 2[n]
+
+AUDIO SAMPLES
+
+n x 0[n]
+
+POLYNOMIAL PREDICTORS
+3$Z E _BjktB8$sj s}}B-$8s$Bt $t}s$Bt BP Y }I${BR ZRI Ak VZI$B_s PB $tT
+sT{Ysttj I{Bjs$Bt
+
+1;
+
+3B s{Y Ps8 Y PBZ }I${$Bt R$IZsjR Ã(>zHD Ãd>zHD Ã1>zHD Ãn>zH s {B8}ZI s %k
+Rs8}j $t Y Ps8 stI Y sARBjZ %sjZR BP YR R$IZsjR s s%sI wRZ88ID B% Y {B8}j Ps8 qY R$IZsj b$Y Y R8sjjR RZ8 BP 8st$ZIR B% sjj Rs8}jR $t Y Ps8 $R Yt IhtI sR Y AR s}}B-$8s$Bt PB Ys Ps8 stI Ys }I${B $R ZRI PB Ys Ps8 qY $tPB8s$Bt Bt bY${Y }I${B bsR ZRI {st A {BII b$Y bB A$R BP $tPB8s$Bt stI Ys A{B8R }s BP Y B%YsI $tPB8s$Bt PB Y Ps8 qsAj M RZ88s$9R YBb 8stk $8R s{Y }I${B bsR ZRI $t {BI$t Y -}$8tsj sZI$B s{,R
+
+qs{,
+qs{, (; qs{, 1( qs{, 1 qs{, ;M qs{, EE
+
+Ã(
+M( E1d nn; 1MM n(d
+
+Ãd
+;;M nE; n(( 1x1 n(
+
+Ã1
+xE; dn((
+EEE nn ;(
+
+Ãn
+nd1 (d 1n1
+d1E E;d
+
+qBsj Ps8R
+d;En; 1ME dxn1 1d;; dn
+
+qsAj M WZ8A BP $8R s{Y R$IZsj $R {YBRt IZ$t {BI$t BP s jP {Ysttj Ps8
+
+VR Rt $t qsAj M Y $R tB RBt }Pt{ PB stk BP Y }I${BR $ Y $R st sI%sts $t %sk$t Y }I${B PB8 Ps8TBTPs8 B j$Y $R RYI Bt YR
+p }I${BR Ak {BtR$I$t Y$ PJZt{k R}BtRR y $R sR$jk RYBbt Ys Y TstRPB8  RkR8 PZt{$Bt BP Y YTBI }I${B $R
+ wpD ) wd pdDD
+
+ stI Y 8st$ZI BP Y PJZt{k R}BtR BP Y YTBI }I${B $R /wÃix D/ ) /1 R$tw)x 1D/D
+
+w;D
+
+1x
+
+bY x $R Y Rs8}j$t s 3$Z  RYBbR }jBR BP w;D PB Y PBZ }I${BR ZRI $t
+
+VZI$B_s wqY PJZt{k s-$R $t Y$R }jB $R tB8sj$9I RB Ys YsjP Y Rs8}j$t s $R s
+ tB8sj$9I PJZt{k dD WB Ys A{sZR BP Y YTBI 9B s F ) d Y }I${BR
+
+Integer Coefficient Predictor Frequency Responses
+10
+
+8
+
+p=3
+
+magnitude
+
+6
+
+4
+
+p=2
+
+2
+
+p=1
+
+p=0
+
+0
+
+0
+
+0.1
+
+0.2
+
+0.3
+
+0.4
+
+0.5
+
+0.6
+
+0.7
+
+0.8
+
+0.9
+
+1
+
+normalized frequency = ωT/π
+
+3$Z  3JZt{k R}BtRR BP 3yi }I${BR ZRI Ak VZI$B_s PB $tsT{Ysttj I{Bjs$Bt
+
+PB  ) d, 1, n sjj Ys% s Y$Y PJZt{k ABBR Ys $t{sRR b$Y $t{sR$t  7}{$h{sjjk Y s$t s PJZt{k 11(x ,<9 $R ( 1( ;( stI E( I  qYZR Y {YB${ BP }I${B {st sjRB A YBZY BP $t 8R BP Rj{$t Y $Y s8BZt BP Y$Y PJZt{k ABBR B 4st Y B%sjj R}{Z8 BP Y }I${$Bt B
+ qY YTBI }Bj s F ) d bBZjI A }BAj8s${ $t 8stk s}}j${s$BtR BP j$ts
+}I${$% 8BIj$t A{sZR Y {BR}BtI$t {BtRZ{$Bt RkR8 BP 3$Z ; bBZjI A ZtRsAj <Bb% $t Y jBRRjRR {sR $P b Rs Y {BtRZ{$Bt RkR8 b$Y  -s{ Rs8}jR PB8 Y }%$BZR Ps8 Y s tB JZst$9s$Bt BR B s{{Z8Zjs stI Y {BtRZ{$Bt $R -s{
+qY JZR$Bt tsZsjjk s$RR sR B YBb 8Z{Y }PB8st{ $R Rs{$h{I Ak ZR$t R$8}j }I${BR qY %sjZs$BtR $t 7{$Bt d BP Y 7YBt sjB$Y8 RZR Ys R$8}j$h{s$Bt BP Y }I${$Bt B}s$Bt Ak ZR$t jBbTBI }I${BR b$Y $t {B^{$tR IBR tB
+1E
+
+IsI }PB8st{ s}}{$sAjk ytII sR qsAj x RYBbR Y $R j$j I$&t{ $t }T PB8st{ Abt Y R$8}j $t }I${BR stI Y B}$8Z8 d(YTBI j$ts }I${B stI $t Ps{ $t RB8 {sRR Y Y$YTBI }I${B }PB8R Rj$Yjk bBR
+
+1n ytT{Ysttj I{Bjs$Bt
+
+VZI$B_s {st s, sI%sts BP $tT{Ysttj I}tIt{$R }Rt $t RB {Ysttj sZI$B Rs8R qY$R $R IBt bYt Y {BI $R R $t RB 8BI yt Y$R 8BI $t sII$$Bt B s}}B-$8s$t Y $Y RB {Ysttj Rs8}jR b {B8}Z Y }BjktB8$sj s}}B-$8s$Bt BP Y I$&t{ Abt Y jP stI $Y {Ysttj sjBt b$Y Y sRRB{$sI R$IZsjR qY R8sjjR %sjZ s8Bt Y M RZ8R BP sARBjZ R$IZsjR w; PB8 Y $Y {Ysttj stI ; PB8 Y I$&t{D IhtR Y AR s}}B-$8s$Bt
+I qsAj  }RtR Y R$8sI hRTBI tB}k ( PB Y jP B {Ysttj Y $Y
+B {Ysttj $t IZsj 8BI stI Y $Y B {Ysttj $t RB 8BIE qYR 8sRZR
+
+qs{,
+qs{, (; qs{, 1( qs{, 1 qs{, ;M qs{, EE
+
+NP B {Ysttj
+d1d( E(n xM dM M1
+
+i$Y B {Ysttj *Zsj 8BI 7B 8BI
+
+d11
+
+d1(
+
+Ed
+
+Ed
+
+x1
+
+x1
+
+dE
+
+dE
+
+(
+
+M
+
+qsAj  3$RTBI tB}k s( $t A$R } Rs8}j PB jP stI $Y B {YsttjR wÃ>zHD
+
+RYBb %k j$j $8}B%8t $t {B8}RR$Bt bYt Y $tT{Ysttj I{Bjs$Bt $R Rb${YI Bt qY$R $R tB RZ}$R$t R$t{ Y $tT{Ysttj I{Bjs$Bt B}s$Bt IBR tB s, $tB
+EqY IZsj {Ysttj 8BI {B8}RRR Y jP stI $Y {YsttjR R}ssjk
+1
+
+s{{BZt $8 IjskR stI BY I$&t{R Ys s {B88Bt Abt {YsttjR BP s RB R$tsj {sZR b R, s {BI b$Y 8$t$8Z8 sjB$Y8 {B8}j-$k Y$R RZRR ZR$t VZI$B_s $t IZsj 8BI
+
+1; etB}k {BI$t
+Ã z D Ã z 7$jt Ps8R {st sR$jk A I{I b$Y R$IZsjR (> H d> H stI ^{$tjk tB}k {BII
+/Ã z / b$Y st R{s} {BI yP Y R$jt Ps8 $R 8sI BP sjj ( %sjZ Rs8}jR Yt Y RZ8 BP (> H
+$R 9B stI $P Y R$jt Ps8 $R 8sI BP %sjZR BY Yst ( wTd B d sR RB8$8R PBZtID
+/ /   Yt Y RZ8 BP Ãd>zH $R 9B w{sjj Ys Ãd>zH ) c>zH c>z dHD
+GYt Y Ps8 $R tB BP {BtRst %sjZ b ZR pBjB8A {BI$t sjBt b$Y s 8s}}$t B BI Y $t tZ8AR qY$R {BI $R ZRI $t Y tb F_epTN7 jBRRjRR $8s {B8}RR$Bt R{Y8 >d;H V A$P IR{$}$Bt BP Y$R {BI PBjjBbR
+
+pBjB8A ]BI$tU pBjB8A {BIR s IhtI B A B}$8sj PB -}Btt$sjjk I{sk$t
+
+i }BAsA$j$k I$R$AZ$BtR BP }BR$$% $tR >MH p$%t s Zt$JZ }ss8  Y pBjB8A
+
+z z i {BI I$%$IR s }BR$$% $t $tB bB }sRU s A$tsk }Rts$Bt BP w 8BI D stI
+!Å
+s Ztsk }Rts$Bt BP w z D >d(H E
+
+i z b z yP
+
+) 1>  Yt Y {BI bBI PB {BtR$RR BP Y jsR R$t$h{st A$R BP  PBjjBbI
+
+z Ak Y tZ8A PB8I Ak Y 8s$t$t 8BR R$t$h{st A$R BP $t Ztsk }Rts$Bt
+
+3Å
+
+b stI s RB} A$ qY jtY BP Y$R {BI bBI $R
+
+LdL
+
+z
+1>
+
+
+
+Ã z E {sZR Y R$IZsjR 7> H s tB sjj }BR$$% s 8s}}$t
+
+w D $R IBt B BI Y
+
+1M
+
+%sjZR sR }BR$$% $tRU
+
+Tz 1Ã7>zH
+
+ $P Ã7>zH (
+
+Z / /  E wÃ7>zHD )
+
+1 Ã7>zH
+
+d BYb$R
+
+wxD
+
+b Vt R$8s PB Y }ss8 $R $%t $t >1;H stI $R ZRI $t VZI$B_s y $R AsRI Bt
+o /Ã z / Y -}{s$Bt w 7> H D sjsIk {B8}ZI $t Y $tsT{Ysttj I{Bjs$Bt AjB{, stI $R
+
+{ / / Q b ) jB1wow Ã7>zH DD
+
+wED
+
+b qY }ss8 $R IhtI B A {BtRst B% st t$ Ps8 stI s,R %sjZR Abt (
+
+u  u stI w
+
+dD $t Y {sR BP A$ sZI$B Rs8}jR qY$R }ss8 {st A R$8sI ^{$tjk
+
+b$YBZ stk 4Bs$tT}B$t B}s$BtR sR PBjjBbRU
+
+g wG D C$  D uWÃ7XÃ4   fjg4 Guu$  ~D Qh \bww4i
+
+uWÃ7XÃ fjg bY
+
+$R Y tZ8A BP Rs8}jR $t s Ps8 stI
+
+$R Y RZ8 BP Y
+
+sARBjZ %sjZR BP Y R$IZsj R$tsj B% Y {B8}j Ps8
+
+]Bt- 8BIj$tU b G sjRB -}$8tI b$Y %sk$t Y %sjZ BP Y }ss8
+b$Y$t s Ps8 qYR -}$8tR PBjjBbI Y {Bt- 8BIj$t $Is PBZtI $t Y tb F_epTN7 RstIsI >d;H ]Bt- 8BIj$t RZRR Iht$t $BtR w{Bt-RD PB bY${Y Y
+Ã z Rs$R${sj AYs%$B BP Y R$IZsj R$tsj > H s R$8$js yt Y tb jBRRjRR $8s {B8T
+}RR$Bt RstIsI F_epTN7 Y {Bt-R s AZ$j ZR$t Y jB{sj sI$t bY${Y {s}ZR Y j%j BP R8BBYtRR B I$tRR RZBZtI$t s }$-j 3B -s8}j }$-jR $t st I ss s BZ}I BY sR s }$-jR $t 4s $BtR !t{ YR $BtR s IhtI Y {BI sIs}$%jk {YBBRR Y AR tB}k {BI$t }ss8 PB s{Y $Bt
+1
+
+G 8sRZI Y 8s-$8Z8 {B8}RR$Bt s$B }BRR$Aj ZR$t {Bt- 8BIj$t PB VZT I$B_s qY$R 8s-$8Z8 bsR PBZtI Ak ZR$t Y AR tB}k {BI$t }ss8 PB %k
+Ã z b Ã z R$IZsj Rs8}j > H qY$R 8stR R$t Y }ss8 PB s{Y R$IZsj > H B $% Y
+R8sjjR {BI bBI jtY =R$t BZ -}$8tsj sZI$B hjR b PBZtI s 8s-$8Z8 {B8T }RR$Bt s$B $8}B%8t st$t PB8 E B d(0 yt BI B s{Y$% Y$R sY R8sjj $8}B%8t $ bBZjI A t{RRsk B $tP Y {Bt- PB8 Y R$tsj Iss s s {B8}ZsT $Btsj {BR Ys $R tB `ZR$hI Ak Y Rs%$tR $t A$ s
+
+1x V$Y8${ {B8}j-$k
+
+qY tZ8A BP $t sII$$BtR stI 8Zj$}j${s$BtR } R{BtI Ys VZI$B_s JZ$R $t IZsj 8BI PB s ;;d ,<9 RB dE A$ sZI$B Rs8 $R RZ88s$9I $t qsAj d(
+
+]B I *{B I
+
+(M !_7 PB8 (nx B (M !_7
+
+q}sARj{Bdt(IV W$BY8 Y$s{{BY8}j!-$_k7PBPBVYZI$IB_{sBI$tIIZ}sjt8IRBIBt Y!}_7IR${stBIRZPRBI88$jBjR$BtPB}JZst$jBktR
+
+1E $ s %s$sA$j$k
+{sZR BP Y tBtTRs$Btsk tsZ BP sZI$B R$tsjR Y {B8}RR$Bt R{Y8 YsR s %s$sAj A$ s 3$Z M $jjZRsR Y$R %s$sA$j$k yt Y$R hZ Y {B8}RR$Bt s$BR B% Ps8R tZ8A nxx( stI nx PB Y jP {Ysttj BP qs{, (; BP >dH s }RtI VjRB I}${I s Y 8$t$8Z8 stI 8s-$8Z8 Rs8}j %sjZR $t s{Y Ps8 sjBt b$Y Y 8st stI %s$st{ %sjZ B% s{Y Ps8 WB Y js$BtRY$} Abt Y %s$st{ wbY${Y sjRB IhtR Y
+n(
+
+tkD stI Y {B8}RR$Bt s$B VR Y tk BP s Ps8 $t{sRR Y {B8}RR$Bt s$B I{sRR
+
+Compression Ratio Per Frame 1.8
+
+1.6
+
+1.4
+
+1.2
+
+1
+
+0
+
+5
+
+10
+
+15
+
+20
+
+25
+
+30
+
+35
+
+40
+
+45
+
+50
+
+x 104 2
+
+Minimum, Maximum Sample Values And Average Value Per frame
+
+1
+
+0
+
+−1
+
+−2
+
+0
+
+5
+
+x 106 8
+
+10
+
+15
+
+20
+
+25
+
+30
+
+35
+
+40
+
+45
+
+50
+
+Variance Per Frame
+
+6
+
+4
+
+2
+
+0
+
+0
+
+5
+
+10
+
+15
+
+20
+
+25
+
+30
+
+35
+
+40
+
+45
+
+50
+
+Frame Number
+
+3$Z M zs$sAj A$ s tsZ BP {BI
+
+yt RB8 s}}j${s$BtR $ 8sk A BP $tR B Ys% s R8BBYI }s, s $tRsI BP s RBt 4Z{Zs$Bt $t $tRststBZR Iss s V RBjZ$Bt B Y$R }BAj8 bsR }B}BRI Ak ]s%t  sj $t >xH bYB RZRI $tR$t AZ&R s ABY Y {BI stI Y I{BI R$IR
+
+n ]Bt{jZR$Bt
+
+NBRRjRR sZI$B {B8}RR$Bt $R j$,jk B }jsk st $8}Bst }s $t 8ZR${ I$R$AZ$Bt B%
+
+Y ytt *z* sZI$B I$$sj sZI$B s{Y$%$t stI 8$-$t
+
+{sZR {B88Bt jBRRjRR
+
+{B8}RR$Bt Z$j$$R RZ{Y sR _,$} IB s }BB `BA BP {B8}RR$t sZI$B Rs8R s I$&t
+
+{YtBjBk sIs}I B YR R$tsjR $R JZ$I
+
+nd
+
+Vjj {Zt RsTBPTYTs jBRRjRR sZI$B {B8}RR$Bt sjB$Y8R s AZ$j sBZtI 8B%sj BP jB{sj I}tIt{k BP Y sZI$B Rs8}jR VR I$R{ZRRI $t Y$R }s} YR sjB$Y8R Ys% s{YI s j$8$ $t {B8}RR$Bt Ys $R %k 8BIR {B8}sI B jBRRk {B8}RR$Bt {YtBjBk =R$t Y AsR${ }$t{$}jR BP Ps8$t }I${$Bt stI tB}k {BI$t b IR$tI s tb {BI u VZI$B_s, u B A $8}j8tI ZR$t Btjk s R8sjj tZ8A BP $t s$Y8${ B}s$BtR VR RYBbt $t qsAjR ; stI x VZI$B_s }PB8R sR bjj B A Yst 8BR RsTBPTYTs {BIR
+V{,tBbjI8tR
+qY sZYBR b$RY B Yst, * 3I $RBt stI <bjT_s{,sI NsABsB$R PB tBZR RZ}}B stI t{BZs8t BP Y$R bB, VjRB b b$RY B Yst, s{jB G$tA stI psI$j 7BZRR$ w8s$t IR$tR BP F_epTN7D PB8 Y z$RZsj ]B8}Z$t *}s8t s <bjT_s{,sI NsABsB$R *tt$R N wsZYB BP GVD ]Y$RB}Y BtB8k wsZYB BP !7JZ$RYD i${YsI 7}sJZ wsZYB BP 7Bts{D Vj Gt wsZYB BP =7y]B8}RRD stI iBAs e,jZtI PB Y$ $8 stI {Bt$AZ$Bt
+V 7Z{Z BP {B8}RRI hj YsI stI Ps8R
+GY$j IR$t$t VZI$B_s b IhtI s RZ{Z PB Y {B8}RRI hjR qYR $t{jZII s hj YsI stI Y {B8}RRI Ps8R qY YsI $tI${sRU
+T Y {BI$t 8BI wR$tj RB B IZsj {YsttjD IhtI ZR$t 1 A$R
+n1
+
+T Y R$9 BP Y Ps8 $t Rs8}jR IhtI b$Y dE A$R
+T Y tZ8A BP 9B %sjZ Rs8}jR s}}tII $t Y jsR Ps8 IhtI b$Y dE A$R
+T stI $t {sR BP RB B IZsj {Ysttj 8BIR s d A$ 4s Rs$t $P Y B$$tsj hj
+{Bts$tI 8B jP Yst $Y Rs8}jR
+VP Y$R YsI Y Ps8R s {BII R}ssjk yt Y R$tj {Ysttj 8BI Y A$ RktsI}tIR Bt bYY B tB Y Ps8 $R {BtRst qY$R Rkts- $R sR PBjjBbRU
+T yP Y Ps8 $R {BtRst YtU
+Tz 3$R A$ R B d Z dE t- A$R Iht Y hR Rs8}j
+T yP Y Ps8 $R tB {BtRst YtU
+T 3$R A$ R B ( z qbB t- A$R Iht bY${Y }BjktB8$sj }I${B bsR ZRI w( d 1 B nD
+> ; A$R Iht Y pBjB8A }ss8 
+   dE A$R Iht Y hR Rs8}jR BP Y Ps8 w} $R Y }BjktB8$sj BID Z i8s$t$t A$R Iht pBjB8A tB}k {BIR PB R$IZsj R$tsj
+yt Y {sR BP RB B IZsj {Ysttj 8BIR bB A$R s sIII s Y A$tt$t BP s R$tj {Ysttj Ps8 YsI Rkts- qYR A$R Iht bYs {Ysttj Y Ps8 t{s}RZjsR stI s R B (( PB jP {Ysttj (d PB $Y {Ysttj d( PB Y I$&t{ Abt jP stI $Y {Ysttj wdd $R tB ZRID
+G {YBR j$jTtI$st PB8s B sjjBb }BsA$j$k BP Y {B8}RRI hj B% I$&t 8s{Y$t s{Y${Z
+nn
+
+ytsT{Ysttj I{Bjs$Bt $8}j8ts$Bt
+VZI$B_s:R $tsT{Ysttj I{Bjs$Bt sjB$Y8 {st A }ssjjj$9I qY {B BP Y $tsT {Ysttj I{Bjs$Bt AjB{, $R Y PBjjBb$t gw44h jBB}
+g w7Dg4 7uWÃ7XÃ4 7uuh  Ãc7r D Hc7r  Hc7gr4 ufyW uD ufwÃc7rh4
+e
+bY${Y {st A ZtBjjI PB ytj:R  7y* s{Y${Z sR PBjjBbRUM
+g w7Dg4 7uWÃ7XÃ4 7uD`h  Ãc7r D Hc7r  Hc7gr4 Ãc7ugr D Hc7ugr  Hc7r4 Ãc7uQr D Hc7uQr  Hc7ugr4 Ãc7upr D Hc7upr  Hc7uQr4 ufyWg uD ufwÃc7rh4 ufyWg uD ufwÃc7ugrh4 ufyWQ uD ufwÃc7uQrh4 ufyWQ uD ufwÃc7uprh4
+e ufyW D ufyWg u ufyWQ4
+qY  $tRZ{$BtR $tR$I Y$R jBB} {st AU
+g w7Dg4 7uWÃ7XÃ4 7uD`h  ~ kÃ071Ã &&C |gv1u7v g gi f71 dgs Hc7upr @ Hc7uQr @ Hc7ugr @ Hc7r uvs &&g |gv1u7v Hc7uQr @ Hc7ugr @ Hc7r @ Hc7gr ~ Tb5q &&C$ &&g
+~ gd &&C |gv1u7v
+sYtIMsqY$Y8{B${IBR}ZBIAskR$BZRt$88R8$PjBss$s9RI$8Y}j{skR{RZj8RR$8YssZIG$BRssR8RZ}8jRIBYYs%8d8EBA$k RsBIjRZs$tBtIbG$BRtPjBk{ABBZtY]I
+n;
+
+Ãc7upr @ Ãc7uQr @ Ãc7ugr @ Ãc7r WÃ &&` uvs &&x |gv1u7v |gv1uv1
+C @ C @ C @ C uvs g @ g @ g @ g ~ &rsq &&`$ &&C 4 7 gvÃ g 1Ã g dgs 7v &&C
+4 7 vÃ0u179Ã 1Ãv |gÃ}gvs7v0 4 dgs 7v &&` d7ll fÃ Ãtul 1g g 4 w6SSSSh$ g1Ãd7Ã 71 d7ll fÃ C3 EEq &&x$ &&` 4 7 gvÃ g 1Ã g dgs 7v &&` 4 7 g 1Ãv |gÃ}gvs7v0 dgs 4 7v &&x d7ll fÃ C$ g1Ãd7Ã g3 EEq &&x$ &&` 4 7 gvÃ g g dgs 7v &&C 7 4 vÃ0u179Ã 1Ãv |gÃ}gvs7v0 dgs 4 7v &&x d7ll fÃ g$ g1Ãd7Ã g3 &EEqE &&C$ &&x 4 &&C d7ll |gv1u7v pQ f71 Ãl1 4 g ufwÃc7uprhu ufwÃc7uQrh uvs 4 ufwÃc7ugrhu ufwÃc7rh3 EEE &&$ &&C 4 && d7ll |gv1u7v pQ f71 Ãl1 4 g ufyWQ uvs ufyWg e ufyW D ufyWg u ufyWQ4
+
+ufw h VRRZ8$t s d {k{j jst{k PB Y
+
+8s{B {sjj Y $tR$I BP Y ] ZtBjjI
+
+gw44h jBB} R$8sR B d1 {k{jR w; 8s{B {sjjR stI M sII$$BtRD bY$j Y sAB% 
+
+{BI R$8sR B E {k{jR qYR R$8sR RZR s Ps{B 1 IZ{$Bt $t {k{jR sRRB{$sI
+
+B s$Y8${ B}s$BtR
+
+nx
+
+iPt{R
+
+>dH V Z,R V !B8t stI i %st I zjZt NBRRjRR ]BI$t PB *z* VZI$B d(dR Ve7 ]Bt%t$Bt NBR VtjR ;nxM WB%8A dE
+
+>1H V Z,R V !B8t stI i %st I zjZt 7sI IZ$t d(dR Ve7 ]Bt%t$Bt NBR VtjR }Rts$Bt BP >dH _Y$j$}R WB%8A dE
+
+>nH ] ]jj$ _ ]YtR stI  iBRR$ NBRRjRR VZI$B *ss ]B8}RR$Bt PB isj q$8 V}}j${s$BtR xY Ve7 ]Bt%t$Bt Wb OB, nM( !{BA dn
+
+>;H _ ]s%t stI  p9Bt NBRRjRR ]BI$t PB VZI$B *$R{R FBZtsj BP VZI$B et$T t$t 7B{$k ;;wDU(Eu1( 7}8A dE
+
+>xH _ ]s%t  Nsb stI F 7Zs NBRRjRR ]B8}RR$Bt =R$t yyi _I${$Bt 3$jR d(1tI Ve7 ]Bt%t$Bt Zt${Y ;;dx s{Y d
+
+>EH *z* 3BZ8 X*z* 7}{$h{s$BtR PB isIT!tjk *$R{" _s ; V=*y! 7_e]y3y]VT qy!W7 zR$Bt d( s{Y d
+
+>H eZB}st BsI{sR$t =t$Bt 7+V w7BZtI +Zsj$k VRRRR8t s$sjD ]* ' ;11 1(;u1 dMM
+
+>MH ip psjjs stI *] zst zBBY$R !}$8sj 7BZ{ ]BIR PB pB8${sjjk *$R$AT ZI yt Vj}YsAR yeee qstRs{$BtR Bt ytPB8s$Bt qYBk s{Y dx
+
+>H V pRYB stI i psk z{B +Zst$9s$Bt VtI 7$tsj ]B8}RR$Bt jZb V{sIT 8${ d1
+
+>d(H 7GpBjB8A iZtTjtY t{BI$tR yeee qstRs{$BtR Bt ytPB8s$Bt qYBk FZjk dEE
+
+>ddH  <stR X!}$8$9s$Bt BP *$$sj VZI$B PB ytt qstR8$RR$Bt" _Y* qYR$R pB$s ytR$Z BP q{YtBjBk sk dM
+
+>d1H  <stR stI i G 7{YsP XVZI$B_s v Vt yt V$Y8${ NBRRjRR VZI$B ]BI{" yt *ss ]B8}RR$Bt ]BtPt{ dM
+
+>dnH  <stR stI i G 7{YsP XVt _ep VZI$B NskI qstR{BI" d(xY Ve7 ]Bt%t$Bt 7st 3st{$R{B ;Md1 7}8A dM
+
+>d;H y7!\ye] Fq]d\7]1\Gpd
+
+F_epTN7U 8$t jBRRjRR\tsTjBRRjRR {B8}RT
+
+R$Bt RstIsI PB {Bt$tZBZRTBt $8sR F_ep NBRRjRR ytPB8s$Bt s%s$jsAj s
+X}U]]ddd!I%R|!C!Y/]}YBl%| d
+
+>dxH W Fskst stI _ WBjj *$$sj ]BI$t BP Gs%PB8R _$t{$}jR stI V}}j${s$BtR B 7}{Y stI z$IB _t${T<sjj dM;
+
+nE
+
+>dEH * N _RBtsj {B88Zt${s$BtR Bt Gs%PB8 V{Y$% wGVD ytPB8s$Bt s%s$jsAj
+s 11}ddd3Ã|31ggv1g3|uIsÃvlÃÃduy}Ã31W VZZR d
+
+>dH sIBtts qY y88s{Zjs ]Bjj{$Bt ]* ' 1E;;(u1
+
+>dMH ] BtB8k _RBtsj {B88Zt${s$BtR Bt !7JZ$RY ytPB8s$Bt s%s$jsAj s
+11}ddd3H7}3|gW VZZR d
+
+>dH  _Zs q N$A{Yt stI _ WBjj NBRRjRR qstRPB8 ]BI$t BP VZI$B 7$tsjR d(1tI Ve7 ]Bt%t$Bt Zt${Y ;;d; s{Y d
+
+>1(H N i isA$t stI i G 7{YsP *$$sj _B{RR$t BP 7}{Y 7$tsjR _t${T<sjj dM
+
+>1dH q iBA$tRBt 7<!iqeWU 7$8}j jBRRjRR stI tsTjBRRjRR bs%PB8 {B8}RR$Bt q{YT t${sj i}B dxE ]s8A$I =t$%R$k et$t$t *}s8t qZ8}$tBt 7 ]s8A$I ] 1 d_ = *{8A d;
+
+>11H i 7}sJZ
+
+_RBtsj {B88Zt${s$BtR Bt 7Bts{
+
+gvu|q|gW}Ã9Ã3|gW VZZR d
+
+ytPB8s$Bt s%s$jsAj s
+
+>1nH V Gt =7y]B8}RRU NBRRjRR NBbTy_7 VZI$B ]B8}RR$Bt $t 7BPT bs stI <sIbs yt _B{I$tR BP Y ytts$Btsj ]BtPt{ Bt 7$tsj _B{RR$t V}}j${s$BtR stI q{YtBjBk 7}8A d ytPB8s$Bt s%s$jsAj s
+11}WÃWfÃ3ugl3|gWvs}u|Ã
+
+>1;H  G$tA p 7BZRR$ stI p 7s}$B N!]!TyU V NBb ]B8}j-$k ]Bt-T
+sRI NBRRjRR y8s ]B8}RR$Bt VjB$Y8 yt *ss ]B8}RR$Bt ]BtPt{ dE
+ytPB8s$Bt s%s$jsAj s 11}ddd3}l3}3|gWlg|g
+
+n
+

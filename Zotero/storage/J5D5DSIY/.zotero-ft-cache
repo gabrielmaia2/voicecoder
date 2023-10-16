@@ -1,0 +1,188 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (48)
+    Cited by (18) 
+
+Elsevier
+Performance Evaluation
+Volume 68, Issue 4 , April 2011, Pages 347-360
+Performance Evaluation
+Evaluating perceived voice quality on packet networks using different random neural network architectures
+Author links open overlay panel Kapilan Radhakrishnan , Hadi Larijani
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.peva.2011.01.001 Get rights and content
+Abstract
+
+Voice over Internet Protocol (VoIP) is one of the fastest growing technologies in the world. In VoIP speech signals are transmitted over the same network used for data communications. The internet is not a robust network and is subjected to delay, jitter, and packet loss. It is very important to measure and monitor the quality of service (QoS) the users experience in VoIP networks; this is not an easy task and usually requires subjective tests . In this paper we have analyzed three non-intrusive models to measure and monitor voice quality using Random Neural Networks (RNN). A RNN is an open queuing network with positive and negative signals. We have assessed the voice quality based on various parameters i.e. delay, jitter, packet loss, and codec. In our approach we have used the Mean Opinion Score (MOS) calculated using a Perceptual Evaluation of Speech Quality (PESQ) algorithm to generate data for training the RNN model. We have studied two feed-forward models and a recurrent architecture. We have found that the simple feed-forward architecture has produced the most accurate results compared to the other two architectures.
+Introduction
+
+Over the last few years, the Internet has grown enormously and has become a converged network of millions of heterogeneous networks. Many new technologies have been developed and among these, voice communication has gained popularity because of its many advanced features: i.e. low cost, easy local or long distance calls, mobility, caller ID, 3-way calling, virtual numbers, etc. The major problem VoIP faces is to provide the same “toll-quality” as traditional Public Switched Telephone Networks (PSTN). The Internet which is generally considered a “best-effort” network, was originally developed to carry only data traffic. This network is not robust and is subject to network delay, jitter, and packet loss. Voice is a real-time traffic type, its quality is affected by various factors of IP networks (delay, jitter, and packet loss) and other non-IP network parameters (codec, language, etc.) [1]. When transmitted over the internet the voice quality degrades significantly compared to data traffic. Delay, jitter, and packet loss (PL) are the three important parameters which can affect the voice quality over the internet. Reliability and availability are the other important parameters to be considered in VoIP networks, traditional PSTN provide service availability of 99.999% (five 9’s) which is 5 min of downtime in a year [2].
+
+The Internet is not as reliable as PSTNs because of complex design, multiple protocols, network management systems, vendors, etc. Transmitting voice over the Internet includes converting analog voice signals to digital signals, encoding, decoding, and converting back the digital signals to analog voice. This adds more delay to voice transmission. The best practice is to minimize this delay; towards this end it is better to encode near the speaker end and decode near the listener end. In addition to this, voice quality degrades if transcoding of speech is performed in the middle of transmission and with concatenation of low bit rate voice codecs [3].
+
+In voice communications, quality of service is measured between speaker and listener or simply stated as Mouth to Ear (M2E). Voice quality measurement methods are broadly classified into two types: subjective methods and objective methods. In subjective methods [4], human subjects are asked to listen to the degraded voice generated in a controlled environment and to use Mean Opinion Score (MOS) to rate the voice quality over the scale of 1–5 (1 being bad quality and 5 being excellent voice quality). Though subjective tests are time-consuming and very expensive they have remained a powerful method which are a preferred choice by international standard bodies for assessing voice quality. The limitations of subjective tests are 1. unsuitable for real time applications, 2. unsuitable for large volume of data, and 3. requires a controlled environment to conduct the tests. Objective methods [5] have been developed to overcome the limitations of subjective methods. Objective methods use subjective methods as benchmarks. Objective methods either use algorithms or mathematical calculations to predict voice quality. Objective methods have been further classified into either intrusive or non-intrusive methods. Intrusive methods [6] (e.g. ITU-T PESQ) use reference signals and distorted signals to predict voice quality. Intrusive methods are more accurate but unsuitable for monitoring live traffic. Non-Intrusive methods (e.g. ITU-T E-Model) are computational models which are suitable for live traffic, but have the disadvantage of complex calculations for R-factor and recalculations into MOS [7]. Measuring voice quality in real-time is a difficult task to do and previous research has shown many different methods to predict perceived voice quality [8], [9], [10], [11] which falls into one of the categories discussed above. There is a need for new methods to measure voice quality non-intrusively and more importantly to perform it in real-time.
+
+In recent years, the Neural Networks (NN) based models have been used in communication networks to predict voice quality [12], [13]. The NN models have been very popular because of their success in a wide range of applications. The NN models are capable of learning the numerical or logical relationships between data given to them. Their parallel architecture gives them an advantage over other methods to overcome computational difficulties. They can adapt to any changes in the input data quickly by allowing training processes to continue while processing the new information [14]. They have their own limitations and the types of data used are limited as well. NN model computation time is less because of the use of nonlinear function calculations for each neuron. Random Neural networks are a recurrent neural network model developed by Gelenbe [15], [16] in 1989. A RNN is an open queuing network of N fully connected neurons in which positive and negative impulse signals circulate. These signals are represented as excitatory (+1) and inhibitory (−1) impulses respectively. The combination of excitation and inhabitation impulse signals changes the potential of a receiving neuron. The neuron can fire only if its potential is positive. Some of the unique features of RNN models are:
+
+    •
+
+    RNNs represent the signals transmitted in a network closer to a biological neuronal network than other networks (i.e. ANNs).
+    •
+
+    The standard training algorithm (Gradient Descent) is less complex and has strong generalization capacity even for small training data sets.
+    •
+
+    Although it is a spiked recurrent stochastic model [17], its steady state probability distribution is a simple analytical equation which can be computed easily and efficiently without the use of Monte Carlo methods.
+    •
+
+    RNNs can be easily implemented in both hardware [18] and software [19] (its neuron can be represented by simple counters).
+    •
+
+    The potential of each neuron can be represented as an integer rather than binary values.
+    •
+
+    The excitatory and inhibitory signal behavior makes RNNs an excellent modeling tool for various applications [20].
+
+The RNN based models have been used in modeling, optimization, hardware, image processing, communication systems, simulation, pattern recognition, and classification [20], [14]. The use of RNNs has improved the modeling capabilities of communication networks. Recent research in the area of communication networks includes QoS of packet switching networks [21], [22], detection of DoS attacks [23], and automatic quantification of the quality of service for real-time multimedia applications such as audio and video [24], [25], [26], [27]. The subjective tests and pseudo-subjective quality assessment (PSQA) methods have been used to validate and to quantify multimedia traffic quality. Delay, jitter, PL, packetization interval, language, and codec have been used as quality affecting parameters.
+
+Our main contribution in this paper has been the use of RNN models to measure perceived voice quality non-intrusively. We have used delay, jitter, packet loss, and codec as voice quality affecting parameters. We have added larger data sets and introduced a new codec (Speex) to our previous research [28]. We have also tested three different RNN architectures: simple feed-forward, 3-layer feed-forward, and recurrent architecture. This has allowed us to study the effect of voice quality parameters in more detail and to observe the behavior of different RNN architectures we have implemented.
+
+The rest of the paper is divided into 5 sections: In Section 2, we discuss the related works. In Section 3, we discuss the RNN mathematical model we used in our method to predict voice quality. In Section 4, we discuss the various impairments used as voice quality affecting parameters in our experiments. In Section 5, we explain the simulation setup we used in this research. And in Section 6, we analyze the results we obtained in detail and is followed by the conclusions.
+Section snippets
+Related works
+
+In [29], the effect of delay, jitter, and packet loss on voice quality was presented. The study was based on data collected using PESQ. In [24], [27], a similar study was presented using data obtained from subjective tests. In [24], the authors used loss rate, loss distribution, codec, forward error correction, and packetization interval as voice quality affecting parameters. The authors used subjective tests to create a degraded voice signal database to train and test the RNN model. The
+Random neural networks model
+
+The RNN is a network of N fully connected neurons. In a RNN, the signals between neurons circulate in the form of positive and negative impulses with unit amplitude. The positive signals represent excitation and the negative signals represent inhibition. At any time t , the potential of neuron i is denoted by k i ( t ) which is a non-integer. The neuron i may receive signals from another neuron within the network or from outside the network. The neuron i may fire if its potential is positive, reduce
+Factors affecting voice quality in packet networks
+
+Voice quality is affected by many parameters including delay, jitter, PL, and codec. Delay is the average time taken by a packet to reach its destination from the source. ITU-T G.114 [39] recommends 0–150 ms range for one way delay which is acceptable for most of the user applications. A delay of 150–400 ms is acceptable if the network administrators are aware of transmission time and the impact on quality of user applications. Delay in IP networks occurs due to many processes such as encoding,
+Experiments
+
+In this section we discuss the lab experiment setup we used in our study. Our experiments was divided two parts, the first one is to create a voice sample database. The second is to use the database to train RNNs and test the RNN models.
+
+To create a degraded voice database, we used the lab setup shown in Fig. 1 and voice samples from ITU-T PESQ P.862 [6]. We have used WANem emulation software [45] to emulate the WAN traffic and X-Lite IP softphone [46] was used to establish VoIP calls. 3CX phone
+Discussion
+
+In this section, we will present a detailed analysis of results we obtained from our experiments. We studied the impact of delay, jitter, PL, and codecs on perceived voice quality. We compared the MOS results obtained from the objective method PESQ to our RNN models. The Fig. 6, Fig. 7, Fig. 8, Fig. 9 show the comparison of outputs from all three RNN models we implemented to PESQ MOS. As we expected all three architectures we tested produced slightly different results. The Mean Square Error
+Conclusions
+
+In this paper we have presented our method to measure and monitor user perceived voice quality using Random Neural Network models. In this study, we have used both IP network parameters (delay, jitter, and packet loss) and a non-IP parameter (codec) as voice quality affecting parameters to test their impact on transmitted voice quality. We have tested and compared results from PESQ, simple feed-forward, three layer feed-forward with 6 hidden layer neurons, and a recurrent architecture. To
+
+Kapilan Radhakrishnan is a Ph.D. candidate with the school of engineering and computing at Glasgow Caledonian University, Glasgow, UK. He received his B.E in computer science and engineering from University of Madras, India in 2002 and M.Sc. in Advanced Computer Networking from Glasgow Caledonian University in 2005. His professional qualifications also include Cisco Certified Network Associate (CCNA) since 2003 and Cisco Certified Academy Instructor (CCAI) since 2007. His current research
+References (48)
+
+    S. Mohamed et al.
+    Performance evaluation of real-time speech through a packet network: a random neural networks-based approach
+    Perform. Eval.
+    (2004)
+    A. da Silva et al.
+    Quality assessment of interactive voice applications
+    Comput. Netw.
+    (2008)
+    M. Manousos et al.
+    Voice-quality monitoring and control for VoIP
+    IEEE Internet Comput.
+    (2005)
+    P. Louis, Voice over internet protocol (VoIP): the “killer” application?, 2004....
+    B. Goode
+    Voice over internet protocol
+    Proc. IEEE
+    (2002)
+    P.800, Methods for subjective determination of transmission quality, ITU-T Recommendations P.800,...
+    P.861, Objective quality measurement of telephone-band (300–3400 Hz) speech codecs, ITU-T Recommendations P. 861,...
+    P. 862, Perceptual evaluation of speech quality (PESQ): an objective method for end-to-end speech quality assessment of...
+    G.107, The E-model, A computational model for use in transmission planning, ITU-T Recommendations,...
+    Y. Bai, M. Ito, A study for providing better quality of service to VoIP users, in: 20th International Conference on... 
+
+View more references
+Cited by (18)
+
+    A two-level multi-gene genetic programming model for speech quality prediction in Voice over Internet Protocol systems
+    2016, Computers and Electrical Engineering
+    Citation Excerpt :
+
+    A non-intrusive objective measurement for estimating the quality of speech is proposed based on fuzzy Gaussian Mixture Model (GMM) and Support Vector Regression (SVR) was proposed in [11] for both narrowband and wideband speech. In [12,13], different types of neural network were utilized to estimate speech quality, non-intrusively. These approaches employed the PESQ results to prepare dataset and predict overall MOS score.
+    Show abstract
+    VoIP: State of art for global connectivity - A critical review
+    2014, Journal of Network and Computer Applications
+    Citation Excerpt :
+
+    Implementation of the secured real-time transport protocol for VoIP communication was presented in Ismail (2010). Radhakrishnan and Hadi (2011) analyzed the non-intrusive models for measuring and monitoring the voice quality using random neural networks and proposed the feed-forward architecture for the better evaluation of the speech quality. Blatnik et al. (2011) examined the influence of the perceptual speech quality of the speech signal captured from VoWLAN, GSM and PSTN systems on the performance of the automated speaker recognition system and measured the performance using PESQ objective measurement.
+    Show abstract
+    Introduction to the special issue on G-networks and the random neural network
+    2011, Performance Evaluation
+    Show abstract
+    RANDOM NEURAL NETWORK METHODS and DEEP LEARNING
+    2021, Probability in the Engineering and Informational Sciences
+    Associated Random Neural Networks for Collective Classification of Nodes in Botnet Attacks
+    2023, arXiv
+    MOS prediction by SDN controller and User Equipment to maintain good quality for VoIP over WiFi
+    2022, Proceedings - 2022 9th International Conference on Wireless Networks and Mobile Communications, WINCOM 2022
+
+View all citing articles on Scopus
+
+Kapilan Radhakrishnan is a Ph.D. candidate with the school of engineering and computing at Glasgow Caledonian University, Glasgow, UK. He received his B.E in computer science and engineering from University of Madras, India in 2002 and M.Sc. in Advanced Computer Networking from Glasgow Caledonian University in 2005. His professional qualifications also include Cisco Certified Network Associate (CCNA) since 2003 and Cisco Certified Academy Instructor (CCAI) since 2007. His current research interest is focused on performance evaluation of VoIP networks and Routing in IP networks.
+
+Hadi Larijani received his Ph.D. in computer Science from Heriot-Watt Univ. Edinburgh, UK in 2006. He is a senior lecturer in the Dept. of CNEE in the School of Engineering and Computing at Glasgow Caledonian University. He was the principal investigator of a major grant with IBM as an industrial partner developing Virtual Call Center agents. He has worked with 3Com Europe, is a Cisco Certified Network Professional academy Instructor. He has several patents pending and his research interests are: Performance evaluation of computer systems and networks, Computer network simulation, Software engineering, VoIP, Call Center Applications and Intelligent Software Agents.
+View full text
+Copyright © 2011 Elsevier B.V. Published by Elsevier B.V. All rights reserved.
+Recommended articles
+
+    Further investigations of the relation between polymorphisms in sex steroid related genes and autistic-like traits
+    Psychoneuroendocrinology, Volume 68, 2016, pp. 1-5
+    Anna Zettergren , …, Lars Westberg
+    Coevolution of female ovulatory signals and male–male competition in primates
+    Journal of Theoretical Biology, Volume 392, 2016, pp. 12-22
+    Wataru Nakahashi
+    Questions, propositions and assessing different levels of evidence: Forensic voice comparison in practice
+    Science & Justice, Volume 58, Issue 4, 2018, pp. 250-257
+    Vincent Hughes , Richard Rhodes
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 16 
+
+Captures
+
+    Exports-Saves: 6
+    Readers: 28 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

@@ -1,0 +1,99 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > Neural Computation > Volume: 1 Issue: 1
+Review of Neural Networks for Speech Recognition
+Publisher: MIT Press
+Cite This
+PDF
+Richard P. Lippmann
+All Authors
+125
+Cites in
+Papers
+3
+Cites in
+Patents
+15
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Authors
+Citations
+Metrics
+Abstract:
+The performance of current speech recognition systems is far below that of humans. Neural nets offer the potential of providing massive parallelism, adaptation, and new algorithmic approaches to problems in speech recognition. Initial studies have demonstrated that multilayer networks with time delays can provide excellent discrimination between small sets of pre-segmented difficult-to-discriminate words, consonants, and vowels. Performance for these small vocabularies has often exceeded that of more conventional approaches. Physiological front ends have provided improved recognition accuracy in noise and a cochlea filter-bank that could be used in these front ends has been implemented using micro-power analog VLSI techniques. Techniques have been developed to scale networks up in size to handle larger vocabularies, to reduce training time, and to train nets with recurrent connections. Multilayer perceptron classifiers are being integrated into conventional continuous-speech recognizers. Neural net architectures have been developed to perform the computations required by vector quantizers, static pattern classifiers, and the Viterbi decoding algorithm. Further work is necessary for large-vocabulary continuous-speech problems, to develop training algorithms that progressively build internal word models, and to develop compact VLSI neural net hardware.
+Published in: Neural Computation ( Volume: 1 , Issue: 1 , March 1989 )
+Page(s): 1 - 38
+Date of Publication: March 1989
+Print ISSN: 0899-7667
+DOI: 10.1162/neco.1989.1.1.1
+Publisher: MIT Press
+Authors
+Citations
+Metrics
+More Like This
+Speech Recognition Using Deep Neural Networks: A Systematic Review
+
+IEEE Access
+
+Published: 2019
+RASR/NN: The RWTH neural network toolkit for speech recognition
+
+2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+
+Published: 2014
+Show More
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

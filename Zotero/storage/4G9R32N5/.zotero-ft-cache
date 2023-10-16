@@ -1,0 +1,124 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > IEEE Transactions on Circuits... > Volume: 30 Issue: 6
+Image and Video Compression With Neural Networks: A Review
+Publisher: IEEE
+Cite This
+PDF
+Siwei Ma ; Xinfeng Zhang ; Chuanmin Jia ; Zhenghui Zhao ; Shiqi Wang ; Shanshe Wang
+All Authors
+170
+Cites in
+Papers
+8107
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction
+    II.
+    Introduction of Neural Network and Image/Video Compression
+    III.
+    Progress of Neural Network Based Image Compression
+    IV.
+    Advancement of Video Coding With Neural Networks
+    V.
+    Optimization Techniques for Image and Video Compression
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Abstract:
+In recent years, the image and video coding technologies have advanced by leaps and bounds. However, due to the popularization of image and video acquisition devices, the growth rate of image and video data is far beyond the improvement of the compression ratio. In particular, it has been widely recognized that there are increasing challenges of pursuing further coding performance improvement within the traditional hybrid coding framework. Deep convolution neural network which makes the neural network resurge in recent years and has achieved great success in both artificial intelligent and signal processing fields, also provides a novel and promising solution for image and video compression. In this paper, we provide a systematic, comprehensive and up-to-date review of neural network-based image and video compression techniques. The evolution and development of neural network-based compression methodologies are introduced for images and video respectively. More specifically, the cutting-edge video coding techniques by leveraging deep learning and HEVC framework are presented and discussed, which promote the state-of-the-art video coding performance substantially. Moreover, the end-to-end image and video coding frameworks based on neural networks are also reviewed, revealing interesting explorations on next generation image and video coding frameworks/standards. The most significant research works on the image and video coding related topics using neural networks are highlighted, and future trends are also envisioned. In particular, the joint compression on semantic and visual information is tentatively explored to formulate high efficiency signal representation structure for both human vision and machine vision, which are the two dominant signal receptors in the age of artificial intelligence.
+Published in: IEEE Transactions on Circuits and Systems for Video Technology ( Volume: 30 , Issue: 6 , June 2020 )
+Page(s): 1683 - 1698
+Date of Publication: 17 April 2019
+ISSN Information:
+INSPEC Accession Number: 19843548
+DOI: 10.1109/TCSVT.2019.2910119
+Publisher: IEEE
+Funding Agency:
+I. Introduction
+
+Image and video compression plays an important role in providing high quality image/video services under the limited capabilities of transmission networks and storage. The redundancies within images and videos are fundamentally important for image and video compression, including spatial redundancy, visual redundancy and statistical redundancy. Besides, the temporal redundancy existing in video sequences enables the video compression to achieve higher compression ratio compared with image compression.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+Deep Learning for Consumer Devices and Services: Pushing the limits for machine learning, artificial intelligence, and computer vision
+
+IEEE Consumer Electronics Magazine
+
+Published: 2017
+Video Anomaly Detection using Pre-Trained Deep Convolutional Neural Nets and Context Mining
+
+2020 IEEE/ACS 17th International Conference on Computer Systems and Applications (AICCSA)
+
+Published: 2020
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

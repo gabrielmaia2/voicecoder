@@ -1,0 +1,210 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (177)
+    Cited by (2414) 
+
+Elsevier
+Neurocomputing
+Volume 234 , 19 April 2017, Pages 11-26
+Neurocomputing
+A survey of deep neural network architectures and their applications ☆
+Author links open overlay panel Weibo Liu a , Zidong Wang a , Xiaohui Liu a , Nianyin Zeng b , Yurong Liu c d , Fuad E. Alsaadi d
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.neucom.2016.12.038 Get rights and content
+Abstract
+
+Since the proposal of a fast learning algorithm for deep belief networks in 2006, the deep learning techniques have drawn ever-increasing research interests because of their inherent capability of overcoming the drawback of traditional algorithms dependent on hand-designed features. Deep learning approaches have also been found to be suitable for big data analysis with successful applications to computer vision, pattern recognition, speech recognition, natural language processing , and recommendation systems. In this paper, we discuss some widely-used deep learning architectures and their practical applications. An up-to-date overview is provided on four deep learning architectures, namely, autoencoder , convolutional neural network , deep belief network, and restricted Boltzmann machine . Different types of deep neural networks are surveyed and recent progresses are summarized. Applications of deep learning techniques on some selected areas (speech recognition, pattern recognition and computer vision) are highlighted. A list of future research topics are finally given with clear justifications.
+Introduction
+
+Machine learning techniques have been widely applied in a variety of areas such as pattern recognition, natural language processing and computational learning. With machine learning techniques, computers are endowed with the capability of acting without being explicitly programmed, constructing algorithms that can learn from data, and making data-driven decisions or predictions. During the past decades, machine learning has brought enormous influence on our daily life with examples including efficient web search, self-driving systems, computer vision, and optical character recognition. In addition, by adopting machine learning methods, the human-level artificial intelligence (AI) has been improved as well, see [101], [137], [165] for more discussions. Nevertheless, when it comes to the human information processing mechanisms (e.g. speech and vision), the performance of traditional machine learning techniques are far from satisfactory. Inspired by deep hierarchical structures of human speech perception and production systems, the concept of deep learning algorithms was introduced in the late 20th century. Breakthroughs on deep learning have been achieved since 2006 when Hinton proposed a novel deep structured learning architecture called deep belief network (DBN) [59]. The past decade has seen rapid developments of deep learning techniques with significant impacts on signal and information processing. Research on neuromorphic systems also supports the development of deep network models [75]. In contrast to traditional machine learning and artificial intelligence approaches, the deep learning technologies have recently been progressing massively with successful applications to speech recognition, natural language processing (NLP), information retrieval, compute vision, and image analysis [91], [125], [159].
+
+The concept of deep learning originated from the study on artificial neural networks (ANNs) [60]. ANNs have become an active research area during the past few decades [175], [162], [166], [63], [167]. To construct a standard neural network (NN), it is essential to utilize neurons to produce real-valued activations and, by adjusting the weights, the NNs behave as expected. However, depending on the problems, the process of training a NN may take long causal chains of computational stages. Backpropagation is an efficient gradient descent algorithm which has played an important role in NNs since 1980. It trains the ANNs with a teacher-based supervised learning approach. Although the training accuracy is high, the performance of backpropagation when applied to the testing data might not be satisfactory. As backpropagation is based on local gradient information with a random initial point, the algorithm often gets trapped in local optima. Furthermore, if the size of the training data is not big enough, NNs will face the problem of overfitting. Consequently, other effective machine learning algorithms such as support vector machine (SVM), boosting and K-nearest neighbour (KNN) have been adopted to obtain global optimum with lower power consumption. In 2006, Hinton [59] proposed a new training method (called layer-wise-greedy-learning) which marked the birth of deep learning techniques. The basic idea of the layer-wise-greedy-learning is that unsupervised learning should be performed for network pre-training before the subsequent layer-by-layer training. By extracting features from the inputs, the data dimension is reduced and a compact representation is hence obtained. Then, exporting the features to the next layer, all of the samples will be labeled and the network will be fine-tuned with the labeled data. The reason for the popularity of deep learning is twofold: on one hand, the development of big data analysis techniques indicates that the overfitting problem in training data can be partially solved; on the other hand, the pre-training procedure before unsupervised learning will assign non-random initial values to the network. Therefore, a better local minimum can be reached after the training process and a faster converge rate can be achieved.
+
+Up to now, the research on deep learning techniques has stirred a great deal of attention and a series of exciting results have been reported in the literatures. Since 2009, the ImageNet's competition has attracted a great many computer vision research groups throughout the world from both academia and industry. In 2012, the research group led by Hinton won the competition of ImageNet Image Classification by using deep learning approaches [86]. Hinton's group attended the competition for the first time and their results were 10% better than that in the second place. Both Google and Baidu have updated their image search engines based on Hinton's deep learning architecture with great improvements in searching accuracy. Baidu also set up the Institute of Deep Learning (IDL) in 2013 and invited Andrew Ng, the associate professor at Stanford University, as the Chief Scientist. In March 2016, a Go Game match was held in South Korea by Google's deep learning project (called DeepMind) between their AI player AlphaGo and one of the world's strongest players Lee Se-dol [140]. It turned out that AlphaGo, adopting deep learning techniques, showed surprising strength and beat Lee Se-dol by 4:1. In addition, deep learning algorithms have also shown outstanding performance in predicting the activity of potential drug molecules and the effects of mutations in non-coding DNA on gene expression.
+
+With rapid development of computation techniques, a powerful framework has been provided by ANNs with deep architectures for supervised learning. Generally speaking, the deep learning algorithm consists of a hierarchical architecture with many layers each of which constitutes a non-linear information processing unit. In this paper, we only discuss deep architectures in NNs. Deep neural networks (DNNs), which employ deep architectures in NNs, can represent functions with higher complexity if the numbers of layers and units in a single layer are increased. Given enough labeled training datasets and suitable models, deep learning approaches can help humans establish mapping functions for operation convenience. In this paper, four main deep architectures are recalled and other methods (e.g. sparse coding) are also briefly discussed. Additionally, some recent advances in the field of deep learning are described.
+
+The purpose of this article is to provide a timely review and introduction on the deep learning technologies and their applications. It is aimed to provide the readers with a background on different deep learning architectures and also the latest development as well as achievements in this area. The rest of the paper is organized as follows. In Sections 23 Deep learning architectures: deep belief network, 4 Deep learning architectures: autoencoder5, four main deep learning architectures, which are restricted Boltzmann machines (RBMs), deep belief networks (DBNs), autoencoder (AE), and convolutional neural networks (CNNs), are reviewed, respectively. Comparisons are made among these deep architectures and recent developments on these algorithms are discussed. The applications of those deep architectures are highlighted in Section 6. Conclusions and future topics of research are presented in Section 7.
+Section snippets
+The motivation
+
+In this part, a brief review of RBMs is given. RBMs are widely used in deep learning networks on account of their historical importance and relative simplicity. The RBM was first proposed as a concept by Smolensky, and has become prominent since Hinton published his work [59] in 2006. RBMs have been used to generate stochastic models of ANNs which can learn the probability distribution with respect to their inputs. RBMs consist of a variant of Boltzmann machines (BMs). BMs can be interpreted as
+The motivation
+
+As mentioned in the previous section, the hidden and visible variables are not mutually independent [165]. To explore the dependencies between these variables, in 2006, Hinton constructed the DBNs by stacking a bank of RBMs. Specifically, the DBNs are composed of multiple layers of stochastic and latent variables and can be regarded as a special form of the Bayesian probabilistic generative model. Compared with ANNs, DBNs are more effective, especially when applied to problems with unlabeled
+The motivation
+
+An autoencoder (AE), which is another type of ANNs, is also called an autoassociator. It is an unsupervised learning algorithm used to efficiently code the dataset for the purpose of dimensionality reduction [10], [60], [137], [61]. During the past few decades, the AEs have been at the cutting edge among researches on the ANN. In 1988, Bourlard and Kamp [15] found that a multilayer perceptron (MLP) in auto-association mode could achieve data compression and dimensionality reduction in the areas
+The motivation
+
+CNNs are a subtype of the discriminative deep architecture [3] and have shown satisfactory performance in processing two-dimensional data with grid-like topology, such as images and videos. The architecture of CNNs is inspired by the animal visual cortex organization. In the 1960s, Hubel and Wisel [73] proposed a concept called receptive fields. They found that the complex arrangements of cells were contained in the animal visual cortex in charge of light detection in overlapping and small
+Applications of deep learning
+
+In this section, we will review some practical applications of the deep learning architectures. In fact, due to its ability to handle large amounts of unlabeled data, deep learning techniques have provided powerful tools to deal with big data analysis [31], [122]. In recent years, massive amounts of data have been collected in various fields including cyber security, medical informatics [173], and social media. Deep learning algorithms are used to extract high-level features from these data in
+Conclusion
+
+In this paper, we have reviewed the latest developments of deep neural networks. Some widely-used deep learning architectures are investigated and selected applications to computer vision, pattern recognition and speech recognition are highlighted. More specifically, four classes of deep learning architectures, namely the restricted Boltzmann machine, the deep belief networks, the autoencoder, and the convolutional neural network, are discussed in detail. Since it is rarely possible to obtain
+
+Weibo Liu received his B. S. degree in electrical engineering from the Department of Electrical Engineering & Electronics, University of Liverpool, Liverpool, UK, in 2015. He is currently pursuing the Ph.D. degree in Computer Science at Brunel University London, London, UK. His research interests include big data analysis and deep learning techniques.
+References (177)
+
+    A.M. Abdel Zaher et al.
+    Breast cancer classification using deep belief networks
+    Exp. Syst. Appl.
+    (2016)
+    S. Aryal et al.
+    Data driven articulatory synthesis with deep neural networks
+    Comput. Speech Lang.
+    (2016)
+    S. Bell et al.
+    Learning visual similarity for product design with convolutional neural networks
+    ACM Trans. Graph. (TOG)
+    (2015)
+    B. Chandra et al.
+    Fast learning in deep neural networks
+    Neurocomputing
+    (2016)
+    Y. Chen et al.
+    CnntrackerOnline discriminative object tracking via deep convolutional neural network
+    Appl. Soft Comput.
+    (2016)
+    D. Ciresan et al.
+    Multi-column deep neural network for traffic sign classification
+    Neural Netw.
+    (2012)
+    L. Deng et al.
+    Large vocabulary word recognition using context-dependent allophonic hidden markov models
+    Comput. Speech Lang.
+    (1990)
+    Y. Dong et al.
+    Adaptive cascade deep convolutional neural networks for face alignment
+    Comput. Stand. Interfaces
+    (2015)
+    S. Elfwing et al.
+    Expected energy-based restricted boltzmann machine for classification
+    Neural Netw.
+    (2015)
+    J. Gonzalez-Dominguez et al.
+    Frame-by-frame language identification in short utterances using deep neural networks
+    Neural Netw.
+    (2015)
+
+View more references
+Cited by (2414)
+
+    Sampling-based adaptive design strategy for failure probability estimation
+    2024, Reliability Engineering and System Safety
+    Show abstract
+    Surrogate-modeling-assisted creep-fatigue reliability assessment in a low-pressure turbine disc considering multi-source uncertainty
+    2023, Reliability Engineering and System Safety
+    Show abstract
+    Intelligent detection and behavior tracking under ammonia nitrogen stress
+    2023, Neurocomputing
+    Show abstract
+    EEG-based neural networks approaches for fatigue and drowsiness detection: A survey
+    2023, Neurocomputing
+    Show abstract
+    Theoretical Enhancement of Energy Production Performance in PV Arrays through Effective Shadow Detection Using Hybrid Technique
+    2023, Solar Energy
+    Show abstract
+    Intelligent recognition and behavior tracking of sea cucumber infected with Vibrio alginolyticus based on machine vision
+    2023, Aquacultural Engineering
+    Show abstract
+
+View all citing articles on Scopus
+
+Weibo Liu received his B. S. degree in electrical engineering from the Department of Electrical Engineering & Electronics, University of Liverpool, Liverpool, UK, in 2015. He is currently pursuing the Ph.D. degree in Computer Science at Brunel University London, London, UK. His research interests include big data analysis and deep learning techniques.
+
+Zidong Wang was born in Jiangsu, China, in 1966. He received the B. Sc. degree in mathematics in 1986 from Suzhou University, Suzhou, China, and the M. Sc. degree in applied mathematics in 1990 and the Ph. D. degree in electrical engineering in 1994, both from Nanjing University of Science and Technology, Nanjing, China.
+
+He is currently a Professor of Dynamical Systems and Computing in the Department of Computer Science, Brunel University London, U.K. From 1990–2002, he held teaching and research appointments in universities in China, Germany and the UK. Prof. Wang's research interests include dynamical systems, signal processing, bioinformatics, control theory and applications. He has published more than 300 papers in refereed international journals. He is a holder of the Alexander von Humboldt Research Fellowship of Germany, the JSPS Research Fellowship of Japan, William Mong Visiting Research Fellowship of Hong Kong.
+
+Prof. Wang serves (or has served) as the Editor-in-Chief for Neurocomputing and an Associate Editor for 12 international journals, including IEEE Transactions on Automatic Control, IEEE Transactions on Control Systems Technology, IEEE Transactions on Neural Networks, IEEE Transactions on Signal Processing, and IEEE Transactions on Systems, Man, and Cybernetics - Part C. He is a Fellow of the IEEE, a Fellow of the Royal Statistical Society and a member of program committee for many international conferences.
+
+Xiaohui Liu received the B.Eng. degree in computing from Hohai University, Nanjing, China, in 1982 and the Ph. D. degree in computer science from Heriot-Watt University, Edinburg, U.K., in 1988. He is currently a Professor of Computing at Brunel University. He leads the Intelligent Data Analysis (IDA) Group, performing interdisciplinary research involving artificial intelligence, dynamic systems, image and signal processing, and statistics, particularly for applications in biology, engineering and medicine. Professor Liu serves on editorial boards of four computing journals, founded the biennial international conference series on IDA in 1995, and has given numerous invited talks in bioinformatics, data mining and statistics conferences.
+
+Nianyin Zeng was born in Fujian Province, China, in 1986. He received the B.Eng. degree in electrical engineering and automation in 2008 and the Ph. D. degree in electrical engineering in 2013, both from Fuzhou University. From October 2012 to March 2013, he was a RA in the Department of Electrical and Electronic Engineering, the University of Hong Kong.
+
+Currently, he is an Assistant Professor with the Department of Instrumental & Electrical Engineering of Xiamen University. His current research interests include intelligent data analysis, computational intelligent, time-series modeling and applications. He is the author or co-author of several technical papers and also a very active reviewer for many international journals and conferences.
+
+Dr. Zeng is currently serving as an Editorial board member for Biomedical Engineering Online (Springer), Journal of Advances in Biomedical Engineering and Technology, and Smart Healthcare.
+
+Yurong Liu received the BSc degree in mathematics from Suzhou University, Suzhou, China, in 1986, the M. Sc. degree in applied mathematics from Nanjing University of Science and Technology, Nanjing, China, in 1989, and the PhD degree in applied mathematics from Suzhou University, Suzhou, China, in 2000.
+
+Currently, he is a Professor at the Department of Mathematics, Yangzhou University, Yangzhou, China. His current interests include neural networks, nonlinear dynamics, time-delay systems, and chaotic dynamics.
+
+Fuad E. Alsaadi received the B.S. and M.Sc. degrees in electronic and communication from King AbdulAziz University, Jeddah, Saudi Arabia, in 1996 and 2002. He then received the Ph.D. degree in Optical Wireless Communication Systems from the University of Leeds, Leeds, UK, in 2011. Between 1996 and 2005, he worked in Jeddah as a communication instructor in the College of Electronics and Communication. He is currently an associate professor of the Electrical and Computer Engineering Department within the Faculty of Engineering, King Abdulaziz University, Jeddah, Saudi Arabia. He published widely in the top IEEE communications conferences and journals and has received the Carter award, University of Leeds for the best PhD. He has research interests in optical systems and networks, signal processing, synchronization and systems design.
+
+☆
+
+    This work was supported in part the Royal Society of the UK , the National Natural Science Foundation of China under Grants 61329301 , 61374010 , and 61403319 , and the Alexander von Humboldt Foundation of Germany .
+
+View full text
+© 2016 Elsevier B.V. All rights reserved.
+Recommended articles
+
+    Soft estimation by hierarchical classification and regression
+    Neurocomputing, Volume 234, 2017, pp. 27-37
+    Shih-Wen Ke , …, Ya-Han Hu
+    Event-triggered sliding mode control of stochastic systems via output feedback
+    Automatica, Volume 82, 2017, pp. 79-92
+    Ligang Wu , …, Hongyi Li
+    Facial expression recognition via learning deep sparse autoencoders
+    Neurocomputing, Volume 273, 2018, pp. 643-649
+    Nianyin Zeng , …, Abdullah M. Dobaie
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 2143
+    Policy Citations: 2 
+
+Captures
+
+    Exports-Saves: 11
+    Readers: 2560 
+
+Mentions
+
+    News Mentions: 1 
+
+Social Media
+
+    Shares, Likes & Comments: 20 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

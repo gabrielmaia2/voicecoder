@@ -1,0 +1,93 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1904.05742
+
+Help | Advanced Search
+Search
+Computer Science > Machine Learning
+(cs)
+[Submitted on 10 Apr 2019 ( v1 ), last revised 22 Aug 2019 (this version, v4)]
+Title: One-shot Voice Conversion by Separating Speaker and Content Representations with Instance Normalization
+Authors: Ju-chieh Chou , Cheng-chieh Yeh , Hung-yi Lee
+Download a PDF of the paper titled One-shot Voice Conversion by Separating Speaker and Content Representations with Instance Normalization, by Ju-chieh Chou and 2 other authors
+Download PDF
+
+    Abstract: Recently, voice conversion (VC) without parallel data has been successfully adapted to multi-target scenario in which a single model is trained to convert the input voice to many different speakers. However, such model suffers from the limitation that it can only convert the voice to the speakers in the training data, which narrows down the applicable scenario of VC. In this paper, we proposed a novel one-shot VC approach which is able to perform VC by only an example utterance from source and target speaker respectively, and the source and target speaker do not even need to be seen during training. This is achieved by disentangling speaker and content representations with instance normalization (IN). Objective and subjective evaluation shows that our model is able to generate the voice similar to target speaker. In addition to the performance measurement, we also demonstrate that this model is able to learn meaningful speaker representations without any supervision. 
+
+Comments: 	Interspeech 2019
+Subjects: 	Machine Learning (cs.LG) ; Sound (cs.SD); Audio and Speech Processing (eess.AS); Machine Learning (stat.ML)
+Cite as: 	arXiv:1904.05742 [cs.LG]
+  	(or arXiv:1904.05742v4 [cs.LG] for this version)
+  	https://doi.org/10.48550/arXiv.1904.05742
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Ju-Chieh Chou [ view email ]
+[v1] Wed, 10 Apr 2019 16:22:18 UTC (1,627 KB)
+[v2] Tue, 16 Apr 2019 14:40:52 UTC (1,628 KB)
+[v3] Sat, 29 Jun 2019 13:42:03 UTC (1,628 KB)
+[v4] Thu, 22 Aug 2019 17:18:16 UTC (1,628 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled One-shot Voice Conversion by Separating Speaker and Content Representations with Instance Normalization, by Ju-chieh Chou and 2 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.LG
+< prev   |   next >
+new | recent | 1904
+Change to browse by:
+cs
+cs.SD
+eess
+eess.AS
+stat
+stat.ML
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+Ju-Chieh Chou
+Cheng-chieh Yeh
+Hung-yi Lee
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

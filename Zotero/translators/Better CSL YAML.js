@@ -12,13 +12,13 @@
 	},
 	"configOptions": {
 		"getCollections": true,
-		"hash": "ca3f16101fc8c0c5b621eee9ce2cff983d6312042e8e74c462d8769705d7dc17"
+		"hash": "b19b0cfce5af1c233d6cce26894b74b46065fcfc47c657ce93ccd83a385b0890"
 	},
 	"translatorType": 3,
 	"browserSupport": "gcsv",
 	"priority": 800,
 	"inRepository": false,
-	"lastUpdated": "2023-09-22"
+	"lastUpdated": "2023-10-07"
 }
 
 ZOTERO_CONFIG = {"GUID":"zotero@chnm.gmu.edu","ID":"zotero","CLIENT_NAME":"Zotero","DOMAIN_NAME":"zotero.org","PRODUCER":"Digital Scholar","PRODUCER_URL":"https://digitalscholar.org","REPOSITORY_URL":"https://repo.zotero.org/repo/","BASE_URI":"http://zotero.org/","WWW_BASE_URL":"https://www.zotero.org/","PROXY_AUTH_URL":"https://zoteroproxycheck.s3.amazonaws.com/test","API_URL":"https://api.zotero.org/","STREAMING_URL":"wss://stream.zotero.org/","SERVICES_URL":"https://services.zotero.org/","API_VERSION":3,"CONNECTOR_MIN_VERSION":"5.0.39","PREF_BRANCH":"extensions.zotero.","BOOKMARKLET_ORIGIN":"https://www.zotero.org","BOOKMARKLET_URL":"https://www.zotero.org/bookmarklet/","START_URL":"https://www.zotero.org/start","QUICK_START_URL":"https://www.zotero.org/support/quick_start_guide","PDF_TOOLS_URL":"https://www.zotero.org/download/xpdf/","SUPPORT_URL":"https://www.zotero.org/support/","SYNC_INFO_URL":"https://www.zotero.org/support/sync","TROUBLESHOOTING_URL":"https://www.zotero.org/support/getting_help","FEEDBACK_URL":"https://forums.zotero.org/","CONNECTORS_URL":"https://www.zotero.org/download/connectors","CHANGELOG_URL":"https://www.zotero.org/support/changelog","CREDITS_URL":"https://www.zotero.org/support/credits_and_acknowledgments","LICENSING_URL":"https://www.zotero.org/support/licensing","GET_INVOLVED_URL":"https://www.zotero.org/getinvolved","DICTIONARIES_URL":"https://download.zotero.org/dictionaries/"}
@@ -98,6 +98,7 @@ var { detectImport, doExport, doImport } = (() => {
     importBibTeXStrings: true,
     importCaseProtection: "as-needed",
     importCitationKey: true,
+    importDetectURLs: true,
     importExtra: true,
     importJabRefAbbreviations: true,
     importJabRefStrings: true,

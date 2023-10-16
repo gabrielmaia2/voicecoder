@@ -1,0 +1,87 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > eess > arXiv:2304.09116
+
+Help | Advanced Search
+Search
+Electrical Engineering and Systems Science > Audio and Speech Processing
+(eess)
+[Submitted on 18 Apr 2023 ( v1 ), last revised 30 May 2023 (this version, v3)]
+Title: NaturalSpeech 2: Latent Diffusion Models are Natural and Zero-Shot Speech and Singing Synthesizers
+Authors: Kai Shen , Zeqian Ju , Xu Tan , Yanqing Liu , Yichong Leng , Lei He , Tao Qin , Sheng Zhao , Jiang Bian
+Download a PDF of the paper titled NaturalSpeech 2: Latent Diffusion Models are Natural and Zero-Shot Speech and Singing Synthesizers, by Kai Shen and 8 other authors
+Download PDF
+
+    Abstract: Scaling text-to-speech (TTS) to large-scale, multi-speaker, and in-the-wild datasets is important to capture the diversity in human speech such as speaker identities, prosodies, and styles (e.g., singing). Current large TTS systems usually quantize speech into discrete tokens and use language models to generate these tokens one by one, which suffer from unstable prosody, word skipping/repeating issue, and poor voice quality. In this paper, we develop NaturalSpeech 2, a TTS system that leverages a neural audio codec with residual vector quantizers to get the quantized latent vectors and uses a diffusion model to generate these latent vectors conditioned on text input. To enhance the zero-shot capability that is important to achieve diverse speech synthesis, we design a speech prompting mechanism to facilitate in-context learning in the diffusion model and the duration/pitch predictor. We scale NaturalSpeech 2 to large-scale datasets with 44K hours of speech and singing data and evaluate its voice quality on unseen speakers. NaturalSpeech 2 outperforms previous TTS systems by a large margin in terms of prosody/timbre similarity, robustness, and voice quality in a zero-shot setting, and performs novel zero-shot singing synthesis with only a speech prompt. Audio samples are available at this https URL . 
+
+Comments: 	A large-scale text-to-speech and singing voice synthesis system with latent diffusion models. Update: NaturalSpeech 2 extension to voice conversion and speech enhancement
+Subjects: 	Audio and Speech Processing (eess.AS) ; Artificial Intelligence (cs.AI); Computation and Language (cs.CL); Machine Learning (cs.LG); Sound (cs.SD)
+Cite as: 	arXiv:2304.09116 [eess.AS]
+  	(or arXiv:2304.09116v3 [eess.AS] for this version)
+  	https://doi.org/10.48550/arXiv.2304.09116
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Xu Tan [ view email ]
+[v1] Tue, 18 Apr 2023 16:31:59 UTC (185 KB)
+[v2] Thu, 4 May 2023 17:08:20 UTC (220 KB)
+[v3] Tue, 30 May 2023 16:09:10 UTC (222 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled NaturalSpeech 2: Latent Diffusion Models are Natural and Zero-Shot Speech and Singing Synthesizers, by Kai Shen and 8 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+eess.AS
+< prev   |   next >
+new | recent | 2304
+Change to browse by:
+cs
+cs.AI
+cs.CL
+cs.LG
+cs.SD
+eess
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

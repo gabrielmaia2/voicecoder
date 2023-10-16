@@ -1,0 +1,187 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (51)
+    Cited by (1005) 
+
+Elsevier
+Ecological Modelling
+Volume 160, Issue 3 , 15 February 2003, Pages 249-264
+Ecological Modelling
+Review and comparison of methods to study the contribution of variables in artificial neural network models
+Author links open overlay panel Muriel Gevrey a , Ioannis Dimopoulos b , Sovan Lek a
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/S0304-3800(02)00257-0 Get rights and content
+Abstract
+
+Convinced by the predictive quality of artificial neural network (ANN) models in ecology, we have turned our interests to their explanatory capacities. Seven methods which can give the relative contribution and/or the contribution profile of the input factors were compared: (i) the ‘PaD’ (for Partial Derivatives) method consists in a calculation of the partial derivatives of the output according to the input variables; (ii) the ‘Weights’ method is a computation using the connection weights; (iii) the ‘Perturb’ method corresponds to a perturbation of the input variables; (iv) the ‘Profile’ method is a successive variation of one input variable while the others are kept constant at a fixed value; (v) the ‘classical stepwise’ method is an observation of the change in the error value when an adding (forward) or an elimination (backward) step of the input variables is operated; (vi) ‘Improved stepwise a’ uses the same principle as the classical stepwise, but the elimination of the input occurs when the network is trained, the connection weights corresponding to the input variable studied is also eliminated; (vii) ‘Improved stepwise b’ involves the network being trained and fixed step by step, one input variable at its mean value to note the consequences on the error. The data tested in this study concerns the prediction of the density of brown trout spawning redds using habitat characteristics. The PaD method was found to be the most useful as it gave the most complete results, followed by the Profile method that gave the contribution profile of the input variables. The Perturb method allowed a good classification of the input parameters as well as the Weights method that has been simplified but these two methods lack stability. Next came the two improved stepwise methods (a and b) that both gave exactly the same result but the contributions were not sufficiently expressed. Finally, the classical stepwise methods gave the poorest results.
+Introduction
+
+The relationships between variables in ecology are almost always very complicated and highly non-linear. One of the most appropriate methods to illustrate this seems to be Artificial Neural Networks (ANNs). In fact, this method is very powerful in dealing with non-linear relationships (Lek et al., 1996b). A large number of authors have underlined the interest of using ANNs instead of linear statistical models (Paruelo and Tomasel, 1997, Ramos-Nino et al., 1997, Manel et al., 1999, Starrett and Adams, 1997, Özesmi and Özesmi, 1999). This method has become increasingly popular in the analysis of ecological phenomena (Skelton et al., 1995, Recknagel et al., 1997, Whitehead et al., 1997, Lu et al., 1998, Mastrorillo et al., 1998, Yang et al., 1998, Brosse et al., 1999, Lae et al., 1999, Lek et al., 1999, Liong et al., 2000b, Maier and Dandy, 2000). Convinced by the predictive power of ANNs and their ability to analyse non-linear relationships, we consider them interesting to study from their explanatory point of view. In fact, starting from input variables, ANNs have the capacity to predict the output variable but the mechanisms that occur within the network are often ignored. ANNs are often considered as black boxes. Various authors have explored this problem and proposed algorithms to illustrate the role of variables in ANN models.
+
+Nevertheless, in most works, these methods are used to eliminate irrelevant input, and are, therefore, called pruning methods (Guo and Uhrig, 1992, Zurada et al., 1994, El-Keib and Ma, 1995, Engelbrecht et al., 1995, Hsu et al., 1995, Maier et al., 1998, Yao et al., 1998, van Wijk and Bouten, 1999, Kim et al., 2000, Liong et al., 2000a, Liong et al., 2000b). First, the most significant explanatory variables are determined, then the variables which are below a fixed threshold are excluded from the network. This allows the size of the network to be reduced and thus minimises redundancy in the training data (Zurada et al., 1994). However, even if good prediction is required in ecology, knowing what contribution each variable makes is of a prime importance. It is this explanatory aspect of ANNs that we studied here. These methods were used to determine the influence of each input variable and its contribution to the output. They are not, therefore, pruning methods but procedures to estimate the relative contribution of each input variable.
+
+Seven different methods that allow contribution analysis were used: (i) the ‘PaD’ (for Partial Derivatives) method consists in calculating the partial derivatives of the output according to the input variables (Dimopoulos et al., 1995, Dimopoulos et al., 1999); (ii) the ‘Weights’ method is a computation using the connection weights (Garson, 1991, Goh, 1995); (iii) the ‘Perturb’ method corresponds to a perturbation of the input variables (Scardi and Harding, 1999); (iv) the ‘Profile’ method is a successive variation of one input variable while the others are kept constant at a fixed value (Lek et al., 1996a, Lek et al., 1996b); (v) the ‘classical stepwise’ method is an observation of the change in the error value when an adding (forward) or an elimination (backward) step of the input variables is operated (Balls et al., 1996, Maier and Dandy, 1996); (vi) ‘Improved stepwise a’ uses the same principle as the last one, but the elimination of the input occurs when the network is trained, the connection weights corresponding to the input variable studied are also eliminated; (vii) ‘Improved stepwise b’ also involves the network being trained and fixed step by step with one input variable at its mean value to note the consequences on the error.
+
+Multiple linear regression (MLR) will be used as classical model to judge the prediction quality of ANNs. In addition the capacities of stepwise regression will be compared with those of the contribution procedures associated to ANNs.
+
+In the present paper, Section 2 describes the ecological database used in our study. Section 3.1 presents the regression model used. Section 3.2 presents the neural model. Section 3.3 introduces the methods that allow the determination of the variable contributions. Section 4 presents the results obtained for all methods used. Finally, Section 5 discusses the contribution of the input through a comparison of the methods and some conclusions are drawn.
+Section snippets
+Database
+
+The data used here were reported in Delacoste et al., 1993, Delacoste, 1995, Lek et al., 1996b. Sampling was done at 29 stations, distributed on six rivers, subdivided into 205 morphodynamic units. Each unit corresponds to a zone where depth, current and gradient are homogeneous (Malavoi, 1989). The physical characteristics of the 205 morphodynamic units were measured in January, immediately after the brown trout reproduction period. They, therefore, most faithfully indicate the conditions met
+Multiple linear regression modelling
+
+MLR being the method most frequently used in ecology, a comparison to ANNs was made in order to judge their predictive capacities. The stepwise multiple regression technique (Weisberg, 1980, Tomassone et al., 1983) was computed especially to define the significant variables and their contribution order. In fact the influence of each variable can be roughly assessed by checking the final values of the regression coefficients. Calculations were done using s plus ® software release 4.5 on PC.
+Neural network modelling
+
+The
+Predictive capacity
+
+Using all ten available variables and the complete dataset, the equation of the MLR model and the determination coefficient were:
+R / M =	1.3374	−0.02  Wi 	+0.48  ASSG 	−0.57  SV 	−0.05  GRA 	+1.31  Fwi 	−0.01  D 	−0.08  SDD 	+0.01  BV 	−0.01  SDBV 	−0.02  VD
+t 		−1.1739	9.1384	−2.1596	−2.1472	1.6213	−1.7189	−1.0074	1.3274	−1.8332	−0.1991
+Sig. 		0.2419	0.0000	0.0320	0.0330	0.1066	0.0872	0.3150	0.1859	0.0683	0.8424
+R 2 =	0.4692										
+
+Using forward–backward stepwise MLR, five variables were retained by the model: ASSG, SV, D, GRA, Fwi. The equation and the determination
+Discussion
+
+MLR is the most commonly used method to analyse ecological data. It has been thoroughly statistically tested and is universally known. Its success comes from its easy use and its capacity to give predictive and explanatory results which make it very interesting. However, its incapacity to take into account non-linear relationships between the dependent variable and each independent variable is its principal drawback. That is why the use of ANNs is wholly justified in ecology where the
+Acknowledgements
+
+Funding for this research was provided by the EU project PAEQANN (N o EVK1-CT1999-00026).
+References (51)
+
+    S Brosse et al.
+    The use of artificial neural networks to assess fish abundance and spatial occupancy in the littoral zone of a mesotrophic lake
+    Ecological Modelling
+    (1999)
+    I Dimopoulos et al.
+    Neural network models to study relationships between lead concentration in grasses and permanent urban descriptors in Athens city (Greece)
+    Ecological Modelling
+    (1999)
+    M Edwards et al.
+    The potential for computer-aided identification in biodiversity research
+    Tree
+    (1995)
+    A.T.C Goh
+    Back-propagation neural networks for modeling complex systems
+    Artificial Intelligence in Engineering
+    (1995)
+    C.T Hsu et al.
+    Distribution feeder loss analysis by using an artificial neural network
+    Electric Power Systems Research
+    (1995)
+    R Lae et al.
+    Predicting fish yield of African lakes using neural networks
+    Ecological Modelling
+    (1999)
+    S Lek et al.
+    Application of neural networks to modelling nonlinear relationships in ecology
+    Ecological Modelling
+    (1996)
+    S Lek et al.
+    Predicting stream nitrogen concentration from watershed features using neural networks
+    Water Research
+    (1999)
+    R.S Lu et al.
+    Predicting solute transfer to surface runoff using neural networks
+    Water Science and Technology
+    (1998)
+    H.R Maier et al.
+    Neural networks for the prediction and forecasting of water resource variables: a review of modelling issues and applications
+    Environmental Modelling and Software
+    (2000)
+
+View more references
+Cited by (1005)
+
+    Optimal combinations of parameters for seismic response prediction of high-speed railway bridges using machine learnings
+    2023, Structures
+    Show abstract
+    Deliberate premarket underpricing: New evidence on IPO pricing using machine learning
+    2023, International Review of Economics and Finance
+    Show abstract
+    Data-driven models for predicting community changes in freshwater ecosystems: A review
+    2023, Ecological Informatics
+    Show abstract
+    Explainable Artificial Intelligence (XAI): What we know and what is left to attain Trustworthy Artificial Intelligence
+    2023, Information Fusion
+    Show abstract
+    Unsupervised learning for structure detection in plastically deformed crystals
+    2023, Computational Materials Science
+    Show abstract
+    Identification of motivating factors to help decision-making to minimise flood risk by applying private mitigation measures
+    2023, International Journal of Disaster Risk Reduction
+    Show abstract
+
+View all citing articles on Scopus
+View full text
+Copyright © 2002 Published by Elsevier B.V.
+Recommended articles
+
+    Time series forecasting using artificial neural networks methodologies: A systematic review
+    Future Computing and Informatics Journal, Volume 3, Issue 2, 2018, pp. 334-340
+    Ahmed Tealab
+    How to determine the unique contributions of input-variables to the nonlinear regression function of a multilayer perceptron
+    Ecological Modelling, Volumes 309–310, 2015, pp. 60-63
+    Andreas Fischer
+    Input reduction of convolutional neural networks with global sensitivity analysis as a data-centric approach
+    Neurocomputing, Volume 506, 2022, pp. 196-205
+    Ernest Jeczmionek , Piotr A. Kowalski
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 943
+    Patent Family Citations: 1 
+
+Captures
+
+    Exports-Saves: 1
+    Readers: 869 
+
+Mentions
+
+    Q&A Site Mentions: 1 
+
+Social Media
+
+    Shares, Likes & Comments: 16 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

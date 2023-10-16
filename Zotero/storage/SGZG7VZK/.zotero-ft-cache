@@ -1,0 +1,228 @@
+
+
+
+
+
+
+
+
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (277)
+    Cited by (230) 
+
+Elsevier
+Neurocomputing
+Volume 461 , 21 October 2021, Pages 370-403
+Neurocomputing
+Pruning and quantization for deep neural network acceleration: A survey
+Author links open overlay panel Tailin Liang a b , John Glossner a b c , Lei Wang a , Shaobo Shi a b , Xiaotong Zhang a
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.neucom.2021.07.045 Get rights and content
+Abstract
+
+Deep neural networks have been applied in many applications exhibiting extraordinary abilities in the field of computer vision. However, complex network architectures challenge efficient real-time deployment and require significant computation resources and energy costs. These challenges can be overcome through optimizations such as network compression. Network compression can often be realized with little loss of accuracy. In some cases accuracy may even improve. This paper provides a survey on two types of network compression: pruning and quantization. Pruning can be categorized as static if it is performed offline or dynamic if it is performed at run-time. We compare pruning techniques and describe criteria used to remove redundant computations. We discuss trade-offs in element-wise, channel-wise, shape-wise, filter-wise, layer-wise and even network-wise pruning. Quantization reduces computations by reducing the precision of the datatype. Weights, biases, and activations may be quantized typically to 8-bit integers although lower bit width implementations are also discussed including binary neural networks . Both pruning and quantization can be used independently or combined. We compare current techniques, analyze their strengths and weaknesses, present compressed network accuracy results on a number of frameworks, and provide practical guidance for compressing networks.
+Introduction
+
+Deep Neural Networks (DNNs) have shown extraordinary abilities in complicated applications such as image classification, object detection, voice synthesis, and semantic segmentation [138]. Recent neural network designs with billions of parameters have demonstrated human-level capabilities but at the cost of significant computational complexity. DNNs with many parameters are also time-consuming to train [26]. These large networks are also difficult to deploy in embedded environments. Bandwidth becomes a limiting factor when moving weights and data between Compute Units (CUs) and memory. Over-parameterization is the property of a neural network where redundant neurons do not improve the accuracy of results. This redundancy can often be removed with little or no accuracy loss [225].
+
+Fig. 1 shows three design considerations that may contribute to over-parameterization: 1) network structure, 2) network optimization, and 3) hardware accelerator design. These design considerations are specific to Convolutional Neural Networks (CNNs) but also generally relevant to DNNs.
+
+Network structure encompasses three parts: 1) novel components, 2) network architecture search, and 3) knowledge distillation. Novel components is the design of efficient blocks such as separable convolution, inception blocks, and residual blocks. They are discussed in Section 2.4. Network components also encompasses the types of connections within layers. Fully connected deep neural networks require N 2 connections between neurons. Feed forward layers reduce connections by considering only connections in the forward path. This reduces the number of connections to N . Other types of components such as dropout layers can reduce the number of connections even further.
+
+Network Architecture Search (NAS) [63], also known as network auto search, programmatically searches for a highly efficient network structure from a large predefined search space. An estimator is applied to each produced architecture. While time-consuming to compute, the final architecture often outperforms manually designed networks.
+
+Knowledge Distillation (KD) [80], [206] evolved from knowledge transfer [27]. The goal is to generate a simpler compressed model that functions as well as a larger model. KD trains a student network that tries to imitate a teacher network. The student network is usually but not always smaller and shallower than the teacher. The trained student model should be less computationally complex than the teacher.
+
+Network optimization [137] includes: 1) computational convolution optimization, 2) parameter factorization, 3) network pruning, and 4) network quantization. Convolution operations are more efficient than fully connected computations because they keep high dimensional information as a 3D tensor rather than flattening the tensors into vectors that removes the original spatial information. This feature helps CNNs to fit the underlying structure of image data in particular. Convolution layers also require significantly less coefficients compared to Fully Connected Layers (FCLs). Computational convolution optimizations include Fast Fourier Transform (FFT) based convolution [168], Winograd convolution [135], and the popular image to column (im2col) [34] approach. We discuss im2col in detail in Section 2.3 since it is directly related to general pruning techniques.
+
+Parameter factorization is a technique that decomposes higher-rank tensors into lower-rank tensors simplifying memory access and compressing model size. It works by breaking large layers into many smaller ones, thereby reducing the number of computations. It can be applied to both convolutional and fully connected layers. This technique can also be applied with pruning and quantization.
+
+Network pruning [201], [24], [12], [250] involves removing parameters that don’t impact network accuracy. Pruning can be performed in many ways and is described extensively in Section 3.
+
+Network quantization [131], [87] involves replacing datatypes with reduced width datatypes. For example, replacing 32-bit Floating Point (FP32) with 8-bit Integers (INT8). The values can often be encoded to preserve more information than simple conversion. Quantization is described extensively in Section 4.
+
+Hardware accelerators [151], [202] are designed primarily for network acceleration. At a high level they encompass entire processor platforms and often include hardware optimized for neural networks. Processor platforms include specialized Central Processing Unit (CPU) instructions, Graphics Processing Units (GPUs), Application Specific Integrated Circuits (ASICs), and Field Programmable Gate Arrays (FPGAs).
+
+CPUs have been optimized with specialized Artificial Intelligence (AI) instructions usually within specialized Single Instruction Multiple Data (SIMD) units [49], [11]. While CPUs can be used for training, they have primarily been used for inference in systems that do not have specialized inference accelerators.
+
+GPUs have been used for both training and inference. nVidia has specialized tensor units incorporated into their GPUs that are optimized for neural network acceleration [186]. AMD [7], ARM [10], and Imagination [117] also have GPUs with instructions for neural network acceleration.
+
+Specialized ASICs have also been designed for neural network acceleration. They typically target inference at the edge, in security cameras, or on mobile devices. Examples include: General Processor Technologies (GPT) [179], ARM, nVidia, and 60 + others [202] all have processors targeting this space. ASICs may also target both training and inference in datacenters. Tensor processing units (TPU) from Google [125], Habana from Intel [169], Kunlun from Baidu [191], Hanguang from Alibaba [124], and Intelligence Processing Unit (IPU) from Graphcore [121].
+
+Programmable reconfigurable FPGAs have been used for neural network acceleration [86], [3], [234], [152]. FPGAs are widely used by researchers due to long ASIC design cycles. Neural network libraries are available from Xilinx [128] and Intel [69]. Specific neural network accelerators are also being integrated into FPGA fabrics [248], [4], [203]. Because FPGAs operate at the gate level, they are often used in low-bit width and binary neural networks [178], [267], [197].
+
+Neural network specific optimizations are typically incorporated into custom ASIC hardware. Lookup tables can be used to accelerate trigonometric activation functions [46] or directly generate results for low bit-width arithmetic [65], partial products can be stored in special registers and reused [38], and memory access ordering with specialized addressing hardware can all reduce the number of cycles to compute a neural network output [126]. Hardware accelerators are not the primary focus of this paper. However, we do note hardware implementations that incorporate specific acceleration techniques. Further background information on efficient processing and hardware implementations of DNNs can be found in [225].
+
+We summarize our main contributions as follows:
+
+    •
+
+    We provide a review of two network compression techniques: pruning and quantization. We discuss methods of compression, mathematical formulations, and compare current State-Of-The-Art (SOTA) compression methods.
+    •
+
+    We classify pruning techniques into static and dynamic methods, depending if they are done offline or at runtime, respectively.
+    •
+
+    We analyze and quantitatively compare quantization techniques and frameworks.
+    •
+
+    We provide practical guidance on quantization and pruning.
+
+This paper focuses primarily on network optimization for convolutional neural networks. It is organized as follows: In Section 2 we give an introduction to neural networks and specifically convolutional neural networks. We also describe some of the network optimizations of convolutions. In Section 3 we describe both static and dynamic pruning techniques. In Section 4 we discuss quantization and its effect on accuracy. We also compare quantization libraries and frameworks. We then present quantized accuracy results for a number of common networks. We present conclusions and provide guidance on appropriate application use in Section 5. Finally, we present concluding comments in Section 7.
+
+Section snippets
+Convolutional neural network
+
+Convolutional neural networks are a class of feed-forward DNNs that use convolution operations to extract features from a data source. CNNs have been most successfully applied to visual-related tasks however they have found use in natural language processing [95], speech recognition [2], recommendation systems [214], malware detection [223], and industrial sensors time series prediction [261]. To provide a better understanding of optimization techniques, in this section, we introduce the two
+Pruning
+
+Network pruning is an important technique for both memory size and bandwidth reduction. In the early 1990s, pruning techniques were developed to reduce a trained large network into a smaller network without requiring retraining [201]. This allowed neural networks to be deployed in constrained environments such as embedded systems. Pruning removes redundant parameters or neurons that do not significantly contribute to the accuracy of results. This condition may arise when the weight coefficients
+Quantization
+
+Quantization is known as the process of approximating a continuous signal by a set of discrete symbols or integer values . Clustering and parameter sharing also fall within this definition [92]. Partial quantization uses clustering algorithms such as k-means to quantize weight states and then store the parameters in a compressed file. The weights can be decompressed using either a lookup table or a linear transformation. This is typically performed during runtime inference. This scheme only
+Summary
+
+In this section we summarize the results of Pruning and Quantization.
+Future Work
+
+Although punning and quantization algorithms help reduce the computation cost and bandwidth burden, there are still areas for improvement. In this section we highlight future work to further improvement quantization and prunning.
+
+Automatic Compression. Low bit width quantization can cause significant accuracy loss, especially when the quantized bit-width is very narrow and the dataset is large [272], [155]. Automatic quantization is a technique to automatically search quantization encoding to
+Conclusions
+
+Deep neural networks have been applied in many applications exhibiting extraordinary abilities in the field of computer vision. However, complex network architectures challenge efficient real-time deployment and require significant computation resources and energy costs. These challenges can be overcome through optimizations such as network compression. Network compression can often be realized with little loss of accuracy. In some cases accuracy may even improve.
+
+Pruning can be categorized as
+Quantization Performance Results
+
+CRediT authorship contribution statement
+
+Tailin Liang: Writing - original draft, Visualization, Formal analysis, Resources, Funding acquisition. John Glossner: Conceptualization, Writing - review & editing, Supervision, Resources. Lei Wang: Resources, Investigation, Validation, Project administration, Funding acquisition. Shaobo Shi: Resources, Investigation, Validation, Funding acquisition. Xiaotong Zhang: Conceptualization, Supervision, Resources, Visualization.
+
+Tailin Liang received the B.E. degree in Computer Science and B.B.A from the University of Science and Technology Beijing in 2017. He is currently working toward a Ph.D. degree in Computer Science at the School of Computer and Communication Engineering, University of Science and Technology Beijing. His current research interests include deep learning domain-specific processors and co-designed optimization algorithms.
+
+References (277)
+
+    W. Balzer et al.
+    Weight quantization in Boltzmann machines
+    Neural Networks
+    (1991)
+    B. Choi et al.
+    Solving local minima problem with large number of hidden nodes on two-layered feed-forward artificial neural networks
+    Neurocomputing
+    (2008)
+    M. Dash et al.
+    Feature selection for classification
+    Intelligent Data Analysis
+    (1997)
+    K. Fukushima
+    Neocognitron: A hierarchical neural network capable of visual pattern recognition
+    Neural Networks
+    (1988)
+    M. Abadi et al.
+    TensorFlow: Large-Scale Machine Learning on Heterogeneous Distributed Systems
+    Abdel-Hamid, O., Mohamed, A.r., Jiang, H., Deng, L., Penn, G., Yu, D., 2014. Convolutional Neural Networks for Speech...
+    Abdelouahab, K., Pelcat, M., Serot, J., Berry, F., 2018. Accelerating CNN inference on FPGAs: A Survey. ArXiv preprint...
+    Achronix Semiconductor Corporation, 2020. FPGAs Enable the Next Generation of Communication and Networking Solutions....
+    Albanie, 2020. convnet-burden....
+    Alemdar, H., Leroy, V., Prost-Boucle, A., Petrot, F., 2017. Ternary neural networks for resource-efficient AI... 
+
+View more references
+Cited by (230)
+
+    An efficient deep learning model using network pruning for fake banknote recognition
+    2023, Expert Systems with Applications
+    Show abstract
+    Highly accurate and fast YOLOv4-based polyp detection
+    2023, Expert Systems with Applications
+    Show abstract
+
+    More than deaths were caused by Colorectal Cancer (CRC) in 2020. Colonoscopy is the gold standard for colorectal cancer screening, with studies concluding that colonoscopies significantly reduce mortality from CRC. It has been shown in the literature that computer-aided detection (CAD) systems can improve adenoma detection. In particular, deep learning models have shown promising results in helping physicians reduce the number of missed lesions during real-time colonoscopies. To keep up with the increase in resolution of the colonoscopies and to perform inference in real-time in smaller medical devices, faster models (i.e., models that can process images at high frame rates) are required.
+    IPAD: Iterative pruning with activation deviation for sclera biometrics
+    2023, Journal of King Saud University - Computer and Information Sciences
+    Show abstract
+
+    The sclera has recently been gaining attention as a biometric modality due to its various desirable characteristics. A key step in any type of ocular biometric recognition, including sclera recognition, is the segmentation of the relevant part(s) of the eye. However, the high computational complexity of the (deep) segmentation models used in this task can limit their applicability on resource-constrained devices such as smartphones or head-mounted displays. As these devices are a common desired target for such biometric systems, lightweight solutions for ocular segmentation are critically needed. To address this issue, this paper introduces IPAD (Iterative Pruning with Activation Deviation), a novel method for developing lightweight convolutional networks, that is based on model pruning. IPAD uses a novel filter-activation-based criterion (ADC) to determine low-importance filters and employs an iterative model pruning procedure to derive the final lightweight model. To evaluate the proposed pruning procedure, we conduct extensive experiments with two diverse segmentation models, over four publicly available datasets (SBVPI, SLD, SMD and MOBIUS), in four distinct problem configurations and in comparison to state-of-the-art methods from the literature. The results of the experiments show that the proposed filter-importance criterion outperforms the standard and approaches from the literature. Furthermore, the results also suggest that: the pruned models are able to retain (or even improve on) the performance of the unpruned originals, as long as they are not over-pruned, with RITnet and U-Net at 50% of their original FLOPs reaching up to and higher IoU values than their unpruned versions, respectively, smaller models require more careful pruning, as the pruning process can hurt the model’s generalization capabilities, and the novel criterion most convincingly outperforms the classic approaches when sufficient training data is available, implying that the abundance of data leads to more robust activation-based importance computation.
+    A real-time detection model for smoke in grain bins with edge devices
+    2023, Heliyon
+    Show abstract
+    Towards global neural network abstractions with locally-exact reconstruction
+    2023, Neural Networks
+    Show abstract
+    Multi-domain clustering pruning: Exploring space and frequency similarity based on GAN
+    2023, Neurocomputing
+    Show abstract
+
+View all citing articles on Scopus
+
+Tailin Liang received the B.E. degree in Computer Science and B.B.A from the University of Science and Technology Beijing in 2017. He is currently working toward a Ph.D. degree in Computer Science at the School of Computer and Communication Engineering, University of Science and Technology Beijing. His current research interests include deep learning domain-specific processors and co-designed optimization algorithms.
+
+John Glossner received the Ph.D. degree in Electrical Engineering from TU Delft in 2001. He is the Director of the Computer Architecture, Heterogeneous Computing, and AI Lab at the University of Science and Technology Beijing. He is also the CEO of Optimum Semiconductor Technologies and President of both the Heterogeneous System Architecture Foundation and Wireless Innovation Forum. John’s research interests include the design of heterogeneous computing systems, computer architecture, embedded systems, digital signal processors, software defined radios, artificial intelligence algorithms, and machine learning systems.
+
+Lei Wang received the B.E. and Ph.D. degrees in 2006 and 2012 from the University of Science and Technology Beijing. He then served as an assistant researcher at the Institute of Automation of the Chinese Academy of Sciences during 2012-2015. He was a joint Ph.D. of Electronic Engineering at The University of Texas at Dallas during 2009-2011. Currently, he is an adjunct professor at the School of Computer and Communication Engineering, University of Science and Technology Beijing.
+
+Shaobo Shi received the B.E. and Ph.D. degrees in 2008 and 2014 from the University of Science and Technology Beijing. He then served as an assistant researcher at the Institute of Automation of the Chinese Academy of Sciences during 2014-2017. Currently, he is a deep learning domain-specific processor engineer at Huaxia General Processor Technology. As well serve as an adjunct professor at the School of Computer and Communication Engineering, University of Science and Technology Beijing.
+
+Xiaotong Zhang received the M.E. and Ph.D. degrees from the University of Science and Technology Beijing in 1997 and 2000, respectively, where he was a professor of Computer Science and Technology. His research interest includes the quality of wireless channels and networks, wireless sensor networks, networks management, cross-layer design and resource allocation of broadband and wireless networks, and the signal processing of communication and computer architecture.
+
+View full text
+© 2021 Elsevier B.V. All rights reserved.
+Recommended articles
+
+    RUFP: Reinitializing unimportant filters for soft pruning
+    Neurocomputing, Volume 483, 2022, pp. 311-321
+    Ke Zhang , …, Meibo Lv
+    CCPrune: Collaborative channel pruning for learning compact convolutional networks
+    Neurocomputing, Volume 451, 2021, pp. 35-45
+    Yanming Chen , …, Weisong Shi
+    AutoPruner: An end-to-end trainable filter pruning method for efficient deep model inference
+    Pattern Recognition, Volume 107, 2020, Article 107461
+    Jian-Hao Luo , Jianxin Wu
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 161
+    Patent Family Citations: 2 
+
+Captures
+
+    Readers: 376 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

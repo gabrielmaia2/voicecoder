@@ -1,0 +1,89 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1808.03113
+
+Help | Advanced Search
+Search
+Computer Science > Sound
+(cs)
+[Submitted on 9 Aug 2018]
+Title: Rhythm-Flexible Voice Conversion without Parallel Data Using Cycle-GAN over Phoneme Posteriorgram Sequences
+Authors: Cheng-chieh Yeh , Po-chun Hsu , Ju-chieh Chou , Hung-yi Lee , Lin-shan Lee
+Download a PDF of the paper titled Rhythm-Flexible Voice Conversion without Parallel Data Using Cycle-GAN over Phoneme Posteriorgram Sequences, by Cheng-chieh Yeh and 4 other authors
+Download PDF
+
+    Abstract: Speaking rate refers to the average number of phonemes within some unit time, while the rhythmic patterns refer to duration distributions for realizations of different phonemes within different phonetic structures. Both are key components of prosody in speech, which is different for different speakers. Models like cycle-consistent adversarial network (Cycle-GAN) and variational auto-encoder (VAE) have been successfully applied to voice conversion tasks without parallel data. However, due to the neural network architectures and feature vectors chosen for these approaches, the length of the predicted utterance has to be fixed to that of the input utterance, which limits the flexibility in mimicking the speaking rates and rhythmic patterns for the target speaker. On the other hand, sequence-to-sequence learning model was used to remove the above length constraint, but parallel training data are needed. In this paper, we propose an approach utilizing sequence-to-sequence model trained with unsupervised Cycle-GAN to perform the transformation between the phoneme posteriorgram sequences for different speakers. In this way, the length constraint mentioned above is removed to offer rhythm-flexible voice conversion without requiring parallel data. Preliminary evaluation on two datasets showed very encouraging results. 
+
+Comments: 	8 pages, 6 figures, Submitted to SLT 2018
+Subjects: 	Sound (cs.SD) ; Audio and Speech Processing (eess.AS)
+Cite as: 	arXiv:1808.03113 [cs.SD]
+  	(or arXiv:1808.03113v1 [cs.SD] for this version)
+  	https://doi.org/10.48550/arXiv.1808.03113
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Cheng-Chieh Yeh [ view email ]
+[v1] Thu, 9 Aug 2018 12:32:23 UTC (1,274 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Rhythm-Flexible Voice Conversion without Parallel Data Using Cycle-GAN over Phoneme Posteriorgram Sequences, by Cheng-chieh Yeh and 4 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.SD
+< prev   |   next >
+new | recent | 1808
+Change to browse by:
+cs
+eess
+eess.AS
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+Cheng-chieh Yeh
+Po-chun Hsu
+Ju-Chieh Chou
+Hung-yi Lee
+Lin-Shan Lee
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

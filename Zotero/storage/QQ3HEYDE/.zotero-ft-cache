@@ -1,0 +1,341 @@
+LEARNING COMPACT RECURRENT NEURAL NETWORKS
+Zhiyun Lu∗1, Vikas Sindhwani2, Tara N. Sainath2
+1 University of Southern California, Los Angeles, CA, USA 2 Google, Inc. New York, NY, USA
+zhiyunlu@usc.edu, {sindhwani,tsainath}@google.com
+
+arXiv:1604.02594v1 [cs.LG] 9 Apr 2016
+
+ABSTRACT
+Recurrent neural networks (RNNs), including long short-term memory (LSTM) RNNs, have produced state-of-the-art results on a variety of speech recognition tasks. However, these models are often too large in size for deployment on mobile devices with memory and latency constraints. In this work, we study mechanisms for learning compact RNNs and LSTMs via low-rank factorizations and parameter sharing schemes. Our goal is to investigate redundancies in recurrent architectures where compression can be admitted without losing performance. A hybrid strategy of using structured matrices in the bottom layers and shared low-rank factors on the top layers is found to be particularly effective, reducing the parameters of a standard LSTM by 75%, at a small cost of 0.3% increase in WER, on a 2,000-hr English Voice Search task.
+1. INTRODUCTION
+Recurrent neural network architectures have become very popular for automatic speech recognition (ASR) tasks in the past few years. Architectures such as recurrent neural networks (RNNs), long shortterm memory networks (LSTMs) and convolutional, long-short term memory networks (CLDNNs) have produced state of the art results for many large vocabulary continuous speech recognition (LVCSR) tasks [1, 2, 3].
+In order to fully exploit thousands of hours of training data for LVCSR tasks, the best performing neural network architectures are typically very large in size. Consequently, they require long training time and consume a signiﬁcant number of ﬂoating point operations per prediction once deployed. These characteristics are further exacerbated in large, deep RNN architectures, which unroll the network for a sequential number of time frames (i.e., 10-20), and must compute the output from one time step before feeding into the next time step. This situation is at odds with the need to enable high-performance on-device speech recognition on storage and power constrained mobile phones for which compact, small-sized models are strongly preferred.
+Numerous approaches have recently been proposed in the model compression literature to build compact neural network models with fast training and prediction speed. A popular technique is low-rank matrix factorization [2, 4, 5], which attempts to compress neural network layers by representing them as matrices with low-rank. This was shown to reduce parameters by 30-50% for DNNs with no loss in accuracy for LVCSR tasks. Other techniques include inducing zeros in the parameter matrices via sparsity regularizers [6]; storing weights in low ﬁxed-precision formats [7, 8]; using speciﬁc param-
+*The author performed the work as a summer intern at Google, NYC.
+
+eter sharing mechanisms [9, 10], or training smaller models on soft outputs of larger models [11].
+The dominant attention in this literature has so far been on reducing the size of fully connected and convolutional architectures (DNNs and CNNs). Given the importance of recurrent architectures in the speech community, the goal of this work is to explore compact architectures for deep RNNs and LSTMs. Several open questions immediately arise in this context: where precisely is the redundancy in recurrent architectures for speech recognition tasks? Which compact architectural variations retain the most performance? How should size constraints vary across layers, between recurrent and feedforward weights, and between different gates in a recurrent model? Our contributions in this paper are as follows: • We are the ﬁrst to undertake a systematic study of various new
+compact architectures for RNNs and LSTMs. Speciﬁcally, we compare the effectiveness of low-rank models [2, 4] and various parameter sharing schemes implemented using hashing [9] and structured matrices [10]. Note that sparsity promoting regularizers and the use of low-precision storage formats are complementary to our study and could yield even more compact models. • Our investigation reveals the following: (i) for aggressive reduction of parameters in the bottom layers, Toeplitz-like structured matrices [10] outperform Hashing based schemes and low-rank factorizations, (ii) shared low-rank factors [2] are very effective for parameter reduction across the network, (iii) a particularly effective hybrid strategy for building compact LSTMs - using Toeplitz-like structured matrices [10] in bottom layers and projection layers involving shared low-rank factors in the upper layers – can save 75% parameters with 0.3% increase in Word Error Rate (WER), compared to a full LSTM, (iv) LSTMs are relatively insensitive to whether compression is applied to recurrent or nonrecurrent weights, and similarly so for input/output/forget gates; on the other hand, the cell state is critical to preserve for better performance.
+
+2. RECURRENT NEURAL NETS
+
+We start by setting some notations and by giving an overview of the basic RNN and LSTM architectures.
+
+RNN: An RNN maps an input sequence x = (x1, . . . , xT ) to output
+sequence y = (y1, . . . , yT ). At each time step t ∈ T , the RNN is modeled with the following equations for the hidden unit hlt in each layer l ∈ {1, . . . , L} and the output yt, where h0t = xt.
+
+hlt = σ[W lhtl−1 + U lhlt−1 + bl] yt = softmax[W L+1hLt + bL+1]
+
+l = 1, . . . , L (1)
+
+We will refer to Equation 1 as RNN full model. We call U l as recurrent weights, and W l as feedforward or non-recurrent weights.
+
+LSTM: A LSTM is an alternative model that has been used to ad-
+
+dress vanishing/exploding gradient issues with RNN, and to model longer-term temporal dependencies [12]. For each time step t ∈ T and layer l ∈ {1, . . . , L}, the LSTM sequence to sequence mapping,
+
+which includes the forget gate [13] and peephole connection [14], is described as follows (as above h0t = xt).
+
+ilt =σ[Wilhlt−1 + Uilhlt−1 + bli + D(vil)clt−1]
+
+input gate (2)
+
+ftl =σ[Wfl hlt−1 + Ufl hlt−1 + blf + D(vfl )clt−1] forget gate (3)
+
+clt =ftl · clt−1 + ilt tanh[Wclhlt−1 + Uclhlt−1 + blc] cell state (4)
+
+olt =σ[Wolhlt−1 + Uol hlt−1 + blo + D(vol )clt]
+
+output gate (5)
+
+hlt =olt · tanh[clt]
+
+cell output (6)
+
+The output of the network is given by,
+
+yt = softmax[W L+1hLt + bL+1].
+The peephole connection D(vil) is a diagonal matrix with vil as its diagonal. We will refer to Equations 2, 3, 4, 5 as input gate, forget gate, cell state and output gate respectively.
+
+3. PARAMETER REDUCTION SCHEMES
+
+We now describe various parameter reduction methods explored in this work, to make the recurrent architectures described in Section 2 more compact. For sake of simplicity, we will refer to the generic matrix we want to compress as W , which is of size m × n. The goal of the compression schemes is to reduce the number of parameters of W , namely mn.
+
+3.1. Low Rank Factorization
+
+In a low-rank compression scheme, we assume that matrix W has rank r. Then there exists [15] a factorization W = Wa × Wb where Wa is a full-rank matrix of size m × r and Wb is a full-rank matrix of size r × n. Thus, we replace matrix W by matrices Wa and Wb which is equivalent to replacing a fully connected layer with a lin-
+ear bottleneck layer. Notice there is no non-linearity (i.e. sigmoid)
+between matrices Wa and Wb. A low-rank decomposition of Equation 1 for recurrent and feedforward matrices U l and W l, for layer l ∈ {1, . . . , L}, is shown in Equation 7.
+
+hlt = σ[WalWblhlt−1 + Ual Ublhlt−1 + bl]
+
+(7)
+
+We can reduce the number of parameters of the system so long as the number of parameters in Wa (i.e., mr) and Wb (i.e., rn) is less than W (i.e., mn). Low-rank matrix factorization was ﬁrst explored for speech in [4], where it was found DNN models could be reduced by 30-50% with no loss in accuracy. Furthermore, in the context of DNNs, [5] explored computing the singular-value-decomposition (SVD) of a full matrix to learn the two smaller low-rank matrices.
+
+3.2. Sharing Low-rank across Layers: Projection Model
+
+More recently, [2] shared the low-rank factor across layers of the recurrent architecture. To be more speciﬁc, we require Wbl = Ubl−1 when we apply low rank to both U l−1 and W l as in Equation 7. We
+can rewrite Equation 1 for RNNs as
+
+hlt = σ[Walmlt−1 + Ual mlt−1 + bl] mlt = Ublhlt yt = softmax[W L+1mLt + bL+1]
+
+l = 1, . . . , L (8) (9)
+
+where m0t = xt. mlt, the low rank output in Equation 8, can be seen as a linear projection of the original hidden layer, which is shared
+across layers. We refer to this as a projection compression scheme.
+The projection model is compact with weight sharing. Besides, since the projection weight Ubl−1 is shared between U l−1 and W l, its gradient also receives error signals from both factors. The error component of Ubl−1 coming from W l is closer to the output, compared to that of U l−1, which makes the learning of recurrent connec-
+tion easier in the projection model (Equation 9) compared to the full
+model (Equation 1). Therefore, the projection model regularizes the
+full model with fewer number of parameters and facilitates learning
+through weight sharing.
+Similarly for LSTM, we can modify Equation 6 to be
+
+hlt = P lolt · tanh[clt]
+
+projection node (10)
+
+which projects the cell clt down to hlt of lower dimensionality, with P l having a similar interpretation to Ubl in Equation 8. Then the projection node hlt will feed forward to next layer and recurrently to the next time step of the same layer, for all gates and cell activations in Equation 2-5. We refer the reader to [2] for detailed equations regarding the LSTM projection model.
+
+3.3. HashedNets
+
+The HashedNets scheme was recently proposed in [9] to reduce
+memory consumption of DNN layers for computer vision tasks. Here, we assume that the matrix W has only k unique parameter
+values, instead of mn. The connections in W are randomly grouped
+together and hashed into one bucket of length-k parameter vector v, Wij = vh(i,j), where h(i, j) : N × N → {1, . . . , k} is a predeﬁned hashing function. vm is shared among all entries of Wij where h(i, j) = m in both feedforward and back-propagation [9].
+To be consistent with other methods, we use pseudo rank r for HashedNets to refer to k = 2nr number of parameters. We will apply this hashing trick to the U l and W l matrices for RNNs.
+
+3.4. Toeplitz-like Structured Matrices
+
+Recently, [10] proposed a new family of parameter sharing schemes
+
+for small-footprint deep learning based on structured matrices char-
+
+acterized by the notion of displacement operators [16]. Unlike
+
+HashedNets where weights are randomly grouped, parameter shar-
+
+ing mechanisms in structured matrices are highly speciﬁc and de-
+
+terministic. The structure can be exploited for fast matrix-vector
+
+multiplication (forward passes) and also gradient computations dur-
+
+ing back-propagation typically using Fast Fourier Transform like
+
+operations. To get a ﬂavor of this approach, consider Toeplitz
+
+matrices where parameters are tied along diagonals.
+
+ t0 t−1 . . . t−(n−1) 
+
+  t1
+
+t0 . . .
+
+...
+
+ 
+
+  
+
+...
+
+...
+
+...
+
+
+ t−1 
+
+tn−1 . . . t1
+
+t0
+
+It is known that n × n Toeplitz matrices admit O(n log n) time to compute matrix-vector products, which are essentially equivalent to performing linear convolutions. Toeplitz matrices also have the property that via certain shift and scale operations as implemented by speciﬁc displacement operators, they can be linearly transformed into matrices of rank less than or equal to 2. Thus, the so called displacement rank of all Toeplitz matrices is up to 2. [10] propose learning parameter matrices that are generalizations of the Toeplitz structure by allowing the displacement rank r to be higher. This class
+
+of matrices are called Toeplitz-like and they include products and inverses of Toeplitz matrices, and their linear combinations, which can be interpreted as composition of convolutions and deconvolutions. These matrices can be parameterized via a sum over products of r Circulant and Skew-circulant matrices. The displacement rank r serves as a knob on modeling capacity. High displacement rank matrices are increasingly unstructured. [10] show that on mobile speech recognition problems, such transforms are highly effective for learning compact Toeplitz-like layers compared to fully connected DNNs.
+With displacement rank r, there are 2nr free parameters in the Toeplitz-like structured matrix. We will apply the Toeplitz-like transform to U l, W l in RNNs, and Wil, Wfl , Wcl, Wol, Uil, Ufl , Ucl, Uol to LSTMs in our experiment.
+Summary: Table 1 gives a summary of different methods with its number of parameters as a function of an appropriate notion of rank. For simplicity we assume m = n. For projection, the number of parameters is averaged across layers where low-rank factors are shared.
+
+method Low-rank Projection HashedNets Toeplitz-like
+
+knob rank r rank r pseudo-rank r displacement rank r
+
+# of params
+
+2nr
+
+3 2
+
+nr
+
+2nr
+
+2nr
+
+Table 1: comparison of compression methods
+
+4. EXPERIMENTAL DETAILS
+We report two sets of experiments: with RNNs on a medium-sized noisy training set of 300 thousand English-spoken utterances (300 hours), and with LSTMs on a larger training set of 3 million utterances (2,000 hours). These data sets are created by artiﬁcially corrupting clean utterances using a room simulator, adding varying degrees of noise and reverberation such that the overall SNR is between 5dB and 30dB. The noise sources are from YouTube and daily life noisy environmental recordings. All training sets are anonymized and hand-transcribed, and are representative of Google’s voice search trafﬁc. The training sets is randomly split into 90% for model training, and 10% for heldout used to evaluate frame accuracy. WER is reported on a noisy test set containing 30,000 utterances (over 20 hours).
+The input feature for all models are 40-dimensional log-mel ﬁlterbank features, computed every 10ms. All recurrent layers are initialized with uniform random weights between −0.02 to 0.02. The RNNs and LSTMs are unrolled for 20 time steps for training with truncated backpropagation through time (BPTT). In addition, the output state label is delayed by 5 frames, similar to [3].
+All neural networks are trained with the cross-entropy criterion, using the asynchronous stochastic gradient descent (ASGD) optimization strategy described in [17]. All networks have 42 phone output targets such that the output layer would have few parameters and we could focus our attention on compressing other layers of the network. We use a exponentially decaying learning rate, which starts at 0.004 and has a decay rate of 0.1 over 15 billion frames. We apply gradient clipping from {1, 10, 100} in RNN training, and cell clipping at 50 for LSTM training.
+
+5. RESULTS
+
+5.1. Learning Compact RNNs
+
+5.1.1. Parameter reduction in bottom layers
+
+We benchmark a full, standard RNN, which has 3 hidden layers with
+600 cells per layer, and studied how we can reduce parameters rela-
+tive to it with various compact architectures.
+We compared different methods introduced in Section 3, with a
+focus on how bottom layers can be heavily condensed. To be more speciﬁc, we compress weight matrices U 1, W 2, U 2 of the ﬁrst two layers, down to rank r = 5 for low rank, HashedNets and Toeplitzlike matrices, with the deﬁnition of rank shown in Table 1. Note that r = 5 is very limited compared to the original 600 dimensionality. 1.85 million parameters of the baseline model is cut down to ∼790k, roughly 40% of its original size.
+
+model full
+low rank HashedNets Toeplitz-like
+
+compression
+5, 5, 600 5, 5, 600 5, 5, 600
+
+# of params 1.85m 790k 790k 790k
+
+frame accuracy 73.26 68.08 70.09 70.79
+
+WER 43.5 54.6 49.2 48.4
+
+Table 2: Learning different compact models for RNN
+From Table 2, the Toeplitz-like transform is the most efﬁcient to compress bottom layers, which attains the lowest WER under similar number of parameters. Given a ﬁxed budget on model size, different compression schemes make different assumptions while compressing. The low rank assumption performs the poorest because rank 5 is too constrained. HashedNets imposes a somewhat weaker structure on the parameters via random grouping, and also performs moderately. On the other hand, a Toeplitz-like structured matrix with rank 5 can be interpreted as composition of convolutions and deconvolutions, and performs the best to reduce parameters in the bottom layers.
+5.1.2. Parameter reduction across all layers with projection
+We also benchmarked a low-rank model with shared factors [2] as described in 3.2. Here, we use 100 projection nodes for m1, m2 and 200 nodes for m3. With just around 635k parameters, this model achieves an frame accuracy of 73.72% and word error rate of 43.5% matching the full RNN model with one-third the number of parameters. This projection model shares weights and thus gradients across all the layers and appears to be a more effective than the aggressive compression of bottom layers alone using HashedNets, Toeplitz-like matrices or untied low-rank models. One hypothesis we have is that perhaps Toeplitz-like compression, with its convolution interpretation, is better for lower layers, while shared low-rank factorizations are more effective for higher layers. This experiment was found to be difﬁcult to run with RNNs, since in our experiments increasing the number of RNN layers exacerbated the vanishing/exploding gradient problem. Hence, we reserve this set of experiments for the next section, where we compress a deep LSTM with 5 layers, which exhibited more stable optimization behavior for this setting.
+5.1.3. Displacement rank of Toeplitz-like transfrom
+Next we explore the behavior of Toeplitz-like matrix by changing the displacement rank r. In Table 3, the WER improves when we compress U 1, W 2, U 2 to higher ranks, at the cost of increasing parameters and training time. From the column of seconds per ASGD optimization step, the training time is proportional to the displacement rank of Toeplitz-like matrix. As rank 5 gives us a reasonable
+
+tradeoff between performance and training time, we will use it for further structured matrix experiments.
+
+rank # of params sec. per step frame accuracy WER
+
+2
+
+779k
+
+0.13
+
+70.41
+
+49.6
+
+5
+
+790k
+
+0.28
+
+70.79
+
+48.4
+
+10
+
+808k
+
+0.50
+
+70.99
+
+47.9
+
+Table 3: Toeplitz-like matrices with different rank
+
+5.2. Learning Compact LSTMs
+
+In light of the observations from the RNN experiments, we mainly
+focus on LSTM with projection layer (Equation 10) and Toeplitz-
+like transforms in bottom layers for compact LSTM experiments.
+The full LSTM model has 5 hidden layer, with 500 hidden unit per layer. For projection model, we introduce projection P 1 − P 5, as
+in Equation 10, to all hidden layers, and the two numbers in column “compression” of Table 4 indicate the dimensions of h1 to h4, and h5 respectively. For Toeplitz-like transform, we start from a projection model with 100 nodes in h1 to h4, and 200 nodes in h5, and replace weight matrices with Toeplitz-like matrices progressively. ‘Uxj’ in column “compression” stands for that all four weights Uij, Ufj, Ucj , Uoj in recurrent connections of layer j are compressed. We reduce all gates and cell state equally. Note that when we compress Uxl−1 and Wxl at the same time, projection layer P l−1 will be
+removed. Column “projection” details the projection layers in the
+model.
+
+model
+full proj. proj. proj. Toep. Toep. Toep. Toep.
+
+proj.
+P1 −P5 P1 −P5 P1 −P5 P1 −P5 P2 −P5 P2 −P5 P3 −P5
+
+compression h1 − h4, h5
+-
+100, 200
+90, 200
+80, 200 Ux1
+Ux1, Wx2 Ux1, Wx2, Ux2 Ux1, Wx2, Ux2, Wx3
+
+# of params
+9.12m 2.41m 2.23m 2.05m 2.23m 2.00m 1.82m 1.59m
+
+WER
+33.1 33.6 33.8 34.2 33.4 33.5 33.9 35.4
+
+Table 4: Learning different compact models for LSTM
+For both projection model and Toeplitz-like transform, the performance drops as we reduce the number of parameters. However, we see that given a ﬁxed model size, it is more effective to compress lower layers with Toeplitz-like matrices of low displacement rank, which has more of a convolutional interpretation, compared to projection compression on all layers with moderate rank. We see this is quite different than the behavior of compression on a shallow RNN (Section 5.1.2), since we can afford to have a deeper network with LSTM . Overall, with the combination of Toeplitz-like transform and projection, we are able to compress the LSTM model down by 75% to 2.2m parameters, with only a 0.3% increase in WER to 33.4.
+Next, we try to answer the question of where in the LSTM we should apply the compression. We compare the effect of compressing recurrent weight U l or non-recurrent weight W l in Table 5. “compression” lists all Toeplitz-like matrices, where all 4 gates are compressed equally, and “projection” speciﬁes projection layers in the model. As we can see, it makes no signiﬁcant difference whether we compress recurrent or non-recurrent weight as long as the number of parameter matches.
+Thus far we have compressed all gates in the same way. However, different gates have different levels of importance in LSTM [18] and perhaps less important gates can be compressed
+
+compression Ux1, Wx2 Ux1, Ux2
+Ux1, Wx2, Ux2, Wx3 Ux1, Wx2, Ux2, Ux3
+
+projection
+P1 −P5 P1 −P5 P2 −P5 P2 −P5
+
+# of params 2.05m 2.05m 1.64m 1.64m
+
+WER 33.8 33.5 34.8 34.7
+
+Table 5: Compression of feedforward or recurrent weights in LSTM
+
+more. Thus, we investigate how the WER is affected by reducing different gates differently with Toeplitz-like matrices.
+We take a LSTM projection model, which has 100 projection nodes in h2 to h4, and 200 projection nodes in h5. All gates and cell states of U 1, W 2, U 2 are Toeplitz-like matrices. We vary the compression on cell state and gates of W 3 with Toeplitz-like transforms, and record the change in WER. These models lie in between the models of last two rows in Table 4, which has a huge jump in WER from 33.9 to 35.4.
+In Table 6, gates column indicates if input gate, forget gate, cell state or output gate of W 3, is being compressed. Compressing the cell state (Equation 4) makes a major difference, 0.4% in WER, for LSTM performance. Compressing forget gate or not alone does not show much impact with 0.1% increase in WER. But reducing input gate, output gate and forget gate altogether, with 0.14m fewer parameters, would make 0.5% worse in WER. Both [18, 19] notice that removing forget gate would signiﬁcantly hurt the performance, and [19] ﬁnds that output gate is of the least importance. We do not identify signiﬁcant difference in compressing different gates in our experiment, probably because we only change the gates for the third layer input weights in a ﬁve-layer LSTM, and that rank 5 Toeplitzlike matrices are sufﬁcient to retain enough information for most gates.
+
+proj.
+P2 −P5 P2 −P5 P2 −P5 P2 −P5
+
+compression Ux1, Wx2, Ux2 Ux1, Wx2, Ux2 Ux1, Wx2, Ux2 Ux1, Wx2, Ux2
+
+compressed gates Wi3, Wf3, Wc3, Wo3
+Wi3, Wf3, Wo3 Wi3, Wo3 −
+
+# of params 1.64m 1.68m 1.73m 1.82m
+
+WER 34.8 34.4 34.3 33.9
+
+Table 6: Compression of different gates in LSTM
+
+6. CONCLUSIONS
+In this work, we studied how to build compact recurrent neural networks for LVCSR tasks. In our RNN experiments, we noted that Toeplitz-like structured matrices outperform HashedNets and Low-rank bottleneck layers for aggressive parameter reduction in the bottom layers. For LSTM parameter reduction, architecting upper layers with projection nodes to moderate rank, and bottom layers with Toeplitz-like transforms was found to be a particularly effective strategy. With this strategy, we are able to build a compact model with 75% fewer parameters than a standard LSTM model, while only incurring 0.3% increase in WER. Compressing recurrent or non-recurrent weight does not make signiﬁcant difference. We ﬁnd that LSTM performance is sensitive to cell state compression, making a noticeable change in WER.
+
+7. ACKNOWLEDGEMENTS
+Thank you to Rohit Prabhavalkar, Ouais Alsharif and Hasim Sak for useful discussions related to model compression and LSTMs.
+
+8. REFERENCES
+[1] G. Saon, H. Soltau, A. Emami, and M. Picheny, “Unfolded Recurrent Neural Networks for Speech Recognition,” in Interspeech, 2014.
+[2] H. Sak, A. Senior, and F. Beaufays, “Long Short-Term Memory Recurrent Neural Network Architectures for Large Scale Acoustic Modeling,” in Proc. Interspeech, 2014.
+[3] T. N. Sainath, O. Vinyals, A. Senior, and H. Sak, “Convolutional, Long Short-Term Memory, Fully Connected Deep Neural Networks,” in Proc. ICASSP, 2015.
+[4] T. N. Sainath, B. Kingsbury, V. Sindhwani, E. Arisoy, and B. Ramabhadran, “Low-Rank Matrix Factorization for Deep Belief Network Training,” in Proc. ICASSP, 2013.
+[5] Jian Xue, Jinyu Li, and Yifan Gong, “Restructuring of Deep Neural Network Acoustic Models with Singular Value Decomposition,” in INTERSPEECH, 2013, pp. 2365–2369.
+[6] M. Collins and P. Kohli, “Memory-bounded Deep Convolutional Neural Networks,” in Proc. ICASSP, 2013.
+[7] Suyog Gupta, Ankur Agrawal, Kailash Gopalakrishnan, and Pritish Narayanan, “Deep Learning with Limited Numerical Precision,” in Proc. ICML, 2015.
+[8] M. Courbariaux, J.-P. David, and Y. Bengio, “Low-precision Storage for Deep Learning,” in Proc. ICLR, 2015.
+[9] Wenlin Chen, James T Wilson, Stephen Tyree, Kilian Q Weinberger, and Yixin Chen, “Compressing Neural Networks with the Hashing Trick,” arXiv preprint arXiv:1504.04788, 2015.
+[10] V. Sindhwani, T. N. Sainath, and S. Kumar, “Structured Transforms for Small-footprint Deep Learning,” in Proc. NIPS, 2015.
+[11] G. Hinton, O. Vinyals, and J. Dean, “Distilling the Knowledge in a Neural Network,” in Deep Learning and Representation Learning Workshop, NIPS, 2014.
+[12] Sepp Hochreiter and Ju¨rgen Schmidhuber, “Long Short-term Memory,” Neural computation, vol. 9, no. 8, pp. 1735–1780, 1997.
+[13] Felix A Gers, Ju¨rgen Schmidhuber, and Fred Cummins, “Learning to Forget: Continual Prediction with LSTM,” Neural computation, vol. 12, no. 10, pp. 2451–2471, 2000.
+[14] F. Gers, J. Schmidhuber, et al., “Recurrent Nets that Time and Count,” in Neural Networks, 2000. IJCNN 2000, Proceedings of the IEEE-INNS-ENNS International Joint Conference on. IEEE, 2000, vol. 3, pp. 189–194.
+[15] G. Strang, Introduction to Linear Algebra, WellesleyCambridge Press, 4th edition, 2009.
+[16] V. Pan, Structured Matrices and Polynomials: Uniﬁed Superfast Algorithms, Springer, 2001.
+[17] J. Dean, G.S. Corrado, R. Monga, K. Chen, M. Devin, Q.V. Le, M.Z. Mao, M. Ranzato, A. Senior, P. Tucker, K. Yang, and A.Y. Ng, “Large Scale Distributed Deep Networks,” in Proc. NIPS, 2012.
+[18] Klaus Greff, Rupesh Kumar Srivastava, Jan Koutn´ık, Bas R Steunebrink, and Ju¨rgen Schmidhuber, “LSTM: A Search Space Odyssey,” arXiv preprint arXiv:1503.04069, 2015.
+[19] Wojciech Zaremba, “An Empirical Exploration of Recurrent Network Architectures,” 2015.
+

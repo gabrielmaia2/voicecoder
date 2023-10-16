@@ -1,0 +1,86 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1708.00853
+
+Help | Advanced Search
+Search
+Computer Science > Sound
+(cs)
+[Submitted on 2 Aug 2017]
+Title: Audio Super Resolution using Neural Networks
+Authors: Volodymyr Kuleshov , S. Zayd Enam , Stefano Ermon
+Download a PDF of the paper titled Audio Super Resolution using Neural Networks, by Volodymyr Kuleshov and 2 other authors
+Download PDF
+
+    Abstract: We introduce a new audio processing technique that increases the sampling rate of signals such as speech or music using deep convolutional neural networks. Our model is trained on pairs of low and high-quality audio examples; at test-time, it predicts missing samples within a low-resolution signal in an interpolation process similar to image super-resolution. Our method is simple and does not involve specialized audio processing techniques; in our experiments, it outperforms baselines on standard speech and music benchmarks at upscaling ratios of 2x, 4x, and 6x. The method has practical applications in telephony, compression, and text-to-speech generation; it demonstrates the effectiveness of feed-forward convolutional architectures on an audio generation task. 
+
+Comments: 	Presented at the 5th International Conference on Learning Representations (ICLR) 2017, Workshop Track, Toulon, France
+Subjects: 	Sound (cs.SD) ; Machine Learning (cs.LG)
+Cite as: 	arXiv:1708.00853 [cs.SD]
+  	(or arXiv:1708.00853v1 [cs.SD] for this version)
+  	https://doi.org/10.48550/arXiv.1708.00853
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Volodymyr Kuleshov [ view email ]
+[v1] Wed, 2 Aug 2017 20:07:39 UTC (1,984 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled Audio Super Resolution using Neural Networks, by Volodymyr Kuleshov and 2 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.SD
+< prev   |   next >
+new | recent | 1708
+Change to browse by:
+cs
+cs.LG
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+DBLP - CS Bibliography
+listing | bibtex
+Volodymyr Kuleshov
+S. Zayd Enam
+Stefano Ermon
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

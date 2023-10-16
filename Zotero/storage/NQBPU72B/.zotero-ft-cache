@@ -1,0 +1,589 @@
+Pergamon
+
+o893-6oso(95)ooosbs
+
+CONTRIBUTED ARTICLE
+
+NeuralNetworks,Vol. 9, No. 4, pp. 695-708, 1996 Published by ElsevierScienceLtd Printed in Great Britain
+0893-6080/96 $15.00+ .00
+
+Wavelet Transforms and Neural Networks for Compression and Recognition
+
+HAROLD SZU, BRIAN TELFER* AND JOSEPH GARCIA
+Naval Surface Warfare Center
+(Received and accepted 22 December 1994)
+Abstract--Robust recognition for image and speech processing needs data compression that preserves features. To accomplish this, we have utilized the discrete wavelet transforms and the continuous wavelet transforms (CWT) together with artificial neural networks (ANN) to achieve automatic pattern recognition. Our approach is motivated by the mathematical analog of the CWT to the human hearing and visual systems, e.g., the so-called Mexican hat and Gabor fanctions, Gaussian window, respectively. We develop an A N N method to construct an optimum mother wavelet that can organize sensor input data in the multiresolution format that seems to become essential for brainstyle computing. In one realization, the architecture of our A N N is similar to that of a radial basisfunction approach, except that each node is a wavelet having three learnable parameters: weight Wij, scale a, and shift b. The node is not a McCullouch-Pitts neuron but a "wave-on". We still use a supervised learning conjugate gradient descent algorithm in these parameters to construct a "super-mother" waveletfrom a superposition o f a set of waveons-mother wavelets. Using these techniques, we can accomplish the signal-enhanced and feature-preserving compression, e.g., on the infrared images, that avoids the overtraining and overfitting that have plagued ANN's ability to generalize and abstract information. Published by Elsevier Science Ltd
+Keywords--Adaptive wavelet transform, Discrete wavelet transform, Data compression, Pattern recognition, Neural networks.
+
+1. INTRODUCTION AND REVIEW
+Open-field automatic pattern recognition (APR) differs in several respects from commercial pattern recognition applications such as character or speech recognition. APR encompasses a wide variety of sensors, e.g., laser radar, radar, sonar, electro-optic, in both passive and active models, and producing a wide variety of signal types, e.g., one-dimensional (lD) signals, two-dimensional (2-D) images, range images. The APR environment is difficult to quantify and noncooperative, with the hostile objects often actively attempting to avoid detection/recognition, as opposed to commercial applications which allow control over the environment to enhance recognizability. The uncontrolled environment leads to a
+Acknowledgement: Support from the NSWCDD Independent Research Program is gratefully acknowledged.
+Requests for reprints should be sent to Harold Szu, Centre for Adv. Comp. Studies, P.O. Box 44330, University of Louisiana, Lafayette, LA 70504-4330, USA.
+* Present address: MIT Lincoln Labs, 244 Wood Street, Lexington, MA 02173, USA.
+
+tremendous variety of types of background clutter, and to partially occluded patterns that can appear in a wide range of scales and aspects. Patterns can also vary greatly due to environmental effects, e.g., the diurnal and climatic variations in infrared imagery. Immense amounts of data must be processed in realtime. Because of the difficulties and expense involved in collecting real data, simulated data must often be used during system development. All of these factors cause APR to be a very difficult problem. For a further introduction to the difficulties of APR, see Roth (1990), Sadjadi (1991) and M I T Lincoln Laboratory Journal (1993).
+In both military and commercial APR, there is an increasing need for data compression in our wireless and wire communication systems for transmitting digital audio and video (e.g., B-ISDN picture phone and two-way television for commerce, education, and polling services). Compressibility is one of the major issues in the development of certain real-time APR systems [e.g., FBI Program in Automatic Fingerprint Identification System (AFIS) at the National Crime Information Center, e.g., to screen traffic violators
+
+696
+
+H. Szu et al.
+
+nation-wide in real-time for those wanted by the FBI]. The other issue is the representation versus the classification (Telfer & Szu, 1993).
+The traditional compression achieves a low bit per pixel (bbp) rate through the IEEE Joint Photographic, Expert Group (JPEG) standard, i.e., implemented by an 8 x 8 pixel moving window using the discrete cosine transform and the Huffman statistical and other run-length compression coding. Recently, the FBI has demonstrated, for fingerprints consisting of ridge discontinuities, that the discrete wavelet transforms (DWT) have achieved a 20:1 compression ratio without any loss of fingerprint minutiae (Hopper, 1994). Furthermore, they have shown the DWT to be fast since the computational complexity is of the order O(N) for N data. In Section 4, this DWT technology is introduced from the historical viewpoint of Haar as the finite impulse response filter bank. Since it consists of a pair of lowpass and highpass filters of finite lengths, it is fast and can filter noise and smooth the signal recursively, thereby permitting the traditional compression scheme. The inverse DWT, which is lossless if the bbp is identical, can synthesize the data and recover an enhanced version. Using multispectral infrared images, we apply the edge-preserving DWT algorithm adopted by FBI and demonstrate 59:1 compression ratio for the infrared imagery and then we apply the continuous wavelet transforms (CWT) to extract the features for artificial neural network (ANN) APR with a much reduced false alarm rate. Since the size of an ANN is usually small, we wish to have a small number of features, making fast data compression desirable.
+The CWT is another compression method having a continuous and selective feature extraction. Because it is directly related to the so-called Mexican hat or the difference of Gaussian (DOG) or the on-centeroff-surround complex cell response function in the human visual system, it is therefore more flexible in extracting features from clutter. We have proved a super-mother theorem that is based on a linear superposition of admissible mother wavelets being itself admissible, and that shows that a smaller number of transform coefficients are required to represent features.
+Since we apply ANN learning to construct a supermother wavelet and use it directly, we develop a recognition algorithm for example to differentiate the vowel of " a " from the other vowels (Szu et al., 1992). Given complex speech data, this concept may be extended if we apply the Morlet wavelet to extract important formant features and then for example we can use an ANN to spot specific phonemes spoken by either a male or female speaker. In this sense, the CWT preprocessing is robust and produces highly compressed features, as the input, without the actual
+
+voiced and unvoiced sounds used in conventional ANNs for APR. Because of the simplicity, there is the possibility to have a real-time integrated system consisting of a wavelet preprocessing chip followed by an ANN post-processing chip.
+Traditionally, APR approaches are both geometric model-based and statistical feature-based (or signature-based) techniques. Model-based methods that employ stored image models are useful for occlusion because parts imply the whole. Feature-based methods are useful if the underlying physicschemistry, e.g., the fuel spectral line ratio, is fully understood and explored. In both cases, some form of data compression and feature extraction is used as an important component of any APR system. Numerous feature extraction methods have been used for automatic target recognition (Szu & Telfer, 1994): Edge detection and Neocognitron-based features (e.g., Daniell et al., 1992), local spatial features (e.g., Thoet et al., 1992), Fourier transform magnitudes (Gorman & Sejnowski, 1988), projection pursuit-based features (Bachmann et al., 1994), and polar-log transforms (Szu & Messner, 1986). For feature-based methods, we have developed new neural network tools employing minimum-misclassification-error (MME) performance (Telfer & Szu, 1994), the adaptive wavelet transform (Szu et al., 1992), and fast annealing techniques (Szu & Hartley, 1987 a,b). The feature-based approach is particularly useful if the feature extraction can be patterned after the human visual system with the capability of selfgeneration of critical features that are locally invariant under the limited variability of motion, intensity, scale and rotation. The wavelet transform, provides both an excellent basis for compression and for selecting time or space/scale features for APR.
+The paper is organized as follows. We introduce the CWT preprocessing in Section 2 from a generalized Fourier transform viewpoint. We then introduce the combination of CWT with an ANN in Section 3. Here we describe how the neuron transfer logic function is replaced by a wavelet kernel function and how a supervised ANN learning may be used to determine an optimum super-mother wavelet when given training data and classification performance measure. We define the DWT from a digital filter theory in Section 4, and describe the data compression of multispectral infrared imagery and give an application in the multispectral infrared pattern recognition in Section 5. We conclude in Section 6.
+2. CONTINUOUS WAVELET TRANSFORMS
+Wavelet transform (WT) is a linear transform similar to the Fourier transform (FT), but generalized for any wideband transient. This generalization becomes efficient from the matched filter viewpoint when the
+
+Wavelet Transforms and Neural Networks for Compression and Recognition
+
+697
+
+kernel is tailor-made to the signal itself. Also, from pedagogical viewpoint, both the WT signal and its wavelet transform happen to share an identical acronym WT. This coincidence says when WT should be used and when not, i.e., the WT is advantageous when applied to wideband transients. Almost all real-world signals are wideband transients, and thus utilization of WT is advantageous in many cases. We emphasize the ability to construct a linear transform kernel (other than sinusoidal functions) as a basis to learn how the brain processes information from the eyes and ears. The relationship to the other orthogonal feature extraction methodology, e.g., Karhunen-Loeve (KL) transform will be given immediately after we define WT.
+Three properties of WT are given as its definition as follows: (i) The transform kernel is a small wave that has a compact support and therefore requires no fixed window. This window employed by the shorttime FT can generate artifacts in case of the high resolution seismic imaging for which the French effort of WT was initiated in 1980. The kernel has no zero frequency, d.c., component, so that the kernel when multiplied by a constant is always integrated to produce a zero area. This attribute is typical of any bandpass filter in producing a change detection. In other words, this change detection is typical to that of human visual experience where any uniform background will not be detected since it will not contribute to the Wavelet expansion. (ii) Wavelet bases are all generated from single template called mother wavelet from a real affine scale a and shift b operations: t - , t ' = (t - b)/a, of which, e.g., a logarithmic base 2 or dyadic representation means a/ao = 2n, b/bo = m for all integer n, m. Consequently, the bandwidth Aj~ of a mother wavelet and its central frequency j~ is maintained at the same value as for all daughters. This definite proportionality constant is called the constant fidelity requirement: Q = f o / A f o . Since any group wave requires a large enough bandwidth Afto produce through interference a small time-localized spread At, the time-bandwidth product of AtAfmust be greater than one. For example, for a high pitch organ pipe fl = 2f0 the corresponding bandwith must be also doubled AJi = 2Af0. Consequently, the organ pipe length becomes shorter Atl = At0/2. That is why a shorter pipe is used for high pitch, in which all the group waves have identical shape with different sizes. (iii) The necessary and sufficient condition for an admissible mother wavelet h(t), to be proved in this Section 2, is that the inversely linear weighted power spectral density IH(f)12/lfl must be integrated over all frequencies to be a finite constant.
+A method commonly used for feature extraction is to compute the spatial pattern covariance and perform a KL transform to find its eigenvectors. This allows the pattern of a certain window size to be
+
+optimally represented (in the least squared sense) under a wide sense stationary assumption as the sum of a small number of eigenvectors with the largest eigenvalues. Potential disadvantages of KL feature extraction are: it relies on fixed windows, with the specified size affecting the results; it assumes stationary samples; it finds the best features for representing the clutter, but not necessarily the best for discriminating between the pattern and target; computing eigenvectors is slow [O(N3) for singular value decomposition of an N x N matrix]. In addition, the eigenvector associated with the largest eigenvalue normally corresponds to the low frequency components including d.c. term and is not best suited for target detection; it may not be a meaningful space-scale feature. Wavelets do provide such features. Wavelet-based feature extraction avoids these disadvantages: there is no fixed window width, since the wavelets are used at different scales; it does not assume stationarity; optimal feature for target detection rather than representation can be chosen; fast transforms exist [O(N) for orthogonal and bi-orthogonal discrete wavelets (Mallat, 1989) and O(NlogN) for continuous wavelets (Rioul & Duhamel, 1992)]. We have developed new methods (Szu et al., 1992; Telfer et al., 1994; Szu & Telfer, 1994) for adaptive wavelet feature extraction that have yielded better results than other common features in an acoustic detection application (Telfer et al., 1994).
+The CWT is easier for adapting its kernel for feature extraction, and the DWT is faster in computation for multiresolution data compression. Since it is concise to introduce the CWT from the continuous FT viewpoint, we define the CWT below and give the DWT later in Section 4.
+Signal analyses have used a windowed or shorttime FT
+
+oo
+
+i G(wlto) =- dtg(t) exp(-jwt)w(tlto), --oo
+
+(1)
+
+where the window function w(tlto) has a fixed width for all frequencies and if it is Gaussian, eqn (1) is a Gabor transform. On the contrary, the WT utilizes a wavelet kernel having compact support of which the time width is a At reduced at smaller scale a < 1 which implies a higher frequency f/a and consequently higher bandwidth Af/a according to the constant fidelity Qo =f/Af, in order to localize the sharp image edge better in Figure 1. Figure 1 shows a comparison between Gabor transform and Morlet wavelet transform for an ideal rooftop/ridge function.
+While a real-world signal is often localized and transient, noise is present everywhere at all frequencies. Consequently, pushing the frequency limit to
+
+698
+
+H. Szu et al.
+
+Wavelet Transform vs. Gabor Transform
+
+Constant
+
+window size
+
+(3
+
+Cb
+
+Cb
+
+Gabor Functions
+
+Gabor Transform
+
+f(t)
+
+Input Signal
+• 71
+
+t.I
+
+1 !
+
+"~
+
+/ ~jW_ \
+
+/
+
+\
+
+(33
+
+Varying
+
+/
+
+\
+
+(3
+
+window size
+
+Wavelets
+
+Wavelet Transform
+
+FIGURE 1. Continuous WT: Comparison between Gabor transform and Morlet wavelet transform for an Ideal rooftop function on a flat
+
+floor without any noise. It shows the wavelet requirement of a constant fidelity Q0 = f l A f which together with the Fourier reciprocity
+
+theorem for a group wave A fA t > 1 Implies e high frequency by a factor 2f which must be associated with twice the bandwidth 2Af, and
+
+consequently the half the window time width ~ t _> 112A f. The visible separation of three singularities of the rooftop function on a fioor.
+
+A short-time Fourier transform that has a fixed Gaussian window is called the Gsbor transform. Morlet wavelet transform Is
+h(t) = exp{ig~0t), e x p ( - t : ) better in locating a roof-top seismic image intensity discontinuity.
+
+achieve higher frequency or shorter wavelength resolution results in a poor signal-to-noise (SNR) ratio because the usual decrease in signal's energy at higher frequencies is compounded with the fixed window that admits an identical amount of (white) noise energy. This drawback was not discovered until the French seismic imaging exploration in the last decade (Combes et al., 1989), for which Morlet (Combes et al., 1989) proposed a wavelet kernel with w0>5
+h(t) = e x p ( - j w o t ) exp(-t2/2) = exp(j5t) exp(-t2/64) (2)
+to achieve an approximately zero integrated area
+J d t e x p ( - j ( w = O)t)h(t) = H ( w = O) = 0
+i.e., no d.c. component, in order to nullify any uniform part of signal echo. The numerical value given in eqn(2) is used in Section 3 to extract the formant over a speech fields of 4096 data points.
+
+Instead of increasing the frequency, the time was relatively shrunken by the affine (scale a, shift b) transform.
+
+t ~ t' = (t- b)/a
+
+(3)
+
+which can generate the complete basis functions h(t) --, h ( t ' ) / ~ / a =- h((t b ) / a ) A / a = hob(t). (4)
+-
+
+The WT is defined similarly to the FT
+oo
+i FT{g(t)} = dtexp(jwt)*g(t) =__(exp(jwt), g(t)) --oo
+a(,,, b) = Wr{g(O} = dtho~(O'g(O - (ho~(tl, g(t)), (5)
+
+where the inner product angular brackets (,) are defined with the complex conjugate*. Similarly, the inverse WT is defined as
+
+Wavelet Transforms and Neural Networks for Compression and Recognition
+
+699
+
+g(t) = F T - ' {FT{g(t')}} = (1/27r) .F~ dw exp (jt) (exp (jwt') , g( tt) )
+
+g(t) = W T - ' {G(a, b)} = (l/c)Jda/a2J dbG(a, b)hab(t)
+
+= (G(a, b), hob(t))
+
+(6)
+
+in terms of 2-D Haar measure [db da/a 2] which is equivalent to the dimensionless time-frequency product [dt dw] where d t ~ - d b , and dw d(I/a) = -da/a 2.
+Substitutingeqn (5) in (6) gives completeness eqn (7) mapping g*(t') identicallyto g(t). The kernel function satisfiesthe completeness condition in the time domain
+
+J da/a 2J dbh~(t)'hab(t') = cr(t - t')
+
+(7)
+
+or rewritten for either even or analytical Fourier amplitude in the Fourier domain:
+
+j~o da'lH(~')1211wl = c < oo,
+
+(8)
+
+--oo
+
+where use is made of FT of a daughter wavelet, eqn
+(4)
+
+Hab(w) = x/ (a)H(w) exp(jwb )
+
+which is related to the FT of the mother wavelet. Note that the instantaneous frequency can be defined by taking the logarithmic derivative of Hab(2) with respect to the shift parameter b
+jw = d(logHab(W))/db
+
+which is the basic formula for Maes and Daubechies (1995) to construct noisy speaker ID problem by the CWT modified Cepstrum approach. Thus, the admissible kernel h(t) should avoid the division-byzero divergence in eqn (6) implying d.c. H(0)= 0 [with an oscillation decay faster than t-I as proved by Daubechies (1993)]. The kernel h(t) has been called a mother wavelet by Morlet, Grossmann, Meyer, Mallat, Coifman and Chui.
+
+3. COMBINE ANN WITH WT--WAVENETS
+Such wavelet features have been shown to be attractive for target detection. Wavelet features chosen to match an object or parts of an object, input to a multilayer perceptron, have been shown to improve detection accuracy in multispectral electrooptical images and in sidescan sonar images (Telfer et
+
+al., 1994). A more powerful approach is to adaptively compute wavelet features in conjunction with the neural network to maximize detection accuracy. This idea has been successfully demonstrated for acoustic backscatter (Telfer et al., 1994) and infrared imagery (Casasent & Smokelin, 1994) detection applications.
+In recognition, wavelet feature orthogonality is not as important as class separation. Since classifiers normally require relatively lengthy off-line training, adapting wavelet features together with the classifier during training is an attractive approach to minimize the misclassification rate. Given an unknown signal with an additive white noise
+s(t) --+s'(t) = s(c~t)
+which has an arbitrary a-scale change, the corresponding wavelet coefficient
+S(a, b) ---+S'(a, b) = S(ota, orb)
+changes likewise along the radial direction of the (a, b) plane. A wedge-shaped filter in the a, b domain was used to collect CWT coefficients with each wedge, which were then passed to the ANN. This is a model of the neural network "optical cochlea" (Szu et al., 1992; Zhang & Benvensite, 1992; Pati & Krishnaprasad, 1993) for scale-invariant classification, as shown in Figure 2 for a real-time implementation.
+Moreover, we wish to match signal class better by adaptively constructing a superposition of admissible mothers called a super-mother wavelet. In so doing the number of terms needed to represent the signals is greatly reduced and each becomes more robust in the sense of the redundancy and stable under perturbation. We state the Adaptive WT theorem of Szu and Telfer (1994) that the linear superposition of admissible mothers is also admissible. This theorem allows us to use both the noisy exemplars and the top-down performance measure, similar to a supervised training strategy used in artificial neural networks to construct a supermother for each phoneme Szu et al. (1992) and Zhang and Benveniste (1992) and Pati and Krishnaprasad (1993). One of our architectures is similar to a radial base function approach, except each base function has different scale size and shift to be determined from the supervised training. Conjugate gradient descent in three variables, the scale, the shift, and the synaptic weight are implemented to produce such "supermothers" representing vowels: "a", "i" and "e", etc.
+Lippman et al. (1993) have demonstrated using a multilayer perceptron, that the variations of the first and second formants are needed to classify ten different phonemes, such as "head, hod, heed, etc." This fact suggests using the Morlet wavelet to extract
+
+700
+
+Acousto-optical cell
+
+~ , ,"ii "
+
+SLM
+
+s(t) ~
+
+"':~::'"
+
+H (2qxa2:f) H (2~aM f)
+
+H. Szu et al.
+
+a
+
+Wedge detector
+
+b
+
+Neural network
+FIGURE 2. Real-time scale-invarlant WT-ANN signal "optical cochlea" classifies. The sound signal s(t) enters as an electrical signal into a acousto-opllcal cell, it generates an ultrasound Inside the crystal, and It modulates the dielectric sontent that affects the coherent
+plane wave passing through it, The cylindrical lens produces a I-D FT to convert the signal to the Fourier domain S(f), which is
+multiplied by several daughter wavelets scaled from Sl to aM coded in the spatial light modulator (SLM). Then, by the Fourier deconvolution theorem, the inverse FT converts a bank of correlations of all wavelets to the output domain scale parameter a versus the time-delay shift b parameter. Then, the theorem states that any scale change of the signal will be translated radially within its wedge.
+
+from the speech local frequency at a constant fidelity Q. We hope to extrapolate the speaker variation of an ordinary sound, e.g., "the seat", from those spoken by a male versus a female speaker. For this example, we found several formants are prominent for the phoneme "e" and thus constructed these formant wavelets correspondingly. This set of formant wavelets can form a bank of matched filters (Figure 3) that can be correlated in parallel with a speech signal, and different weights of each formant can have different importance involving its identification. This weight set could be obtained by a supervised training ANN over multiple speakers. Then, this bank can then be used to segment vowels from the continuous speech with different emphases on each formant for different speakers. All together, these correlation peaks would identify and single out the phonemes involved as shown in Figure 3 on the righthand side. Different dilated versions of the supermothers could be used to identify speech at different speeds. This would serve as the front end of a wavelet neural network classifier, e.g., given a male and female speaker saying "the seat" as shown in the first column of Figure 3: Phoneme spotting by supermothers. This could be done by a single correlation of the input speech with a bank of super-mothers (and column of Figure 3) which only kept those matched phonemes irrespective of a male or female speaker (in third column), and consequently achieving a featurepreserving data compression.
+
+An interesting example is the cocktail party effect in which one can hear one's own name no matter at what pitch it is whispered during a noisy drinking party. In that case, one's name is a wideband transient mother wavelet h(t). Since the daughters called the "wave-ons" are from a set like radial basis functions but related to one another by the affine transform, they can match in parallel the input sound, the name plus noise, with specific daughter neurons. When this happens a winner-take-all can be used to suppress all the other weak SNR contributions from other daughter neurons. This winner-takeall ANN approach has been implemented optically using electron trapping material (Athale et al., 1993). It eliminates other less-matched daughter neurons having more noise contribution than a signal, and thus the wavenet enhances the relative SNR, explaining the cocktail party effect as conjectured (Szu et al., 1992). We wish to comment that Maes and Daubechies (1995) have constructed a noisy speaker ID by the CWT modified Cepstrum approach, based on Section 2 the logarithmic derivative of daughter wavelet delay parameter b, of which an ANN postprocessing would be a natural extension.
+4. DISCRETE WT FROM DIGITAL FILTER BANK VIEWPOINT
+Wavelets form a complete, orthogonal and normalized (CON) coordinate system satisfying a scaling
+
+7500 5000 2500
+< E .2500 .5000
+
+input male and female speakers on "the seat"
+
+2500
+
+5000
+
+7500
+
+10000
+
+Time sample (16 kHz sampling)
+
+(a)
+
+Phonemes-wavelets
+
+Spotted and cept, or rejected 7500
+5000
+2500
+
+2500
+
+5000
+
+9
+
+2500
+
+5000
+
+7500
+
+10000
+
+Time sample (16 kHz sampling)
+
+(a)
+
+1000
+
+000
+
+500
+
+500
+
+= 0
+
+E < -500
+
+-500
+
+-I000
+
+1000
+
+-1500 0
+
+2500
+
+5000
+
+7500
+
+Time sample (16 kHz sampling)
+
+10000
+
+1500 L 0
+
+2500
+
+5000
+
+7500
+
+Time sample (16 kHz sampling)
+
+.0000
+
+(b)
+
+(b)
+
+FIGURE 3. Continuous WT compression and recognition application. Phoneme spotting among various speakers. Continuous speech spoken by a male and female speaker represents the speaker variation. Example "the seat" is shown on the left-hand side. The CWT of the both male and female speeches is performed by a scaled bank of Morlet wavelet transform h(t)-exp(io~t) exp(-t:) where t--~g = (t, 2t, 4t). The result is plotted, in the middle against the time axis showing the distinctive "the" and "s" high frequency sounds on the left-hand side and follows the important
+
+"e" vowel which is characterized with several ferments in both male end female speakers. Thus, we construct three wavelets corresponding to three ferments. The decision by means of an ANN can determine the relative importance of this training set varying from a male to • female speaker when projected onto the ferment wavelets. Likewise, the supervised training result is used to lest the phoneme spotting among other less meaningful sounds so that we can keep the original sound with its original pitch and time ordering by simply deleting the other sound as shown on the
+
+right-hand side.
+
+702
+
+H. Szu et al.
+
+relationship, as suggested by Haar similar to the 45° rotation of the Cartesian coordinates as follows. The simplest orthogonal coordinates are the well-known Cartesian coordinates, e.g.
+x = (1,0,0,0), y - (0, 1,0,0), z-- (0,0, 1,0), andz' = (0,0,0, 1)
+
+because the inner product of any pair of coordinate axes will be zero (by component 0 x 1= 0), implying the orthogonality. Likewise, Haar chose the even-odd orthogonality, namely an even function
+~(t) = (+, +, +, +)
+
+pointing in the first orthant of four positive axes, and an odd function
+~P(t) = ( + , + , - 1 , - 1 )
+
+pointing in the lower orthant of positive x, y, and negative z, and z'. Their inner product gives the result of zero implying the orthogonality in four dimensions (4-D). Furthermore, this property repeats itself in a half interval, if ~b(2t)= ( + ,-,0,0) is chosen pointing in the plane bounded by x > 0 and y < 0, and ~b(2t-1)=(0,0,+,-) pointing in the plane bounded by z > 0 and z' < 0. For example, any 4-D vector, e.g., a ramp g, can be identically expanded in Cartesian or Haar coordinates, because both are complete
+
++++0
+
+5
+
+g--=
+
++ + -0 + - O+
+
+-2 -1 = [H4]G,
+
+(9)
+
++-0-
+
+-1
+
+where the expansion coefficient G is easily computed because of the orthogonal property, i.e., the inverse matrix is the transpose matrix [superscript T indicates the matrix transpose operation if use is made of the basis normalization (4, 4, 2, 2)].
+G - { 5 , - 2 , - 1 , - 1 } r=[H4]-Ig=[H4lrg (10)
+
+which is formally identical to the expansion of CWT: G(a,b) = (hab( t), g( t) ).
+The O(N) computational complexity is due to the matrix reduction (Strang, 1994).
+
+[H2] 0000 l 0 0 ~ ][H2100
+
+[H4] =
+
+001
+
+00
+
+(11)
+
+Io o Ira]
+00
+
+010 000
+
+100 10 00 01
+
+in terms of three reduced matrices
+
+[H2] = I ++ +_ .
+
+(12)
+
+Similarly, [H8] is reduced to [H4]. Zero entries reduce the dense marix of O(N2) to O(N) for large N data. Equation (12) reveals also a base-2 sub-band nature as below.
+The lowpass L and highpass H filters define the scaling function ~band wavelet ~b
+
+L{ck} = {+, +} ~ ~b(t) = ~b(2t)+ ~b(2t- 1)
+
+= ~_, CkCk(2t -- k)
+
+(13)
+
+k
+
+H{dk} = (+, - } ~ ~b(t) = ~b(2t)- ~b(2t- 1)
+
+= ~_, dkqb(2t -- k).
+
+(14)
+
+k
+
+The scaling function eqn (13) of Haar is satisfied by rect(t)=rect(2t) + r e c t ( 2 t - 1) which has {1, 1} coefficients that are equivalent to averaging two neighborhood pixels via the lowpass filter L, eqn (13). Likewise, a Haar wavelet H = { + , -}, eqn (14) is a highpass filter in differencing two neighborhood pixels. Given an arbitrary input signal, say {1, 1} fed in parallel to lowpass L = { + , + }, and to highpass H = { + , - } , then the convolution product gives {1, 1} x {+,. + } = { 1 , 2 , 1} and {1, 1} x { + , - } = { 1 , 0 , - 1}. Because of the smoothing, a smaller number of pixels is needed, and a down sampling decimates every other pixel in both channels giving {1, 2, 1}---~{1, 1}; {1, 0, -1}---*{1, -1}. The receiver for reconstruction takes the up sampling by interpolation, fill-in zeros giving {I,1}---~{1, 0, 1}; {1, -1}---~{1, 0, -1}. Since Haar synthesis filters L+={ - , - } = - 1 x {1, 1} and H + = { + , - } are within an overall constant identical to those of analysis filters, the reconstruction gives {1, 0, 1} x { - , - } = i - I , - 1 , - 1 , -1} and {1, 0, -1} x { + , - } = { 1 , - 1 , -1, 1}, which are added: i-I, -1, -1, -1}+{1, -1, -1, - 1 } = { - 2 , - 2 } = { 1 , 1} x (-2) to reproduce the original {1, I} within a factor. Without the down and up sampling, the system remains lossless, as easily verified with the above example. Such a DWT via the sub-band coding was known in digital filter theory as lossless quadrature mirror filters coined for the mirror symmetry with respect to 27r/4. Only the highpass outputs called detail signals are sent through the channel, the lowpass outputs called reference signals are usually fed back to the input to produce the next level highpass detail signal to be sent through recursively shown in Figure 2. Since the down sampling by two is at every level of recursion, the net number of pixels remains the same N/2+N/4+ .... N. Otherwise, the amount of
+
+Wavelet Transforms and Neural Networks for Compression and Recognition
+
+703
+
+TABLE 1 Analy/islDecompositlon and Synthesl$1ReconMruction Filters
+
+System
+
+L
+
+H
+
+L +
+
+H +
+
+Haar, /-/2
+
+1, 1
+
+1, - 1
+
+-1, -1
+
+1, - 1
+
+Hat, /-/3
+
+1, 2, 1
+
+1, 2, - 6 , 2, 1
+
+-1, 2, 6, 2, -1
+
+1, - 2 , 1
+
+Spline, $4
+
+1, c~, a, 1
+
+1, a, -c~, - 1
+
+-1, e, a, -1
+
+1, - a , a, - 1
+
+Spline, So,7 0.04, -0.02, -0.1, 0.4, 0.9, 0.4, -0.1, -0.02, 0.04; -1 x even L; -0.06, -0.04, 0.8, 0.4, -0.04, -0.06; -1 x odd H
+
+Daubechies 4 xD4 1 4- ~/3, 3 4- ~/3, 3 - ~/3, 1 - ~/3; 1 - ~/3, - 3 4- ~/3, 3 4- ,,/3, - 1 - ~/3; identical
+
+L a p l a c i a n pyramid 1 4- 2a, 1, 4a, 1, 1 - 2 a ; difference image;
+
+identical
+
+data to be stored in the original (Laplacian pyramid) algorithm would prohibitively increase. Such a down sampling, however, sensitizes the quantization or alignment errors. Daubechies (1992) was the first to go beyond Haar's system, by assuming analysis filters
+
+L and H equal to synthesis filters L ÷ and H +, and moreover made the simplification Ansatz
+
+I. = (co, Ch c~, c3); H = (c3, - c2, cl, - co)
+
+(15)
+
+FIGURE 4. Discrete WT data compression and recognition application. Given the immense throughput rate of the 6 band mulUspectrel infrared imagery shown in (a), the goal is to detect in reel time the blob-Iike man-made objects on a beach. A single frame is given in (b) and the application of biorthogonal subband coding using S,.z (given in Table 1) in four levels lterative and decimation is shown in (c). The DWT is based on a biorthogonal subband coding system that has the standard FBI filter bank design: seven and nine coefficients for the respective low-pass and high-pass filters. The compression ratio of 59:1 is accomplished due to the nonumiform quantization to a few bits depending on the repeated filtering and decimation in half over four levels shown in (d). The reconstructed image is shown in (e). We have simultaneously achieved infrared sensor non-uniformity compensation, sensor denoising and edge-preserving data compression, as demonstrated by the frame differencing between (b) and (e) shown in (f). When the result of decompression via the inverse DWT synthesis is passed through a CWT feature extractor and then followed by an ANN APR, we obtain a good result shown in the right-hand side of (g) in contrast to the identical ANN APR without the CWT wavelet preproceseing shown on the left-hand side.
+
+704
+
+H. Szu et al.
+
+FIGURE 4b.
+
+which guarantees the orthogonality between the low
+
+co c3
+
+and high-pass filters, and also reduced eight unknowns c’s and d’s to four unknowns c’s, so that
+
+co Cl c2
+
+c3
+
+“c: -;;
+
+= I=:
+
+;)I.
+
+(16)
+
+the self-adjoint system forms a unitary matrix (called
+
+c3 -c2
+
+Cl - co
+
+paraunitary by Vetterli and Herley, 1992)
+
+c3 - co
+
+FIGURE 4c.
+
+Wavelet Transforms and Neural Networks for Compression and Recognition
+
+705
+
+63 31 31 31 15
+3
+15 7
+0
+0
+
+0
+
+0
+
+(d)
+FIGURE 4d.
+
+Only four equations are needed to determine four o's: (i) The low-pass scaling eqn (13) is normalized by J'dt~b(t)=l, which yields cl+c2+ca+c4=2. (ii) To extract the change, the high-pass wavelet filter H, eqn (14) should nullify a constant (1,1,1,1): c 3 - c2 ÷ C l - co = 0, and also (iii) nullify a linear ramp (1,2,3,4): c3 - 2c2 + 3cl - 4c0 = 0. (iv) Two daughter wavelets should be orthogonal in a shift by two: (c3, - c 2 , cl - co, O, O) (0, O, c3, - c 2 , c l , - c o ) r = clc3 + coc2 = 0. This set determines uniquely four filter coefficients L = (1,3,3, 1)/ 4 + (1, 1 , - 1 , - 1 ) ~/(3)/4 shown in Table 1. A contribution of WT to the filter bank theory was the discovery of the
+
+importance of the regularity condition which means that solving the scaling function ¢(t) of eqn (13) by recursion should converge stably, and then a shifted version ~ ( 2 t - k) gives the wavelet eqn (14). Then, continuous WT: (g(t), ~b(t)) can be approximated by discrete WT: filter bank convolution product: g, H recursively in an iterative fashion by feedback of the low-pass output to the pair of filters. Note that for data compression application of the regularity condition is necessary for repeated usage of the filter, but not sufficient for it can still yield a unsymmetric scaling function (and sometimes even fractal-like) which is less suited for image compression. This is because for DWT the image value at a boundary is extrapolated by assuming usually a mirror-symmetric value with respect to the image boundary in order to minimize the discontinuity effect. A symmetric scaling function in four taps is still unitary in a biorthogonal system L ~ L+; H ~ H + o f eight coefficients (Table 1)
+
+1, or, or, 1 [ o~
+1, ~, --(~, --1 c~
+--1
+
+I2~2 -- 2
+
+0
+
+= 0
+
+--2~2 +2
+
+5. IMAGE COMPRESSION AND ANN CLASSIFICATION
+In Table 1, only the Spline $9,7 system, whose L of nine coefficients and the adjoint L+ of seven
+
+FIGURE 4e.
+
+706
+
+H. Szu et al.
+
+FIGURE 4f.
+
+coefficients satisfies the regularity conditions is symmetric for easy extrapolation of mirrorsymmetric boundary condition. Therefore it is suited for image compression, as demonstrated by Antonini et al. (1992). In fact, the FBI (Hopper, 1994) has developed a "lossless" 20:1 (approximate) fingerprint compression that will become an important part of a real-time nation-wide fingerprint ID system.
+The synergism between (9, 7) biorthogonal FBI wavelet chips with neural chips may push the frontier of information and automation technologies. Since DWT is linear, it merely rearranges the information content. Data compression must result from non-uniform requirement of pixel dynamic range generated by successive filter bank operations. The data compression exploits the fact that a filtered image which has less detail requires fewer bbp. In so doing the convergence of recursive filtering depends crucially on the stability of the filter under the iteration, the so-called regularity property. Since for a biorthogonal system analysis L synthesis L+, both must be regular. Unfortunately, the simple 4 tap L+ is not regular. As a byproduct, one can achieve noise suppression or clutter rejection by means of selective reconstruction. In Figure 4 we have applied $9,7 recursively to four levels to a multispectral infrared imagery and shown that when the detail output at the first level was eliminated, the non-uniform infrared sensor noise (appearing as diagonal waves in two sub-bands) has been eliminated while preserving the target features at 59:1 compression ratio. We have demonstrated that with and without wavelet feature extraction the performance of ANN classi-
+
+tier of the mine fields is quite different (Telfer & Szu, 1993).
+6. CONCLUSION
+We have compared mathematically, the functionality of ears and eyes with the CWT parallel inputs to ANN to produce a redundant and yet complete multiresolution analysis input. The DWT is introduced to be CON basis used in digital filter theory as the subband coding with the added regularity condition derived from mathematical wavelet theory. Such a smart and fast preprocessing can accomplish a feature-preserving data compression that avoids the overtraining or overfitting plagued the ANN's ability of generalization and abstraction.
+ANN is a democratic voting scheme among hidden layer neurons without hidden agenda. WT is a bank of constant Q matched filters, that is an efficient way to produce more correlation peaks than single matched filter peak. Then, the committee member consisting of daughter wavelets, one for each input neurons can be trained by ANN supervised learning to weight differently each neuron output voting.
+Since WT is a systematic MRA scheme, and it produces local frequency content written conveniently in terms of the linear, first order time-scaling/ frequency joint representation, as opposed to the second-order Wigner distribution and Woodward ambiguity function which tend to produce cross talks. More voter participation in ANN may help resolve the mini-max conflicting requirement that we wish to
+
+Wavelet Transforms and Neural Networksfor Compression and Recognition
+
+707
+
+FIGURE 4g.
+
+group alike as closely as possible and segregate the dislikes as far apart as possible (Szu, 1992).
+We believe that the combination of Contifiuous WT and ANN is a powerful paradigm for pattern recognition, and the DWT is a fast MRA algorithm to provide different dynamic range requirement for bpp data compression accordingly. Together, we have demonstrated compression followed by recognition giving us a better SNR and an improved performance of the receiver operation characteristics of the detection probability against the false alarm rate.
+REFERENCES
+Antonini, M., Barlaud, M., Mathieu, P. & Daubechies, I. (1992). Image coding using wavelet transform. IEEE Transactions on Image Processing, 2(2), 205-220.
+Bachmann, C. M., Musman, S. A., Luong, D. & Schultz, A. (1994). Unsupervised BCM projection pursuit algorithms for classification of simulated radar presentations. Neural Networks, 7, 709728.
+Baum, E. B. & Haussler, D. (1989). What size net gives valid generalization? Neural Computation, 2, 151-160.
+Casasent, D. & Smokelin, J.-S. (1994). Neural net design of macro Gabor wavelet filters for distortion-invariant object detection in clutter. Optical Engineering, 33, 2264-2271.
+Combes, J. M., Grossmann, A. & Tchamitchian, P. (Eds.) (1989) Wavelets: Time-frequency methods and phase space. New York: Springer.
+Daubechies, I. (1992) Ten lectures on wavelets. Philadelphia, PA: SIAM.
+Daniell, C. E., Kemsley, D. H., Lincoln, W. P., Tackett, W. A. & Baraghimian, G. A. (1992). Artificial neural networks for automatic target recognition. Optical Engineering, 31, 25212531.
+Haar, A. (1910). Zur Theorie der orthogonalen Funktionensysteme. Mathematical Annals, 69, 331-371.
+Hopper, T. (1994). Compression of grey-scale fingerprint images. In Wavelet applications, Proceedings of SPIE, Vol. 2242, pp. 180-187, 5-8 April, Orlando.
+Fogler, R. J., Koch, M. W., Moya, M. M., Hostetler, L. D. & Hush, D. R. (1992). Feature discovery via neural networks for object recognition in SAR imagery. Proceedings of the
+
+International Joint Conference on Neural Networks, Vol. IV, pp. 408-413. Gorman, R. P. & Sejnowski, T. J. (1988). Analysis of hidden units in a layered network trained to classify sonar targets. Neural Networks, 1, 75-89. Hampshire, J. (1993). A differential theory of learning for efficient statistical pattern recognition. Ph.D. dissertation, Carnegie Mellon University, Electrical Engineering Department. Hampshire, J. & Waibel, A. (1990). A novel objective function for improved phoneme recognition using time delay neural networks. IEEE Transactions on Neural Networks, 2, 216-228. M I T Lincoln Laboratory Journal (1993). Special issue on automatic target recognition, Spring, Vol. 6. Rioul, O. & Duhamel, P. (1992). Fast algorithms for discrete and continuous wavelet transforms. IEEE Trans. lnfo. Theory, 38, 569-586. Roth, M. W. (1990). Survey of neural network technology for automatic target recognition. IEEE Transactions on Neural Networks, 2, 28-43. Ruck, D. W., Rogers, S. K., Kabrisky, M. & Miller, J. P. (1988). Multisensor target detection and classification. Proceedings of SPIE, 931, 14-21. Ruck, D. W., Rogers, S. K., Kabrisky, M., Oxley, M. E. & Suter, B. W. (1990). The multilayer perceptron as an approximation to a Bayes optimal discriminant function. IEEE Transactions on Neural Networks, 2, 296-298. Lippmann, R. P., Kukolich, L. & Singer, E. (1993). LNKnet: Neural network, machine-learning, and statistical software for pattern classification. The Lincoln Lab Journal, 6, 249-268. Mallat, S. (1989). A theory of multiresolution signal decomposition: The wavelet representation. IEEE Transactions on Pattern Analysis and Machine Intelligence, PAMI-11, 674-693. Mallat, S. & Zhang, Z. (1993). Matching pursuit with timefrequency dictionaries. IEEE Transactions on Signal Processing. Pati, Y. C. & Krishnaprasad, P. S. (1993). Analysis and synthesis of feedforward neural networks using discrete affine wavelet transforms. IEEE Transactions on Neural Networks, 4, 73-85. Strang, G. (1994) Wavelets. American Scientist, 82, 150-255. Sheng, Y., Roberge, D., Szu, H. & Lu, T. (1993). Optical wavelet matched filters for shift-invariant pattern recognition. Optics Letters, lg(2), 209-301. Szu, H., Telfer, B. & Kadambe, S. (1992). Neural network adaptive wavelets for signal representation and classification. Optical Engineering, 31(9), 1907-1916. Szu, H. & Teller, B. (1994). Mathematics of adaptive wavelet transforms: Relating continuous with discrete transforms. Optical Engineering, 33(7), 2111-2124. Szu, H., Hsu, C., Thaker, P. & Zaghioul, M. (1994). Image wavelet
+
+708
+transforms implemented by discrete wavelet chips. Optical Engineering, 33(7), 2310-2325. Szu, H., Sheng, Y. & Chen, J. (1992). Wavelet transform as a bank of matched filters. Applied Optics, 31(6), 3267-3277. Szu, H., Yang, X.-Y., Tetfer, B. & Sheng, Y. (1993). Neural network and wavelet transform for scale-invariant data classification. Physical Reviews E, 48(2), 1497-1501. Szu, H. & Hartley, R. (1987a). Fast simulated annealing. Physical Letters A, 122, 157-162. Szu, H. & Hartley, R. (1987b). Nonconvex optimization by fast simulated annealing. Proceedings of the IEEE, 75, 1538-1540. Szu, H. & Messner, R. (1986). Adaptive invariant novelty filters. Proceedings of the 1EEE, 74, 519-520. Sadjadi, F. (1991), Automatic object recognition: Critical issues and current approaches. Proceedings of SPIE, 1471, 303--313. Telfer, B. & Szu, H. (1994). Energy functions for minimizing misclassification error with minimum-complexity networks. Neural Networks, 7, 809-818.
+
+H. Szu et al.
+Telfer, B., Szu, H., Dobeek, G., Garcia, J., Ko, H., Dubey, A. & Witherspoon, N. (1994). Adaptive wavelet classification of acoustic backscatter and imagery. Optical Engineering, 33, 2192-2203.
+Thoet, W. A., Rainey, T. G., Brettle, D. W., Slutz, L. A. & Weingard, F. S. (1992). ANVIL neural network program for three-dimensional automatic target recognition. Optical Engineering, 31, 2532-2539.
+Zhang, Q. & Benveniste, A. (1992). Wavelet networks. 1EEE Transactions on Neural Networks, 3, 889-898.
+Vetterli, M. & Herley, C. (1992) Wavelets and filter bank: theory and design. 1EEE Transactions on Signal Processing, 40(9), 2207-2232.
+Maes, S. & Daubechies, I. (1995). Private communication for SPIE Wavelet Applications Conference (Chair Szu) April 17-20, Orlando.
+

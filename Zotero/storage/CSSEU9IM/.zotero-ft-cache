@@ -1,0 +1,148 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    References (39)
+    Cited by (79) 
+
+Elsevier
+Neural Networks
+Volume 9, Issue 4 , June 1996, Pages 695-708
+Neural Networks
+Contributed article
+Wavelet transforms and neural networks for compression and recognition
+Author links open overlay panel Harold Szu , Brian Telfer ∗ , Joseph Garcia
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/0893-6080(95)00051-8 Get rights and content
+Abstract
+
+Robust recognition for image and speech processing needs data compression that preserves features. To accomplish this, we have utilized the discrete wavelet transforms and the continuous wavelet transforms (CWT) together with artificial neural networks (ANN) to achieve automatic pattern recognition. Our approach is motivated by the mathematical analog of the CWT to the human hearing and visual systems, e.g., the so-called Mexican hat and Gabor functions, Gaussian window, respectively. We develop an ANN method to construct an optimum mother wavelet that can organize sensor input data in the multiresolution format that seems to become essential for brainstyle computing. In one realization, the architecture of our ANN is similar to that of a radial basis function approach, except that each node is a wavelet having three learnable parameters: weight W ij , scale a, and shift b. The node is not a McCullouch-Pitts neuron but a “wave-on”. We still use a supervised learning conjugate gradient descent algorithm in these parameters to construct a “super-mother” wavelet from a superposition of a set of waveons-mother wavelets. Using these techniques, we can accomplish the signal-enhanced and feature-preserving compression, e.g., on the infrared images, that avoids the overtraining and overfitting that have plagued ANN's ability to generalize and abstract information.
+References (39)
+
+    C.M. Bachmann et al.
+    Unsupervised BCM projection pursuit algorithms for classification of simulated radar presentations
+    Neural Networks
+    (1994)
+    R.P. Gorman et al.
+    Analysis of hidden units in a layered network trained to classify sonar targets
+    Neural Networks
+    (1988)
+    H. Szu et al.
+    Fast simulated annealing
+    Physical Letters A
+    (1987)
+    M. Antonini et al.
+    Image coding using wavelet transform
+    IEEE Transactions on Image Processing
+    (1992)
+    E.B. Baum et al.
+    What size net gives valid generalization?
+    Neural Computation
+    (1989)
+    D. Casasent et al.
+    Neural net design of macro Gabor wavelet filters for distortion-invariant object detection in clutter
+    Optical Engineering
+    (1994)
+    I. Daubechies
+    C.E. Daniell et al.
+    Artificial neural networks for automatic target recognition
+    Optical Engineering
+    (1992)
+    A. Haar
+    Zur Theorie der orthogonalen Funktionensysteme
+    Mathematical Annals
+    (1910)
+
+View more references
+Cited by (79)
+
+    Tucker network: Expressive power and comparison
+    2023, Neural Networks
+    Show abstract
+    Deep cepstrum-wavelet autoencoder: A novel intelligent sonar classifier
+    2022, Expert Systems with Applications
+    Citation Excerpt :
+
+    The background of the wavelet network and autoencoder will be briefly represented in this section. Generally speaking, Wavelet Network (WN) is produced by combining wavelet and neural network (Szu et al., 1996). The WN including three layers: the input layer (with Np input nodes), the hidden layer, consisting of Q wavelets, and the output layer.
+    Show abstract
+    Evolving multi-dimensional wavelet neural networks for classification using Cartesian Genetic Programming
+    2017, Neurocomputing
+    Citation Excerpt :
+
+    The wavelet transform has been used in pattern recognition, signal processing and compression applications for its ability to extract information from signals at either high time or frequency resolutions [1–3].
+    Show abstract
+    Wavelet fuzzy cognitive maps
+    2017, Neurocomputing
+    Show abstract
+    Gabor Wavelets Based Word Retrieval from Kannada Documents
+    2016, Procedia Computer Science
+    Show abstract
+    An adaptive wavelet differential neural networks based identifier and its stability analysis
+    2012, Neurocomputing
+    Citation Excerpt :
+
+    Wavelet neural networks (WNNs) have the advantage over NNs in a sense that they can capture local information. Many researchers [15–19] have used such structures for solving approximation, classification, prediction, control and many other problems. The existing WNNs are classified into two categories: fixed grid WNNs and adaptive WNNs [19].
+    Show abstract
+
+View all citing articles on Scopus
+
+∗
+
+    Present address: MIT Lincoln Labs, 244 Wood Street, Lexington, MA 02173, USA.
+
+View full text
+Copyright © 1996 Published by Elsevier Ltd.
+Recommended articles
+
+    A wavelet gradient sparsity based algorithm for reconstruction of reduced-view tomography datasets obtained with a monochromatic synchrotron-based X-ray source
+    Computerized Medical Imaging and Graphics, Volume 69, 2018, pp. 69-81
+    S. Ali Melli , …, Ahmed M. Hasan
+    An improved speech enhancement algorithm for dual-channel mobile phones using wavelet and genetic algorithm
+    Computers & Electrical Engineering, Volume 62, 2017, pp. 692-705
+    Wahbi Nabi , …, Adnane Cherif
+    Blowup solutions for the generalized two-component Camassa–Holm system on the circle
+    Nonlinear Analysis: Theory, Methods & Applications, Volume 105, 2014, pp. 120-133
+    Fei Guo , Weiwei Peng
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 79 
+
+Captures
+
+    Exports-Saves: 1
+    Readers: 33 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

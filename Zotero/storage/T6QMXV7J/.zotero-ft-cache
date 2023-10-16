@@ -1,0 +1,87 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > eess > arXiv:2210.13438
+
+Help | Advanced Search
+Search
+Electrical Engineering and Systems Science > Audio and Speech Processing
+(eess)
+[Submitted on 24 Oct 2022]
+Title: High Fidelity Neural Audio Compression
+Authors: Alexandre Défossez , Jade Copet , Gabriel Synnaeve , Yossi Adi
+Download a PDF of the paper titled High Fidelity Neural Audio Compression, by Alexandre D\'efossez and 3 other authors
+Download PDF
+
+    Abstract: We introduce a state-of-the-art real-time, high-fidelity, audio codec leveraging neural networks. It consists in a streaming encoder-decoder architecture with quantized latent space trained in an end-to-end fashion. We simplify and speed-up the training by using a single multiscale spectrogram adversary that efficiently reduces artifacts and produce high-quality samples. We introduce a novel loss balancer mechanism to stabilize training: the weight of a loss now defines the fraction of the overall gradient it should represent, thus decoupling the choice of this hyper-parameter from the typical scale of the loss. Finally, we study how lightweight Transformer models can be used to further compress the obtained representation by up to 40%, while staying faster than real time. We provide a detailed description of the key design choices of the proposed model including: training objective, architectural changes and a study of various perceptual loss functions. We present an extensive subjective evaluation (MUSHRA tests) together with an ablation study for a range of bandwidths and audio domains, including speech, noisy-reverberant speech, and music. Our approach is superior to the baselines methods across all evaluated settings, considering both 24 kHz monophonic and 48 kHz stereophonic audio. Code and models are available at this http URL . 
+
+Comments: 	Preprint
+Subjects: 	Audio and Speech Processing (eess.AS) ; Artificial Intelligence (cs.AI); Sound (cs.SD); Machine Learning (stat.ML)
+Cite as: 	arXiv:2210.13438 [eess.AS]
+  	(or arXiv:2210.13438v1 [eess.AS] for this version)
+  	https://doi.org/10.48550/arXiv.2210.13438
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Alexandre Defossez [ view email ]
+[v1] Mon, 24 Oct 2022 17:52:02 UTC (639 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled High Fidelity Neural Audio Compression, by Alexandre D\'efossez and 3 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+eess.AS
+< prev   |   next >
+new | recent | 2210
+Change to browse by:
+cs
+cs.AI
+cs.SD
+eess
+stat
+stat.ML
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+1 blog link
+( what is this? )
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

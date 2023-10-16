@@ -1,0 +1,127 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Conferences > 2020 54th Asilomar Conference...
+A Review of On-Device Fully Neural End-to-End Automatic Speech Recognition Algorithms
+Publisher: IEEE
+Cite This
+PDF
+Chanwoo Kim ; Dhananjaya Gowda ; Dongsoo Lee ; Jiyeon Kim ; Ankur Kumar ; Sungsoo Kim ; Abhinav Garg ; Changwoo Han
+All Authors
+11
+Cites in
+Papers
+462
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    1.
+    INTRODUCTION
+    2.
+    NEURAL NETWORK COMPONENTS FOREND-TO-END SPEECH RECOGNITION
+    3.
+    END-TO-END SPEECH RECOGNITIONARCHITECTURES
+    4.
+    APPROACHES FOR FURTHER PERFORMANCE IMPROVEMENT
+    5.
+    COMPRESSION
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+Abstract:
+In this paper, we review various end-to-end automatic speech recognition algorithms and their optimization techniques for on-device applications. Conventional speech recognition systems comprise a large number of discrete components such as an acoustic model, a language model, a pronunciation model, a text-normalizer, an inverse-text normalizer, a decoder based on a Weighted Finite State Transducer (WFST), and so on. To obtain sufficiently high speech recognition accuracy with such conventional speech recognition systems, a very large language model (up to 100 GB) is usually needed. Hence, the corresponding WFST size becomes enormous, which prohibits their on-device implementation. Recently, fully neural network end-to-end speech recognition algorithms have been proposed. Examples include speech recognition systems based on Connectionist Temporal Classification (CTC), Recurrent Neural Network Transducer (RNN-T), Attention-based Encoder-Decoder models (AED), Monotonic Chunk-wise Attention (MoChA), transformer-based speech recognition systems, and so on. These fully neural network-based systems require much smaller memory footprints compared to conventional algorithms, therefore their on-device implementation has become feasible. In this paper, we review such end-to-end speech recognition models. We extensively discuss their structures, performance, and advantages compared to conventional algorithms.
+Published in: 2020 54th Asilomar Conference on Signals, Systems, and Computers
+Date of Conference: 01-04 November 2020
+Date Added to IEEE Xplore : 03 June 2021
+ISBN Information:
+ISSN Information:
+INSPEC Accession Number: 20800141
+DOI: 10.1109/IEEECONF51394.2020.9443456
+Publisher: IEEE
+Conference Location: Pacific Grove, CA, USA
+1. INTRODUCTION
+
+The advent of deep learning techniques has dramatically improved accuracy of speech recognition models [1]. Deep learning techniques first saw success by replacing the Gaussian Mixture Model (GMM) of the Acoustic Model (AM) part of the conventional speech recognition systems [2] with the Feed-Forward Deep Neural Networks (FF-DNNs), further with Recurrent Neural Network (RNN) such as the Long Short-Term Memory (LSTM) networks [3] or Convonlutional Neural Networks (CNNs). In addition to this, there have been improvements in noise robustness by using models motivated by auditory processing [4], [5], [6], data augmentation techniques [7], [8], [9], and beam-forming [10]. Thanks to these advances, voice assistant devices such as Google Home [11] and Amazon Alexa have been widely used at home environments.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+More Like This
+Gradient-free decoding parameter optimization on automatic speech recognition
+
+2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+
+Published: 2014
+Limited-Memory BFGS Optimization of Recurrent Neural Network Language Models for Speech Recognition
+
+2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+
+Published: 2018
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

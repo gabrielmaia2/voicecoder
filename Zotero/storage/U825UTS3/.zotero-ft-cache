@@ -1,0 +1,130 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Journals & Magazines > Proceedings of the IEEE > Volume: 108 Issue: 4
+Model Compression and Hardware Acceleration for Neural Networks: A Comprehensive Survey
+Publisher: IEEE
+Cite This
+PDF
+Lei Deng ; Guoqi Li ; Song Han ; Luping Shi ; Yuan Xie
+All Authors
+360
+Cites in
+Papers
+1
+Cites in
+Patent
+22553
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    Introduction, Motivation, Andoverview
+    II.
+    Brief Preliminaries of Neural Networks
+    III.
+    Neural Network Compression: Algorithms
+    IV.
+    Neural Network Acceleration: Hardware
+    V.
+    Summary and Discussion
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+Abstract:
+Domain-specific hardware is becoming a promising topic in the backdrop of improvement slow down for general-purpose processors due to the foreseeable end of Moore's Law. Machine learning, especially deep neural networks (DNNs), has become the most dazzling domain witnessing successful applications in a wide spectrum of artificial intelligence (AI) tasks. The incomparable accuracy of DNNs is achieved by paying the cost of hungry memory consumption and high computational complexity, which greatly impedes their deployment in embedded systems. Therefore, the DNN compression concept was naturally proposed and widely used for memory saving and compute acceleration. In the past few years, a tremendous number of compression techniques have sprung up to pursue a satisfactory tradeoff between processing efficiency and application accuracy. Recently, this wave has spread to the design of neural network accelerators for gaining extremely high performance. However, the amount of related works is incredibly huge and the reported approaches are quite divergent. This research chaos motivates us to provide a comprehensive survey on the recent advances toward the goal of efficient compression and execution of DNNs without significantly compromising accuracy, involving both the high-level algorithms and their applications in hardware design. In this article, we review the mainstream compression approaches such as compact model, tensor decomposition, data quantization, and network sparsification. We explain their compression principles, evaluation metrics, sensitivity analysis, and joint-way use. Then, we answer the question of how to leverage these methods in the design of neural network accelerators and present the state-of-the-art hardware architectures. In the end, we discuss several existing issues such as fair comparison, testing workloads, automatic compression, influence on security, and framework/hardware-level support, and give promising topics in this field and the possible ...
+(Show More)
+Published in: Proceedings of the IEEE ( Volume: 108 , Issue: 4 , April 2020 )
+Page(s): 485 - 532
+Date of Publication: 20 March 2020
+ISSN Information:
+INSPEC Accession Number: 19527856
+DOI: 10.1109/JPROC.2020.2976475
+Publisher: IEEE
+Funding Agency:
+I. Introduction, Motivation, Andoverview
+
+Deep structure endows deep neural networks (DNNs) [1] the ability to learn high-level features from big data. This powerful representation distinguishes itself from the traditional ways using hand-crafted features and enables impressive breakthroughs in a myriad of artificial intelligence (AI) applications, including image and speech recognition, natural language processing, object detection, autonomous driving, medical diagnosis, and game playing. Nowadays, DNNs have become the mainstay of AI tasks in both academia and industry.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+More Like This
+Review of prominent strategies for mapping CNNs onto embedded systems
+
+IEEE Latin America Transactions
+
+Published: 2020
+A review of CNN accelerators for embedded systems based on RISC-V
+
+2022 IEEE International Conference on Omni-layer Intelligent Systems (COINS)
+
+Published: 2022
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

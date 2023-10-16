@@ -1,0 +1,97 @@
+
+Skip to main content
+Cornell University
+We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate
+arxiv logo > cs > arXiv:1710.09282
+
+Help | Advanced Search
+Search
+Computer Science > Machine Learning
+(cs)
+[Submitted on 23 Oct 2017 ( v1 ), last revised 14 Jun 2020 (this version, v9)]
+Title: A Survey of Model Compression and Acceleration for Deep Neural Networks
+Authors: Yu Cheng , Duo Wang , Pan Zhou , Tao Zhang
+Download a PDF of the paper titled A Survey of Model Compression and Acceleration for Deep Neural Networks, by Yu Cheng and 3 other authors
+Download PDF
+
+    Abstract: Deep neural networks (DNNs) have recently achieved great success in many visual recognition tasks. However, existing deep neural network models are computationally expensive and memory intensive, hindering their deployment in devices with low memory resources or in applications with strict latency requirements. Therefore, a natural thought is to perform model compression and acceleration in deep networks without significantly decreasing the model performance. During the past five years, tremendous progress has been made in this area. In this paper, we review the recent techniques for compacting and accelerating DNN models. In general, these techniques are divided into four categories: parameter pruning and quantization, low-rank factorization, transferred/compact convolutional filters, and knowledge distillation. Methods of parameter pruning and quantization are described first, after that the other techniques are introduced. For each category, we also provide insightful analysis about the performance, related applications, advantages, and drawbacks. Then we go through some very recent successful methods, for example, dynamic capacity networks and stochastic depths networks. After that, we survey the evaluation matrices, the main datasets used for evaluating the model performance, and recent benchmark efforts. Finally, we conclude this paper, discuss remaining the challenges and possible directions for future work. 
+
+Comments: 	Published in IEEE Signal Processing Magazine, updated version including more recent works
+Subjects: 	Machine Learning (cs.LG) ; Computer Vision and Pattern Recognition (cs.CV)
+Cite as: 	arXiv:1710.09282 [cs.LG]
+  	(or arXiv:1710.09282v9 [cs.LG] for this version)
+  	https://doi.org/10.48550/arXiv.1710.09282
+Focus to learn more
+arXiv-issued DOI via DataCite
+Submission history
+From: Yu Cheng [ view email ]
+[v1] Mon, 23 Oct 2017 20:16:55 UTC (903 KB)
+[v2] Mon, 30 Oct 2017 01:22:14 UTC (952 KB)
+[v3] Sun, 5 Nov 2017 00:12:34 UTC (903 KB)
+[v4] Sat, 18 Nov 2017 07:54:57 UTC (912 KB)
+[v5] Wed, 13 Dec 2017 21:10:49 UTC (837 KB)
+[v6] Mon, 21 Jan 2019 23:34:25 UTC (904 KB)
+[v7] Thu, 7 Feb 2019 05:07:15 UTC (904 KB)
+[v8] Sun, 8 Sep 2019 16:30:38 UTC (407 KB)
+[v9] Sun, 14 Jun 2020 19:10:03 UTC (246 KB)
+Full-text links:
+Access Paper:
+
+    Download a PDF of the paper titled A Survey of Model Compression and Acceleration for Deep Neural Networks, by Yu Cheng and 3 other authors
+    Download PDF
+    PostScript
+    Other Formats 
+
+( view license )
+Current browse context:
+cs.LG
+< prev   |   next >
+new | recent | 1710
+Change to browse by:
+cs
+cs.CV
+References & Citations
+
+    NASA ADS
+    Google Scholar
+    Semantic Scholar
+
+2 blog links
+( what is this? )
+DBLP - CS Bibliography
+listing | bibtex
+Yu Cheng
+Duo Wang
+Pan Zhou
+Tao Zhang
+a export BibTeX citation Loading...
+Bookmark
+BibSonomy logo Reddit logo
+Bibliographic Tools
+Bibliographic and Citation Tools
+Bibliographic Explorer Toggle
+Bibliographic Explorer ( What is the Explorer? )
+Litmaps Toggle
+Litmaps ( What is Litmaps? )
+scite.ai Toggle
+scite Smart Citations ( What are Smart Citations? )
+Code, Data, Media
+Demos
+Related Papers
+About arXivLabs
+Which authors of this paper are endorsers? | Disable MathJax ( What is MathJax? )
+
+    About
+    Help
+
+    contact arXiv Click here to contact arXiv Contact
+    subscribe to arXiv mailings Click here to subscribe Subscribe
+
+    Copyright
+    Privacy Policy
+
+    Web Accessibility Assistance
+
+    arXiv Operational Status
+    Get status notifications via email or slack
+

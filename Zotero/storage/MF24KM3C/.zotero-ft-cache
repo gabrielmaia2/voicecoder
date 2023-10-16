@@ -1,0 +1,130 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Conferences > 2016 IEEE International Confe...
+On the compression of recurrent neural networks with an application to LVCSR acoustic modeling for embedded speech recognition
+Publisher: IEEE
+Cite This
+PDF
+Rohit Prabhavalkar ; Ouais Alsharif ; Antoine Bruguier ; Lan McGraw
+All Authors
+40
+Cites in
+Papers
+2
+Cites in
+Patents
+702
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    1.
+    Introduction
+    2.
+    Related Work
+    3.
+    Model Compression
+    4.
+    Experimental Setup
+    5.
+    Results
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+Abstract:
+We study the problem of compressing recurrent neural networks (RNNs). In particular, we focus on the compression of RNN acoustic models, which are motivated by the goal of building compact and accurate speech recognition systems which can be run efficiently on mobile devices. In this work, we present a technique for general recurrent model compression that jointly compresses both recurrent and non-recurrent inter-layer weight matrices. We find that the proposed technique allows us to reduce the size of our Long Short-Term Memory (LSTM) acoustic model to a third of its original size with negligible loss in accuracy.
+Published in: 2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+Date of Conference: 20-25 March 2016
+Date Added to IEEE Xplore : 19 May 2016
+ISBN Information:
+Electronic ISSN: 2379-190X
+INSPEC Accession Number: 16021365
+DOI: 10.1109/ICASSP.2016.7472823
+Publisher: IEEE
+Conference Location: Shanghai, China
+1. Introduction
+
+Neural networks (NNs) with multiple feed-forward [1], [2] or recurrent hidden layers [3], [4] have emerged as state-of-the-art acoustic models (AMs) for automatic speech recognition (ASR) tasks. Advances in computational capabilities coupled with the availability of large annotated speech corpora have made it possible to train NN-based AMs with a large number of parameters [5] with great success.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+More Like This
+Advanced language model fusion method for encoder-decoder model in Japanese speech recognition
+
+2021 Asia-Pacific Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC)
+
+Published: 2021
+Listen, attend and spell: A neural network for large vocabulary conversational speech recognition
+
+2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)
+
+Published: 2016
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.

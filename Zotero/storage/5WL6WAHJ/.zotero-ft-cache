@@ -1,0 +1,194 @@
+
+JavaScript is disabled on your browser. Please enable JavaScript to use all the features on this page. Skip to main content Skip to article
+Elsevier logo ScienceDirect
+
+    Journals & Books 
+
+    Search 
+
+Register Sign in
+
+    Access through  your institution
+    Purchase PDF 
+
+Article preview
+
+    Abstract
+    Introduction
+    Section snippets
+    References (48)
+    Cited by (1) 
+
+Elsevier
+Expert Systems with Applications
+Volume 181 , 1 November 2021, 115180
+Expert Systems with Applications
+Evaluating deep learned voice compression for use in video games
+Author links open overlay panel Aidan Possemiers , Ickjai Lee 1
+Show more
+Add to Mendeley
+Share
+Cite
+https://doi.org/10.1016/j.eswa.2021.115180 Get rights and content
+Abstract
+
+In recent years video games have become one of the most popular entertainment mediums. This can partly be attributed to advances in computer graphics, and the availability, affordability and performance of hardware which have made modern video games the most realistic and immersive they have ever been. These games have a rich story with large open worlds, and a diverse cast of fully voice acted characters which also means that they take up large amounts of disk space. While a large percentage of this audio is sound effects and music, modern, character-driven, open world games contain multiple hours and many gigabytes of spoken voice audio. This paper examines how audio compression in video games poses distinctly different challenges than in telecommunications or archiving, the primary motivating factor that inspired audio compression systems currently used in video games. By evaluating new, deep learning based, methods of voice compression with video games in mind, we determine the criteria needed to be met for a new method to succeed current methods in measures of compression factor and quality at an acceptable level of algorithmic performance and what directions new research is needed to meet this criteria.
+Introduction
+
+The game, ‘Titanfall’ by Respawn entertainment, has had more than 10 million unique users worldwide (Respawn Entertainment, 2014). On release, PC players were shocked to find out that 35 GB, of the games’ 48 GB total file size, was raw uncompressed audio. At the time, in 2014, the most common CPU specifications made by Intel, had two cores and were clocked between 2.3 and 2.96 GHz (Valve Corperation, 2015). The developers had made a choice determining that the task of decompression was too computationally intensive to perform at runtime on the common hardware. Instead they chose to sacrifice disk space and shipped the game with the audio uncompressed. This created quite a stir as, while this meant performance gains, Solid State hard-Drives (SSDs) had just started to emerge on the market. While significantly faster than their spinning plater counterparts, high capacity drives were prohibitively expensive, meaning that the audio for Titanfall alone takes up more than a third of an 128 GB drive. This is a clear example of the need for compression, as not only did players need to download that data but that it would persistently take up that large amount of space.
+
+A more recent game ‘The Witcher 3: Wild Hunt’ by CD Projekt Red (CD Projeckt Red, 2015) which has sold more than 20 million copies worldwide, and requires an additional 2 GB download (per language) for voice audio alone. As the game was launched in 2016, and was a singleplayer game rather than a low latency requiring multiplayer game, it had the audio compressed using the Ogg/Vorbis codec (Xiph.Org Foundation, 2015). Uncompressed the size of this voice audio is over 20GBs. The Witcher 3 is an open world adventure game and CD Projekt Red has made a different decision than Remedy entertainment did with Titanfall. As there is a lot of other content, the total disk size for game is approximately 50 GB -including the compressed audio- and as digital distribution has become the main avenue for game sales (Statista, 2019), CD Projekt Red chose to compress the audio. This results in a much smaller file size but also comes at the cost of quality, as some details are lost during compression, as well as performance headroom, as the compressed audio must be decompressed at some point during runtime. System memory limitations -the average steam user has 8 GB of memory (Valve Corperation, 2015)- mean that only part of the total game audio can be decompressed in memory at a time. Hence developers have come up with clever performance balancing schemes based on factors like player location, voices files that ‘could’ be played, and current system loads. But what if they did not need to? Could a compression algorithm exist that: costs so little performance that it can easily run in parallel with the rest of the game; has a high compression factor to minimize storage and memory requirements; and yet, still produce high quality results?
+
+Ogg/Vorbis (Xiph.Org Foundation, 2015) has been the de facto audio compression algorithm for many games (Xiph.Org Foundation, 2018a) mostly due to its open source and patent-free nature, and its’ ‘acceptable’ levels of quality and performance. Most modern game engines, like Unreal Engine 4 (Epic Games, 2019), Game Maker Studio 2 (Yo Yo Games, 2019) and Unity (Unity Technologies, 2019), use it as their default audio compression algorithm. Vorbis has several parameters that can be tuned, and while it is up to the developer themselves to make the final decision on the quality/compression ratio balance, the default setting used in Unreal, Unity and Game Maker is q3 which results in a target Variable BitRate (VBR) range of approximately 112–160 kbps.
+
+Outside of games, Ogg/Opus (Valin, Vos, & Terriberry, 2012) has become the, open source, web standard for compression of streaming content being used in Voice Over Internet Protocol (VOIP) applications like Skype, Discord and Facebook Messenger, as well as, music and video streaming services like Spotify and YouTube. While we can look at the default engine settings with Vorbis, Opus is not readily used in engine and do not have a game related “default” setting. According to xiph.org’s “Opus Recommended Settings” webpage (Xiph.Org Foundation, 2018b) for “Music Storage”, the recommended bitrate setting is 96 kbps VBR which also aligns with some public subjective multiformat testing conducted in 2014 that places Opus above Vorbis at 96 kbps (coresv.net, 2014). While there would be a potential minor improvement in subjective quality/compression ratio improvement if developers switched from Vorbis to Opus, the improvement is not great enough to overcome the level of comfort developers have with using Vorbis.
+
+Recently, great strides have been made in audio processing through the use of deep learning. While research originally started as an extension of image classification networks, architectures like WaveNet (van den Oord et al., 2016) and SampleRNN (Mehri et al., 2017) have shown great promise for using deep learning neural networks for audio generation. The recent development of LPCNet (Valin & Skoglund, 2019a), a codec that claims subjectively better voice audio at 1.6 kbps when tested with to Opus at 6 kbps (Valin & Skoglund, 2019b) -while running faster than real-time on a consumer CPU- has opened the way for deep learning to become a viable candidate to be applied in video games.
+
+It is the intent of this study to situate LPCNet in the deep-learned voice compression literature, to identify why it is the best candidate over other deep-learned methods, and to compare it with the “traditional” non-deep learning methodologies; Vorbis and Opus. This is conducted by testing the three algorithms on a small, video-game representative, dataset and evaluating the results using objective measures that evaluate the algorithms’: performance cost; compression factor; and audio quality.
+
+The game industry has become one of mainstream markets in recent years, audio compression is of great importance in games. This paper investigates an intelligent and effective deep-learned voice compression using LPCNet for the game industry. The unique contributions of this paper are:
+
+    •
+
+    identification of the key areas where the audio compression requirements of video games deviate from transmission or storage;
+    •
+
+    reviewing the current and candidate techniques to be evaluated;
+    •
+
+    outline the dataset requirements to adequately test video game quality audio;
+    •
+
+    propose and perform objective performance measures on video game audio data;
+    •
+
+    provide initial results on off-the-shelf versions of the algorithms;
+    •
+
+    evaluate any gaps that need to be addressed;
+    •
+
+    and, outlining more detailed evaluation for future analysis.
+
+Section snippets
+Preliminaries
+
+In this section, we outline how the domain of voice compression in video games deviates from the typical cases of transmission and storage in that real-time performance must also be accounted for. Furthermore, we suggest some factors that to be studied objectively and subjectively to determine the quality of a compression algorithm by understanding how sounds are perceived. Finally, we explore how current algorithms and new classes of deep learning algorithms approach the factors important to
+Voice datasets for games
+
+In order to accurately determine a test environment for video games, we have to first outline what separates the game audio from the datasets that are currently being used for training/testing compression techniques. Firstly, games voice audio datasets are a finite set, meaning that, unlike when transmitting real-time spoken voice data, where any new unseen data could be provided to be compressed, at runtime of a game, all possible voice audio is already stored somewhere on disk. This means
+Literature review
+
+Psychoacoustics, time–frequency transformations, and quantization are the fundamental building blocks used for performing audio compression. The specific algorithms we will now discuss are split into two groups: “deep learned” and “non deep learned”. All currently used industry compression methods are non deep learned methods and will be addressed first. Deep learned refers to a new class of audio compression algorithm, based in deep learning neural networks, that has been emerging recently.
+Performance measurement
+
+In this section, we outline the metrics we will use to assess the viability of a voice compression system targeting video games. The first metric, compression ratio, is quite self explanatory. Compression ratio is calculated by dividing the compressed file size by the original file size (in bytes).
+
+Decompression cost is harder to measure as, unlike when doing performance testing in isolation and only having to worry about operating system noise, a games resource allocation and availability can
+Dataset
+
+The dataset for this pilot analysis features 8 voices (6 male and 2 female) performing five samples. The samples were recorded in a studio environment at a bit depth of 24bits with a 96 kHz sampling rate. Noise was removed, using spectral noise gating (Inouye, Blemker, & Inouye, 2014), and the samples are then normalised to −6.6 dB before being resampled to 16bit, 48 kHz for compression. Each of the samples are compressed using Vorbis (q3 and q-1), Opus (bitrate 96, 24 and 6) and LPCNet. LPCNet
+Conclusion
+
+Audio compression is of great importance in the game industry as the size of audio grows at an unprecedented rate. This paper investigates a deep-learned audio compression approach using LPCNet that outperforms non deep-learned traditional approaches. This study includes a generation of studio recorded uncompressed dataset for adequate performance measure in order to overcome the lack of existing data for testing. In addition, this study proposes objective performance measures and provides
+CRediT authorship contribution statement
+
+Aidan Possemiers: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing - original draft, Visualization. Ickjai Lee: Writing - review & editing, Formal analysis, Supervision, Project administration.
+Declaration of Competing Interest
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Acknowledgements
+
+Special thanks go to 2Bit Studios (2bitstudios.com.au) for kindly donating the uncompressed, game quality, voice audio data used in this research.
+Research data for this article
+Data not available / Data will be made available on request
+Further information on research data
+References (48)
+
+    A.E. Mahdi et al.
+    Advances in voice quality measurement in modern telecommunications
+    Digital Signal Processing
+    (2009)
+    M. Papakostas et al.
+    Speech-music discrimination using deep visual feature extractors
+    Expert Systems with Applications
+    (2018)
+    M.N. Rastgoo et al.
+    Automatic driver stress level classification using multimodal deep learning
+    Expert Systems with Applications
+    (2019)
+    E. Sejdić et al.
+    Time–frequency feature representation using energy concentration: An overview of recent advances
+    Digital Signal Processing
+    (2009)
+    P. Vecchiotti et al.
+    Detection of activity and position of speakers by using deep neural networks and acoustic data augmentation
+    Expert Systems with Applications
+    (2019)
+    S. Amada et al.
+    Experimental evaluation of wavernn predictor for audio lossless coding
+    B.S. Atal et al.
+    Speech analysis and synthesis by linear prediction of the speech wave
+    The Journal of the Acoustical Society of America
+    (1971)
+    J.G. Beerends et al.
+    Perceptual objective listening quality assessment (polqa), the third generation itu-t standard for end-to-end speech quality measurement part ii–perceptual model
+    Journal of the Audio Engineering Society
+    (2013)
+    B. Bessette et al.
+    The adaptive multirate wideband speech codec (amr-wb)
+    IEEE Transactions on Speech and Audio Processing
+    (2002)
+    Bethesda Game Studios, (2011). The Elder Scrolls V: Skyrim.... 
+
+View more references
+Cited by (1)
+
+    Fault Diagnosis of Wind Turbine Bearings Based on CNN and SSA–ELM
+    2022, Journal of Vibration Engineering and Technologies
+
+1
+
+    https://orcid.org/0000-0002-6886-6201
+
+View full text
+© 2021 Elsevier Ltd. All rights reserved.
+Recommended articles
+
+    Best-Worst method and Hamacher aggregation operations for intuitionistic 2-tuple linguistic sets
+    Expert Systems with Applications, Volume 181, 2021, Article 115088
+    Shahzad Faizi , …, Jarosław Wątróbski
+    Intern retrieval from community question answering websites: A new variation of expert finding problem
+    Expert Systems with Applications, Volume 181, 2021, Article 115044
+    Peyman Rostami , Mahmood Neshati
+    Discriminant Spatial Filtering Method (DSFM) for the identification and analysis of abnormal resting state brain activities
+    Expert Systems with Applications, Volume 181, 2021, Article 115074
+    Abhay M.S. Aradhya , …, Narasimhan Sundararajan
+
+Show 3 more articles
+Article Metrics
+Citations
+
+    Citation Indexes: 1 
+
+Captures
+
+    Readers: 13 
+
+plumX logo
+View details
+Elsevier logo with wordmark
+
+    About ScienceDirect
+    Remote access
+    Shopping cart
+    Advertise
+    Contact and support
+    Terms and conditions
+    Privacy policy 
+
+We use cookies to help provide and enhance our service and tailor content and ads. By continuing you agree to the use of cookies .
+
+All content on this site: Copyright © 2023 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the Creative Commons licensing terms apply.
+RELX group home page

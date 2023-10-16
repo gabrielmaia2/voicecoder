@@ -9,7 +9,7 @@
 	"configOptions": {
 		"async": true,
 		"getCollections": true,
-		"hash": "e5f6499588f20d9189bbc0ccd755eb09f4648a6866b2c3a004e577c51478b670"
+		"hash": "516ab5fd73e2044b4f3cd0c695952e00a2c86749f8a5535a8e55b43080dd1b9a"
 	},
 	"displayOptions": {
 		"exportNotes": true,
@@ -22,7 +22,7 @@
 	"browserSupport": "gcsv",
 	"priority": 49,
 	"inRepository": false,
-	"lastUpdated": "2023-09-22"
+	"lastUpdated": "2023-10-10"
 }
 
 ZOTERO_CONFIG = {"GUID":"zotero@chnm.gmu.edu","ID":"zotero","CLIENT_NAME":"Zotero","DOMAIN_NAME":"zotero.org","PRODUCER":"Digital Scholar","PRODUCER_URL":"https://digitalscholar.org","REPOSITORY_URL":"https://repo.zotero.org/repo/","BASE_URI":"http://zotero.org/","WWW_BASE_URL":"https://www.zotero.org/","PROXY_AUTH_URL":"https://zoteroproxycheck.s3.amazonaws.com/test","API_URL":"https://api.zotero.org/","STREAMING_URL":"wss://stream.zotero.org/","SERVICES_URL":"https://services.zotero.org/","API_VERSION":3,"CONNECTOR_MIN_VERSION":"5.0.39","PREF_BRANCH":"extensions.zotero.","BOOKMARKLET_ORIGIN":"https://www.zotero.org","BOOKMARKLET_URL":"https://www.zotero.org/bookmarklet/","START_URL":"https://www.zotero.org/start","QUICK_START_URL":"https://www.zotero.org/support/quick_start_guide","PDF_TOOLS_URL":"https://www.zotero.org/download/xpdf/","SUPPORT_URL":"https://www.zotero.org/support/","SYNC_INFO_URL":"https://www.zotero.org/support/sync","TROUBLESHOOTING_URL":"https://www.zotero.org/support/getting_help","FEEDBACK_URL":"https://forums.zotero.org/","CONNECTORS_URL":"https://www.zotero.org/download/connectors","CHANGELOG_URL":"https://www.zotero.org/support/changelog","CREDITS_URL":"https://www.zotero.org/support/credits_and_acknowledgments","LICENSING_URL":"https://www.zotero.org/support/licensing","GET_INVOLVED_URL":"https://www.zotero.org/getinvolved","DICTIONARIES_URL":"https://download.zotero.org/dictionaries/"}
@@ -55,7 +55,7 @@ var { detectImport, doExport, doImport } = (() => {
   // gen/version.js
   var require_version = __commonJS({
     "gen/version.js"(exports, module) {
-      module.exports = "6.7.122";
+      module.exports = "6.7.124";
     }
   });
 
@@ -112,6 +112,7 @@ var { detectImport, doExport, doImport } = (() => {
     importBibTeXStrings: true,
     importCaseProtection: "as-needed",
     importCitationKey: true,
+    importDetectURLs: true,
     importExtra: true,
     importJabRefAbbreviations: true,
     importJabRefStrings: true,

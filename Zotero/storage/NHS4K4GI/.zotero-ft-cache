@@ -1,0 +1,124 @@
+IEEE websites place cookies on your device to give you the best user experience. By using our websites, you agree to the placement of these cookies. To learn more, read our Privacy Policy.
+Accept & Close
+Skip to Main Content
+
+    IEEE.org
+    IEEE Xplore
+    IEEE SA
+    IEEE Spectrum
+    More Sites 
+
+Subscribe
+
+        Cart 
+        Create Account
+        Personal Sign In 
+
+IEEE Xplore logo - Link to home
+
+    Browse
+    My Settings
+    Help
+
+Institutional Sign In
+IEEE logo - Link to IEEE main site homepage
+ADVANCED SEARCH
+Conferences > 2011 3rd International Confer...
+Speech recognition using Radial Basis Function neural network
+Publisher: IEEE
+Cite This
+PDF
+R. L. K. Venkateswarlu ; R. Vasantha Kumari ; G. Vani Jayasri
+All Authors
+6
+Cites in
+Papers
+495
+Full
+Text Views
+
+    Alerts
+
+Abstract
+Document Sections
+
+    I.
+    INTRODUCTION
+    II.
+    SYSTEM CONCEPT
+    III.
+    FEATURE EXTRACTION
+    IV.
+    RECOGNITION METHODOLOGY
+    V.
+    CLASSIFIERS
+
+Show Full Outline
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Abstract:
+In this paper a novel approach for implementing isolated speech recognition is studied. While most of the literature on speech recognition (SR) is based on hidden Markov model (HMM), the present system is implemented by Radial Basis Function type neural network. The two phases of training and testing in a Radial Basis Function type neural network has been described. All of classifiers use Linear Predictive Cepstral Coefficients. It is found that the performance of Radial Basis Function type neural networks is superior to the other classifier Multilayer Perceptron Neural Networks. The promising results obtained through this design show that this new neural networks approach can compete with the traditional speech recognition approaches. Promising results are obtained both in the training and testing phases due to the exploitation of discriminative information with neural networks. It is found that RBF trains and tests faster than MLP.
+Published in: 2011 3rd International Conference on Electronics Computer Technology
+Date of Conference: 08-10 April 2011
+Date Added to IEEE Xplore : 07 July 2011
+ISBN Information:
+INSPEC Accession Number: 12096548
+DOI: 10.1109/ICECTECH.2011.5941788
+Publisher: IEEE
+Conference Location: Kanyakumari, India
+I. INTRODUCTION
+
+Automatic speech recognition has been an active research topic for more than five decades. With the advent of digital computing and signal processing, the problem of speech recognition was clearly posed and thoroughly studied. These developments were complemented with an increased awareness of the advantages of conversational systems. The range of the possible applications is wide and includes: voice-controlled appliances, fully featured speech-to-text software, automation of operator-assisted services, and voice recognition aids for the handicapped.
+Sign in to Continue Reading
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+A hybrid radial basis function network/hidden Markov model handwritten word recognition system
+
+Proceedings of 3rd International Conference on Document Analysis and Recognition
+
+Published: 1995
+Fault Tolerance Comparison of IDS Models with Multilayer Perceptron and Radial Basis Function Networks
+
+2007 International Joint Conference on Neural Networks
+
+Published: 2007
+Show More
+References
+References is not available for this document.
+IEEE Personal Account
+
+    Change username/password 
+
+Purchase Details
+
+    Payment Options
+    View Purchased Documents 
+
+Profile Information
+
+    Communications Preferences
+    Profession and Education
+    Technical interests 
+
+Need Help?
+
+    US & Canada: +1 800 678 4333
+    Worldwide: +1 732 981 0060
+    Contact & Support 
+
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A not-for-profit organization, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2023 IEEE - All rights reserved.
